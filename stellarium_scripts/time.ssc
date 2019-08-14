@@ -1,0 +1,112 @@
+//
+// Author: Brian W. Mulligan
+// Version: 1.0
+// License: GPL v3.0
+// Name: Solar Time
+// Description: A demonstration of the relation between clock and solar time
+//
+
+include("i18n.inc");
+include("save_state.inc");
+
+function do_time(timeRelNoon)
+{
+	var hour = timeRelNoon + 18;
+	var fullDate = "2019-04-15T";
+	if (hour < 10)
+		fullDate = fullDate + "0";
+	fullDate = fullDate + hour + ":00:00";
+	core.setDate(fullDate, "utc");
+	core.wait(0.25);
+	var info = core.getObjectInfo("Sun");
+	var az = info.azimuth;
+	var alt = info.altitude;
+	MarkerMgr.markerHorizon(az, alt, true, "gear", mrkrColor, 5);
+	alt = alt - 10;	
+	var labelText;
+	if (timeRelNoon == 0)
+		labelText = "noon";
+	else if (timeRelNoon == -12 || timeRelNoon == 12)
+		labelText = "midnight";
+	else if (timeRelNoon > 0)
+		labelText = timeRelNoon + " pm";
+	else //if (timeRelNoon < 0)
+		labelText = (timeRelNoon + 12) + " am";
+	LabelMgr.labelHorizon(labelText, az, alt, true, 20, color);
+	core.wait(0.5);
+}
+
+
+core.goHome();
+//var meteorOn = SporadicMeteorMgr.getFlagShow();
+saveState("pre-time-demo");
+
+
+//var JD = core.getJDay();
+var color = "#aa0000";
+var mrkrColor = "#ff0000";
+
+//var planetsOn = SolarSystem.setFlagPlanets(false);
+//var labelsOn = SolarSystem.setFlagLabels(false);
+//var starsOn = StarMgr.setFlagStars(false);
+//var projectionMode = core.getProjectionMode();
+//var cardinalLabelsOn = LandscapeMgr.getFlagCardinalsPoints();
+//var observerLocation = core.getObserverLocation();
+
+core.setGuiVisible(false);
+core.clear("natural");
+core.setProjectionMode("ProjectionCylinder");
+core.setObserverLocation(-90, 30, 0, 1, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
+core.setDate("2019-04-15T18:00:00", "utc");
+SolarSystem.setFlagPlanets(true);
+SolarSystem.setFlagLabels(false);
+LandscapeMgr.setFlagCardinalsPoints(true);
+
+LabelMgr.labelScreen(tr("Time & The Sun"), 20, 20, true, 30, color);
+LabelMgr.labelScreen(tr("N30°00'00\" W90°00'00\""), 20, 50, true, 30, color);
+LabelMgr.labelScreen(tr("15 Apr 2019"), 20, 80, true, 30, color);
+core.selectObjectByName("Sun", false);
+StelMovementMgr.setFlagTracking(false);
+StelMovementMgr.lookSouth(true);
+StelMovementMgr.zoomTo(360, 3);
+core.wait(5);
+GridLinesMgr.setFlagAzimuthalGrid(true);
+core.wait(5);
+//GridLinesMgr.setFlagMeridianLine(true);
+//core.wait(5);
+
+// set time to noon on Apr 15 (so EoT = 0 min)
+core.setDate("2019-04-15T18:00:00", "utc");
+core.wait(1);
+
+for (timeRelNoon = 0; timeRelNoon <= 6; timeRelNoon++)
+{
+	do_time(timeRelNoon);
+}
+core.wait(5);
+core.setDate("2019-04-15T18:00:00", "utc");
+core.wait(0.5);
+for (timeRelNoon = -1; timeRelNoon >= -6; timeRelNoon--)
+{
+	do_time(timeRelNoon);
+}
+core.wait(5);
+
+SolarSystem.setFlagPlanets(false);
+SolarSystem.setFlagLabels(false);
+StarMgr.setFlagStars(false);
+//core.wait(60);
+LabelMgr.deleteAllLabels();
+MarkerMgr.deleteAllMarkers();
+//StarMgr.setFlagStars(starsOn);
+//SolarSystem.setFlagPlanets(planetsOn);
+//SolarSystem.setFlagLabels(labelsOn);
+//LandscapeMgr.setFlagCardinalsPoints(cardinalLabelsOn);
+//core.setObserverLocation(observerLocation);
+//core.setProjectionMode(projectionMode);
+restoreState("pre-time-demo");
+core.clear("natural");
+//core.setJDay(JD);
+core.goHome();
+core.setGuiVisible(true);
+

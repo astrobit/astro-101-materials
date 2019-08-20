@@ -12,7 +12,8 @@ function addLeadingZero(value)
 	var ret;
 	if (value != undefined)
 	{
-		if (value.isInteger())
+		var varLcl = Number(value);
+		if (!isNaN(varLcl))
 		{
 			var absVal = Math.abs(value);
 			if (absVal < 10)

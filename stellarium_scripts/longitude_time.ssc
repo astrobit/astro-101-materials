@@ -1,0 +1,141 @@
+//
+// Author: Brian W. Mulligan
+// Version: 1.0
+// License: GPL v3.0
+// Name: Solar Time
+// Description: A demonstration of the relation between longitude and the zone time. Uses noon at W90° as fixed time, and moves wesward to Austin, TX (~W97'), displaying a marker for every 1° of movement in longitude; then moves further westward to San Diego, CA (~W117). Finally advances time, showing the the sun stays along the same path.
+//
+
+include("i18n.inc");
+include("save_state.inc");
+include("basicDisplay.inc");
+include("addLeadingZero.inc");
+
+
+core.goHome();
+//var meteorOn = SporadicMeteorMgr.getFlagShow();
+saveState("long-time-demo");
+
+
+//var JD = core.getJDay();
+var color = "#aa0000";
+var mrkrColor = "#ff0000";
+
+//var planetsOn = SolarSystem.setFlagPlanets(false);
+//var labelsOn = SolarSystem.setFlagLabels(false);
+//var starsOn = StarMgr.setFlagStars(false);
+//var projectionMode = core.getProjectionMode();
+//var cardinalLabelsOn = LandscapeMgr.getFlagCardinalsPoints();
+//var observerLocation = core.getObserverLocation();
+
+core.setGuiVisible(false);
+core.clear("natural");
+core.setTimezone("UTC-06:00");
+core.setObserverLocation(-90.0000000, 30.26666667, 0, 1, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
+core.setTimeRate(0); // pause time
+
+core.setDate("2019-04-15T18:00:00", "utc");
+SolarSystem.setFlagPlanets(true);
+SolarSystem.setFlagLabels(false);
+LandscapeMgr.setFlagCardinalsPoints(true);
+
+var display =  Object.create(basicDisplay);
+display.textTitle = "Time, Longitude, & The Sun";
+display.display();
+
+core.selectObjectByName("Sun", false);
+StelMovementMgr.setFlagTracking(false);
+
+GridLinesMgr.setFlagAzimuthalGrid(false);
+StelMovementMgr.lookSouth(true);
+//core.wait(2);
+for (panStep = 0; panStep < 128; panStep++)
+{
+	StelMovementMgr.panView(0,0.5282529869 / 128.0);
+	core.wait(3.0 / 128.0);
+}
+core.wait(1);
+StelMovementMgr.zoomTo(90, 3);
+core.wait(5);
+
+var last_long = -1000.0;
+var curr_long = -90.0;
+for (longitude = -90.0; longitude >= -97.73333333; longitude-=0.25)
+{
+	core.setObserverLocation(longitude, 30.26666667, 0, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
+	core.wait(0.25);
+	curr_long = longitude;
+	display.display();
+	if (Math.abs(longitude - last_long) > 5.0)
+	{
+		last_long = longitude;
+		var info = core.getObjectInfo("Sun");
+		var az = info.azimuth;
+		var alt = info.altitude;
+		MarkerMgr.markerHorizon(az, alt, true, "circle", mrkrColor, 10);
+		alt = alt - 3;
+		var markerLong = Math.floor(Math.abs(longitude));
+		var labelLongMarker = "";
+		if (markerLong < 10)
+			labelLongMarker = "0";
+		labelLongMarker = labelLongMarker + markerLong;
+		LabelMgr.labelHorizon(labelLongMarker, az, alt, true, 20, color);
+	}
+}
+core.wait(5.0);
+for (longitude = curr_long; longitude >= -117.1611; longitude-=0.25)
+{
+	core.setObserverLocation(longitude, 30.26666667, 0, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
+	core.wait(0.25);
+	display.display();
+	if (Math.abs(longitude - last_long) > 1.0)
+	{
+		last_long = longitude;
+		var info = core.getObjectInfo("Sun");
+		var az = info.azimuth;
+		var alt = info.altitude;
+		MarkerMgr.markerHorizon(az, alt, true, "circle", mrkrColor, 10);
+		alt = alt - 3;
+		var markerLong = Math.floor(Math.abs(longitude));
+		var labelLongMarker = "";
+		if (markerLong < 10)
+			labelLongMarker = "0";
+		labelLongMarker = labelLongMarker + markerLong;
+		LabelMgr.labelHorizon(labelLongMarker, az, alt, true, 20, color);
+	}
+}
+core.wait(5);
+var lastTime = -2;
+for (currTime = 0; currTime <= 1.84; currTime+=0.25)
+{
+	core.setDate("+15 minutes");
+	core.wait(1.0);
+	display.display();
+	if (Math.abs(currTime - lastTime) > 1.0)
+	{
+		lastTime = currTime;
+		var info = core.getObjectInfo("Sun");
+		var az = info.azimuth;
+		var alt = info.altitude;
+		MarkerMgr.markerHorizon(az, alt, true, "gear", mrkrColor, 10);
+	}
+}
+core.wait(5);
+SolarSystem.setFlagPlanets(false);
+SolarSystem.setFlagLabels(false);
+StarMgr.setFlagStars(false);
+//core.wait(60);
+LabelMgr.deleteAllLabels();
+MarkerMgr.deleteAllMarkers();
+//StarMgr.setFlagStars(starsOn);
+//SolarSystem.setFlagPlanets(planetsOn);
+//SolarSystem.setFlagLabels(labelsOn);
+//LandscapeMgr.setFlagCardinalsPoints(cardinalLabelsOn);
+//core.setObserverLocation(observerLocation);
+//core.setProjectionMode(projectionMode);
+core.clear("natural");
+restoreState("long-time-demo");
+//core.setJDay(JD);
+core.goHome();
+core.setGuiVisible(true);
+

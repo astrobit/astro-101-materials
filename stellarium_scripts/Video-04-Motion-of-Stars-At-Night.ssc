@@ -1,0 +1,135 @@
+//
+// Author: Brian W. Mulligan
+// Version: 1.0
+// License: GPL v3.0
+// Name: Daily motion of stars
+// Description: A demonstration of how a star (Denebola) moves across the sky over the course of a night.
+//
+
+include("i18n.inc");
+include("save_state.inc");
+include("basicDisplay.inc");
+include("addLeadingZero.inc");
+
+//
+// move to "home" position, then save state of stellarium
+core.goHome();
+saveState("pre-night-sky-1-demo");
+core.setTimezone("UTC-06:00");
+core.setTimeRate(0); // pause time
+
+var color = "#aa0000";
+var mrkrColor = "#ff0000";
+
+// remove GUI, set desired starting position
+core.setGuiVisible(false);
+MarkerMgr.deleteAllMarkers();
+core.clear("natural");
+//core.setProjectionMode("ProjectionCylinder");
+core.setObserverLocation(-90, 30.2666667, 200, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
+core.setDate("2019-04-01T01:00:00", "utc");
+// turn on planets, turn off planet labels
+SolarSystem.setFlagPlanets(true);
+SolarSystem.setFlagLabels(false);
+// turn on cardinal points
+LandscapeMgr.setFlagCardinalsPoints(true);
+LandscapeMgr.setFlagAtmosphere(true);
+core.wait(0.5);
+
+var display =  Object.create(basicDisplay);
+display.textTitle = "Time & The Night Sky";
+display.display();
+StelMovementMgr.setFlagTracking(false);
+GridLinesMgr.setFlagAzimuthalGrid(false);
+GridLinesMgr.setFlagEquatorGrid (false);
+var labelBottom = LabelMgr.labelScreen("Looking southward in Austin, TX at 7 pm CST",300,800,true,20,"#ffff00",true,1500);
+StelMovementMgr.lookSouth(true);
+StelMovementMgr.zoomTo(360, 3);
+core.wait(5);
+
+core.selectObjectByName("Denebola", true);
+LabelMgr.setLabelText(labelBottom,"This is the star Denebola, we will follow it over the course of a night.");
+LabelMgr.setLabelShow(labelBottom,true);
+
+var info = core.getObjectInfo("Denebola");
+var az = info.azimuth;
+var alt = info.altitude;
+
+core.wait(1.5);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1);
+
+core.setTimeRate(900.0); //speed up time
+for (time = 0; time < 64; time++)
+{
+	display.display();
+	if ((time % 8) == 0)
+	{
+		var info = core.getObjectInfo("Denebola");
+		var az = info.azimuth;
+		var alt = info.altitude;
+		MarkerMgr.markerHorizon(az, alt, true, "circle", mrkrColor, 10);
+	}
+	switch (time)
+	{
+	case 8:
+		LabelMgr.setLabelText(labelBottom,"Denebola (and everything else in the sky) move from east to west, just like the Sun.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 16:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 24:
+		LabelMgr.setLabelText(labelBottom,"Stars move at the same rate across the sky. It takes about an hour for their hour angle to change.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 32:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 40:
+		LabelMgr.setLabelText(labelBottom,"The amount of time they are visible depends on how far north or south they are in they sky.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 48:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	}
+
+	core.wait(0.5);
+}
+core.setTimeRate(0.0); //pause time
+
+LabelMgr.setLabelText(labelBottom,"If we pan down by 30° (the latitude at Austin), we can see that the path that Denebola takes is a circle.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(1);
+for (panStep = 0; panStep < 128; panStep++)
+{
+	StelMovementMgr.panView(0,-0.5282529869 / 128.0);
+	core.wait(5.0 / 128.0);
+}
+GridLinesMgr.setFlagEquatorGrid (true);
+core.wait(5);
+LabelMgr.setLabelShow(labelBottom,false);
+
+
+MarkerMgr.deleteAllMarkers();
+
+SolarSystem.setFlagPlanets(false);
+SolarSystem.setFlagLabels(false);
+StarMgr.setFlagStars(false);
+//core.wait(60);
+LabelMgr.deleteAllLabels();
+MarkerMgr.deleteAllMarkers();
+//StarMgr.setFlagStars(starsOn);
+//SolarSystem.setFlagPlanets(planetsOn);
+//SolarSystem.setFlagLabels(labelsOn);
+//LandscapeMgr.setFlagCardinalsPoints(cardinalLabelsOn);
+//core.setObserverLocation(observerLocation);
+//core.setProjectionMode(projectionMode);
+core.clear("natural");
+restoreState("pre-night-sky-1-demo");
+//core.setJDay(JD);
+core.setTimeRate(1.0); // pause time
+core.goHome();
+core.setGuiVisible(true);
+

@@ -2,8 +2,8 @@
 // Author: Brian W. Mulligan
 // Version: 1.0
 // License: GPL v3.0
-// Name: Longitude & Zone Time
-// Description: A demonstration of how the Sun moves across the sky over the course of a day. Uses April 15 to reduce the equation of time to about 0.
+// Name: The Sun at "noon"
+// Description: A demonstration of the sun at local noon (clock time) over the course of a year; demonstrating the analemma.
 //
 
 include("i18n.inc");
@@ -11,39 +11,11 @@ include("save_state.inc");
 include("basicDisplay.inc");
 include("addLeadingZero.inc");
 
-
-
-function do_time(display, year,month,day,timeRelNoon)
-{
-	var hour = timeRelNoon + 18;
-	var fullDate = year + "-" + addLeadingZero(month) + "-" + addLeadingZero(day) + "T";
-	fullDate = fullDate + addLeadingZero(hour) + ":00:00";
-	//core.output("do_time: " + fullDate);
-	core.setDate(fullDate, "utc");
-	core.wait(0.25);
-	display.display();
-	var info = core.getObjectInfo("Sun");
-	var az = info.azimuth;
-	var alt = info.altitude;
-	MarkerMgr.markerHorizon(az, alt, true, "circle", mrkrColor, 10);
-	alt = alt - 10;	
-	var labelText;
-	if (timeRelNoon == 0)
-		labelText = "noon";
-	else if (timeRelNoon == -12 || timeRelNoon == 12)
-		labelText = "midnight";
-	else if (timeRelNoon > 0)
-		labelText = timeRelNoon + " pm";
-	else //if (timeRelNoon < 0)
-		labelText = (timeRelNoon + 12) + " am";
-	LabelMgr.labelHorizon(labelText, az, alt, true, 20, color);
-	core.wait(0.5);
-}
 //
 // move to "home" position, then save state of stellarium
 core.goHome();
-saveState("pre-time-demo");
-
+saveState("pre-analemma-demo");
+core.setTimezone("UTC-06:00");
 
 var color = "#aa0000";
 var mrkrColor = "#ff0000";
@@ -51,11 +23,10 @@ var mrkrColor = "#ff0000";
 // remove GUI, set desired starting position
 core.setGuiVisible(false);
 core.clear("natural");
-core.setTimezone("UTC-06:00");
-core.setProjectionMode("ProjectionStereographic");
-
+//core.setProjectionMode("ProjectionCylinder");
 core.setObserverLocation(-90, 30.2666667, 200, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
-core.setDate("2019-04-15T12:00:00", "utc");
+core.setDate("2019-04-15T18:00:00", "utc");
+core.setTimeRate(0); // pause time
 // turn on planets, turn off planet labels
 SolarSystem.setFlagPlanets(true);
 SolarSystem.setFlagLabels(false);
@@ -64,30 +35,42 @@ LandscapeMgr.setFlagCardinalsPoints(true);
 core.wait(0.5);
 
 var display =  Object.create(basicDisplay);
-display.textTitle = "Time & The Sun";
+display.textTitle = "The Sun at \"noon\"";
 display.display();
 core.selectObjectByName("Sun", false);
 StelMovementMgr.setFlagTracking(false);
-
-GridLinesMgr.setFlagAzimuthalGrid(false);
 StelMovementMgr.lookSouth(true);
-//core.wait(2);
 for (panStep = 0; panStep < 128; panStep++)
 {
 	StelMovementMgr.panView(0,-0.5282529869 / 128.0);
 	core.wait(5.0 / 128.0);
 }
-core.wait(1);
-StelMovementMgr.zoomTo(360, 3);
-core.wait(5);
 
-for (timeRelNoon = -6; timeRelNoon <= 6; timeRelNoon++)
-{
-	do_time(display,2019,4,15,timeRelNoon);
-}
+StelMovementMgr.zoomTo(270, 3);
 core.wait(5);
+GridLinesMgr.setFlagAzimuthalGrid(false);
 GridLinesMgr.setFlagEquatorGrid (true);
 core.wait(5);
+
+for (timeYear = 0; timeYear < 365; timeYear = timeYear + 3)
+{
+	core.setDate("+3 days");
+	display.display();
+	var info = core.getObjectInfo("Sun");
+	var az = info.azimuth;
+	var alt = info.altitude;
+	MarkerMgr.markerHorizon(az, alt, true, "circle", mrkrColor, 5);
+	core.wait(0.25);
+}
+core.wait(1);
+StarMgr.setFlagStars(false);
+SolarSystem.setFlagPlanets(false);
+LandscapeMgr.setFlagAtmosphere(false);
+core.wait(15);
+//core.setProjectionMode("ProjectionStereographic");
+//GridLinesMgr.setFlagAzimuthalGrid(false);
+//GridLinesMgr.setFlagEquatorGrid (true);
+//core.wait(15);
 
 
 SolarSystem.setFlagPlanets(false);
@@ -103,7 +86,7 @@ MarkerMgr.deleteAllMarkers();
 //core.setObserverLocation(observerLocation);
 //core.setProjectionMode(projectionMode);
 core.clear("natural");
-restoreState("pre-time-demo");
+restoreState("pre-analemma-demo");
 //core.setJDay(JD);
 core.goHome();
 core.setGuiVisible(true);

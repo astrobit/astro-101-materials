@@ -1,0 +1,122 @@
+//
+// Author: Brian W. Mulligan
+// Version: 1.0
+// License: GPL v3.0
+// Name: Sun & The Seasons
+// Description: A demonstration of the how the Sun appears higher and lower in the sky in different seasons. Set at W90 N30°16', uses UTC-6 for timezone
+//
+
+include("i18n.inc");
+include("save_state.inc");
+include("basicDisplay.inc");
+include("addLeadingZero.inc");
+
+
+core.goHome();
+saveState("sunSeasons-demo");
+core.setTimezone("UTC-06:00");
+
+core.setGuiVisible(false);
+core.clear("natural");
+core.setObserverLocation(-90, 30.2666667, 200, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
+core.setDate("2019-03-21T12:00:00", "utc");
+core.setTimeRate(0); // pause time
+core.selectObjectByName("Sun", false);
+StelMovementMgr.setFlagTracking(false);
+core.wait(1);
+var display =  Object.create(basicDisplay);
+display.textTitle = "The Sun's path in different seasons";
+display.display();
+
+GridLinesMgr.setFlagAzimuthalGrid(false);
+StelMovementMgr.lookSouth(true);
+SolarSystem.setFlagPlanets(true);
+SolarSystem.setFlagLabels(false);
+LandscapeMgr.setFlagCardinalsPoints(true);
+core.wait(1);
+//core.wait(2);
+for (panStep = 0; panStep < 128; panStep++)
+{
+	StelMovementMgr.panView(0,-0.5282529869 / 128.0);
+	core.wait(3.0 / 128.0);
+}
+core.wait(1);
+StelMovementMgr.zoomTo(240, 3);
+core.wait(5);
+
+for (date = 1; date <= 4; date++)
+{
+	var month = date * 3;
+	var datefull;
+
+	if (month < 10)
+		datefull="2019-0"+month+"-21T12:00:00";
+	else
+		datefull="2019-"+month+"-21T12:00:00";
+
+	core.setDate(datefull, "utc");
+	core.wait(0.25);
+	display.display();
+	var dateverbose;
+	var mrkrColor;
+	if (month == 3)
+	{
+		mrkrColor = "#0000ff";
+		dateverbose = "March 21";
+	}
+	else if (month == 6)
+	{
+		mrkrColor = "#ff0000";
+		dateverbose = "June 21";
+	}
+	else if (month == 9)
+	{
+		mrkrColor = "#ffff00";
+		dateverbose = "Sept. 21";
+	}
+	else if (month == 12)
+	{
+		mrkrColor = "#ffffff";
+		dateverbose = "Dec. 21";
+	}
+
+	for (i=0; i<=12; i++)
+	{
+		var hour = 6 + i;
+		var clockhour = hour % 12;
+		if (i != 0)
+		{
+			core.setDate("+1 hour");
+		}
+		core.wait(0.25);
+		info = core.getObjectInfo("Sun");
+		display.display();
+		az = info.azimuth;
+		alt = info.altitude;
+		MarkerMgr.markerHorizon(az, alt, true, "circle", mrkrColor, 10);    
+		if (hour == 12)
+		{
+			var ang = alt - 7.5;
+			if (month == 9) // shift sept down so it doesn't overlap march
+				ang = ang - 7.5;
+			LabelMgr.labelHorizon(dateverbose, az, ang, true, 20, mrkrColor);
+		}
+
+		core.wait(0.25);    
+	}
+	core.wait(2);
+}
+core.wait(15);
+GridLinesMgr.setFlagEquatorGrid (true);
+SolarSystem.setFlagPlanets(false);
+SolarSystem.setFlagLabels(false);
+StarMgr.setFlagStars(false);
+core.wait(5);
+
+LabelMgr.deleteAllLabels();
+MarkerMgr.deleteAllMarkers();
+core.clear("natural");
+restoreState("sunSeasons-demo");
+core.goHome();
+core.setGuiVisible(true);
+

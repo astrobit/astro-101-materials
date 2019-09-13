@@ -1,0 +1,124 @@
+//
+// Author: Brian W. Mulligan
+// Version: 1.0
+// License: GPL v3.0
+// Name: Circumpolas Stars
+// Description: A demonstration of how a circumpolar star moves across the sky over the course of a day.
+//
+
+include("i18n.inc");
+include("save_state.inc");
+include("basicDisplay.inc");
+include("addLeadingZero.inc");
+
+
+
+//
+// move to "home" position, then save state of stellarium
+core.goHome();
+saveState("pre-night-sky-1-demo");
+core.setTimeRate(0); // pause time
+
+var color = "#aa0000";
+var mrkrColor = "#ff0000";
+
+// remove GUI, set desired starting position
+core.setGuiVisible(false);
+core.clear("natural");
+core.setTimezone("UTC-06:00");
+//core.setProjectionMode("ProjectionCylinder");
+core.setObserverLocation(-90, 30.2666667, 200, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
+core.setDate("2019-04-15T01:00:00", "utc");
+// turn on planets, turn off planet labels
+SolarSystem.setFlagPlanets(true);
+SolarSystem.setFlagLabels(false);
+// turn on cardinal points
+LandscapeMgr.setFlagCardinalsPoints(true);
+LandscapeMgr.setFlagAtmosphere(true);
+core.wait(2.0);
+
+
+var display =  Object.create(basicDisplay);
+display.textTitle = "Time & The Night Sky, pt 4 -- Circumpolar Stars";
+display.display();
+core.setProjectionMode("ProjectionStereographic");
+StelMovementMgr.setFlagTracking(false);
+StelMovementMgr.lookSouth(true);
+for (panStep = 0; panStep < 128; panStep++)
+{
+	StelMovementMgr.panView(3.14159265 / 128.0,0);
+	core.wait(5.0 / 128.0);
+}
+for (panStep = 0; panStep < 128; panStep++)
+{
+	StelMovementMgr.panView(0,0.5282529869 / 128.0);
+	core.wait(5.0 / 128.0);
+}
+StelMovementMgr.zoomTo(90, 3);
+LandscapeMgr.setFlagAtmosphere(true);
+core.wait(5);
+//GridLinesMgr.setFlagAzimuthalGrid(true);
+//core.wait(5);
+
+var info = core.getObjectInfo("Kochab");
+var az = info.azimuth;
+var alt = info.altitude;
+
+
+info = core.getObjectInfo("Kochab");
+az = info.azimuth;
+alt = info.altitude;
+MarkerMgr.markerHorizon(az, alt, true, "circle", "#0000ff" , 10, false, 125);
+core.wait(0.25);
+MarkerMgr.markerHorizon(az, alt, true, "circle", "#0000ff" , 10, false, 125);
+core.wait(0.25);
+MarkerMgr.markerHorizon(az, alt, true, "circle", "#0000ff" , 10, false, 125);
+core.wait(0.25);
+core.selectObjectByName("Kochab", true);
+core.wait(0.50);
+MarkerMgr.markerHorizon(az, alt, true, "circle", mrkrColor, 10);
+
+
+for (time = 0; time < 12; time++)
+{
+	for (timeInner = 0; timeInner < 8; timeInner++)
+	{
+		core.setDate("+7.5 minutes");
+		core.wait(0.25);
+		display.display();
+	}
+	core.wait(1.0);
+	var info = core.getObjectInfo("Kochab");
+	var az = info.azimuth;
+	var alt = info.altitude;
+	MarkerMgr.markerHorizon(az, alt, true, "circle", mrkrColor, 10);
+	core.wait(1.0);
+}
+core.wait(1.0);
+GridLinesMgr.setFlagEquatorGrid (true);
+
+
+
+core.wait(5);
+
+MarkerMgr.deleteAllMarkers();
+
+SolarSystem.setFlagPlanets(false);
+SolarSystem.setFlagLabels(false);
+StarMgr.setFlagStars(false);
+//core.wait(60);
+LabelMgr.deleteAllLabels();
+MarkerMgr.deleteAllMarkers();
+//StarMgr.setFlagStars(starsOn);
+//SolarSystem.setFlagPlanets(planetsOn);
+//SolarSystem.setFlagLabels(labelsOn);
+//LandscapeMgr.setFlagCardinalsPoints(cardinalLabelsOn);
+//core.setObserverLocation(observerLocation);
+//core.setProjectionMode(projectionMode);
+core.clear("natural");
+restoreState("pre-night-sky-1-demo");
+//core.setJDay(JD);
+core.setTimeRate(1.0); // pause time
+core.goHome();
+core.setGuiVisible(true);
+

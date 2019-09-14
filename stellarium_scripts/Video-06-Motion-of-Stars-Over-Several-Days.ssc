@@ -1,0 +1,207 @@
+//
+// Author: Brian W. Mulligan
+// Version: 1.0
+// License: GPL v3.0
+// Name: Daily motion of stars
+// Description: A demonstration of how a star (Denebola) moves across the sky over the course of a night.
+//
+
+include("i18n.inc");
+include("save_state.inc");
+include("basicDisplay.inc");
+include("addLeadingZero.inc");
+
+//
+// move to "home" position, then save state of stellarium
+core.goHome();
+saveState("pre-night-sky-1-demo");
+core.setTimezone("UTC-06:00");
+core.setTimeRate(0); // pause time
+
+var color = "#aa0000";
+var mrkrColor = "#ff0000";
+
+// remove GUI, set desired starting position
+core.setGuiVisible(false);
+MarkerMgr.deleteAllMarkers();
+core.clear("natural");
+//core.setProjectionMode("ProjectionCylinder");
+core.setObserverLocation(-97.7431, 30.2666667, 200, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
+core.setDate("2019-04-01T04:00:00", "utc");
+// turn on planets, turn off planet labels
+SolarSystem.setFlagPlanets(true);
+SolarSystem.setFlagLabels(false);
+// turn on cardinal points
+LandscapeMgr.setFlagCardinalsPoints(true);
+LandscapeMgr.setFlagAtmosphere(true);
+core.wait(0.5);
+
+var display =  Object.create(basicDisplay);
+display.textTitle = "Time & The Night Sky";
+display.display();
+StelMovementMgr.setFlagTracking(false);
+GridLinesMgr.setFlagAzimuthalGrid(false);
+GridLinesMgr.setFlagEquatorGrid (false);
+var labelBottom = LabelMgr.labelScreen("Looking southward in Austin, TX at 10 pm CST",200,800,true,20,"#ffff00",true,5000);
+StelMovementMgr.lookSouth(true);
+StelMovementMgr.zoomTo(360, 3);
+core.wait(5);
+
+core.selectObjectByName("Denebola", true);
+LabelMgr.setLabelText(labelBottom,"This is the star Denebola, we will follow it over the course of several days.");
+LabelMgr.setLabelShow(labelBottom,true);
+
+var info = core.getObjectInfo("Denebola");
+var az = info.azimuth;
+var alt = info.altitude;
+
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+LabelMgr.setLabelText(labelBottom,"We will jump forward exactly 24 hours in each step. Notice that Denbola (and the other stars) aren't in the same place each night.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5);
+
+for (time = 0; time < 28; time++)
+{
+	core.setDate("+1 days");
+	display.display();
+	if (time == 0)
+		LabelMgr.setLabelShow(labelBottom,false);
+	core.wait(0.5);
+	switch (time)
+	{
+	case 8:
+		LabelMgr.setLabelText(labelBottom,"(The big bright thing you see moving west to east is the Moon. We'll talk about it in a later video.)");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 18:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	}
+
+}
+core.wait(0.5);
+
+core.wait(3.0);
+core.setDate("2019-04-01T04:00:00", "utc");
+core.wait(0.5);
+display.display();
+LabelMgr.setLabelText(labelBottom,"Watch again. This time we will mark the location of Denebola once a week.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(2.0);
+LabelMgr.setLabelShow(labelBottom,false);
+
+
+for (time = 0; time < 28; time++)
+{
+	core.setDate("+1 days");
+	display.display();
+	if ((time % 7) == 0)
+	{
+		var info = core.getObjectInfo("Denebola");
+		var az = info.azimuth;
+		var alt = info.altitude;
+		MarkerMgr.markerHorizon(az, alt, true, "circle", mrkrColor, 10);
+	}
+	switch (time)
+	{
+	case 8:
+		LabelMgr.setLabelText(labelBottom,"Denebola and all of the other stars are a little bit further west at the same time every night.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	}
+
+	core.wait(0.5);
+}
+LabelMgr.setLabelShow(labelBottom,false);
+
+LabelMgr.setLabelText(labelBottom,"If we pan down by 30° (the latitude at Austin), we can see that this path that Denebola takes is again part of a circle.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(1);
+for (panStep = 0; panStep < 128; panStep++)
+{
+	StelMovementMgr.panView(0,-0.5282529869 / 128.0);
+	core.wait(5.0 / 128.0);
+}
+GridLinesMgr.setFlagEquatorGrid (true);
+core.wait(4.0);
+GridLinesMgr.setFlagEquatorGrid (false);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+LabelMgr.setLabelText(labelBottom,"It takes a star only 23 hours 56 minutes to reach the same position in the sky. This is called a sidereal day.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+LabelMgr.setLabelText(labelBottom,"As we looked at the same time every night, we see the stars 4 minutes further west from where they were the previous night. ");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"Let's try again, advancing time 23 hours and 56 minutes each day. ");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+MarkerMgr.deleteAllMarkers();
+core.setDate("2019-04-01T04:00:00", "utc");
+core.wait(0.5);
+display.display();
+core.wait(1.0);
+for (time = 0; time < 28; time++)
+{
+	core.setDate("+1 days sidereal");
+	display.display();
+	core.wait(0.5);
+	if (time == 4)
+	{
+		LabelMgr.setLabelText(labelBottom,"Here you see that Denebola is in the same place every 23 hours and 56 minutes.");
+		LabelMgr.setLabelShow(labelBottom,true);
+	}
+	if (time == 14)
+	{
+		LabelMgr.setLabelShow(labelBottom,false);
+	}
+	if (time == 18)
+	{
+		LabelMgr.setLabelText(labelBottom,"(The small red thing moving west to east is Mars; we'll talk about it in a later video).");
+		LabelMgr.setLabelShow(labelBottom,true);
+	}
+}
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+LabelMgr.setLabelText(labelBottom,"The difference in the time it takes a star to reach the same place in the sky, and the time it takes the Sun to do the same,");
+var labelBottom2 = LabelMgr.labelScreen("is due to the Earth's orbit around the Sun.",500,825,true,20,"#ffff00",true,8000);
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+LabelMgr.setLabelText(labelBottom,"In the next video, we will watch the motion over the course of a year.");
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+LabelMgr.labelScreen("Video and script by Dr. Brian W. Mulligan, using Stellarium 0.19.1.",50,850,true,14,"#ffff00",true,8000);
+core.wait(10.0);
+
+
+MarkerMgr.deleteAllMarkers();
+
+SolarSystem.setFlagPlanets(false);
+SolarSystem.setFlagLabels(false);
+StarMgr.setFlagStars(false);
+//core.wait(60);
+LabelMgr.deleteAllLabels();
+MarkerMgr.deleteAllMarkers();
+//StarMgr.setFlagStars(starsOn);
+//SolarSystem.setFlagPlanets(planetsOn);
+//SolarSystem.setFlagLabels(labelsOn);
+//LandscapeMgr.setFlagCardinalsPoints(cardinalLabelsOn);
+//core.setObserverLocation(observerLocation);
+//core.setProjectionMode(projectionMode);
+core.clear("natural");
+restoreState("pre-night-sky-1-demo");
+//core.setJDay(JD);
+core.setTimeRate(1.0); // pause time
+core.goHome();
+core.setGuiVisible(true);
+

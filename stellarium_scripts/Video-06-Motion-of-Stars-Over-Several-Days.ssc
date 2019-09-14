@@ -2,8 +2,8 @@
 // Author: Brian W. Mulligan
 // Version: 1.0
 // License: GPL v3.0
-// Name: Daily motion of stars
-// Description: A demonstration of how a star (Denebola) moves across the sky over the course of a night.
+// Name: Weekly motion of stars (Sidereal Time)
+// Description: A demonstration of how a star (Denebola) moves across the sky over the course of several weeks. Demonstrates the difference between a sidereal day and a solar day.
 //
 
 include("i18n.inc");

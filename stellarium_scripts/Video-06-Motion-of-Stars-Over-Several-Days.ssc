@@ -89,7 +89,7 @@ core.wait(0.5);
 display.display();
 LabelMgr.setLabelText(labelBottom,"Watch again. This time we will mark the location of Denebola once a week.");
 LabelMgr.setLabelShow(labelBottom,true);
-core.wait(2.0);
+core.wait(5.0);
 LabelMgr.setLabelShow(labelBottom,false);
 
 
@@ -177,6 +177,7 @@ core.wait(8.0);
 LabelMgr.setLabelShow(labelBottom,false);
 core.wait(1.0);
 LabelMgr.setLabelText(labelBottom,"In the next video, we will watch the motion over the course of a year.");
+LabelMgr.setLabelShow(labelBottom,true);
 core.wait(5.0);
 LabelMgr.setLabelShow(labelBottom,false);
 core.wait(1.0);

@@ -27,7 +27,7 @@ MarkerMgr.deleteAllMarkers();
 core.clear("natural");
 //core.setProjectionMode("ProjectionCylinder");
 core.setObserverLocation(-90, 30.2666667, 200, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
-core.setDate("2019-04-01T01:00:00", "utc");
+core.setDate("2019-04-01T02:00:00", "utc");
 // turn on planets, turn off planet labels
 SolarSystem.setFlagPlanets(true);
 SolarSystem.setFlagLabels(false);
@@ -80,7 +80,7 @@ for (time = 0; time < 64; time++)
 		LabelMgr.setLabelShow(labelBottom,false);
 		break;
 	case 24:
-		LabelMgr.setLabelText(labelBottom,"Stars move at the same rate across the sky. It takes about an hour for their hour angle to change.");
+		LabelMgr.setLabelText(labelBottom,"Stars move across the sky at about the same rate as the Sun.");
 		LabelMgr.setLabelShow(labelBottom,true);
 		break;
 	case 32:
@@ -108,7 +108,7 @@ for (panStep = 0; panStep < 128; panStep++)
 	core.wait(5.0 / 128.0);
 }
 GridLinesMgr.setFlagEquatorGrid (true);
-core.wait(5);
+core.wait(10);
 LabelMgr.setLabelShow(labelBottom,false);
 
 

@@ -140,7 +140,9 @@ LabelMgr.setLabelText(labelBottom,"In the next video, you will see that Denebola
 LabelMgr.setLabelShow(labelBottom,true);
 core.wait(3.0);
 LabelMgr.setLabelShow(labelBottom,false);
-core.wait(5.0);
+core.wait(1.0);
+LabelMgr.labelScreen("Video and script by Dr. Brian W. Mulligan, using Stellarium 0.19.1.",50,850,true,14,"#ffff00",true,8000);
+core.wait(10.0);
 
 
 MarkerMgr.deleteAllMarkers();

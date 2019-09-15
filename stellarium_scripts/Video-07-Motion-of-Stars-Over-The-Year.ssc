@@ -14,7 +14,7 @@ include("addLeadingZero.inc");
 //
 // move to "home" position, then save state of stellarium
 core.goHome();
-saveState("pre-night-sky-1-demo");
+saveState("video-7-demo");
 core.setTimezone("UTC-06:00");
 core.setTimeRate(0); // pause time
 
@@ -42,10 +42,12 @@ display.display();
 StelMovementMgr.setFlagTracking(false);
 GridLinesMgr.setFlagAzimuthalGrid(false);
 GridLinesMgr.setFlagEquatorGrid (false);
-var labelBottom = LabelMgr.labelScreen("Looking southward in Austin, TX at 10 pm CST",200,800,true,20,"#ffff00",true,5000);
+core.wait(5.0);
+
+var labelBottom = LabelMgr.labelScreen("Looking southward in Austin, TX at 10 pm CST",200,750,true,20,"#ffff00",true,5000);
 StelMovementMgr.lookSouth(true);
 StelMovementMgr.zoomTo(360, 3);
-core.wait(5);
+core.wait(6.0);
 
 core.selectObjectByName("Denebola", true);
 LabelMgr.setLabelText(labelBottom,"This is the star Denebola, we will follow it over the course of several months.");
@@ -168,7 +170,7 @@ MarkerMgr.deleteAllMarkers();
 //core.setObserverLocation(observerLocation);
 //core.setProjectionMode(projectionMode);
 core.clear("natural");
-restoreState("pre-night-sky-1-demo");
+restoreState("video-7-demo");
 //core.setJDay(JD);
 core.setTimeRate(1.0); // pause time
 core.goHome();

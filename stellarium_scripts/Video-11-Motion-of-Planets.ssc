@@ -25,7 +25,7 @@ var mrkrColor = "#ff0000";
 core.setGuiVisible(false);
 MarkerMgr.deleteAllMarkers();
 core.clear("natural");
-//core.setProjectionMode("ProjectionCylinder");
+core.setProjectionMode("ProjectionCylinder");
 core.setObserverLocation(-97.7431, 30.2666667, 200, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
 core.setDate("2019-03-20T22:00:00", "utc");
 // turn on planets, turn off planet labels
@@ -73,7 +73,7 @@ var alt = info.altitude;
 core.wait(1.0);
 
 core.setTimeRate(2419200.0); //speed up time
-for (time = 0; time < 400; time++)
+for (time = 0; time < 445; time++)
 {
 	display.display();
 	if (time == 0)
@@ -89,14 +89,14 @@ for (time = 0; time < 400; time++)
 		LabelMgr.setLabelShow(labelBottom,false);
 		break;
 	case 50:
-		LabelMgr.setLabelText(labelBottom,"The planets, Sun, and Moon all travel along one line in the sky.");
+		LabelMgr.setLabelText(labelBottom,"The planets, Sun, and Moon all travel along one path in the sky.");
 		LabelMgr.setLabelShow(labelBottom,true);
 		break;
 	case 70:
 		LabelMgr.setLabelShow(labelBottom,false);
 		break;
 	case 80:
-		LabelMgr.setLabelText(labelBottom,"This line is called the ecliptic. The ecliptic is a result of all of the planets orbiting in the same plane.");
+		LabelMgr.setLabelText(labelBottom,"This path is called the ecliptic. The ecliptic is a result of all of the planets orbiting in the same plane.");
 		LabelMgr.setLabelShow(labelBottom,true);
 		break;
 	case 100:
@@ -142,6 +142,27 @@ for (time = 0; time < 400; time++)
 		LabelMgr.setLabelShow(labelBottom,true);
 		break;
 	case 350:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 360:
+		LabelMgr.setLabelText(labelBottom,"The differences in speed are a result of the positions relative to the Sun.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 380:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 390:
+		LabelMgr.setLabelText(labelBottom,"Planets closer to the Sun move faster than planets further from the Sun.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 410:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 420:
+		LabelMgr.setLabelText(labelBottom,"This is due to the force of gravity from the Sun.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 440:
 		LabelMgr.setLabelShow(labelBottom,false);
 		break;
 	}

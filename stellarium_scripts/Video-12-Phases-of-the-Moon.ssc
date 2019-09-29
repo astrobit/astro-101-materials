@@ -105,7 +105,7 @@ for (time = 0; time < 224; time++)
 		LabelMgr.setLabelShow(labelBottom,false);
 		break;
 	case 70:
-		LabelMgr.setLabelText(labelBottom,"Warning Crescent");
+		LabelMgr.setLabelText(labelBottom,"Waning Crescent");
 		LabelMgr.setLabelShow(labelBottom,true);
 		break;
 	case 90:

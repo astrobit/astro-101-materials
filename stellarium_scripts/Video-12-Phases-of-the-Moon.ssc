@@ -14,7 +14,7 @@ include("addLeadingZero.inc");
 //
 // move to "home" position, then save state of stellarium
 core.goHome();
-saveState("video-11-demo");
+saveState("video-12-demo");
 core.setTimezone("UTC-06:00");
 core.setTimeRate(0); // pause time
 
@@ -356,6 +356,10 @@ LabelMgr.setLabelShow(labelBottom,false);
 StelMovementMgr.zoomTo(2, 3);
 core.wait(1.0);
 
+//LabelMgr.setLabelText(labelBottom,"Let's now watch the cycle from far above the Earth's north pole.");
+//core.setProjectionMode("ProjectionStereoscopic");
+//core.setObserverLocation(0.0, 90.0, 0, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
+//core.setDate("2019-03-20T22:00:00", "utc");
 
 core.setTimeRate(0.0); //pause time
 core.wait(1.0);
@@ -378,7 +382,7 @@ MarkerMgr.deleteAllMarkers();
 //core.setObserverLocation(observerLocation);
 //core.setProjectionMode(projectionMode);
 core.clear("natural");
-restoreState("video-11-demo");
+restoreState("video-12-demo");
 //core.setJDay(JD);
 core.setTimeRate(1.0); // pause time
 core.goHome();

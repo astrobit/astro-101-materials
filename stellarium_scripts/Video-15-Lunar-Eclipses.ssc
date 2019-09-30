@@ -14,7 +14,7 @@ include("addLeadingZero.inc");
 //
 // move to "home" position, then save state of stellarium
 core.goHome();
-saveState("video-11-demo");
+saveState("video-16-demo");
 core.setTimezone("UTC-06:00");
 core.setTimeRate(0); // pause time
 
@@ -275,7 +275,7 @@ MarkerMgr.deleteAllMarkers();
 //core.setObserverLocation(observerLocation);
 //core.setProjectionMode(projectionMode);
 core.clear("natural");
-restoreState("video-11-demo");
+restoreState("video-16-demo");
 //core.setJDay(JD);
 core.setTimeRate(1.0); // pause time
 core.goHome();

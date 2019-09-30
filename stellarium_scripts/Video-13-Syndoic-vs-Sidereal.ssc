@@ -1,0 +1,186 @@
+//
+// Author: Brian W. Mulligan
+// Version: 1.0
+// License: GPL v3.0
+// Name: Proper motion of stars
+// Description: A demonstration of how a star (Denebola) moves across the sky over the course of many years, demonstrating proper motion.
+//
+
+include("i18n.inc");
+include("save_state.inc");
+include("basicDisplay.inc");
+include("addLeadingZero.inc");
+
+//
+// move to "home" position, then save state of stellarium
+core.goHome();
+saveState("video-11-demo");
+core.setTimezone("UTC-06:00");
+core.setTimeRate(0); // pause time
+
+var color = "#aa0000";
+var mrkrColor = "#ff0000";
+
+// remove GUI, set desired starting position
+core.setGuiVisible(false);
+MarkerMgr.deleteAllMarkers();
+core.clear("natural");
+core.setProjectionMode("ProjectionCylinder");
+core.setObserverLocation(-97.7431, 30.2666667, 200, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
+core.setDate("2019-03-20T22:00:00", "utc");
+// turn on planets, turn off planet labels
+SolarSystem.setFlagPlanets(true);
+SolarSystem.setFlagLabels(true);
+// turn on cardinal points
+LandscapeMgr.setFlagCardinalsPoints(false);
+core.wait(0.5);
+
+var display =  Object.create(basicDisplay);
+display.textTitle = "Synodic vs. Sidereal";
+display.display();
+StelMovementMgr.setFlagTracking(false);
+GridLinesMgr.setFlagAzimuthalGrid(false);
+GridLinesMgr.setFlagEquatorGrid (false);
+StelMovementMgr.lookSouth(true);
+StelMovementMgr.zoomTo(360, 3);
+core.wait(5);
+var labelBottom = LabelMgr.labelScreen("We will turn off the atmosphere and the ground so we can see the whole sky at once",200,800,true,20,"#ffff00",true,5000);
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(1);
+LandscapeMgr.setFlagAtmosphere(false);
+LandscapeMgr.setFlagLandscape(false);
+core.wait(4);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+core.selectObjectByName("Moon", true);
+StelMovementMgr.setFlagTracking(true);
+StelMovementMgr.setEquatorialMount(true);
+StelMovementMgr.setFlagLockEquPos(true);
+StelMovementMgr.setFlagTracking(false);
+//LabelMgr.setLabelText(labelBottom,"We focus on just the Sun. Watch how the planets move around the sky.");
+//LabelMgr.setLabelShow(labelBottom,true);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"In the previous video, we found that the Moon took 29½ days to complete the cycle of phases.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"That is also the amount of time that it takes for the Moon to move 360° with respect to the Sun.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"Now, we will watch to see how long it takes the Moon to move 360° with respect to the stars.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+var info = core.getObjectInfo("Moon");
+var az = info.azimuth;
+var alt = info.altitude;
+LabelMgr.setLabelText(labelBottom,"The Moon is currently just southeast of Denebola.");
+core.selectObjectByName("Denebola", true);
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(2.5);
+core.selectObjectByName("Moon", true);
+core.setTimeRate(86400.0); //speed up time
+for (time = 0; time < 107; time++)
+{
+	display.display();
+	core.wait(0.25);
+	switch (time)
+	{
+	case 6:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 14:
+		LabelMgr.setLabelText(labelBottom,"The Moon moves right to left (west to east) with respect to the stars.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 34:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 44:
+		LabelMgr.setLabelText(labelBottom,"Notice that the Sun is also slowly moving west to east.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 64:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	}
+}
+core.setTimeRate(0.0); //pause time
+core.wait(1.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"It takes about 27 days to complete a circle with respect to the stars.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+
+LabelMgr.setLabelText(labelBottom,"This is called the Sidereal period (sidereal means with respect to the stars).");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"The time that it takes to make a circle with respect to the Sun is called the Synodic period.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"Synodic means with respect to the Sun.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"The Moon's Sidereal period is about 27 days, it's Synodic period is about 29½ days.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"The slight movement of the Sun with respect to the stars is the cause of the difference between the Sidereal and Synodic periods.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+
+core.setTimeRate(0.0); //pause time
+core.wait(1.0);
+LabelMgr.labelScreen("Video and script by Dr. Brian W. Mulligan, using Stellarium 0.19.1.",50,850,true,14,"#ffff00",true,8000);
+core.wait(10.0);
+
+
+MarkerMgr.deleteAllMarkers();
+
+SolarSystem.setFlagPlanets(false);
+SolarSystem.setFlagLabels(false);
+StarMgr.setFlagStars(false);
+//core.wait(60);
+LabelMgr.deleteAllLabels();
+MarkerMgr.deleteAllMarkers();
+//StarMgr.setFlagStars(starsOn);
+//SolarSystem.setFlagPlanets(planetsOn);
+//SolarSystem.setFlagLabels(labelsOn);
+//LandscapeMgr.setFlagCardinalsPoints(cardinalLabelsOn);
+//core.setObserverLocation(observerLocation);
+//core.setProjectionMode(projectionMode);
+core.clear("natural");
+restoreState("video-11-demo");
+//core.setJDay(JD);
+core.setTimeRate(1.0); // pause time
+core.goHome();
+core.setGuiVisible(true);
+

@@ -59,226 +59,226 @@ StelMovementMgr.setEquatorialMount(true);
 //LabelMgr.setLabelShow(labelBottom,true);
 core.wait(1.0);
 
-//var info = core.getObjectInfo("Sun");
-//var az = info.azimuth;
-//var alt = info.altitude;
-//LabelMgr.setLabelText(labelBottom,"The Moon is just about to eclipse the Sun. The eclipse will begin on the right side of the Sun.");
-//StelMovementMgr.zoomTo(1, 3);
-//core.setTimeRate(600.0); //speed up time
-//for (time = 0; time < 65; time++)
-//{
-//	display.display();
-//	core.wait(0.25);
-//	switch (time)
-//	{
-//	case 6:
-//		LabelMgr.setLabelShow(labelBottom,false);
-//		break;
-//	case 14:
-//		LabelMgr.setLabelText(labelBottom,"I've sped up time to get to the good part.");
-//		LabelMgr.setLabelShow(labelBottom,true);
-//		break;
-//	case 34:
-//		LabelMgr.setLabelShow(labelBottom,false);
-//		break;
-//	}
-//}
-//core.waitFor("2017-08-21T18:18:00", "utc");
-//core.setTimeRate(1.0); //pause time
-//display.display();
-//LabelMgr.setLabelText(labelBottom,"We're about to enter totality, when the Moon entirely covers the Sun.");
-//LabelMgr.setLabelShow(labelBottom,true);
-//core.setTimeRate(1.0); //1s/s
-//for (time = 2; time < 379; time++)
-//{
-//	var timeMin = Math.floor(time / 60) + 18;
-//	var timeSec = Math.floor(time % 60);
-//	var timeString = "2017-08-21T18:" + timeMin + ":" + addLeadingZero(timeSec);
-//	core.waitFor(timeString);
-//	display.display();
-//	switch (time)
-//	{
-//	case 5:
-//		LabelMgr.setLabelShow(labelBottom,false);
-//		break;
-//	case 6:
-//		LabelMgr.setLabelText(labelBottom,"I've slowed time back to normal speed.");
-//		LabelMgr.setLabelShow(labelBottom,true);
-//		break;
-//	case 11:
-//		LabelMgr.setLabelShow(labelBottom,false);
-//		break;
-//	case 12:
-//		LabelMgr.setLabelText(labelBottom,"You'll notice we can already see a couple of faint stars - one to the upper right and another to the lower left.");
-//		LabelMgr.setLabelShow(labelBottom,true);
-//		break;
-//	case 17:
-//		LabelMgr.setLabelShow(labelBottom,false);
-//		break;
-//	case 18:
-//		LabelMgr.setLabelText(labelBottom,"If we zoom out we can see a few more and a planet.");
-//		SolarSystem.setFlagLabels(true);
-//		StelMovementMgr.zoomTo(10, 3);
-//		LabelMgr.setLabelShow(labelBottom,true);
-//		break;
-//	case 38:
-//		LabelMgr.setLabelShow(labelBottom,false);
-//		StelMovementMgr.zoomTo(1, 3);
-//		SolarSystem.setFlagLabels(false);
-//		break;
-//	case 137:
-//		LabelMgr.setLabelText(labelBottom,"The Sun is now entirely covered.");
-//		LabelMgr.setLabelShow(labelBottom,true);
-//		break;
-//	case 142:
-//		LabelMgr.setLabelShow(labelBottom,false);
-//		break;
-//	case 143:
-//		LabelMgr.setLabelText(labelBottom,"Totality lasts about 2 minutes.");
-//		LabelMgr.setLabelShow(labelBottom,true);
-//		break;
-//	case 148:
-//		LabelMgr.setLabelShow(labelBottom,false);
-//		break;
-//	case 149:
-//		LabelMgr.setLabelText(labelBottom,"The light that you see around the Moon is the Sun's corona. It is only visible from Earth during total Solar eclipses.");
-//		LabelMgr.setLabelShow(labelBottom,true);
-//		break;
-//	case 154:
-//		LabelMgr.setLabelShow(labelBottom,false);
-//		break;
-//	case 155:
-//		LabelMgr.setLabelText(labelBottom,"The corona is much more vivid in real life.");
-//		LabelMgr.setLabelShow(labelBottom,true);
-//		break;
-//	case 160:
-//		LabelMgr.setLabelShow(labelBottom,false);
-//		break;
-//	case 260:
-//		LabelMgr.setLabelText(labelBottom,"We are now starting to see the Sun emerge on the right side.");
-//		LabelMgr.setLabelShow(labelBottom,true);
-//		break;
-//	case 265:
-//		LabelMgr.setLabelShow(labelBottom,false);
-//		break;
-//	case 358:
-//		LabelMgr.setLabelText(labelBottom,"The partial eclipse lasts another hour and a half.");
-//		LabelMgr.setLabelShow(labelBottom,true);
-//		break;
-//	case 378:
-//		LabelMgr.setLabelShow(labelBottom,false);
-//		break;
-//	}
-//}
-//core.setTimeRate(600.0); //1s/s
-//for (time = 0; time < 36; time++)
-//{
-//	display.display();
-//	core.wait(0.25);
-//	switch (time)
-//	{
-//	case 5:
-//		LabelMgr.setLabelShow(labelBottom,false);
-//		break;
-//	}
-//}
-//core.wait(1.0);
+var info = core.getObjectInfo("Sun");
+var az = info.azimuth;
+var alt = info.altitude;
+LabelMgr.setLabelText(labelBottom,"The Moon is just about to eclipse the Sun. The eclipse will begin on the right side of the Sun.");
+StelMovementMgr.zoomTo(1, 3);
+core.setTimeRate(600.0); //speed up time
+for (time = 0; time < 65; time++)
+{
+	display.display();
+	core.wait(0.25);
+	switch (time)
+	{
+	case 6:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 14:
+		LabelMgr.setLabelText(labelBottom,"I've sped up time to get to the good part.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 34:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	}
+}
+core.waitFor("2017-08-21T18:18:00", "utc");
+core.setTimeRate(1.0); //pause time
+display.display();
+LabelMgr.setLabelText(labelBottom,"We're about to enter totality, when the Moon entirely covers the Sun.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.setTimeRate(1.0); //1s/s
+for (time = 2; time < 379; time++)
+{
+	var timeMin = Math.floor(time / 60) + 18;
+	var timeSec = Math.floor(time % 60);
+	var timeString = "2017-08-21T18:" + timeMin + ":" + addLeadingZero(timeSec);
+	core.waitFor(timeString);
+	display.display();
+	switch (time)
+	{
+	case 5:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 6:
+		LabelMgr.setLabelText(labelBottom,"I've slowed time back to normal speed.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 11:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 12:
+		LabelMgr.setLabelText(labelBottom,"You'll notice we can already see a couple of faint stars - one to the upper right and another to the lower left.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 17:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 18:
+		LabelMgr.setLabelText(labelBottom,"If we zoom out we can see a few more and a planet.");
+		SolarSystem.setFlagLabels(true);
+		StelMovementMgr.zoomTo(10, 3);
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 38:
+		LabelMgr.setLabelShow(labelBottom,false);
+		StelMovementMgr.zoomTo(1, 3);
+		SolarSystem.setFlagLabels(false);
+		break;
+	case 137:
+		LabelMgr.setLabelText(labelBottom,"The Sun is now entirely covered.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 142:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 143:
+		LabelMgr.setLabelText(labelBottom,"Totality lasts about 2 minutes.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 148:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 149:
+		LabelMgr.setLabelText(labelBottom,"The light that you see around the Moon is the Sun's corona. It is only visible from Earth during total Solar eclipses.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 154:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 155:
+		LabelMgr.setLabelText(labelBottom,"The corona is much more vivid in real life.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 160:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 260:
+		LabelMgr.setLabelText(labelBottom,"We are now starting to see the Sun emerge on the right side.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 265:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 358:
+		LabelMgr.setLabelText(labelBottom,"The partial eclipse lasts another hour and a half.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 378:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	}
+}
+core.setTimeRate(600.0); //1s/s
+for (time = 0; time < 36; time++)
+{
+	display.display();
+	core.wait(0.25);
+	switch (time)
+	{
+	case 5:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	}
+}
+core.wait(1.0);
 
-//core.setTimeRate(0.0); //pause time
-//core.setObserverLocation(0.0, 0.0, 0, 0.25, "", "Moon"); // longitude, latitude, altitude, transition time, name, planet 
-//core.setDate("2017-08-21T16:00:00", "utc");
-//core.selectObjectByName("Earth", false);
-//StelMovementMgr.setFlagTracking(true);
-//StelMovementMgr.setEquatorialMount(true);
-//StelMovementMgr.zoomTo(3, 3);
-//LabelMgr.setLabelText(labelBottom,"Let's watch again, but standing on the Moon watching Earth.");
-//LabelMgr.setLabelShow(labelBottom,true);
-//core.wait(5.0);
-//LabelMgr.setLabelShow(labelBottom,false);
-//LabelMgr.setLabelText(labelBottom,"Watch the shadow of the Moon travel from west to east (left to right) across the Earth.");
-//LabelMgr.setLabelShow(labelBottom,true);
-//core.setTimeRate(600.0); //pause time
-//for (time = 0; time < 120; time++)
-//{
-//	display.display();
-//	core.wait(0.25);
-//	switch (time)
-//	{
-//	case 20:
-//		LabelMgr.setLabelShow(labelBottom,false);
-//		break;
-//	case 30:
-//		LabelMgr.setLabelText(labelBottom,"Only a small area is in the shadow.");
-//		LabelMgr.setLabelShow(labelBottom,true);
-//		break;
-//	case 50:
-//		LabelMgr.setLabelShow(labelBottom,false);
-//		break;
-//	case 60:
-//		LabelMgr.setLabelText(labelBottom,"A solar eclipse is only visible on a portion of the Earth.");
-//		LabelMgr.setLabelShow(labelBottom,true);
-//		break;
-//	case 80:
-//		LabelMgr.setLabelShow(labelBottom,false);
-//		break;
-//	case 90:
-//		LabelMgr.setLabelText(labelBottom,"The area that experiences a total eclipse is only tens of miles across.");
-//		LabelMgr.setLabelShow(labelBottom,true);
-//		break;
-//	case 110:
-//		LabelMgr.setLabelShow(labelBottom,false);
-//		break;
-//	}
-//}
-//core.wait(1.0);
+core.setTimeRate(0.0); //pause time
+core.setObserverLocation(0.0, 0.0, 0, 0.25, "", "Moon"); // longitude, latitude, altitude, transition time, name, planet 
+core.setDate("2017-08-21T16:00:00", "utc");
+core.selectObjectByName("Earth", false);
+StelMovementMgr.setFlagTracking(true);
+StelMovementMgr.setEquatorialMount(true);
+StelMovementMgr.zoomTo(3, 3);
+LabelMgr.setLabelText(labelBottom,"Let's watch again, but standing on the Moon watching Earth.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+LabelMgr.setLabelText(labelBottom,"Watch the shadow of the Moon travel from west to east (left to right) across the Earth.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.setTimeRate(600.0); //pause time
+for (time = 0; time < 120; time++)
+{
+	display.display();
+	core.wait(0.25);
+	switch (time)
+	{
+	case 20:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 30:
+		LabelMgr.setLabelText(labelBottom,"Only a small area is in the shadow.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 50:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 60:
+		LabelMgr.setLabelText(labelBottom,"A solar eclipse is only visible on a portion of the Earth.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 80:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 90:
+		LabelMgr.setLabelText(labelBottom,"The area that experiences a total eclipse is only tens of miles across.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 110:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	}
+}
+core.wait(1.0);
 
-//LabelMgr.setLabelText(labelBottom,"Let's go back to Carbondale during totality.");
-//LabelMgr.setLabelShow(labelBottom,true);
-//core.setTimeRate(0.0); //pause time
+LabelMgr.setLabelText(labelBottom,"Let's go back to Carbondale during totality.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.setTimeRate(0.0); //pause time
 
-//core.setObserverLocation(-89.11666667, 37.65, 126, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
-//core.setDate("2017-08-21T18:21:20", "utc");
-//core.selectObjectByName("Sun", false);
-//StelMovementMgr.setFlagTracking(true);
-//StelMovementMgr.setEquatorialMount(true);
-//StelMovementMgr.zoomTo(1, 3);
-//core.wait(1.0);
-//display.display();
-//core.wait(4.0);
-//LabelMgr.setLabelShow(labelBottom,true);
-//core.wait(1.0);
+core.setObserverLocation(-89.11666667, 37.65, 126, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
+core.setDate("2017-08-21T18:21:20", "utc");
+core.selectObjectByName("Sun", false);
+StelMovementMgr.setFlagTracking(true);
+StelMovementMgr.setEquatorialMount(true);
+StelMovementMgr.zoomTo(1, 3);
+core.wait(1.0);
+display.display();
+core.wait(4.0);
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(1.0);
 
-//LabelMgr.setLabelText(labelBottom,"If we travel north, we don't need to go to far before it is no longer a total eclispe.");
-//LabelMgr.setLabelShow(labelBottom,true);
-//core.wait(5.0);
-//LabelMgr.setLabelShow(labelBottom,false);
-//core.wait(1.0);
-//for (latitude = 37.65; latitude < 38.3; latitude = latitude + 0.025)
-//{
-//	core.setObserverLocation(-89.11666667, latitude, 126, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
-//	display.display();
-//	core.wait(0.5);
-//}
-//LabelMgr.setLabelText(labelBottom,"We can also try going south, with the same effect.");
-//LabelMgr.setLabelShow(labelBottom,true);
-//core.wait(5.0);
-//LabelMgr.setLabelShow(labelBottom,false);
-//core.wait(1.0);
-//core.setObserverLocation(-89.11666667, 37.65, 126, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
-//core.wait(1.0);
-//display.display();
-//core.wait(5.0);
-//for (latitude = 37.65; latitude > 36.9; latitude = latitude - 0.025)
-//{
-//	core.setObserverLocation(-89.11666667, latitude, 126, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
-//	display.display();
-//	core.wait(0.5);
-//}
-//LabelMgr.setLabelText(labelBottom,"The total eclipse can only be seen over about 1° of latitude, or about 60 miles.");
-//LabelMgr.setLabelShow(labelBottom,true);
-//core.wait(5.0);
-//LabelMgr.setLabelShow(labelBottom,false);
-//core.wait(1.0);
+LabelMgr.setLabelText(labelBottom,"If we travel north, we don't need to go to far before it is no longer a total eclispe.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+for (latitude = 37.65; latitude < 38.3; latitude = latitude + 0.025)
+{
+	core.setObserverLocation(-89.11666667, latitude, 126, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
+	display.display();
+	core.wait(0.5);
+}
+LabelMgr.setLabelText(labelBottom,"We can also try going south, with the same effect.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+core.setObserverLocation(-89.11666667, 37.65, 126, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
+core.wait(1.0);
+display.display();
+core.wait(5.0);
+for (latitude = 37.65; latitude > 36.9; latitude = latitude - 0.025)
+{
+	core.setObserverLocation(-89.11666667, latitude, 126, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
+	display.display();
+	core.wait(0.5);
+}
+LabelMgr.setLabelText(labelBottom,"The total eclipse can only be seen over about 1° of latitude, or about 60 miles.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
 
 LabelMgr.setLabelText(labelBottom,"Now let's watch an eclipse that occurred 6 months earlier.");
 LabelMgr.setLabelShow(labelBottom,true);

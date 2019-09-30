@@ -1,0 +1,283 @@
+//
+// Author: Brian W. Mulligan
+// Version: 1.0
+// License: GPL v3.0
+// Name: Proper motion of stars
+// Description: A demonstration of how a star (Denebola) moves across the sky over the course of many years, demonstrating proper motion.
+//
+
+include("i18n.inc");
+include("save_state.inc");
+include("basicDisplay.inc");
+include("addLeadingZero.inc");
+
+//
+// move to "home" position, then save state of stellarium
+core.goHome();
+saveState("video-11-demo");
+core.setTimezone("UTC-06:00");
+core.setTimeRate(0); // pause time
+
+var color = "#aa0000";
+var mrkrColor = "#ff0000";
+
+// remove GUI, set desired starting position
+core.setGuiVisible(false);
+MarkerMgr.deleteAllMarkers();
+core.clear("natural");
+//core.setProjectionMode("ProjectionCylinder");
+core.setObserverLocation(-97.7431, 30.2666667, 200, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
+core.setDate("2019-01-21T02:36:00", "utc");
+// turn on planets, turn off planet labels
+SolarSystem.setFlagPlanets(true);
+SolarSystem.setFlagLabels(false);
+// turn on cardinal points
+LandscapeMgr.setFlagCardinalsPoints(false);
+core.wait(0.5);
+
+var display =  Object.create(basicDisplay);
+display.textTitle = "Lunar Eclipses";
+display.display();
+StelMovementMgr.setFlagTracking(false);
+GridLinesMgr.setFlagAzimuthalGrid(false);
+GridLinesMgr.setFlagEquatorGrid (false);
+StelMovementMgr.lookSouth(true);
+StelMovementMgr.zoomTo(360, 3);
+core.wait(5);
+var labelBottom = LabelMgr.labelScreen("We are watching from Austin, TX, USA on Jan. 20, 2019",200,800,true,20,"#ffff00",true,5000);
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+core.selectObjectByName("Moon", false);
+StelMovementMgr.setFlagTracking(true);
+StelMovementMgr.setEquatorialMount(true);
+//StelMovementMgr.setFlagLockEquPos(true);
+//StelMovementMgr.setFlagTracking(false);
+//LabelMgr.setLabelText(labelBottom,"We focus on just the Sun. Watch how the planets move around the sky.");
+//LabelMgr.setLabelShow(labelBottom,true);
+core.wait(1.0);
+
+var info = core.getObjectInfo("Moon");
+var az = info.azimuth;
+var alt = info.altitude;
+LabelMgr.setLabelText(labelBottom,"The Moon is about to experience an eclipse. The eclipse will begin on the left side of the Moon.");
+StelMovementMgr.zoomTo(1, 3);
+core.wait(5);
+LabelMgr.setLabelShow(labelBottom,false);
+
+core.setTimeRate(150.0); //speed up time
+for (time = 0; time < 428; time++)
+{
+	display.display();
+	core.wait(0.25);
+	switch (time)
+	{
+	case 0:
+		LabelMgr.setLabelText(labelBottom,"I've sped up time to get to the good part.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 20:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 30:
+		LabelMgr.setLabelText(labelBottom,"The Moon is already experiencing a partial eclipse of the Sun by the Earth.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 40:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 50:
+		LabelMgr.setLabelText(labelBottom,"The Moon is slightly darker than it would otherwise be at full moon.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 70:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 88:
+		LabelMgr.setLabelText(labelBottom,"The main part of the eclipse has started.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 108:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 118:
+		LabelMgr.setLabelText(labelBottom,"Notice that the shadow of the Earth is curved.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 138:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 148:
+		LabelMgr.setLabelText(labelBottom,"This is another piece of evidence that the Earth isn't flat!");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 168:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 178:
+		LabelMgr.setLabelText(labelBottom,"The Moon appears red during the total eclipse because of sunlight that is bent by Earth's atmosphere.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 198:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 208:
+		LabelMgr.setLabelText(labelBottom,"Blue light tends to get scattered, so only red light makes it to the Moon.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 228:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 278:
+		LabelMgr.setLabelText(labelBottom,"The eclipse is nearing the end. Part of the Moon can again see part of the Sun.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 298:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 308:
+		LabelMgr.setLabelText(labelBottom,"Lunar eclipses only occur during full moon.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 328:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 338:
+		LabelMgr.setLabelText(labelBottom,"They are visible anywhere on Earth that it is night time.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 358:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	}
+}
+core.setTimeRate(0.0); //pause time
+LabelMgr.setLabelText(labelBottom,"Let's watch again, but standing on the Moon watching the Sun.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(3.0);
+core.setObserverLocation(0.0, 0.0, 0, 0.25, "", "Moon"); // longitude, latitude, altitude, transition time, name, planet 
+core.setDate("2019-01-21T02:36:00", "utc");
+core.selectObjectByName("Sun", false);
+StelMovementMgr.setFlagTracking(true);
+StelMovementMgr.setEquatorialMount(true);
+StelMovementMgr.zoomTo(3, 3);
+core.wait(3.0);
+LabelMgr.setLabelShow(labelBottom,false);
+
+
+core.setTimeRate(150.0); //pause time
+for (time = 0; time < 428; time++)
+{
+	display.display();
+	core.wait(0.25);
+	switch (time)
+	{
+	case 40:
+		LabelMgr.setLabelText(labelBottom,"A partial eclipse of the Sun by the Earth is observed from the Moon.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 60:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 70:
+		LabelMgr.setLabelText(labelBottom,"The Moon is in the Earth's penumbra at this phase.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 90:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 100:
+		LabelMgr.setLabelText(labelBottom,"The Moon appears only slightly darker than usual from Earth.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 120:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 130:
+		LabelMgr.setLabelText(labelBottom,"Once the total eclipse begins, the Moon will be in the Earth's umbra.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 150:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 160:
+		LabelMgr.setLabelText(labelBottom,"On Earth, we are now seeing the noticiable shadow cross the face of the Moon");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 180:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 220:
+		LabelMgr.setLabelText(labelBottom,"Lunar eclipses occur about twice a year, roughly six months apart.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 240:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 250:
+		LabelMgr.setLabelText(labelBottom,"Lunar eclipses always occur a month before or a month after a solar eclipse.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 270:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 340:
+		LabelMgr.setLabelText(labelBottom,"The period of totality has ended. This spot on the Moon is again in Earth's penumbra.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 360:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 370:
+		LabelMgr.setLabelText(labelBottom,"This was a total lunar eclipse.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 390:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	case 400:
+		LabelMgr.setLabelText(labelBottom,"If only part of the Moon passes through Earth's umbra, it is a partial lunar eclipse.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		break;
+	case 420:
+		LabelMgr.setLabelShow(labelBottom,false);
+		break;
+	}
+}
+LabelMgr.setLabelText(labelBottom,"If the Moon only passes through Earth's penumbra, it is called a penumbral eclipse.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(5);
+
+
+
+
+core.wait(1.0);
+LabelMgr.labelScreen("Video and script by Dr. Brian W. Mulligan, using Stellarium 0.19.1.",50,850,true,14,"#ffff00",true,8000);
+core.wait(10.0);
+
+
+MarkerMgr.deleteAllMarkers();
+
+SolarSystem.setFlagPlanets(false);
+SolarSystem.setFlagLabels(false);
+StarMgr.setFlagStars(false);
+//core.wait(60);
+LabelMgr.deleteAllLabels();
+MarkerMgr.deleteAllMarkers();
+//StarMgr.setFlagStars(starsOn);
+//SolarSystem.setFlagPlanets(planetsOn);
+//SolarSystem.setFlagLabels(labelsOn);
+//LandscapeMgr.setFlagCardinalsPoints(cardinalLabelsOn);
+//core.setObserverLocation(observerLocation);
+//core.setProjectionMode(projectionMode);
+core.clear("natural");
+restoreState("video-11-demo");
+//core.setJDay(JD);
+core.setTimeRate(1.0); // pause time
+core.goHome();
+core.setGuiVisible(true);
+

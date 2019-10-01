@@ -217,7 +217,7 @@ for (time = 0; time < 428; time++)
 		LabelMgr.setLabelShow(labelBottom,false);
 		break;
 	case 250:
-		LabelMgr.setLabelText(labelBottom,"Lunar eclipses always occur a month before or a month after a solar eclipse.");
+		LabelMgr.setLabelText(labelBottom,"Lunar eclipses always occur two weeks before or two weeks after a solar eclipse.");
 		LabelMgr.setLabelShow(labelBottom,true);
 		break;
 	case 270:

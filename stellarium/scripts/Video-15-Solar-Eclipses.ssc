@@ -154,11 +154,11 @@ for (time = 2; time < 379; time++)
 	case 160:
 		LabelMgr.setLabelShow(labelBottom,false);
 		break;
-	case 260:
+	case 320:
 		LabelMgr.setLabelText(labelBottom,"We are now starting to see the Sun emerge on the right side.");
 		LabelMgr.setLabelShow(labelBottom,true);
 		break;
-	case 265:
+	case 340:
 		LabelMgr.setLabelShow(labelBottom,false);
 		break;
 	case 358:

@@ -353,12 +353,153 @@ LabelMgr.setLabelShow(labelBottom,false);
 StelMovementMgr.zoomTo(2, 3);
 core.wait(1.0);
 
-LabelMgr.setLabelText(labelBottom,"Let's now watch the cycle from far above the Earth's north pole.");
+LabelMgr.setLabelText(labelBottom,"Let's now watch the cycle one more time, zoomed out.");
 LabelMgr.setLabelShow(labelBottom,true);
 core.wait(2.0);
-core.setProjectionMode("ProjectionStereoscopic");
-core.setObserverLocation(0.0, 89.9, 0, 0.25, "", "Earth Observer Sphere"); // longitude, latitude, altitude, transition time, name, planet 
+LabelMgr.setLabelShow(labelBottom,false);
 core.setDate("2019-03-20T22:00:00", "utc");
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"When Full, the Moon is opposite the Sun in the sky.");
+StelMovementMgr.zoomTo(360, 3);
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(10.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+core.setTimeRate(43200.0); //speed up time
+for (time = 0; time < 28; time++)
+{
+	display.display();
+	if (time == 0)
+		LabelMgr.setLabelShow(labelBottom,false);
+	core.wait(0.25);
+}
+core.setTimeRate(0.0); //pause time
+LabelMgr.setLabelText(labelBottom,"Waning Gibbous: 135° to the right of the Sun.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+core.setTimeRate(43200.0); //speed up time
+for (time = 0; time < 28; time++)
+{
+	display.display();
+	if (time == 0)
+		LabelMgr.setLabelShow(labelBottom,false);
+	core.wait(0.25);
+}
+core.setTimeRate(0.0); //pause time
+LabelMgr.setLabelText(labelBottom,"Third Quarter: 90° to the right of the Sun.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+core.setTimeRate(43200.0); //speed up time
+for (time = 0; time < 28; time++)
+{
+	display.display();
+	if (time == 0)
+		LabelMgr.setLabelShow(labelBottom,false);
+	core.wait(0.25);
+}
+core.setTimeRate(0.0); //pause time
+LabelMgr.setLabelText(labelBottom,"Waning Crescent: 45° to the right of the Sun.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+core.setTimeRate(43200.0); //speed up time
+for (time = 0; time < 29; time++)
+{
+	display.display();
+	if (time == 0)
+		LabelMgr.setLabelShow(labelBottom,false);
+	core.wait(0.25);
+}
+core.setTimeRate(0.0); //pause time
+LabelMgr.setLabelText(labelBottom,"New: near the Sun.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+core.setTimeRate(43200.0); //speed up time
+for (time = 0; time < 28; time++)
+{
+	display.display();
+	if (time == 0)
+		LabelMgr.setLabelShow(labelBottom,false);
+	core.wait(0.25);
+}
+core.setTimeRate(0.0); //pause time
+LabelMgr.setLabelText(labelBottom,"Waxing Crescent: 45° to the left of the Sun.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+
+core.setTimeRate(43200.0); //speed up time
+for (time = 0; time < 28; time++)
+{
+	display.display();
+	if (time == 0)
+		LabelMgr.setLabelShow(labelBottom,false);
+	core.wait(0.25);
+}
+core.setTimeRate(0.0); //pause time
+LabelMgr.setLabelText(labelBottom,"First Quarter: 90° to the left of the Sun.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+
+
+core.setTimeRate(43200.0); //speed up time
+for (time = 0; time < 28; time++)
+{
+	display.display();
+	if (time == 0)
+		LabelMgr.setLabelShow(labelBottom,false);
+	core.wait(0.25);
+}
+core.setTimeRate(0.0); //pause time
+LabelMgr.setLabelText(labelBottom,"Waxing Gibbous: 135° to the left of the Sun.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+
+core.setTimeRate(43200.0); //speed up time
+for (time = 0; time < 29; time++)
+{
+	display.display();
+	if (time == 0)
+		LabelMgr.setLabelShow(labelBottom,false);
+	core.wait(0.25);
+}
+core.setTimeRate(0.0); //pause time
+LabelMgr.setLabelText(labelBottom,"Full: opposite the Sun.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"Let's now watch the cycle one last time from far above the Earth's north pole.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(2.0);
+core.setTimeRate(0.0); //pause time
+core.setDate("2019-03-20T22:00:00", "utc");
+core.wait(1.0);
+
+core.setProjectionMode("ProjectionStereographic");
+core.setObserverLocation(180.0, 89.9, 0, 0.001, "", "Earth Observer Sphere"); // longitude, latitude, altitude, transition time, name, planet 
 core.wait(1.0);
 display.display();
 StelMovementMgr.lookSouth(true);

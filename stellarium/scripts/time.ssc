@@ -53,6 +53,7 @@ core.setGuiVisible(false);
 core.clear("natural");
 core.setTimezone("UTC-06:00");
 core.setProjectionMode("ProjectionStereographic");
+core.setTimeRate(0.0); //pause time
 
 core.setObserverLocation(-90, 30.2666667, 200, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
 core.setDate("2019-04-15T12:00:00", "utc");
@@ -62,10 +63,23 @@ SolarSystem.setFlagLabels(false);
 // turn on cardinal points
 LandscapeMgr.setFlagCardinalsPoints(true);
 core.wait(0.5);
-
 var display =  Object.create(basicDisplay);
 display.textTitle = "Time & The Sun";
 display.display();
+var labelBottom = LabelMgr.labelScreen("Looking southward at 6 am CST",300,750,true,20,"#ffff00",true,5000);
+var labelBottom2 = LabelMgr.labelScreen(" ",300,775,true,20,"#ffff00",false,5000);
+core.wait(6.0);
+
+LabelMgr.setLabelText(labelBottom,"In this video we will watch how the Sun moves across the sky over the course of a day.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"We begin by panning down by 30° then zooming out.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(5.0);
+
 core.selectObjectByName("Sun", false);
 StelMovementMgr.setFlagTracking(false);
 
@@ -77,17 +91,128 @@ for (panStep = 0; panStep < 128; panStep++)
 	StelMovementMgr.panView(0,-0.5282529869 / 128.0);
 	core.wait(5.0 / 128.0);
 }
-core.wait(1);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
 StelMovementMgr.zoomTo(360, 3);
 core.wait(5);
+
+LabelMgr.setLabelText(labelBottom,"We will now advance time by 1 hour at each step and mark where the Sun is each hour.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
 
 for (timeRelNoon = -6; timeRelNoon <= 6; timeRelNoon++)
 {
 	do_time(display,2019,4,15,timeRelNoon);
+	if (timeRelNoon == 0)
+	{
+		LabelMgr.setLabelText(labelBottom,"The Sun moves east to west, and is highest above the horizon near Noon.");
+		LabelMgr.setLabelShow(labelBottom,true);
+	}
 }
-core.wait(5);
+core.wait(3.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"The Sun is never directly overhead from this location.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
 GridLinesMgr.setFlagEquatorGrid (true);
-core.wait(5);
+LabelMgr.setLabelText(labelBottom,"When we display an equatorial grid we can see that the Sun's path is part of a circle.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"It takes the Sun 24 hours to complete the circle and return to where it was the previous day.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"24 hours, the time it takes for the Sun to complete a circle, is called a Synodic day or a Solar day.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+
+LabelMgr.setLabelText(labelBottom,"If we move north or south from here, the length of a day is not affected, but");
+LabelMgr.setLabelText(labelBottom2,"the Sun will appear lower or higher in the sky.");
+LabelMgr.setLabelShow(labelBottom,true);
+LabelMgr.setLabelShow(labelBottom2,true);
+core.wait(8);
+LabelMgr.setLabelShow(labelBottom,false);
+LabelMgr.setLabelShow(labelBottom2,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"Let's go back to noon and head north.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+core.setDate("2019-04-15T18:00:00", "utc");
+core.wait(0.25);
+display.display();
+
+for (latitudedelta = 0; latitudedelta < 59; latitudedelta += 1.0)
+{
+	core.setObserverLocation(-90, 30.2666667 + latitudedelta, 200, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
+//	StelMovementMgr.panView(0,-0.01745329252);
+	core.wait(0.25);
+	display.display();
+	if (latitudedelta >= 10 && latitudedelta < 10.25)
+	{
+		LabelMgr.setLabelText(labelBottom,"Notice that the Sun is getting lower in the sky as we head further north.");
+		LabelMgr.setLabelShow(labelBottom,true);
+	}
+	if (latitudedelta >= 30 && latitudedelta < 30.25)
+	{
+		LabelMgr.setLabelShow(labelBottom,false);
+	}
+}
+LabelMgr.setLabelText(labelBottom,"We're now nearly at the north pole. Let's watch what the Sun does over the course of a day.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1);
+core.setTimeRate(3600.0); //pause time
+for (counter = 0; counter < 24; counter++)
+{
+	display.display();
+	if (counter == 9)
+	{
+		LabelMgr.setLabelText(labelBottom,"The Sun is currently behind us (to the north).");
+		LabelMgr.setLabelShow(labelBottom,true);
+	}
+	if (counter == 15)
+	{
+		LabelMgr.setLabelShow(labelBottom,false);
+	}
+	core.wait(1.0);
+}
+LabelMgr.setLabelText(labelBottom,"The Sun again went in a circle, but the circle is nearly parallel with the horizon.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1);
+LabelMgr.setLabelText(labelBottom,"It remained daylight the entire 24 hours.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1);
+
+
+
+
+LabelMgr.labelScreen("Video and script by Dr. Brian W. Mulligan, using Stellarium 0.19.2.",50,850,true,14,"#ffff00",true,8000);
+core.wait(10.0);
+
 
 
 SolarSystem.setFlagPlanets(false);

@@ -31,14 +31,14 @@ var mrkrColor = "#ff0000";
 core.setGuiVisible(false);
 core.clear("natural");
 core.setTimezone("UTC-06:00");
-core.setObserverLocation(-90.0000000, 30.26666667, 0, 1, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
+core.setObserverLocation(-90.0000000, 30.26666667, 0, 0, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
 core.setTimeRate(0); // pause time
 
 core.setDate("2019-04-15T18:00:00", "utc");
 SolarSystem.setFlagPlanets(true);
 SolarSystem.setFlagLabels(false);
 LandscapeMgr.setFlagCardinalsPoints(true);
-
+core.wait(0.25);
 var display =  Object.create(basicDisplay);
 display.textTitle = "Time, Longitude, & The Sun";
 display.display();
@@ -48,6 +48,22 @@ StelMovementMgr.setFlagTracking(false);
 
 GridLinesMgr.setFlagAzimuthalGrid(false);
 StelMovementMgr.lookSouth(true);
+var labelBottom = LabelMgr.labelScreen("Looking southward at noon CST from Lake Ponchetrain, LA",300,750,true,20,"#ffff00",true,5000);
+var labelBottom2 = LabelMgr.labelScreen(" ",300,775,true,20,"#ffff00",false,5000);
+core.wait(6.0);
+
+LabelMgr.setLabelText(labelBottom,"In this video we will see how your longitude affects the position of the Sun in the sky.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+
+LabelMgr.setLabelText(labelBottom,"We begin by looking south at noon, panning upward by 30°, and zooming out so we see the Sun.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
 //core.wait(2);
 for (panStep = 0; panStep < 128; panStep++)
 {
@@ -58,6 +74,30 @@ core.wait(1);
 StelMovementMgr.zoomTo(90, 3);
 core.wait(5);
 
+LabelMgr.setLabelText(labelBottom,"Our initial longitude is 90° west (Lake Ponchetrain, LA).");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"We will move westward from here until we reach Austin, TX.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"We're keeping the clock time fixed at Noon.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"We'll place a marker every 5° of longitude that we travel.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
 var last_long = -1000.0;
 var curr_long = -90.0;
 for (longitude = -90.0; longitude >= -97.73333333; longitude-=0.25)
@@ -66,7 +106,8 @@ for (longitude = -90.0; longitude >= -97.73333333; longitude-=0.25)
 	core.wait(0.25);
 	curr_long = longitude;
 	display.display();
-	if (Math.abs(longitude - last_long) > 5.0)
+	if ((longitude <= -90 && longitude > -90.25) ||
+		(longitude <= -95 && longitude > -95.25))
 	{
 		last_long = longitude;
 		var info = core.getObjectInfo("Sun");
@@ -82,13 +123,28 @@ for (longitude = -90.0; longitude >= -97.73333333; longitude-=0.25)
 		LabelMgr.labelHorizon(labelLongMarker, az, alt, true, 20, color);
 	}
 }
-core.wait(5.0);
+LabelMgr.setLabelText(labelBottom,"We've made it to Austin. The Sun is further east here than it is in Louisiana.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"We'll keep going west until we reach the west coast near San Diego, CA.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
 for (longitude = curr_long; longitude >= -117.1611; longitude-=0.25)
 {
 	core.setObserverLocation(longitude, 30.26666667, 0, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
 	core.wait(0.25);
 	display.display();
-	if (Math.abs(longitude - last_long) > 1.0)
+
+	if ((longitude <= -100 && longitude > -100.25) ||
+		(longitude <= -105 && longitude > -105.25) ||
+		(longitude <= -110 && longitude > -110.25) ||
+		(longitude <= -115 && longitude > -115.25))
 	{
 		last_long = longitude;
 		var info = core.getObjectInfo("Sun");
@@ -104,23 +160,106 @@ for (longitude = curr_long; longitude >= -117.1611; longitude-=0.25)
 		LabelMgr.labelHorizon(labelLongMarker, az, alt, true, 20, color);
 	}
 }
-core.wait(5);
+core.wait(0.25);
+display.display();
+
+LabelMgr.setLabelText(labelBottom,"We've reached San Diego. The Sun appears even further east from here.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"We'll advance time and see how long it takes the Sun to catch up.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
 var lastTime = -2;
-for (currTime = 0; currTime <= 1.84; currTime+=0.25)
+core.setTimeRate(900.0); //pause time
+
+for (currTime = 0; currTime < 54; currTime++)
 {
-	core.setDate("+15 minutes");
-	core.wait(1.0);
+//	core.setDate("+15 minutes");
+	core.wait(0.125);
 	display.display();
-	if (Math.abs(currTime - lastTime) > 1.0)
-	{
-		lastTime = currTime;
-		var info = core.getObjectInfo("Sun");
-		var az = info.azimuth;
-		var alt = info.altitude;
-		MarkerMgr.markerHorizon(az, alt, true, "gear", mrkrColor, 10);
-	}
+//	if (Math.abs(currTime - lastTime) > 1.0)
+//	{
+//		lastTime = currTime;
+//		var info = core.getObjectInfo("Sun");
+//		var az = info.azimuth;
+//		var alt = info.altitude;
+//		MarkerMgr.markerHorizon(az, alt, true, "gear", mrkrColor, 10);
+//	}
 }
-core.wait(5);
+core.setTimeRate(0.0); //pause time
+LabelMgr.setLabelText(labelBottom,"The Sun reaches the highest point above the horizon about 1¾ hours later in San Diego than in LA.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"It takes the Sun 24 hours to travel in a circle of 360°. This means it travels 15° in an hour.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"Since San Diego is about 27° west of Lake Ponchetrain, the Sun's position is different by 27°.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"Time zones are located about 15° of longitude apart, so that the clock time is the same for");
+LabelMgr.setLabelText(labelBottom2,"everyone in the time zone, but the actual position of the Sun varies.");
+LabelMgr.setLabelShow(labelBottom,true);
+LabelMgr.setLabelShow(labelBottom2,true);
+core.wait(12.0);
+LabelMgr.setLabelShow(labelBottom,false);
+LabelMgr.setLabelShow(labelBottom2,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"Lousiana and Austin, TX are in the central time zone. The central zone is approximately centered");
+LabelMgr.setLabelText(labelBottom2,"around W90° longitude, where we started. Clock time is the same as solar time at that point.");
+LabelMgr.setLabelShow(labelBottom,true);
+LabelMgr.setLabelShow(labelBottom2,true);
+core.wait(12.0);
+LabelMgr.setLabelShow(labelBottom,false);
+LabelMgr.setLabelShow(labelBottom2,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"Solar time refers to where the Sun actually is in the sky. Solar noon is when the Sun crosses the meridian.");
+//LabelMgr.setLabelText(labelBottom2,"the meridian. ");
+LabelMgr.setLabelShow(labelBottom,true);
+//LabelMgr.setLabelShow(labelBottom2,true);
+core.wait(8.0);
+LabelMgr.setLabelShow(labelBottom,false);
+//LabelMgr.setLabelShow(labelBottom2,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"In Austin, solar time differs from clock time by about 31 minutes during winter, and");
+LabelMgr.setLabelText(labelBottom2,"by 1 hour 31 minutes during daylight saving time. ");
+LabelMgr.setLabelShow(labelBottom,true);
+LabelMgr.setLabelShow(labelBottom2,true);
+core.wait(12.0);
+LabelMgr.setLabelShow(labelBottom,false);
+LabelMgr.setLabelShow(labelBottom2,false);
+core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"In the next video you will see there is an additional variation between clock time and solar time over the course of the year.");
+//LabelMgr.setLabelText(labelBottom2,"the meridian. ");
+LabelMgr.setLabelShow(labelBottom,true);
+//LabelMgr.setLabelShow(labelBottom2,true);
+core.wait(8.0);
+LabelMgr.setLabelShow(labelBottom,false);
+//LabelMgr.setLabelShow(labelBottom2,false);
+core.wait(1.0);
+
+
+LabelMgr.labelScreen("Video and script by Dr. Brian W. Mulligan, using Stellarium 0.19.2.",50,850,true,14,"#ffff00",true,8000);
+core.wait(10.0);
+
 SolarSystem.setFlagPlanets(false);
 SolarSystem.setFlagLabels(false);
 StarMgr.setFlagStars(false);

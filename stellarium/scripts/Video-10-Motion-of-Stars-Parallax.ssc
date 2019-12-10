@@ -1,0 +1,184 @@
+//
+// Author: Brian W. Mulligan
+// Version: 1.0
+// License: GPL v3.0
+// Name: Proper motion of stars
+// Description: A demonstration of how a star (HD 48915B) moves across the sky over the course of a year, demonstrating parallax.
+// Note: Stellarium doesn't include parallax right now, so this script is useless.
+//
+
+include("i18n.inc");
+include("save_state.inc");
+include("basicDisplay.inc");
+include("addLeadingZero.inc");
+
+//
+// move to "home" position, then save state of stellarium
+core.goHome();
+saveState("video-9-demo");
+core.setTimezone("UTC-06:00");
+core.setTimeRate(0); // pause time
+
+var color = "#aa0000";
+var mrkrColor = "#ff0000";
+
+// remove GUI, set desired starting position
+core.setGuiVisible(false);
+MarkerMgr.deleteAllMarkers();
+core.clear("natural");
+//core.setProjectionMode("ProjectionCylinder");
+core.setObserverLocation(-97.7431, 30.2666667, 200, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
+core.setDate("2019-10-11T04:00:00", "utc");
+// turn on planets, turn off planet labels
+SolarSystem.setFlagPlanets(true);
+SolarSystem.setFlagLabels(false);
+// turn on cardinal points
+LandscapeMgr.setFlagCardinalsPoints(true);
+LandscapeMgr.setFlagAtmosphere(true);
+core.wait(0.5);
+
+var display =  Object.create(basicDisplay);
+display.textTitle = "Parallax of Stars";
+display.display();
+StelMovementMgr.setFlagTracking(false);
+GridLinesMgr.setFlagAzimuthalGrid(false);
+GridLinesMgr.setFlagEquatorGrid (false);
+
+var labelBottom = LabelMgr.labelScreen("Looking southward in Austin, TX at 10 pm CST",200,750,true,20,"#ffff00",true,5000);
+StelMovementMgr.lookSouth(true);
+StelMovementMgr.zoomTo(360, 3);
+core.wait(6.0);
+
+
+LabelMgr.setLabelText(labelBottom,"We'll get rid of the ground and atmosphere so we can easily watch this star.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(3.0);
+LandscapeMgr.setFlagCardinalsPoints(false);
+LandscapeMgr.setFlagAtmosphere(false);
+LandscapeMgr.setFlagLandscape(false);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+
+core.selectObjectByName("HD 48915B", true);
+LabelMgr.setLabelText(labelBottom,"Here is the star HD 48915B, we will follow it over the course of a few years. (We'll zoom in on it in a moment)");
+LabelMgr.setLabelShow(labelBottom,true);
+StelMovementMgr.setEquatorialMount(true);
+StelMovementMgr.setFlagTracking(true);
+
+var info = core.getObjectInfo("HD 48915B");
+var az = info.azimuth;
+var alt = info.altitude;
+
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+
+StelMovementMgr.setFlagTracking(true);
+core.selectObjectByName("HD 48915B", true);
+core.wait(1.0);
+LabelMgr.setLabelText(labelBottom,"We'll zoom in on just HD 48915B and the nearby stars.");
+LabelMgr.setLabelShow(labelBottom,true);
+StelMovementMgr.zoomTo(0.0625, 3);
+core.wait(8.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+
+LabelMgr.setLabelText(labelBottom,"We will speed up time to watch it move. We will place a marker about once a month.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+var timeRate = 86400.0 * 365.25 * 0.125;
+var displayOnPause = timeRate / 86400.0 * 8.0;
+var displayOffPause = timeRate / 86400.0 * 4.0;
+var endPause = timeRate / 86400.0 * 60.0;
+
+core.setTimeRate(timeRate);
+var bDone = false;
+var dayStart = core.getMJDay();
+var lastDisplay = core.getMJDay();
+var lastMarker = lastDisplay;
+var iDisplay = 0;
+var bDisplayOn = false;
+while (!bDone)
+{
+	display.display();
+	core.wait(0.03333);
+	var currDay = core.getMJDay();
+	if ((currDay - lastMarker) > 4)
+	{
+		info = core.getObjectInfo("HD 48915B");
+		var ra = info.raJ2000;
+		var dec = info.decJ2000;
+		MarkerMgr.markerEquatorial(ra, dec, true, true, "circle", mrkrColor, 3);    
+		lastMarker = currDay;
+	}
+	if (bDisplayOn && (currDay - lastDisplay) > displayOnPause)
+	{
+		LabelMgr.setLabelShow(labelBottom,false);
+		bDisplayOn = false;
+		lastDisplay = currDay;
+	}
+	if (!bDisplayOn && (currDay - lastDisplay) > displayOffPause)
+	{
+		lastDisplay = currDay;
+		bDisplayOn = true;
+		switch (iDisplay)
+		{
+		case 0:
+			LabelMgr.setLabelText(labelBottom,"We can see it moving slowly (over decades) with respect to the other stars.");
+			LabelMgr.setLabelShow(labelBottom,true);
+			break;
+		case 1:
+			LabelMgr.setLabelText(labelBottom,"This motion is called \"proper motion\" and is due to the movement of the star through space.");
+			LabelMgr.setLabelShow(labelBottom,true);
+			break;
+		case 2:
+			LabelMgr.setLabelText(labelBottom,"The other stars you see here are either much further away or moving more slowly through space.");
+			LabelMgr.setLabelShow(labelBottom,true);
+			break;
+		case 3:
+			LabelMgr.setLabelText(labelBottom,"In the next video we will watch how planets move across the sky.");
+			LabelMgr.setLabelShow(labelBottom,true);
+			break;
+		default:
+			break;
+		}
+		iDisplay++;
+	}
+	bDone = (core.getMJDay() - dayStart) > endPause;
+}
+LabelMgr.labelScreen("Video and script by Dr. Brian W. Mulligan, using Stellarium 0.19.2.",50,850,true,14,"#ffff00",true,8000);
+for (counter = 0; counter < 300; counter++)
+{
+	display.display();
+	core.wait(0.03333);
+}
+
+
+MarkerMgr.deleteAllMarkers();
+
+SolarSystem.setFlagPlanets(false);
+SolarSystem.setFlagLabels(false);
+StarMgr.setFlagStars(false);
+//core.wait(60);
+LabelMgr.deleteAllLabels();
+MarkerMgr.deleteAllMarkers();
+//StarMgr.setFlagStars(starsOn);
+//SolarSystem.setFlagPlanets(planetsOn);
+//SolarSystem.setFlagLabels(labelsOn);
+//LandscapeMgr.setFlagCardinalsPoints(cardinalLabelsOn);
+//core.setObserverLocation(observerLocation);
+//core.setProjectionMode(projectionMode);
+core.clear("natural");
+restoreState("video-9-demo");
+//core.setJDay(JD);
+core.setTimeRate(1.0); // pause time
+core.goHome();
+core.setGuiVisible(true);
+

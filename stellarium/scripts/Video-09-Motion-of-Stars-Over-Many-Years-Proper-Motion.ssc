@@ -3,7 +3,7 @@
 // Version: 1.0
 // License: GPL v3.0
 // Name: Proper motion of stars
-// Description: A demonstration of how a star (Denebola) moves across the sky over the course of many years, demonstrating proper motion.
+// Description: A demonstration of how a star (HD 179626) moves across the sky over the course of many years, demonstrating proper motion.
 //
 
 include("i18n.inc");
@@ -37,78 +37,116 @@ LandscapeMgr.setFlagAtmosphere(true);
 core.wait(0.5);
 
 var display =  Object.create(basicDisplay);
-display.textTitle = "Time & The Night Sky";
+display.textTitle = "Proper Motion of Stars";
 display.display();
 StelMovementMgr.setFlagTracking(false);
 GridLinesMgr.setFlagAzimuthalGrid(false);
 GridLinesMgr.setFlagEquatorGrid (false);
-core.wait(5.0);
 
 var labelBottom = LabelMgr.labelScreen("Looking southward in Austin, TX at 10 pm CST",200,750,true,20,"#ffff00",true,5000);
 StelMovementMgr.lookSouth(true);
 StelMovementMgr.zoomTo(360, 3);
 core.wait(6.0);
 
-core.selectObjectByName("λ And", true);
-LabelMgr.setLabelText(labelBottom,"This is the star λ Andromeda, we will follow it over the course of many years.");
+core.selectObjectByName("HD 179626", true);
+LabelMgr.setLabelText(labelBottom,"Here is the star HD 179626, we will follow it over the course of many years. (We'll zoom in on it in a moment)");
 LabelMgr.setLabelShow(labelBottom,true);
+StelMovementMgr.setEquatorialMount(true);
+StelMovementMgr.setFlagTracking(true);
 
-var info = core.getObjectInfo("λ And");
+var info = core.getObjectInfo("HD 179626");
 var az = info.azimuth;
 var alt = info.altitude;
 
 core.wait(5.0);
 LabelMgr.setLabelShow(labelBottom,false);
 core.wait(1.0);
+
+LabelMgr.setLabelText(labelBottom,"We'll get rid of the ground and atmosphere so we can easily watch this star.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(3.0);
+LandscapeMgr.setFlagCardinalsPoints(false);
+LandscapeMgr.setFlagAtmosphere(false);
+LandscapeMgr.setFlagLandscape(false);
+core.wait(5.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
+
+
 StelMovementMgr.setFlagTracking(true);
-core.selectObjectByName("λ And", true);
+core.selectObjectByName("HD 179626", true);
 core.wait(1.0);
-LabelMgr.setLabelText(labelBottom,"We'll zoom in on just λ Andromeda and the nearby stars.");
+LabelMgr.setLabelText(labelBottom,"We'll zoom in on just HD 179626 and the nearby stars.");
 LabelMgr.setLabelShow(labelBottom,true);
-StelMovementMgr.zoomTo(0.25, 3);
-core.wait(5.0);
+StelMovementMgr.zoomTo(0.0625, 3);
+core.wait(8.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
 
-LabelMgr.setLabelText(labelBottom,"We will jump forward about 4 years in each step.");
+
+LabelMgr.setLabelText(labelBottom,"We will speed up time significantly to watch it move.");
 LabelMgr.setLabelShow(labelBottom,true);
-core.wait(5);
+core.wait(8.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
 
-for (time = 0; time < 48; time++)
+var timeRate = 86400.0 * 365.25 * 4.0;
+var displayOnPause = timeRate / 86400.0 * 8.0;
+var displayOffPause = timeRate / 86400.0 * 4.0;
+var endPause = timeRate / 86400.0 * 60.0;
+
+core.setTimeRate(timeRate);
+var bDone = false;
+var dayStart = core.getMJDay();
+var lastDisplay = core.getMJDay();
+var iDisplay = 0;
+var bDisplayOn = false;
+while (!bDone)
 {
-	core.setDate("+1461 days");
 	display.display();
-	if (time == 0)
-		LabelMgr.setLabelShow(labelBottom,false);
-	core.wait(0.25);
-	switch (time)
+	core.wait(0.03333);
+	var currDay = core.getMJDay();
+	if (bDisplayOn && (currDay - lastDisplay) > displayOnPause)
 	{
-	case 16:
-		LabelMgr.setLabelText(labelBottom,"We can see it moving slowly with respect to the other stars.");
-		LabelMgr.setLabelShow(labelBottom,true);
-		break;
-	case 36:
 		LabelMgr.setLabelShow(labelBottom,false);
-		break;
+		bDisplayOn = false;
+		lastDisplay = currDay;
 	}
-
+	if (!bDisplayOn && (currDay - lastDisplay) > displayOffPause)
+	{
+		lastDisplay = currDay;
+		bDisplayOn = true;
+		switch (iDisplay)
+		{
+		case 0:
+			LabelMgr.setLabelText(labelBottom,"We can see it moving slowly (over decades) with respect to the other stars.");
+			LabelMgr.setLabelShow(labelBottom,true);
+			break;
+		case 1:
+			LabelMgr.setLabelText(labelBottom,"This motion is called \"proper motion\" and is due to the movement of the star through space.");
+			LabelMgr.setLabelShow(labelBottom,true);
+			break;
+		case 2:
+			LabelMgr.setLabelText(labelBottom,"The other stars you see here are either much further away or moving more slowly through space.");
+			LabelMgr.setLabelShow(labelBottom,true);
+			break;
+		case 3:
+			LabelMgr.setLabelText(labelBottom,"In the next video we will look for motion due to parallax.");
+			LabelMgr.setLabelShow(labelBottom,true);
+			break;
+		default:
+			break;
+		}
+		iDisplay++;
+	}
+	bDone = (core.getMJDay() - dayStart) > endPause;
 }
-core.wait(1.0);
-LabelMgr.setLabelText(labelBottom,"This motion is due to the movement of the star through space.");
-LabelMgr.setLabelShow(labelBottom,true);
-core.wait(5.0);
-LabelMgr.setLabelShow(labelBottom,false);
-core.wait(1.0);
-LabelMgr.setLabelText(labelBottom,"The other stars you see here are either much further away or moving more slowly through space.");
-LabelMgr.setLabelShow(labelBottom,true);
-core.wait(5.0);
-LabelMgr.setLabelShow(labelBottom,false);
-core.wait(1.0);
-LabelMgr.setLabelText(labelBottom,"In the next video we will look for motion due to parallax.");
-LabelMgr.setLabelShow(labelBottom,true);
-core.wait(5.0);
-LabelMgr.setLabelShow(labelBottom,false);
-core.wait(1.0);
-LabelMgr.labelScreen("Video and script by Dr. Brian W. Mulligan, using Stellarium 0.19.1.",50,850,true,14,"#ffff00",true,8000);
-core.wait(10.0);
+LabelMgr.labelScreen("Video and script by Dr. Brian W. Mulligan, using Stellarium 0.19.2.",50,850,true,14,"#ffff00",true,8000);
+for (counter = 0; counter < 300; counter++)
+{
+	display.display();
+	core.wait(0.03333);
+}
 
 
 MarkerMgr.deleteAllMarkers();

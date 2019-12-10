@@ -207,6 +207,11 @@ core.wait(8);
 LabelMgr.setLabelShow(labelBottom,false);
 core.wait(1);
 
+LabelMgr.setLabelText(labelBottom,"In the next video you will see how moving west or east (your longitude) affects the position of the Sun.");
+LabelMgr.setLabelShow(labelBottom,true);
+core.wait(8.0);
+LabelMgr.setLabelShow(labelBottom,false);
+core.wait(1.0);
 
 
 

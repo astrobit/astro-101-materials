@@ -15,7 +15,8 @@ include("addLeadingZero.inc");
 // move to "home" position, then save state of stellarium
 core.goHome();
 saveState("pre-analemma-demo");
-core.setTimezone("UTC-06:00");
+//core.setTimezone("UTC-06:00");
+core.setTimezone("America/Chicago");
 
 var color = "#aa0000";
 var mrkrColor = "#ff0000";
@@ -23,10 +24,15 @@ var mrkrColor = "#ff0000";
 // remove GUI, set desired starting position
 core.setGuiVisible(false);
 core.clear("natural");
-//core.setProjectionMode("ProjectionCylinder");
-core.setObserverLocation(-90, 30.2666667, 200, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
-core.setDate("2019-04-15T18:00:00", "utc");
 core.setTimeRate(0); // pause time
+core.wait(0.25);
+
+
+//core.setProjectionMode("ProjectionCylinder");
+core.setObserverLocation(-90.0, 30.26666667, 0, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
+core.wait(0.25);
+
+core.setDate("2019-04-15T18:00:00", "utc");
 // turn on planets, turn off planet labels
 SolarSystem.setFlagPlanets(true);
 SolarSystem.setFlagLabels(false);
@@ -83,7 +89,7 @@ core.wait(3);
 //GridLinesMgr.setFlagEquatorGrid (true);
 //core.wait(5);
 
-LabelMgr.setLabelText(labelBottom,"We will advance time 3 days at a time, keeping the clock at noon clock time.");
+LabelMgr.setLabelText(labelBottom,"We will advance time 3 days each step, keeping the clock at noon clock time.");
 LabelMgr.setLabelShow(labelBottom,true);
 core.wait(8.0);
 LabelMgr.setLabelShow(labelBottom,false);
@@ -102,16 +108,16 @@ for (timeYear = 0; timeYear < 365; timeYear = timeYear + 3)
 	switch  (timeYear)
 	{
 	case 15:
-		LabelMgr.setLabelText(labelBottom,"Even though we're staying at noon clock time and always in the same location on Earth, the Sun.");
+		LabelMgr.setLabelText(labelBottom,"Even though we're staying at noon clock time and always in the same location on Earth, the Sun");
 		LabelMgr.setLabelText(labelBottom2,"isn't staying at solar noon.");
 		LabelMgr.setLabelShow(labelBottom,true);
 		LabelMgr.setLabelShow(labelBottom2,true);
 		break;
-	case 47:
+	case 79:
 		LabelMgr.setLabelShow(labelBottom,false);
 		LabelMgr.setLabelShow(labelBottom2,false);
 		break;
-	case 60:
+	case 130:
 		LabelMgr.setLabelText(labelBottom,"When it's too far west, the Sun is moving a little faster than expected - it covers more than 360° in 24 hours.");
 		LabelMgr.setLabelText(labelBottom2,"When its too far east, the Sun is now moving a little slower than expected - it covers less than 360° in 24 hours.");
 		break;
@@ -165,7 +171,7 @@ LabelMgr.setLabelShow(labelBottom,false);
 core.wait(1.0);
 
 LabelMgr.setLabelText(labelBottom,"The Sun's motion is a little faster than expected in April - June and September - January.");
-LabelMgr.setLabelText(labelBottom2,"The Sun's motion is a little slower than expected in June - September and January - April.");
+LabelMgr.setLabelText(labelBottom2,"During this time it will be a little west of the meridian at noon clock time.");
 LabelMgr.setLabelShow(labelBottom,true);
 LabelMgr.setLabelShow(labelBottom2,true);
 core.wait(12.0);
@@ -173,6 +179,24 @@ LabelMgr.setLabelShow(labelBottom,false);
 LabelMgr.setLabelShow(labelBottom2,false);
 core.wait(1.0);
 
+LabelMgr.setLabelText(labelBottom,"The Sun's motion is a little slower than expected in June - September and January - April.");
+LabelMgr.setLabelText(labelBottom2,"During this time it will be a little east of the meridian at noon clock time.");
+LabelMgr.setLabelShow(labelBottom,true);
+LabelMgr.setLabelShow(labelBottom2,true);
+core.wait(12.0);
+LabelMgr.setLabelShow(labelBottom,false);
+LabelMgr.setLabelShow(labelBottom2,false);
+core.wait(1.0);
+
+
+LabelMgr.setLabelText(labelBottom,"TheIn the next video we will watch how the Sun rises and sets and the path that it takes");
+LabelMgr.setLabelText(labelBottom2,"over the course of a day in different seasons.");
+LabelMgr.setLabelShow(labelBottom,true);
+LabelMgr.setLabelShow(labelBottom2,true);
+core.wait(12.0);
+LabelMgr.setLabelShow(labelBottom,false);
+LabelMgr.setLabelShow(labelBottom2,false);
+core.wait(1.0);
 
 LabelMgr.labelScreen("Video and script by Dr. Brian W. Mulligan, using Stellarium 0.19.2.",50,850,true,14,"#ffff00",true,8000);
 core.wait(10.0);

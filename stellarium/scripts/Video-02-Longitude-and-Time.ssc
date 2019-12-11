@@ -219,7 +219,7 @@ LabelMgr.setLabelShow(labelBottom,false);
 LabelMgr.setLabelShow(labelBottom2,false);
 core.wait(1.0);
 
-LabelMgr.setLabelText(labelBottom,"Lousiana and Austin, TX are in the central time zone. The central zone is approximately centered");
+LabelMgr.setLabelText(labelBottom,"Louisiana and Austin, TX are in the central time zone. The central zone is approximately centered");
 LabelMgr.setLabelText(labelBottom2,"around W90° longitude, where we started. Clock time is the same as solar time at that point.");
 LabelMgr.setLabelShow(labelBottom,true);
 LabelMgr.setLabelShow(labelBottom2,true);

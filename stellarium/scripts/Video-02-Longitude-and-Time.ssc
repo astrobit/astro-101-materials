@@ -30,9 +30,13 @@ var mrkrColor = "#ff0000";
 
 core.setGuiVisible(false);
 core.clear("natural");
-core.setTimezone("UTC-06:00");
-core.setObserverLocation(-90.0000000, 30.26666667, 0, 0, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
 core.setTimeRate(0); // pause time
+core.wait(0.25);
+
+//core.setTimezone("UTC-06:00");
+core.setTimezone("America/Chicago");
+core.setObserverLocation(-90.0, 30.26666667, 0, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
+core.wait(0.25);
 
 core.setDate("2019-04-15T18:00:00", "utc");
 SolarSystem.setFlagPlanets(true);
@@ -41,6 +45,7 @@ LandscapeMgr.setFlagCardinalsPoints(true);
 core.wait(0.25);
 var display =  Object.create(basicDisplay);
 display.textTitle = "Time, Longitude, & The Sun";
+display.timezone = -6.0;
 display.display();
 
 core.selectObjectByName("Sun", false);
@@ -80,13 +85,13 @@ core.wait(8.0);
 LabelMgr.setLabelShow(labelBottom,false);
 core.wait(1.0);
 
-LabelMgr.setLabelText(labelBottom,"We will move westward from here until we reach Austin, TX.");
+LabelMgr.setLabelText(labelBottom,"We will move westward from here until we reach Austin, TX (longitude 97.5° west).");
 LabelMgr.setLabelShow(labelBottom,true);
 core.wait(8.0);
 LabelMgr.setLabelShow(labelBottom,false);
 core.wait(1.0);
 
-LabelMgr.setLabelText(labelBottom,"We're keeping the clock time fixed at Noon.");
+LabelMgr.setLabelText(labelBottom,"We're keeping the clock time fixed as we move.");
 LabelMgr.setLabelShow(labelBottom,true);
 core.wait(8.0);
 LabelMgr.setLabelShow(labelBottom,false);
@@ -129,7 +134,7 @@ core.wait(8.0);
 LabelMgr.setLabelShow(labelBottom,false);
 core.wait(1.0);
 
-LabelMgr.setLabelText(labelBottom,"We'll keep going west until we reach the west coast near San Diego, CA.");
+LabelMgr.setLabelText(labelBottom,"We'll keep going west until we reach the west coast near San Diego, CA (longitude 117°W)");
 LabelMgr.setLabelShow(labelBottom,true);
 core.wait(8.0);
 LabelMgr.setLabelShow(labelBottom,false);
@@ -178,22 +183,16 @@ core.wait(1.0);
 var lastTime = -2;
 core.setTimeRate(900.0); //pause time
 
-for (currTime = 0; currTime < 54; currTime++)
+var quitTime =  core.getMJDay() + 27.0/15.0/24.0
+var bQuit = false;
+while (!bQuit)
 {
-//	core.setDate("+15 minutes");
-	core.wait(0.125);
 	display.display();
-//	if (Math.abs(currTime - lastTime) > 1.0)
-//	{
-//		lastTime = currTime;
-//		var info = core.getObjectInfo("Sun");
-//		var az = info.azimuth;
-//		var alt = info.altitude;
-//		MarkerMgr.markerHorizon(az, alt, true, "gear", mrkrColor, 10);
-//	}
+	core.wait(0.0333);
+	bQuit = (core.getMJDay() > quitTime);
 }
 core.setTimeRate(0.0); //pause time
-LabelMgr.setLabelText(labelBottom,"The Sun reaches the highest point above the horizon about 1¾ hours later in San Diego than in LA.");
+LabelMgr.setLabelText(labelBottom,"The Sun reaches the highest point above the horizon about 1¾ hours later in San Diego than in Louisiana.");
 LabelMgr.setLabelShow(labelBottom,true);
 core.wait(8.0);
 LabelMgr.setLabelShow(labelBottom,false);

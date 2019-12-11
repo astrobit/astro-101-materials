@@ -190,7 +190,7 @@ var basicDisplay = {
 		if (secondInMinute < 10)
 			timeSecVerbose = "0" + secondInMinute;
 		else
-			timeSecVerbose = minuteInHour;
+			timeSecVerbose = secondInMinute;
 
 
 		switch(month)

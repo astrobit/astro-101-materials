@@ -243,7 +243,11 @@ var basicDisplay = {
 		var epoch = "CE";
 		if (year < 0)
 			epoch = "BCE";
-		timeVerbose = dayOfMonth + " " + monthVerbose + " " + absYear + " " + epoch + " " + timeHourVerbose + ":" + timeMinVerbose + ":" + timeSecVerbose;
+
+		var dayOfMonthVerbose = dayOfMonth;
+		if (dayOfMonth < 10)
+			dayOfMonthVerbose = "0" + dayOfMonth;
+		timeVerbose = dayOfMonthVerbose + " " + monthVerbose + " " + absYear + " " + epoch + " " + timeHourVerbose + ":" + timeMinVerbose + ":" + timeSecVerbose;
 
 
 

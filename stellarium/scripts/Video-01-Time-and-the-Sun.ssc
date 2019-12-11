@@ -51,11 +51,12 @@ var mrkrColor = "#ff0000";
 // remove GUI, set desired starting position
 core.setGuiVisible(false);
 core.clear("natural");
-core.setTimezone("UTC-06:00");
+//core.setTimezone("UTC-06:00");
+core.setTimezone("America/Chicago");
 core.setProjectionMode("ProjectionStereographic");
 core.setTimeRate(0.0); //pause time
 
-core.setObserverLocation(-90, 30.2666667, 200, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
+core.setObserverLocation(-90.0, 30.2666667, 200, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
 core.setDate("2019-04-15T12:00:00", "utc");
 // turn on planets, turn off planet labels
 SolarSystem.setFlagPlanets(true);
@@ -65,6 +66,7 @@ LandscapeMgr.setFlagCardinalsPoints(true);
 core.wait(0.5);
 var display =  Object.create(basicDisplay);
 display.textTitle = "Time & The Sun";
+display.timezone = -6.0;
 display.display();
 var labelBottom = LabelMgr.labelScreen("Looking southward at 6 am CST",300,750,true,20,"#ffff00",true,5000);
 var labelBottom2 = LabelMgr.labelScreen(" ",300,775,true,20,"#ffff00",false,5000);
@@ -162,7 +164,7 @@ display.display();
 
 for (latitudedelta = 0; latitudedelta < 59; latitudedelta += 1.0)
 {
-	core.setObserverLocation(-90, 30.2666667 + latitudedelta, 200, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
+	core.setObserverLocation(-90.0, 30.2666667 + latitudedelta, 200, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
 //	StelMovementMgr.panView(0,-0.01745329252);
 	core.wait(0.25);
 	display.display();
@@ -182,31 +184,53 @@ core.wait(8);
 LabelMgr.setLabelShow(labelBottom,false);
 core.wait(1);
 core.setTimeRate(3600.0); //pause time
-for (counter = 0; counter < 24; counter++)
+var startTime = core.getMJDay();
+var bQuit = false;
+var bDisplay = false;
+while (!bQuit)
 {
+	var currTime = core.getMJDay();
+	var ElapsedHours = (currTime - startTime) * 24.0;
 	display.display();
-	if (counter == 9)
+	if (!bDisplay && ElapsedHours > 9.0 &&  ElapsedHours < 10.0)
 	{
 		LabelMgr.setLabelText(labelBottom,"The Sun is currently behind us (to the north).");
 		LabelMgr.setLabelShow(labelBottom,true);
+		bDisplay = true;
 	}
-	if (counter == 15)
+	if (bDisplay && ElapsedHours > 15.0 &&  ElapsedHours < 16.0)
 	{
+		bDisplay = false;
 		LabelMgr.setLabelShow(labelBottom,false);
 	}
-	core.wait(1.0);
-}
-LabelMgr.setLabelText(labelBottom,"The Sun again went in a circle, but the circle is nearly parallel with the horizon.");
-LabelMgr.setLabelShow(labelBottom,true);
-core.wait(8);
-LabelMgr.setLabelShow(labelBottom,false);
-core.wait(1);
-LabelMgr.setLabelText(labelBottom,"It remained daylight the entire 24 hours.");
-LabelMgr.setLabelShow(labelBottom,true);
-core.wait(8);
-LabelMgr.setLabelShow(labelBottom,false);
-core.wait(1);
+	if (!bDisplay && ElapsedHours > 23.0 &&  ElapsedHours < 24.0)
+	{
+		LabelMgr.setLabelText(labelBottom,"The Sun again went in a circle, but the circle is nearly parallel with the horizon.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		bDisplay = true;
+	}
+	if (bDisplay && ElapsedHours > 32.0 &&  ElapsedHours < 33.0)
+	{
+		bDisplay = false;
+		LabelMgr.setLabelShow(labelBottom,false);
+	}
+	if (!bDisplay && ElapsedHours > 35.0 &&  ElapsedHours < 36.0)
+	{
+		LabelMgr.setLabelText(labelBottom,"It remained daylight the entire 24 hours.");
+		LabelMgr.setLabelShow(labelBottom,true);
+		bDisplay = true;
+	}
+	if (bDisplay && ElapsedHours > 44.0 &&  ElapsedHours < 45.0)
+	{
+		bDisplay = false;
+		LabelMgr.setLabelShow(labelBottom,false);
+	}
 
+	bQuit = ElapsedHours > 46.0;
+	core.wait(0.0333);
+}
+
+core.setTimeRate(0.0); //pause time
 LabelMgr.setLabelText(labelBottom,"In the next video you will see how moving west or east (your longitude) affects the position of the Sun.");
 LabelMgr.setLabelShow(labelBottom,true);
 core.wait(8.0);

@@ -18,9 +18,13 @@ core.setTimezone("UTC-06:00");
 
 core.setGuiVisible(false);
 core.clear("natural");
-core.setObserverLocation(-90, 30.2666667, 200, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
-core.setDate("2019-03-21T11:02:00", "utc");
 core.setTimeRate(0); // pause time
+core.wait(0.25);
+
+core.setObserverLocation(-90.0, 30.2666667, 0.0, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
+core.wait(0.25);
+
+core.setDate("2019-03-21T11:02:00", "utc");
 core.selectObjectByName("Sun", false);
 StelMovementMgr.setFlagTracking(false);
 core.wait(1);
@@ -98,7 +102,7 @@ for (date = 1; date <= 4; date++)
 		starthr = "11";
 		startmin = "02";
 		totaltime = 12 + 9/60.0;
-		mrkrColor = "#0000ff";
+		mrkrColor = "#ff00ff";
 		dateverbose = "March 21";
 		break;
 	case 6:
@@ -163,7 +167,7 @@ for (date = 1; date <= 4; date++)
 	core.setTimeRate(0); // pause time
 	core.wait(2);
 }
-LabelMgr.setLabelText(labelBottom,"The Sun is highest in the sky in June and lowest in December.");
+LabelMgr.setLabelText(labelBottom,"The Sun is highest in the sky in June (red) and lowest in December (white).");
 LabelMgr.setLabelShow(labelBottom,true);
 core.wait(8.0);
 LabelMgr.setLabelShow(labelBottom,false);
@@ -175,19 +179,19 @@ core.wait(8.0);
 LabelMgr.setLabelShow(labelBottom,false);
 core.wait(1.0);
 
-LabelMgr.setLabelText(labelBottom,"Notice that in June, the Sun rises north of east and sets north of west.");
+LabelMgr.setLabelText(labelBottom,"Notice that in June (red circles), the Sun rises north of east and sets north of west.");
 LabelMgr.setLabelShow(labelBottom,true);
 core.wait(8.0);
 LabelMgr.setLabelShow(labelBottom,false);
 core.wait(1.0);
 
-LabelMgr.setLabelText(labelBottom,"In December, the Sun rises south of east and sets south of west.");
+LabelMgr.setLabelText(labelBottom,"In December (white circles), the Sun rises south of east and sets south of west.");
 LabelMgr.setLabelShow(labelBottom,true);
 core.wait(8.0);
 LabelMgr.setLabelShow(labelBottom,false);
 core.wait(1.0);
 
-LabelMgr.setLabelText(labelBottom,"In March and September, the Sun rises nearly due east and sets nearly due west.");
+LabelMgr.setLabelText(labelBottom,"In March and September (magenta and yellow circles), the Sun rises nearly due east and sets nearly due west.");
 LabelMgr.setLabelShow(labelBottom,true);
 core.wait(8.0);
 LabelMgr.setLabelShow(labelBottom,false);

@@ -26,58 +26,272 @@ var basicDisplay = {
 	sizeTitle: 30,
 	sizePosition: 30,
 	sizeDateTime: 30,
+	timezone: -6.0, // relative to UTC
 	display : function() {
-		var DateTime = core.getDate("local");
-		var timeYear = DateTime[0] + DateTime[1] + DateTime[2] + DateTime[3];
-		var timeMonth = DateTime[5] + DateTime[6];
-		var timeDay = DateTime[8] + DateTime[9];
-		var timeHour = DateTime[11] + DateTime[12];
-		var timeMin = DateTime[14] + DateTime[15];
-		var timeSec = DateTime[17] + DateTime[18];
-		var timeVerbose = timeDay + " ";
-
-		switch(timeMonth)
+		var currTime = core.getJDay();
+		currTime = currTime + 0.5; // correct to midnight based day start
+ // adjust time to user specified time zone
+		currTime = currTime + this.timezone / 24.0;
+		var isLeapYear = false;
+		var year;
+		var month = 1;
+		var day = 1;
+		var hour;
+		var minute;
+		var second;
+		if (currTime >= 2299161.0) // start of gregorian calendar
 		{
-		case "01":
-			timeVerbose = timeVerbose + "Jan";
+			// 1461 days per average 4 years
+			// 36524 days per average century, 36525 days in first cnetury of 4
+			// 146097 days per 4 centuries
+			var gregorianTime = currTime - 2159351.0; // Dec 25, 1199 (Julian), would be Jan 1, 1200 (Proleptic Gregorian)
+
+
+			var quadCentury = Math.floor(gregorianTime / 146097.0);
+//			core.debug("QC: " + quadCentury);
+			var dayInQuadCentury = gregorianTime - quadCentury * 146097.0;
+//			core.debug("dQC: " + dayInQuadCentury);
+			var centuryInQuadCentury = 0;
+			if (dayInQuadCentury > 36525.0)
+			{
+				centuryInQuadCentury = Math.floor((dayInQuadCentury - 36525.0) / 36524.0) + 1.0; // +1 since we subtract off first 36525 days
+				dayInCentury = dayInQuadCentury - centuryInQuadCentury * 36524.0 - 1.0; // extra 1 for the leap year in year 0
+			}
+			else
+			{
+				dayInCentury = dayInQuadCentury;
+			}
+//			core.debug("cQC: " + centuryInQuadCentury);
+//			core.debug("dC: " + dayInCentury);
+
+			var quadYearInCentury = 0;
+			if (dayInCentury > 1462.0)
+			{
+				quadYearInCentury = Math.floor((dayInCentury - 1462.0) / 1461.0) + 1.0; // +1 since we subtract off first 36525 days
+				dayInQuadYear = dayInCentury - quadYearInCentury * 1461.0 - 1.0; // extra 1 for the leap year in year 0
+			}
+			else
+			{
+				dayInQuadYear = dayInCentury;
+			}
+//			core.debug("qyC: " + quadYearInCentury);
+//			core.debug("dQY: " + dayInQuadYear);
+
+			var yearInQuadYear = 0;
+			if (dayInQuadYear > 366.0)
+			{
+				yearInQuadYear = Math.floor((dayInQuadYear - 366.0) / 365.0) + 1.0; // +1 since we subtract off first 36525 days
+				dayInYear = dayInQuadYear - yearInQuadYear * 365.0 - 1.0; // extra 1 for the leap year in year 0
+			}
+			else
+			{
+				dayInYear = dayInQuadYear;
+			}
+//			core.debug("yQY: " + yearInQuadYear);
+//			core.debug("dY: " + dayInYear);
+
+			isLeapYear = (yearInQuadYear == 0 && (centuryInQuadCentury == 0 || quadYearInCentury != 0));
+
+			year = quadCentury * 400 + centuryInQuadCentury * 100 +  quadYearInCentury * 4 + yearInQuadYear + 1200.0; // 1200 is since we started on Jan 1, 1200 (Proleptic Gregorian)
+
+		}
+		else
+		{
+			var quadYear = Math.floor(currTime / 1461.0);
+			var dayInQuadYear = currTime - quadYear * 1461.0;
+			var yearInQuadYear = 0;
+			if (dayInQuadYear > 366.0)
+			{
+				yearInQuadYear = Math.floor((dayInQuadYear - 366.0) / 365.0) + 1.0;
+				dayInYear = dayInQuadYear - yearInQuadYear * 365.0 - 1.0; // extra 1 for the leap year in year 0
+			}
+			else
+			{
+				isLeapYear = true;
+				dayInYear = dayInQuadYear;
+			}
+			year = quadYear * 4 + yearInQuadYear - 4713;
+			if (year >= 0)
+				year = year + 1;
+		}
+		var dayInMonth = dayInYear + 1; // since dayInYear has 0 on Jan 1, add 1 to it
+		if (dayInMonth > 31)
+		{
+			month = month + 1;
+			dayInMonth = dayInMonth - 31;
+			if ((isLeapYear && dayInMonth > 29) || (!isLeapYear && dayInMonth > 28))
+			{
+				month = month + 1;
+				if (isLeapYear)
+					dayInMonth = dayInMonth - 29;
+				else
+					dayInMonth = dayInMonth - 28;
+				if (dayInMonth > 30)
+				{
+					month = month + 1;
+					dayInMonth = dayInMonth - 30;
+					if (dayInMonth > 31)
+					{
+						month = month + 1;
+						dayInMonth = dayInMonth - 31;
+						if (dayInMonth > 30)
+						{
+							month = month + 1;
+							dayInMonth = dayInMonth - 30;
+							if (dayInMonth > 31)
+							{
+								month = month + 1;
+								dayInMonth = dayInMonth - 31;
+								if (dayInMonth > 31)
+								{
+									month = month + 1;
+									dayInMonth = dayInMonth - 31;
+									if (dayInMonth > 30)
+									{
+										month = month + 1;
+										dayInMonth = dayInMonth - 30;
+										if (dayInMonth > 31)
+										{
+											month = month + 1;
+											dayInMonth = dayInMonth - 31;
+											if (dayInMonth > 30)
+											{
+												month = month + 1;
+												dayInMonth = dayInMonth - 30;
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		dayOfMonth = Math.floor(dayInMonth);
+		timeOfDay = (dayInMonth - dayOfMonth) * 24.0;
+		timeHourNum = Math.floor(timeOfDay);
+		minuteInHour = Math.floor((timeOfDay - timeHourNum) * 60.0);
+		secondInMinute = Math.floor(((timeOfDay - timeHourNum) * 60.0 - minuteInHour) * 60.0);
+
+		
+		var timeHourVerbose = "";
+		if (timeHourNum < 10)
+			timeHourVerbose = "0" + timeHourNum;
+		else
+			timeHourVerbose = timeHourNum;
+		var timeMinVerbose = "";
+		if (minuteInHour < 10)
+			timeMinVerbose = "0" + minuteInHour;
+		else
+			timeMinVerbose = minuteInHour;
+		var timeSecVerbose = "";
+		if (secondInMinute < 10)
+			timeSecVerbose = "0" + secondInMinute;
+		else
+			timeSecVerbose = minuteInHour;
+
+
+		switch(month)
+		{
+		case 1:
+			monthVerbose = "Jan";
 			break;
-		case "02":
-			timeVerbose = timeVerbose + "Feb";
+		case 2:
+			monthVerbose = "Feb";
 			break;
-		case "03":
-			timeVerbose = timeVerbose + "Mar";
+		case 3:
+			monthVerbose = "Mar";
 			break;
-		case "04":
-			timeVerbose = timeVerbose + "Apr";
+		case 4:
+			monthVerbose = "Apr";
 			break;
-		case "05":
-			timeVerbose = timeVerbose + "May";
+		case 5:
+			monthVerbose = "May";
 			break;
-		case "06":
-			timeVerbose = timeVerbose + "Jun";
+		case 6:
+			monthVerbose = "Jun";
 			break;
-		case "07":
-			timeVerbose = timeVerbose + "Jul";
+		case 7:
+			monthVerbose = "Jul";
 			break;
-		case "08":
-			timeVerbose = timeVerbose + "Aug";
+		case 8:
+			monthVerbose = "Aug";
 			break;
-		case "09":
-			timeVerbose = timeVerbose + "Sep";
+		case 9:
+			monthVerbose = "Sep";
 			break;
-		case "10":
-			timeVerbose = timeVerbose + "Oct";
+		case 10:
+			monthVerbose = "Oct";
 			break;
-		case "11":
-			timeVerbose = timeVerbose + "Nov";
+		case 11:
+			monthVerbose = "Nov";
 			break;
-		case "12":
-			timeVerbose = timeVerbose + "Dec";
+		case 12:
+			monthVerbose = "Dec";
 			break;
 		}
-		timeVerbose = timeVerbose + " " + timeYear;
 
-		timeVerbose = timeVerbose + " " + timeHour + ":" + timeMin + ":" + timeSec;
+		var absYear = Math.abs(year);
+		var epoch = "CE";
+		if (year < 0)
+			epoch = "BCE";
+		timeVerbose = dayOfMonth + " " + monthVerbose + " " + absYear + " " + epoch + " " + timeHourVerbose + ":" + timeMinVerbose + ":" + timeSecVerbose;
+
+
+
+//		var DateTime = core.getDate("local");
+//		var timeYear = DateTime[0] + DateTime[1] + DateTime[2] + DateTime[3];
+//		var timeMonth = DateTime[5] + DateTime[6];
+//		var timeDay = DateTime[8] + DateTime[9];
+//		var timeHour = DateTime[11] + DateTime[12];
+//		var timeMin = DateTime[14] + DateTime[15];
+//		var timeSec = DateTime[17] + DateTime[18];
+//		var timeVerbose = timeDay + " ";
+
+//		switch(timeMonth)
+//		{
+//		case "01":
+//			timeVerbose = timeVerbose + "Jan";
+//			break;
+//		case "02":
+//			timeVerbose = timeVerbose + "Feb";
+//			break;
+//		case "03":
+//			timeVerbose = timeVerbose + "Mar";
+//			break;
+//		case "04":
+//			timeVerbose = timeVerbose + "Apr";
+//			break;
+//		case "05":
+//			timeVerbose = timeVerbose + "May";
+//			break;
+//		case "06":
+//			timeVerbose = timeVerbose + "Jun";
+//			break;
+//		case "07":
+//			timeVerbose = timeVerbose + "Jul";
+//			break;
+//		case "08":
+//			timeVerbose = timeVerbose + "Aug";
+//			break;
+//		case "09":
+//			timeVerbose = timeVerbose + "Sep";
+//			break;
+//		case "10":
+//			timeVerbose = timeVerbose + "Oct";
+//			break;
+//		case "11":
+//			timeVerbose = timeVerbose + "Nov";
+//			break;
+//		case "12":
+//			timeVerbose = timeVerbose + "Dec";
+//			break;
+//		}
+//		timeVerbose = timeVerbose + " " + timeYear;
+
+//		timeVerbose = timeVerbose + " " + timeHour + ":" + timeMin + ":" + timeSec;
 
 		var posInfo = core.getObserverLocationInfo();
 		var dmsLatitude = Object.create(DegMinSec);

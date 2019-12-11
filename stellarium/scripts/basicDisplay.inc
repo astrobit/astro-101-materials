@@ -173,7 +173,8 @@ var basicDisplay = {
 		timeOfDay = (dayInMonth - dayOfMonth) * 24.0;
 		timeHourNum = Math.floor(timeOfDay);
 		minuteInHour = Math.floor((timeOfDay - timeHourNum) * 60.0);
-		secondInMinute = Math.floor(((timeOfDay - timeHourNum) * 60.0 - minuteInHour) * 60.0);
+		
+		secondinMinute = Math.floor((timeOfDay - timeHourNum) * 3600.0 - minuteInHour * 60.0);
 
 		
 		var timeHourVerbose = "";
@@ -187,10 +188,10 @@ var basicDisplay = {
 		else
 			timeMinVerbose = minuteInHour;
 		var timeSecVerbose = "";
-		if (secondInMinute < 10)
-			timeSecVerbose = "0" + secondInMinute;
+		if (secondinMinute < 10)
+			timeSecVerbose = "0" + secondinMinute;
 		else
-			timeSecVerbose = secondInMinute;
+			timeSecVerbose = secondinMinute;
 
 
 		switch(month)

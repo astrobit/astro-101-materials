@@ -114,7 +114,7 @@ var basicDisplay = {
 			if (year >= 0)
 				year = year + 1;
 		}
-		var dayInMonth = dayInYear + 1; // since dayInYear has 0 on Jan 1, add 1 to it
+		var dayInMonth = dayInYear + 2; // since dayInYear has 0 on Jan 1, add 1 to it
 		if (dayInMonth > 31)
 		{
 			month = month + 1;
@@ -126,38 +126,43 @@ var basicDisplay = {
 					dayInMonth = dayInMonth - 29;
 				else
 					dayInMonth = dayInMonth - 28;
-				if (dayInMonth > 30)
+				if (dayInMonth > 31)
 				{
 					month = month + 1;
-					dayInMonth = dayInMonth - 30;
-					if (dayInMonth > 31)
+					dayInMonth = dayInMonth - 31;
+					if (dayInMonth > 30)
 					{
 						month = month + 1;
-						dayInMonth = dayInMonth - 31;
-						if (dayInMonth > 30)
+						dayInMonth = dayInMonth - 30;
+						if (dayInMonth > 31)
 						{
 							month = month + 1;
-							dayInMonth = dayInMonth - 30;
-							if (dayInMonth > 31)
+							dayInMonth = dayInMonth - 31;
+							if (dayInMonth > 30)
 							{
 								month = month + 1;
-								dayInMonth = dayInMonth - 31;
+								dayInMonth = dayInMonth - 30;
 								if (dayInMonth > 31)
 								{
 									month = month + 1;
 									dayInMonth = dayInMonth - 31;
-									if (dayInMonth > 30)
+									if (dayInMonth > 31)
 									{
 										month = month + 1;
-										dayInMonth = dayInMonth - 30;
-										if (dayInMonth > 31)
+										dayInMonth = dayInMonth - 31;
+										if (dayInMonth > 30)
 										{
 											month = month + 1;
-											dayInMonth = dayInMonth - 31;
-											if (dayInMonth > 30)
+											dayInMonth = dayInMonth - 30;
+											if (dayInMonth > 31)
 											{
 												month = month + 1;
-												dayInMonth = dayInMonth - 30;
+												dayInMonth = dayInMonth - 31;
+												if (dayInMonth > 30)
+												{
+													month = month + 1;
+													dayInMonth = dayInMonth - 30;
+												}
 											}
 										}
 									}

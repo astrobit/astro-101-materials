@@ -12,6 +12,20 @@
 //        foo.display(); // re-display the info
 //
 include("DegMinSec.inc");
+function intDiv(a, b)
+{
+	var ret = Math.floor(a / b);
+	if (ret < 0)
+		ret = ret + 1;
+	return ret;
+}
+
+function mod(a, b)
+{
+	var temp = a / b;
+	var ret = (temp - Math.floor(temp)) * b;
+	return ret;
+}
 
 var basicDisplay = {
 	labelTitle : undefined,
@@ -52,9 +66,11 @@ var basicDisplay = {
 			var dayInQuadCentury = gregorianTime - quadCentury * 146097.0;
 //			core.debug("dQC: " + dayInQuadCentury);
 			var centuryInQuadCentury = 0;
-			if (dayInQuadCentury > 36525.0)
+
+			if (dayInQuadCentury >= 36525.0)
 			{
-				centuryInQuadCentury = Math.floor((dayInQuadCentury - 36525.0) / 36524.0) + 1.0; // +1 since we subtract off first 36525 days
+				centuryInQuadCentury = Math.floor((dayInQuadCentury - 36525.0) / 36524.0) + 1.0; 
+// +1 since we subtract off first 36525 days
 				dayInCentury = dayInQuadCentury - centuryInQuadCentury * 36524.0 - 1.0; // extra 1 for the leap year in year 0
 			}
 			else
@@ -64,35 +80,38 @@ var basicDisplay = {
 //			core.debug("cQC: " + centuryInQuadCentury);
 //			core.debug("dC: " + dayInCentury);
 
+			var daysInFirstQuad = 1461.0;
+			if (centuryInQuadCentury > 0)
+				daysInFirstQuad = 1460.0;
+
 			var quadYearInCentury = 0;
-			if (dayInCentury > 1462.0)
-			{
-				quadYearInCentury = Math.floor((dayInCentury - 1462.0) / 1461.0) + 1.0; // +1 since we subtract off first 36525 days
-				dayInQuadYear = dayInCentury - quadYearInCentury * 1461.0 - 1.0; // extra 1 for the leap year in year 0
-			}
-			else
-			{
-				dayInQuadYear = dayInCentury;
-			}
+			if (dayInCentury > daysInFirstQuad)
+				quadYearInCentury = Math.floor((dayInCentury - daysInFirstQuad) / 1461.0) + 1.0; 
+			var dayInQuadYear = dayInQuadYear = dayInCentury - quadYearInCentury * 1461.0;
+			if (centuryInQuadCentury > 0 && quadYearInCentury > 0)
+				dayInQuadYear = dayInQuadYear + 1;
+
 //			core.debug("qyC: " + quadYearInCentury);
 //			core.debug("dQY: " + dayInQuadYear);
 
+			var daysInFirstYear = 365.0;
+			if (centuryInQuadCentury == 0)
+				daysInFirstYear = 366.0;
+
 			var yearInQuadYear = 0;
-			if (dayInQuadYear > 366.0)
-			{
-				yearInQuadYear = Math.floor((dayInQuadYear - 366.0) / 365.0) + 1.0; // +1 since we subtract off first 36525 days
-				dayInYear = dayInQuadYear - yearInQuadYear * 365.0 - 1.0; // extra 1 for the leap year in year 0
-			}
-			else
-			{
-				dayInYear = dayInQuadYear;
-			}
+			if (dayInQuadYear > daysInFirstYear)
+				yearInQuadYear = Math.floor((dayInQuadYear - daysInFirstYear) / 365.0) + 1.0; 
+			var dayInYear = dayInQuadYear - yearInQuadYear * 365.0 - 1.0;
+			if (yearInQuadYear == 0 || (quadYearInCentury == 0 && centuryInQuadCentury > 0))
+				dayInYear = dayInYear + 1;
+
 //			core.debug("yQY: " + yearInQuadYear);
 //			core.debug("dY: " + dayInYear);
 
 			isLeapYear = (yearInQuadYear == 0 && (centuryInQuadCentury == 0 || quadYearInCentury != 0));
 
 			year = quadCentury * 400 + centuryInQuadCentury * 100 +  quadYearInCentury * 4 + yearInQuadYear + 1200.0; // 1200 is since we started on Jan 1, 1200 (Proleptic Gregorian)
+
 
 		}
 		else
@@ -110,58 +129,68 @@ var basicDisplay = {
 				isLeapYear = true;
 				dayInYear = dayInQuadYear;
 			}
-			year = quadYear * 4 + yearInQuadYear - 4713;
+			year = quadYear * 4.0 + yearInQuadYear - 4713.0;
 			if (year >= 0)
-				year = year + 1;
+				year = year + 1.0;
 		}
-		var dayInMonth = dayInYear + 2; // since dayInYear has 0 on Jan 1, add 1 to it
-		if (dayInMonth > 31)
+		if (isLeapYear && dayInYear >= 366.0)
+		{
+			year = year + 1;
+			dayInYear = dayInYear - 366.0;
+		}
+		if (!isLeapYear && dayInYear >= 365.0)
+		{
+			year = year + 1;
+			dayInYear = dayInYear - 365.0;
+		}
+		var dayInMonth = dayInYear + 1; // since dayInYear has 0 on Jan 1, add 1 to it
+		if (dayInMonth >= 32.0)
 		{
 			month = month + 1;
-			dayInMonth = dayInMonth - 31;
-			if ((isLeapYear && dayInMonth > 29) || (!isLeapYear && dayInMonth > 28))
+			dayInMonth = dayInMonth - 31.0;
+			if ((isLeapYear && dayInMonth >= 30.0) || (!isLeapYear && dayInMonth >= 29.0))
 			{
 				month = month + 1;
 				if (isLeapYear)
-					dayInMonth = dayInMonth - 29;
+					dayInMonth = dayInMonth - 29.0;
 				else
-					dayInMonth = dayInMonth - 28;
-				if (dayInMonth > 31)
+					dayInMonth = dayInMonth - 28.0;
+				if (dayInMonth >= 32.0)
 				{
 					month = month + 1;
-					dayInMonth = dayInMonth - 31;
-					if (dayInMonth > 30)
+					dayInMonth = dayInMonth - 31.0;
+					if (dayInMonth >= 31.0)
 					{
 						month = month + 1;
-						dayInMonth = dayInMonth - 30;
-						if (dayInMonth > 31)
+						dayInMonth = dayInMonth - 30.0;
+						if (dayInMonth >= 32.0)
 						{
 							month = month + 1;
-							dayInMonth = dayInMonth - 31;
-							if (dayInMonth > 30)
+							dayInMonth = dayInMonth - 31.0;
+							if (dayInMonth >= 31.0)
 							{
 								month = month + 1;
-								dayInMonth = dayInMonth - 30;
-								if (dayInMonth > 31)
+								dayInMonth = dayInMonth - 30.0;
+								if (dayInMonth >= 32.0)
 								{
 									month = month + 1;
-									dayInMonth = dayInMonth - 31;
-									if (dayInMonth > 31)
+									dayInMonth = dayInMonth - 31.0;
+									if (dayInMonth >= 32.0)
 									{
 										month = month + 1;
-										dayInMonth = dayInMonth - 31;
-										if (dayInMonth > 30)
+										dayInMonth = dayInMonth - 31.0;
+										if (dayInMonth >= 31.0)
 										{
 											month = month + 1;
-											dayInMonth = dayInMonth - 30;
-											if (dayInMonth > 31)
+											dayInMonth = dayInMonth - 30.0;
+											if (dayInMonth >= 32.0)
 											{
 												month = month + 1;
-												dayInMonth = dayInMonth - 31;
-												if (dayInMonth > 30)
+												dayInMonth = dayInMonth - 31.0;
+												if (dayInMonth >= 31.0)
 												{
 													month = month + 1;
-													dayInMonth = dayInMonth - 30;
+													dayInMonth = dayInMonth - 30.0;
 												}
 											}
 										}

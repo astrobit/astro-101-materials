@@ -1,0 +1,165 @@
+//
+// Author: Brian W. Mulligan
+// Version: 1.0
+// License: GPL v3.0
+// Name: Sun & The Seasons
+// Description: A demonstration of the how the Sun appears higher and lower in the sky in different seasons. Set at W90 N30°16', uses UTC-6 for timezone
+//
+
+include("i18n.inc");
+include("save_state.inc");
+include("basicDisplay.inc");
+include("addLeadingZero.inc");
+
+
+function do_time(dateString)
+{
+	core.setDate(dateString, "utc");
+	LabelMgr.labelScreen(dateString,150,150,true,20,"#ffff00",true,2000);
+	core.wait(0.25);
+	display.display();
+	core.wait(2.00);
+}
+
+core.goHome();
+saveState("sunSeasons-demo");
+core.setTimezone("UTC-06:00");
+
+core.setGuiVisible(false);
+core.clear("natural");
+core.setTimeRate(0.0); // pause time
+core.wait(0.25);
+
+core.setObserverLocation(0.0, 0.0, 0.0, 0.25, "", "Earth"); // longitude, latitude, altitude, transition time, name, planet 
+core.setDate("2019-01-01T00:00:00", "utc");
+core.wait(0.25);
+
+
+
+var display =  Object.create(basicDisplay);
+display.timezone = 0.0;
+display.textTitle = "The Sun's path in different seasons";
+display.display();
+
+do_time("2019-01-01T00:00:00");
+//do_time("2019-01-31T00:00:00");
+//do_time("2019-02-01T00:00:00");
+//do_time("2019-02-28T00:00:00");
+//do_time("2019-03-01T00:00:00");
+//do_time("2019-03-31T00:00:00");
+//do_time("2019-04-01T00:00:00");
+//do_time("2019-04-30T00:00:00");
+//do_time("2019-05-01T00:00:00");
+//do_time("2019-05-31T00:00:00");
+//do_time("2019-06-01T00:00:00");
+//do_time("2019-06-30T00:00:00");
+//do_time("2019-07-01T00:00:00");
+//do_time("2019-07-31T00:00:00");
+//do_time("2019-08-01T00:00:00");
+//do_time("2019-08-31T00:00:00");
+//do_time("2019-09-01T00:00:00");
+//do_time("2019-09-30T00:00:00");
+//do_time("2019-10-01T00:00:00");
+//do_time("2019-10-31T00:00:00");
+//do_time("2019-11-01T00:00:00");
+//do_time("2019-11-30T00:00:00");
+//do_time("2019-12-01T00:00:00");
+//do_time("2019-12-31T00:00:00");
+
+//do_time("2020-01-01T00:00:00");
+//do_time("2020-01-31T00:00:00");
+//do_time("2020-02-01T00:00:00");
+//do_time("2020-02-29T00:00:00");
+//do_time("2020-03-01T00:00:00");
+//do_time("2020-03-31T00:00:00");
+//do_time("2020-04-01T00:00:00");
+//do_time("2020-04-30T00:00:00");
+//do_time("2020-05-01T00:00:00");
+//do_time("2020-05-31T00:00:00");
+//do_time("2020-06-01T00:00:00");
+//do_time("2020-06-30T00:00:00");
+//do_time("2020-07-01T00:00:00");
+//do_time("2020-07-31T00:00:00");
+//do_time("2020-08-01T00:00:00");
+//do_time("2020-08-31T00:00:00");
+//do_time("2020-09-01T00:00:00");
+//do_time("2020-09-30T00:00:00");
+//do_time("2020-10-01T00:00:00");
+//do_time("2020-10-31T00:00:00");
+//do_time("2020-11-01T00:00:00");
+//do_time("2020-11-30T00:00:00");
+//do_time("2020-12-01T00:00:00");
+//do_time("2020-12-31T00:00:00");
+
+do_time("2000-01-01T00:00:00");
+//do_time("2000-02-29T00:00:00");
+
+//do_time("1996-01-01T00:00:00");
+//do_time("1996-02-29T00:00:00");
+
+//do_time("1599-01-01T00:00:00");
+//do_time("1600-01-01T00:00:00");
+//do_time("1601-01-01T00:00:00");
+//do_time("1602-01-01T00:00:00");
+//do_time("1603-01-01T00:00:00");
+//do_time("1604-01-01T00:00:00");
+//do_time("1605-01-01T00:00:00");
+//do_time("1699-01-01T00:00:00");
+//do_time("1700-01-01T00:00:00");
+//do_time("1701-01-01T00:00:00");
+////do_time("1702-01-01T00:00:00");
+////do_time("1703-01-01T00:00:00");
+//do_time("1704-01-01T00:00:00");
+//do_time("1705-01-01T00:00:00");
+////do_time("1706-01-01T00:00:00");
+////do_time("1707-01-01T00:00:00");
+//do_time("1708-01-01T00:00:00");
+//do_time("1709-01-01T00:00:00");
+////do_time("1710-01-01T00:00:00");
+////do_time("1711-01-01T00:00:00");
+////do_time("1900-02-28T00:00:00");
+//do_time("1799-01-01T00:00:00");
+//do_time("1800-01-01T00:00:00");
+//do_time("1801-01-01T00:00:00");
+//do_time("1802-01-01T00:00:00");
+//do_time("1803-01-01T00:00:00");
+//do_time("1804-01-01T00:00:00");
+//do_time("1805-01-01T00:00:00");
+//do_time("1899-01-01T00:00:00");
+
+//do_time("1900-01-01T00:00:00");
+//do_time("1901-01-01T00:00:00");
+//do_time("1902-01-01T00:00:00");
+//do_time("1903-01-01T00:00:00");
+//do_time("1904-01-01T00:00:00");
+//do_time("1905-01-01T00:00:00");
+//do_time("1999-01-01T00:00:00");
+
+//do_time("1800-01-01T00:00:00");
+//do_time("1800-02-28T00:00:00");
+
+//do_time("1700-01-01T00:00:00");
+//do_time("1700-02-28T00:00:00");
+
+//do_time("1600-01-01T00:00:00");
+//do_time("1600-02-29T00:00:00");
+
+do_time("1582-10-15T00:00:00");
+do_time("1582-10-04T00:00:00");
+
+do_time("1-01-01T00:00:00");
+do_time("1-02-28T00:00:00");
+
+do_time("0-01-01T00:00:00");
+do_time("0-02-29T00:00:00");
+
+core.setTimeRate(0.0); // pause time
+core.wait(0.250);
+
+LabelMgr.deleteAllLabels();
+MarkerMgr.deleteAllMarkers();
+core.clear("natural");
+restoreState("sunSeasons-demo");
+core.goHome();
+core.setGuiVisible(true);
+

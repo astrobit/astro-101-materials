@@ -1,0 +1,13 @@
+//
+// Author: Brian W. Mulligan
+// Version: 1.0
+// License: GPL v3.0
+// Name: Motion of Venus
+// Description: A demonstration of how Venus moves over the course of a year
+//
+
+
+include("planetMotion.inc");
+
+PlanetMotion("Venus");
+

@@ -1,0 +1,13 @@
+//
+// Author: Brian W. Mulligan
+// Version: 1.0
+// License: GPL v3.0
+// Name: Motion of Jupiter
+// Description: A demonstration of how Jupiter moves over the course of a year
+//
+
+
+include("planetMotion.inc");
+
+PlanetMotion("Jupiter");
+

@@ -1,0 +1,14 @@
+data/
+*.tar.gz
+code/
+myparse/africa
+myparse/asia
+myparse/antarctica
+myparse/australasia
+myparse/links.csv
+myparse/europe
+myparse/northamerica
+myparse/southamerica
+myparse/pacificnew
+myparse/parse
+myparse/timezones.csv

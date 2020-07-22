@@ -105,7 +105,7 @@ CREATE TABLE userdata (
 	permissionsID INT UNSIGNED NOT NULL COMMENT 'The type of user permissions that this user has (e.g. user, administrator, instructor, etc.)',
 	allowUseGeoIP TINYINT NOT NULL COMMENT 'Authorize use of GeoIP to determine location',
 	allowUseDevice TINYINT NOT NULL COMMENT 'Authorize use of device capabilities (e.g. GPS) to determine location',
-	preferDefaultLocationOverClass TINYINT NOT NULL 'prefer use of default location over class location',
+	preferDefaultLocationOverClass TINYINT NOT NULL COMMENT 'prefer use of default location over class location',
 	defaultTimeZoneID INT UNSIGNED COMMENT 'A user selected default time zone', 
 	defaultLocationID INT UNSIGNED COMMENT 'A user selected default location',
 	defaultLatitude FLOAT COMMENT 'A user entered latitude for their default location',
@@ -113,7 +113,7 @@ CREATE TABLE userdata (
 	defaultMeasurementUnitsID INT UNSIGNED COMMENT 'Default angular units used for measurements',
 	FOREIGN KEY (permissionsID) REFERENCES permissions(id),
 	FOREIGN KEY (defaultLocationID) REFERENCES locations(id),
-	FOREIGN KEY (timeZoneID) REFERENCES timezones(id),
+	FOREIGN KEY (defaultTimeZoneID) REFERENCES timezones(id),
 	FOREIGN KEY (defaultMeasurementUnitsID) REFERENCES angle_units(id)
 );
 

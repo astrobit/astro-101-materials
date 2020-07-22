@@ -27,8 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		$_SESSION['generalerror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\">There was a problem with the connection. Please try again or contact an administrator.<br></font></p><br></div>";
 		$_noerrors = false;
 	}
-	if ($_noerrors && $resultPermissions = $con->query('SELECT id FROM permissions WHERE name = "user"'))
-	{
+	if ($_noerrors && $resultPermissions = $con->query('SELECT id FROM permissions WHERE name = "user"')) {
 		if ($resultPermissions->num_rows > 0)
 		{
 			$row = $resultPermissions->fetch_assoc();
@@ -36,14 +35,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		}
 	}
 	
-	if ($_noerrors && (!isset($permissionsID) || empty($permissionsID)))
-	{
+	if ($_noerrors && (!isset($permissionsID) || empty($permissionsID))) {
 		$_SESSION['generalerror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\">There was a problem retrieving user permissions. Please try again or contact an administrator.<br></font></p><br></div>";
 		$_noerrors = false;
 	}
-	if ($_noerrors)
-	{
-
+	if ($_noerrors) {
 		// Now we check if the data was submitted, isset() function will check if the data exists.
 		if (!isset($_POST['username']) || empty($_POST['username'])) {
 			// Could not get the data that should have been sent.
@@ -75,16 +71,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 				$_SESSION['fistsizeerror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\">A fist size is required.<br></font></p><br></div>";
 				$_noerrors = false;
 		}
-		else
-		{
+		else {
 			$fistsize = floatval($_POST['fistsize']);
-			if ($fistsize < 3.0)
-			{
+			if ($fistsize < 3.0) {
 				$_SESSION['fistsizeerror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\">Your fist size seems unusually small. Please check your entry and/or check your fist size again.<br></font></p><br></div>";
 				$_noerrors = false;
 			}
-			else if ($fistsize > 6.0)
-			{
+			elseif ($fistsize > 6.0) {
 				$_SESSION['fistsizeerror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\">Your fist size seems unusually large. Please check your entry and/or check your fist size again.<br></font></p><br></div>";
 				$_noerrors = false;
 			}
@@ -118,49 +111,50 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		$stmt->close();
 	}
 
-	if (isset($_POST['researchconsent']))
+	if (isset($_POST['researchconsent'])) {
 		$researchConsent = 1;
-	else
+	}
+	else {
 		$researchConsent = 0;
-	if (isset($_POST['geoIPconsent']))
+	}
+	if (isset($_POST['geoIPconsent'])) {
 		$geoIPconsent = 1;
-	else
+	}
+	else {
 		$geoIPconsent = 0;
-	if (isset($_POST['deviceLocationConsent']))
+	}
+	if (isset($_POST['deviceLocationConsent'])) {
 		$deviceLocationConsent = 1;
-	else
+	}
+	else {
 		$deviceLocationConsent = 0;
+	}
 	
 	if ($_noerrors)
 	{
 		$password = password_hash($_POST['password'], PASSWORD_DEFAULT);
-		if (!isset($_POST['familyname') || empty($_POST['familyname'))
-		{
+		if (!isset($_POST['familyname']) || empty($_POST['familyname'])) {
 			$stmt = $con->prepare('INSERT INTO userdata (username, email, emailVerified, password, givenname, fistsize, consentResearch, permissionsID, allowUseGeoIP, allowUseDevice, preferDefaultLocationOverClass) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-			$stmt->bind_param('ssissdiiiii', $_POST['username'], $_POST['email'], 0, $password, $_POST['givenname'], $fistsize, $researchConsent, $permissionsID, $geoIPconsent, $deviceLocationConsent, 0);
+			$stmt->bind_param('ssissdiiiii', $_POST['username'], $_POST['email'], 0, $password, $_POST['givenname'], $fistsize, $researchConsent, $permissionsID, $geoIPconsent, $deviceLocationConsent, 1);
 			
 			$stmt->execute();
 		}
-		else
-		{
+		else {
 			$stmt = $con->prepare('INSERT INTO userdata (username, email, emailVerified, password, givenname, familyname, fistsize, consentResearch, permissionsID, allowUseGeoIP, allowUseDevice, preferDefaultLocationOverClass) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-			$stmt->bind_param('ssisssdiiiii', $_POST['username'], $_POST['email'], 0, $password, $_POST['givenname'], $_POST['familyname'], $fistsize, $researchConsent, $permissionsID, $geoIPconsent, $deviceLocationConsent, 0);
+			$stmt->bind_param('ssisssdiiiii', $_POST['username'], $_POST['email'], 0, $password, $_POST['givenname'], $_POST['familyname'], $fistsize, $researchConsent, $permissionsID, $geoIPconsent, $deviceLocationConsent, 1);
 			
 		}
 		$stmt->execute();
 	}			
 
-	if ($_noerrors)
-	{
-		if ($stmt = $con->prepare('SELECT id FROM userdata WHERE username = ?')) 
-		{
+	if ($_noerrors) {
+		if ($stmt = $con->prepare('SELECT id FROM userdata WHERE username = ?'))  {
 			// Bind parameters (s = string, i = int, b = blob, etc), in our case the username is a string so we use "s"
 			$stmt->bind_param('s', $_POST['username']);
 			$stmt->execute();
 			// Store the result so we can check if the account exists in the database.
 			$stmt->store_result();
-			if ($stmt->num_rows > 0)
-			{
+			if ($stmt->num_rows > 0) {
 				$stmt->bind_result($id);
 				$stmt->fetch();
 
@@ -169,8 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 				$_SESSION['id'] = $id;
 				header('Location: home.php');
 			}
-			else
-			{
+			else {
 				$_SESSION['generalerror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\">There was a problem adding the user. Please try again or contact an administrator.<br></font></p><br></div>";
 				$_noerrors = false;
 			}
@@ -187,7 +180,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	<head>
 		<meta charset="utf-8">
 		<title>Register</title>
-		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css">
+<!--		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.13.0/css/all.css">-->
+		<script src="https://kit.fontawesome.com/210f2f19d7.js" crossorigin="anonymous"></script><!-- fontawesome kit -->
 		<link href="style.css" rel="stylesheet" type="text/css">
 	</head>
 	<body>
@@ -199,69 +193,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			<form action="register.php" method="post" autocomplete="off">
 				<label for="username">
 					<i class="fas fa-user-tag"></i>
+					<input type="text" name="username" placeholder="Username" id="username" autocomplete="on" required>
 				</label>
-				<input type="text" name="username" placeholder="Username" id="username" required><br>
 				<?php 
 					echo $_SESSION['usernameerror'];
 				?>
 				<label for="fname">
 					<i class="fas fa-user"></i>
+					<input type="text" name="givenname" placeholder="Given Name" id="givenname" autocomplete="on" required>
 				</label>
-				<input type="text" name="givenname" placeholder="Given Name" id="givenname" required><br>
 				<?php 
 					echo $_SESSION['givennameerror'];
 				?>
 				<label for="lname">
-					<i class="fas fa-user"></i>
+					<i class="fas fa-users"></i>
+					<input type="text" name="familyname" placeholder="Family Name" id="familyname"  autocomplete="on">
 				</label>
-				<input type="text" name="familyname" placeholder="Family Name" id="familyname"><br>
 				<?php 
 					echo $_SESSION['familynameerror'];
 				?>
 				<label for="password">
 					<i class="fas fa-lock"></i>
+				<input type="password" name="password" placeholder="Password" id="password" autocomplete="on" required>
 				</label>
-				<input type="password" name="password" placeholder="Password" id="password" required><br>
 				<?php 
 					echo $_SESSION['passworderror'];
 				?>
 				<label for="passwordcheck">
 					<i class="fas fa-lock"></i>
+				<input type="password" name="passwordcheck" placeholder="Retype Password" id="passwordcheck" autocomplete="on" required>
 				</label>
-				<input type="password" name="passwordcheck" placeholder="Retype Password" id="passwordcheck" required><br>
 				<?php 
 					echo $_SESSION['passwordcheckerror'];
 				?>
-				<label for="fist size">
-					<i class="fas fa-hand-rock"></i>
-				</label>
-				<input type="numeric" name="fistsize" placeholder="Size of your fist in degrees" id="fistsize" min="3" max="6" step="0.1"><br>
-				<?php 
-					echo $_SESSION['fistsizeerror'];
-				?>
 				<label for="email">
-					<i class="fas at"></i>
+					<i class="fas fa-at"></i>
+				<input type="text" name="email" placeholder="email" id="email" required>
 				</label>
-				<input type="text" name="email" placeholder="email" id="email" required><br>
 				<?php 
 					echo $_SESSION['emailerror'];
 				?>
-				<label for="researchconsent">
-					<i class="fas flask"> Do you consent to use of your observational data for research purposes?
+				<label for="fistsize">
+					<i class="fas fa-hand-rock"></i>
+				<input type="number" name="fistsize" placeholder="Size of your fist in degrees" id="fistsize" min="3" max="6" step="0.1" required/>
 				</label>
-				<input type="checkbox" name="researchconsent" id="researchconsent" value="researchconsent"><br>
-				<label for="geoIPconsent">
-					<i class="fas globe"> Do you wish to use your IP to determine your location?
+				<?php 
+					echo $_SESSION['fistsizeerror'];
+				?>
+				<div>
+				<label for="researchconsent" class="checkboxprompt">
+					<i class="fas fa-flask"></i>
+					<p class="checkboxprompt">I consent to the use of my observations for research purposes.<br><i> Note: Not required for registration</i></p>
+					<input type="checkbox" name="researchconsent" id="researchconsent" value="researchconsent">
 				</label>
-				<input type="checkbox" name="geoIPconsent" id="geoIPconsent" value="geoIPconsent"><br>
-				<label for="deviceLocationConsent">
-					<i class="fas satellite"> Do you wish to use your device location services (e.g. GPS) to determine your location?
+				</div>
+				<div>
+				<label for="geoIPconsent" class="checkboxprompt">
+					<i class="fas fa-globe"></i>
+					<p class="checkboxprompt">I wish to use my IP to determine my location.<br><i> Note: Not required for registration</i></p>
+					<input type="checkbox" name="geoIPconsent" id="geoIPconsent" value="geoIPconsent">
 				</label>
-				<input type="checkbox" name="deviceLocationConsent" id="deviceLocationConsent" value="deviceLocationConsent"><br>
+				</div>
+				<div>
+				<label for="deviceLocationConsent" class="checkboxprompt">
+					<i class="fas fa-satellite"></i>
+					<p class="checkboxprompt">I wish to use my device location services (e.g. GPS) to determine my location.<br><i> Note: Not required for registration</i></p>
+				<input type="checkbox" name="deviceLocationConsent" id="deviceLocationConsent" value="deviceLocationConsent">
+				</label>
+				</div>
+				<div>
 				<label for="regcode">
 					<i class="fas fa-barcode"></i>
+					<input type="text" name="regcode" placeholder="Class Code (optional)" id="regcode">
 				</label>
-				<input type="text" name="regcode" placeholder="Class Registration Code (optional)" id="regcode" required><br>
+				</div>
 				<input type="submit" value="Register">
 			</form>
 		</div>

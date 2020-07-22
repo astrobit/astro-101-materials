@@ -27,7 +27,7 @@ body {
   	justify-content: center;
   	padding-top: 20px;
 }
-.login form label {
+.login form i.fas {
   	display: flex;
   	justify-content: center;
   	align-items: center;
@@ -128,7 +128,7 @@ body.loggedin {
 }
 
 .register {
-  	width: 400px;
+  	width: 450px;
   	background-color: #ffffff;
   	box-shadow: 0 0 9px 0 rgba(0, 0, 0, 0.3);
   	margin: 100px auto;
@@ -146,7 +146,7 @@ body.loggedin {
   	justify-content: center;
   	padding-top: 20px;
 }
-.register form label {
+.register form i.fas {
   	display: flex;
   	justify-content: center;
   	align-items: center;
@@ -155,8 +155,54 @@ body.loggedin {
   	background-color: #3274d6;
   	color: #ffffff;
 }
-.register form input[type="password"], .register form input[type="text"] {
+
+.register form label {
+	white-space: nowrap;
+	margin-left: 15px;
+	display: flex;
+  	justify-content: center;
+  	align-items: baseline;
+  	width: 400px;
+  	background-color: #ffffff;
+  	color: #000000;
+}
+.register label.checkboxprompt {
+	white-space: normal;
+	margin-left: 15px;
+	display: flex;
+  	flex-wrap: wrap;
+  	justify-content: center;
+  	align-items: baseline;
+  	background-color: #ffffff;
+  	color: #000000;
+}
+.register p.checkboxprompt {
+	white-space: normal;
+	margin-left: 15px;
+	display: flex;
+	flex-wrap: wrap;
+  	justify-content: left;
+  	align-items: center;
+  	background-color: #ffffff;
+  	width:250px;
+  	color: #000000;
+}
+
+.register form input[type="password"], .register form input[type="text"], .register form input[type="number"] {
+	display: flex;
+  	justify-content: center;
+  	align-items: baseline;
   	width: 310px;
+  	height: 50px;
+  	border: 1px solid #dee0e4;
+  	margin-bottom: 20px;
+  	padding: 0 15px;
+}
+.register form input[type="checkbox"] {
+	display: flex;
+  	justify-content: center;
+  	align-items: baseline;
+  	width: 50px;
   	height: 50px;
   	border: 1px solid #dee0e4;
   	margin-bottom: 20px;

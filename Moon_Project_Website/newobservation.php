@@ -70,7 +70,7 @@ class DSTtimes
 	}
 }
 
-$DSTlist = new array();
+$DSTlist = new array(){};
 array_push($DSTlist,new DSTtimes(2020,3,8,11,1));
 array_push($DSTlist,new DSTtimes(2021,3,14,11,7));
 array_push($DSTlist,new DSTtimes(2022,3,13,11,6));
@@ -112,14 +112,22 @@ $ObsZone = $ObsDSTCorrection + $ObsTimeRelUTC;
 $jdUTC = $jd + $ObsZone / 24.0;
 $timedecimalUTC = $timedecimal + $ObsZone;
 if ($timedecimalUTC < 0.0)
+{
 	$timedecimalUTC += 24.0;
+}
 else if ($timedecimalUTC >= 24.0)
+{
 	$timedecimalUTC -= 24.0;
+}
 $LocalTime = $timedecimalUTC + $ObsLong / 15.0;
 if ($LocalTime < 0.0)
+{
 	$LocalTime += 24.0;
+}
 else if ($LocalTime >= 24.0)
+{
 	$LocalTime -= 24.0;
+}
 
 $jdVE2000 = gregoriantojd(3, 20, 2000) + (7.0 + 35.0 / 60.0) / 24.0 - 0.5;
 $jdNewMoonMar2020 = gregoriantojd(3, 24, 2020) + (9.0 + 29.0 / 60.0) / 24.0 - 0.5;
@@ -130,8 +138,9 @@ $jdNewMoonMar2020 = gregoriantojd(3, 24, 2020) + (9.0 + 29.0 / 60.0) / 24.0 - 0.
 // calculate expected RA of Moon and Sun on date
 // RA and Dec of mean Sun on date. @@TODO Does not account for ellipticity of Earth's orbit
 $eclipLongSun = fmod(($jdUTC - $jdVE2000) / 365.2421896698,1.0);
-if ($eclipLongSun < 0)
-	$eclipLongSun += 1.0;
+if ($eclipLongSun < 0){
+	$eclipLongSun += 1.0;    
+}
 $eclipLongSunRad = $eclipLongSun * 2.0 * M_PI;
 $eclipXSun = cos($eclipLongSunRad);
 $eclipYSun = sin($eclipLongSunRad);
@@ -152,8 +161,9 @@ $DecSun = asin($equZSun) * 180.0 / M_PI;
 // expected phase angle of the Moon
 $expElongationMoon = fmod(($jdUTC - $jdNewMoonMar2020) / 29.530587981 * 360.0,360.0);
 if ($expElongationMoon < 0)
+{
 	$expElongationMoon += 360.0;
-
+}
 // test phase to ensure that it matches the selected image and that is is approximately consistent with expected values
 $userAng = floatval($_POST['phase']) * 45.0;
 switch ($_POST['phaseimage']) {
@@ -190,7 +200,7 @@ switch ($_POST['phaseimage']) {
 		$userPhaseImage = 7;
 		break;
 	default:
-		$observationErrorList = $observationErrorList . "<p>- You must select a phase image.</p><br>"
+		$observationErrorList = $observationErrorList . "<p>- You must select a phase image.</p><br>";
 		break;
 	}
 	
@@ -206,7 +216,7 @@ else if ($userAngPhaseDiagram > 315 && $userAng < 45)
 if (abs($userAngPhaseDiagram - $userAng) > 67.5)
 {
 	// mismatch in the user selected phase and phase diagram
-	$observationErrorList = $observationErrorList . "<p>- The phase number you have selected does not match the picture you selected.</p><br>"
+	$observationErrorList = $observationErrorList . "<p>- The phase number you have selected does not match the picture you selected.</p><br>";
 }
 if ($userAng < 45 && $expElongationMoon > 315)
 {
@@ -219,7 +229,7 @@ else if ($userAng > 315 && $expElongationMoon < 45)
 if (abs($expElongationMoon - $userAng) > 67.5)
 {
 	// mismatch in the user selected phase and the expected phase
-	$observationErrorList = $observationErrorList . "<p>- The phase number differs significantly from the expected phase.</p><br>"
+	$observationErrorList = $observationErrorList . "<p>- The phase number differs significantly from the expected phase.</p><br>";
 }
 
 // estimate rise and set times based on solar RA and expected phase
@@ -241,41 +251,50 @@ $DecMoonRad = asin($equZMoon);
 $HAMoonSet = acos(-tan($DecMoonRad) * tan($ObsLatRad)) * 12.0 / M_PI;
 $UTCMoonRiseLocal = 12.0 - $expElongationMoon/15.0 - $ObsLong / 15.0 - $HAMoonSet;
 if ($UTCMoonRiseLocal < 0.0)
+{
 	$UTCMoonRiseLocal = fmod($UTCMoonRiseLocal,24.0) + 24.0;
-	
+}	
 $UTCMoonSetLocal = 12.0 - $expElongationMoon/ 15.0 - $ObsLong / 15.0 + $HAMoonSet;
 if ($UTCMoonSetLocal < 0.0)
+{
 	$UTCMoonSetLocal = fmod($UTCMoonSetLocal,24.0) + 24.0;
+}
 if ($UTCMoonSetLocal >= 24.0)
+{
 	$UTCMoonSetLocal -= 24.0;
-	
+}	
 if ($UTCMoonSetLocal < $UTCMoonRiseLocal && $timedecimalUTC > ($UTCMoonSetLocal + 1.0) && $timedecimalUTC < ($UTCMoonRiseLocal - 1.0))
 {
 	// Moon is probably not visible
-	$observationErrorList = $observationErrorList . "<p>- The Moon is not visible in your location at the time you have selected.</p><br>"
+	$observationErrorList = $observationErrorList . "<p>- The Moon is not visible in your location at the time you have selected.</p><br>";
 }
 else if ($UTCMoonSetLocal > $UTCMoonRiseLocal && $timedecimalUTC > $UTCMoonSetLocal || $timedecimalUTC < $UTCMoonRiseLocal)
 {
-	$observationErrorList = $observationErrorList . "<p>- The Moon is not visible in your location at the time you have selected.</p><br>"
+	$observationErrorList = $observationErrorList . "<p>- The Moon is not visible in your location at the time you have selected.</p><br>";
 }
 
 // test direction to ensure that it is approximately consistent with expected values
 $ExpectedHA = fmod($LocalTime - $expElongationMoon / 15.0,24.0);
 if ($ExpectedHA > 12.0)
+{
 	$ExpectedHA -= 24.0;
+}
 else if ($ExpectedHA < -12.0)
+{
 	$ExpectedHA += 24.0;
+}
 
 $MeasuredHA = floatval($_POST['fists']) * $ObsFistSize / 15.0;
 if ($MeasuredHA > 12.0)
 {
 	// Measured HA is more than 12h, incorrect fist size or incorrect measurement
-	$observationErrorList = $observationErrorList . "<p>- The number of fists combined with your fist size result in an hour angle greater than +/- 12h.</p><br>"
+	$observationErrorList = $observationErrorList . "<p>- The number of fists combined with your fist size result in an hour angle greater than +/- 12h.</p><br>";
 }
 
 if ($_POST['direction'] == 'left')
+{
 	$MeasuredHA *= -1.0;
-	
+}	
 if (abs($MeasuredHA - $ExpectedHA) > 2)
 {
 	// Significant difference between expected and measured HA
@@ -290,14 +309,16 @@ if ($hasFatalErrors)
 }
 else
 {
-	if ($stmt = $con->prepare('INSERT INTO observationsManual (date,time,observerID,fists,phase,phaseimage,observerLatitude,observerLongitude,observerZone,observerDST) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')) {
-			
+	if ($stmt = $con->prepare('INSERT INTO observationsManual (date,time,observerID,fists,phase,phaseimage,observerLatitude,observerLongitude,observerZone,observerDST) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)'))
+        {
 		$dateInsert = $year . '-' . $month . '-' . $day;
 		$timeInsert = $hour . ":" . $minute . ":00";
 		
 		$fistsValInsert = floatval($_POST['fists']);
 		if ($_POST['direction'] == 'left')
+                {
 			$fistsValInsert *= -1.0;
+                }
 		$fistsInsert = strval($fistsValInsert);
 		
 		if ($stmt->bind_param('sssssssss', $dateInsert, $timeInsert, $_SESSION['id'], $fistsInsert, $_POST['phase'], $userPhaseImage, strval($ObsLat), strval($ObsLong), strval($ObsTimeRelUTC), strval($ObsDSTCorrection)) )
@@ -306,7 +327,9 @@ else
 //				echo 'Error state (bind) ' . $stmt->$error . '  ' . $stmt->$errno . "\n";
 //				print_r($stmt->error_list);
 			echo ' execute insert ';
-			if ($stmt->execute() )
+//			if ($stmt->execute() )
+                }
+        }
 }
 ?>
 

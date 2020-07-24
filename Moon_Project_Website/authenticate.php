@@ -1,4 +1,5 @@
 <?php
+require_once 'errorBox.php';
 session_start();
 
 mb_internal_encoding("UTF-8"); // ensure utf-8 functionality
@@ -23,7 +24,7 @@ if ($requestMethod === 'POST')
     //$con = mysqli_connect('localhost','root','colombia','moon_project');
     if ( !isset($con) || $con === null || mysqli_connect_errno() )
     {
-        $_SESSION['generalerror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\">An error has occurred. Please contact an administrator.<br></font></p><br></div>";
+        $_SESSION['generalerror'] = errorBox("An error has occurred. Please contact an administrator.");
         $_noerrors = false;
     }
     if ($_noerrors)
@@ -35,14 +36,14 @@ if ($requestMethod === 'POST')
         if ( !isset($userName) )
         {
                 // Could not get the data that should have been sent.
-            $_SESSION['usernameerror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\">A username is required.<br></font></p><br></div>";
+            $_SESSION['usernameerror'] = errorBox("A user name is required");
             $_noerrors = false;
         }
 
         if ( !isset($passwordEntered) )
         {
                 // Could not get the data that should have been sent.
-            $_SESSION['passworderror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\">A password is required.<br></font></p><br></div>";
+            $_SESSION['passworderror'] = errorBox("A password is required");
             $_noerrors = false;
         }
     }
@@ -82,12 +83,12 @@ if ($requestMethod === 'POST')
                 }
                 else
                 {
-                    $_SESSION['passworderror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\">The password does not match.<br></font></p><br></div>";
+                    $_SESSION['passworderror'] = errorBox("The password does not match.");
                 }
             }
             else
             {
-                $_SESSION['usernameerror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\">No user with this name has been found.<br></font></p><br></div>";
+                $_SESSION['usernameerror'] = errorBox("No user with this name has been found.");
             }
             $stmt->close();
         }

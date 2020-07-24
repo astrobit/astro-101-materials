@@ -1,4 +1,5 @@
 <?php
+require_once 'errorBox.php';
 session_start();
 
 $config = parse_ini_file('../../config/moon_proj_config.ini'); 

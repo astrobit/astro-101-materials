@@ -1,5 +1,6 @@
 <?php
 // We need to use sessions, so you should always start sessions using the below code.
+require_once 'errorBox.php';
 session_start();
 
 mb_internal_encoding("UTF-8"); // ensure utf-8 functionality
@@ -23,7 +24,7 @@ else
     if ( !isset($con) || $con == null || mysqli_connect_errno() ) 
     {
             // If there is an error with the connection, stop the script and display the error.
-        $_SESSION['generalerror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\">There was a problem with the connection. Please try again or contact an administrator.<br></font></p><br></div>";
+        $_SESSION['generalerror'] = errorBox("There was a problem with the connection. Please try again or contact an administrator.");
         $_noerrors = false;
     }
 }

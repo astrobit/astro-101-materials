@@ -1,4 +1,5 @@
 <?php
+require_once 'errorBox.php';
 mb_internal_encoding("UTF-8"); // ensure utf-8 functionality
 mb_http_output("UTF-8"); // ensure utf-8 functionality
 
@@ -24,25 +25,25 @@ if ($requestMethod === 'POST')
     $passwordCheck = filter_input(INPUT_POST,'passwordcheck',FILTER_DEFAULT);
     $emailSan= filter_input(INPUT_POST,'email',FILTER_SANITIZE_EMAIL);
     $email = filter_var($emailSan,FILTER_VALIDATE_EMAIL);
-    $fistSizeSan = filter_input(INPUT_POST,'fistsize',FILTER_SANITIZE_NUMBER_FLOAT);
+    $fistSizeSan = filter_input(INPUT_POST,'fistsize',FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION);
     $fistsize = filter_var($fistSizeSan ,FILTER_VALIDATE_FLOAT,0);
     $researchConsentRaw = filter_input(INPUT_POST,'researchconsent',FILTER_SANITIZE_SPECIAL_CHARS);
     $geoIPConsentRaw = filter_input(INPUT_POST,'geoIPconsent',FILTER_SANITIZE_SPECIAL_CHARS);
     $deviceLocConsentRaw = filter_input(INPUT_POST,'deviceLocationConsent',FILTER_SANITIZE_SPECIAL_CHARS);
         
         
-    $_SESSION['loggedin'] = FALSE;
+    $_SESSION['loggedin'] = false;
     $_SESSION['name'] = $givenName;
     $_SESSION['email'] = $email;
     $_SESSION['username'] = $userName;
     $_SESSION['fistsize'] = $fistsize;
 
     // Try and connect to the database, if a connection has not been established yet
-    $con = mysqli_connect($config['servername'],$config['username'],$config['password'],$config['dbname']);
+   $con = mysqli_connect($config['servername'],$config['username'],$config['password'],$config['dbname']);
     if (!isset($con) || $con === null || mysqli_connect_errno())
     {
             // If there is an error with the connection, stop the script and display the error.
-        $_SESSION['generalerror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\">There was a problem with the connection. Please try again or contact an administrator.<br></font></p><br></div>";
+        $_SESSION['generalerror'] = errorBox("There was a problem with the connection. Please try again or contact an administrator.");
         $_noerrors = false;
     }
     if ($_noerrors)
@@ -54,103 +55,69 @@ if ($requestMethod === 'POST')
             $permissionsID = $row['id'];
         }
     }
-	
+
     if ($_noerrors && (!isset($permissionsID) || empty($permissionsID)))
     {
-        $_SESSION['generalerror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\">There was a problem retrieving user permissions. Please try again or contact an administrator.<br></font></p><br></div>";
+        $_SESSION['generalerror'] = errorBox("There was a problem retrieving user permissions. Please try again or contact an administrator.");
         $_noerrors = false;
     }
     if ($_noerrors)
     {
         // Now we check if the data was submitted, isset() function will check if the data exists.
-        if (!isset($username) || empty($username))
+        if (!isset($userName) || empty($userName) || $userName === false)
         {
                 // Could not get the data that should have been sent.
-            $_SESSION['usernameerror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\">A user name is required.<br></font></p><br></div>";
+            $_SESSION['usernameerror'] = errorBox("A user name is required");
             $_noerrors = false;
         }
-        if (!isset($password) || empty($password))
+        if (!isset($password) || empty($password) || $password === false)
         {
                 // Could not get the data that should have been sent.
-            $_SESSION['passworderror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\">A password is required.<br></font></p><br></div>";
+            $_SESSION['passworderror'] = errorBox("A password is required");
             $_noerrors = false;
         }
-        if (!isset($passwordCheck) || empty($passwordCheck))
+        if (!isset($passwordCheck) || empty($passwordCheck) || $passwordCheck === false)
         {
                 // Could not get the data that should have been sent.
-            $_SESSION['passwordcheckerror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\">Please re-enter your password.<br></font></p><br></div>";
+            $_SESSION['passwordcheckerror'] = errorBox("Please re-enter your password.");
             $_noerrors = false;
         }
         else if ($password != $passwordCheck)
         {
                 // Could not get the data that should have been sent.
-            $_SESSION['passwordcheckerror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\">Passwords do not match.<br></font></p><br></div>";
+            $_SESSION['passwordcheckerror'] = errorBox("Passwords do not match.");
             $_noerrors = false;
         }
-        if (!isset($givenName) || empty($givenName))
+        if (!isset($givenName) || empty($givenName) || $givenName === false)
         {
                 // Could not get the data that should have been sent.
-            $_SESSION['givennameerror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\">A given name is required.<br></font></p><br></div>";
+            $_SESSION['givennameerror'] = errorBox("A given name is required.");
             $_noerrors = false;
         }
-        if (!isset($fistSize) || empty($fistSize))
+        if (!isset($email) || empty($email) || $email === false)
         {
                 // Could not get the data that should have been sent.
-            $_SESSION['fistsizeerror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\">A fist size is required.<br></font></p><br></div>";
+            $_SESSION['emailerror'] = errorBox("Please enter a valid email address.");
+            $_noerrors = false;
+        }
+        if (!isset($fistsize) || empty($fistsize) || $fistsize === false)
+        {
+                // Could not get the data that should have been sent.
+            $_SESSION['fistsizeerror'] = errorBox("A fist size is required.");
             $_noerrors = false;
         }
         else
         {
-            $fistsize = floatval($fistSize);
             if ($fistsize < 3.0)
             {
-                $_SESSION['fistsizeerror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\">Your fist size seems unusually small. Please check your entry and/or check your fist size again.<br></font></p><br></div>";
+                $_SESSION['fistsizeerror'] = errorBox("Your fist size seems unusually small (". $fistsize . "). Please check your entry and/or check your fist size again.");
                 $_noerrors = false;
             }
-            elseif ($fistsize > 6.0)
+            else if ($fistsize > 6.0)
             {
-                $_SESSION['fistsizeerror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\">Your fist size seems unusually large. Please check your entry and/or check your fist size again.<br></font></p><br></div>";
+                $_SESSION['fistsizeerror'] = errorBox("Your fist size seems unusually large (". $fistsize . "). Please check your entry and/or check your fist size again.");
                 $_noerrors = false;
             }
-        }
-    }
-    // We need to check if the account with that username exists.
-    if ($_noerrors)
-    {
-        $stmt = $con->prepare('SELECT id FROM userdata WHERE username = ?');
-        if ($stmt != null)
-        {
-            // Bind parameters (s = string, i = int, b = blob, etc), hash the password using the PHP password_hash function.
-            $stmt->bind_param('s', $username);
-            $stmt->execute();
-            $stmt->store_result();
-            // Store the result so we can check if the account exists in the database.
-            if ($stmt->num_rows > 0)
-            {
-                    // Username already exists
-                $_SESSION['usernameerror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\"> Username " . $username . " already exists. Please choose another! <br></font></p><br></div>";
-                $_noerrors = false;
-            }
-            $stmt->close();
-        }
-    }
-    if ($_noerrors)
-    {
-        $stmt = $con->prepare('SELECT id FROM userdata WHERE email = ?');
-        if ($stmt != null)
-        {
-            // Bind parameters (s = string, i = int, b = blob, etc), hash the password using the PHP password_hash function.
-            $stmt->bind_param('s', $email);
-            $stmt->execute();
-            $stmt->store_result();
-            // Store the result so we can check if the account exists in the database.
-            if ($stmt->num_rows > 0)
-            {
-                    // email already exists
-                $_SESSION['emailerror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\"> This email already has an account associated with it. To reset your passord, select <a href=\"reset_password_request.php\">this</a> link.<br></font></p><br></div>";
-                $_noerrors = false;
-            }
-            $stmt->close();
         }
     }
 
@@ -178,56 +145,172 @@ if ($requestMethod === 'POST')
     {
         $deviceLocationConsent = 0;
     }
-	
-    if ($_noerrors)
-    {
-        $password = password_hash($password, PASSWORD_DEFAULT);
-        if (!isset($familyName) || empty($familyName))
-        {
-            $stmt = $con->prepare('INSERT INTO userdata (username, email, emailVerified, password, givenname, fistsize, consentResearch, permissionsID, allowUseGeoIP, allowUseDevice, preferDefaultLocationOverClass) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-            $stmt->bind_param('ssissdiiiii', $username, $email, 0, $password, $givenName, $fistsize, $researchConsent, $permissionsID, $geoIPconsent, $deviceLocationConsent, 1);
 
-            $stmt->execute();
-        }
-        else 
-        {
-            $stmt = $con->prepare('INSERT INTO userdata (username, email, emailVerified, password, givenname, familyname, fistsize, consentResearch, permissionsID, allowUseGeoIP, allowUseDevice, preferDefaultLocationOverClass) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-            $stmt->bind_param('ssisssdiiiii', $username, $email, 0, $password, $givenName, $familyName, $fistsize, $researchConsent, $permissionsID, $geoIPconsent, $deviceLocationConsent, 1);
-
-        }
-        $stmt->execute();
-    }			
-
+    // We need to check if the account with that username exists.
     if ($_noerrors)
     {
         $stmt = $con->prepare('SELECT id FROM userdata WHERE username = ?');
-        if ($stmt != null)
+        if (isset($stmt) && $stmt != null)
         {
-            // Bind parameters (s = string, i = int, b = blob, etc), in our case the username is a string so we use "s"
-            $stmt->bind_param('s', $username);
+            // Bind parameters (s = string, i = int, b = blob, etc), hash the password using the PHP password_hash function.
+            $stmt->bind_param('s', $userName);
             $stmt->execute();
-            // Store the result so we can check if the account exists in the database.
             $stmt->store_result();
+            // Store the result so we can check if the account exists in the database.
             if ($stmt->num_rows > 0)
             {
-                $row = $stmt->fetch_assoc();
-                $id = $row['id'];
-
-                session_regenerate_id();
-                $_SESSION['loggedin'] = TRUE;
-                $_SESSION['id'] = $id;
-                header('Location: home.php');
-                exit();
-            }
-            else
-            {
-                $_SESSION['generalerror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\">There was a problem adding the user. Please try again or contact an administrator.<br></font></p><br></div>";
+                    // Username already exists
+                $_SESSION['usernameerror'] = errorBox("Username " . $userName . " already exists. Please choose another!");
                 $_noerrors = false;
             }
             $stmt->close();
         }
     }
-    $con->close();
+    if ($_noerrors)
+    {
+        $stmt = $con->prepare('SELECT id FROM userdata WHERE email = ?');
+        if ($stmt != null)
+        {
+            // Bind parameters (s = string, i = int, b = blob, etc), hash the password using the PHP password_hash function.
+            $stmt->bind_param('s', $email);
+            $stmt->execute();
+            $stmt->store_result();
+            // Store the result so we can check if the account exists in the database.
+            if ($stmt->num_rows > 0)
+            {
+                    // email already exists
+                $_SESSION['emailerror'] = errorBox("This email already has an account associated with it. To reset your passord, select <a href=\"reset_password_request.php\">this</a> link");
+                $_noerrors = false;
+            }
+            $stmt->close();
+        }
+    }
+	
+    if ($_noerrors)
+    {
+        $passwordHash = password_hash($password, PASSWORD_DEFAULT);
+        $stmt = $con->stmt_init();
+        if (isset($stmt) && $stmt != null)
+        {
+            $zero = 0;
+            $one = 1;
+            if (!isset($familyName) || empty($familyName))
+            {
+                if ($stmt->prepare('INSERT INTO userdata (username, email, emailVerified, password, givenname, fistsize, consentResearch, permissionsID, allowUseGeoIP, allowUseDevice, preferDefaultLocationOverClass) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'))
+                {
+                    if (!$stmt->bind_param('ssissdiiiii', $userName, $email, $zero, $passwordHash, $givenName, $fistsizeVal, $researchConsent, $permissionsID, $geoIPconsent, $deviceLocationConsent, $one))
+                    {
+                        $_SESSION['generalerror'] = errorBox("There was a accessing the database. X1 ".$stmt->error);
+                        $_noerrors = false;
+                    }
+                }
+                else
+                {
+                    $_SESSION['generalerror'] = errorBox("There was a accessing the database. X2 ".$stmt->error);
+                    $_noerrors = false;
+                }
+            }
+            else 
+            {
+                if ($stmt->prepare('INSERT INTO userdata (username, email, emailVerified, password, givenname, familyname, fistsize, consentResearch, permissionsID, allowUseGeoIP, allowUseDevice, preferDefaultLocationOverClass) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'))
+                {
+                    if (!$stmt->bind_param('ssisssdiiiii', $userName, $email, $zero, $passwordHash, $givenName, $familyName, $fistsizeVal, $researchConsent, $permissionsID, $geoIPconsent, $deviceLocationConsent, $one))
+                    {
+                        $_SESSION['generalerror'] = errorBox("There was a accessing the database. X3 ".$stmt->error);
+                        $_noerrors = false;
+                    }
+                }
+                else
+                {
+                    $_SESSION['generalerror'] = errorBox("There was a accessing the database. X4 ".$stmt->error);
+                    $_noerrors = false;
+                }
+            }
+            if ($_noerrors)
+            {
+                if (!$stmt->execute())
+                {
+                    $_SESSION['generalerror'] = errorBox("There was a accessing the database. X6 ".$stmt->error);
+                    $_noerrors = false;
+                }
+            }
+            $stmt->close();
+        }
+        else
+        {
+            $_SESSION['generalerror'] = errorBox("There was a accessing the database. X5");
+            $_noerrors = false;
+        }
+ 
+    }			
+
+    if ($_noerrors)
+    {
+        $stmt = $con->stmt_init();
+        if (isset($stmt) && $stmt != null && $stmt != false && !empty($stmt))
+        {
+            if ($stmt->prepare('SELECT id FROM userdata WHERE username = ?'))
+            {
+                // Bind parameters (s = string, i = int, b = blob, etc), in our case the username is a string so we use "s"
+                if (!$stmt->bind_param('s', $userName))
+                {
+                    $_SESSION['generalerror'] = errorBox("There was a accessing the database. Z1 " .$stmt->error);
+                    $_noerrors = false;
+                }
+                if ($_noerrors)
+                {
+                    if (!$stmt->execute())
+                    {
+                        $_SESSION['generalerror'] = errorBox("There was a accessing the database. Z1 " .$stmt->error);
+                        $_noerrors = false;
+                    }
+                }
+                // Store the result so we can check if the account exists in the database.
+                if ($_noerrors)
+                {
+                    if (!$stmt->store_result())
+                    {
+                        $_SESSION['generalerror'] = errorBox("There was a accessing the database. Z2 " .$stmt->error);
+                        $_noerrors = false;
+                    }
+                    else
+                    {
+                        if ($stmt->bind_result($id))
+                        {
+                            if ($stmt->fetch())
+                            {
+                                session_regenerate_id();
+                                $_SESSION['loggedin'] = true;
+                                $_SESSION['id'] = $id;
+                                header('Location: home.php');
+                                exit();
+                            }
+                            else
+                            {
+                                $_SESSION['generalerror'] = errorBox("There was a problem adding the user. Please try again or contact an administrator.");
+                                $_noerrors = false;
+                            }
+                        }
+                        else
+                        {
+                            $_SESSION['generalerror'] = errorBox("There was a problem adding the user. Please try again or contact an administrator.".$stmt->error);
+                            $_noerrors = false;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                $_SESSION['generalerror'] = errorBox("There was a problem adding the user. Please try again or contact an administrator.".$stmt->error);
+                $_noerrors = false;
+            }
+            $stmt->close();
+        }
+    }
+    if (isset($con) && $con != null)
+    {
+        $con->close();
+    }
 }
 ?>
 

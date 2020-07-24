@@ -1,4 +1,5 @@
 <?php
+require_once 'errorBox.php';
 mb_internal_encoding("UTF-8"); // ensure utf-8 functionality
 mb_http_output("UTF-8"); // ensure utf-8 functionality
 
@@ -18,7 +19,7 @@ $config = parse_ini_file('../../config/moon_proj_config.ini');
 $con = mysqli_connect($config['servername'],$config['username'],$config['password'],$config['dbname']);
 if (!isset($con) || $con === null || mysqli_connect_errno())
 {
-    $_SESSION['generalerror'] = "<div><br><label><i class=\"fas fa-exclamation-triangle\"></i></label><p> <font color=\"red\">There was a problem with the connection. Please try again or contact an administrator.<br></font></p><br></div>";
+    $_SESSION['generalerror'] = errorBox("There was a problem with the connection. Please try again or contact an administrator.");
     $_noerrors = false;
 }
 // We don't have the password or email info stored in sessions so instead we can get the results from the database.

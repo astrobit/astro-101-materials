@@ -1,5 +1,6 @@
 <?php
 require_once 'errorBox.php';
+require_once 'UserData.php';
 session_start();
 
 mb_internal_encoding("UTF-8"); // ensure utf-8 functionality
@@ -15,82 +16,78 @@ if ($requestMethod === 'POST')
 {
 
     $config = parse_ini_file('../../config/moon_proj_config.ini'); 
-
-
     // Try and connect to the database, if a connection has not been established yet
-    $con = mysqli_connect($config['servername'],$config['username'],$config['password'],$config['dbname']);
-    //$con = mysqli_connect('localhost','moonproject','7c3J0r*nO0M#0rD$s@P','moon_project');
-    //$con = mysqli_connect('localhost','root','yr3v0c$iDSST','moon_project');
-    //$con = mysqli_connect('localhost','root','colombia','moon_project');
-    if ( !isset($con) || $con === null || mysqli_connect_errno() )
+    try
     {
-        $_SESSION['generalerror'] = errorBox("An error has occurred. Please contact an administrator.");
+        $con = new PDO(
+            'mysql:host='.$config['servername'].
+            ';dbname='.$config['dbname'].';charset=utf8mb4',
+            $config['username'],
+            $config['password'],
+            array(
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_PERSISTENT => false,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES   => false
+            )
+            );
+    }
+    catch (\PDOException $e)
+    {
+        throw new \PDOException($e->getMessage(), (int)$e->getCode());
+    }
+
+    $userName = filter_input(INPUT_POST,'username',FILTER_SANITIZE_SPECIAL_CHARS);
+    $passwordEntered = filter_input(INPUT_POST,'password',FILTER_DEFAULT);
+
+    // Now we check if the data from the login form was submitted, isset() will check if the data exists.
+    if ( !isset($userName) )
+    {
+            // Could not get the data that should have been sent.
+        $_SESSION['usernameerror'] = errorBox("A user name is required");
+        $_noerrors = false;
+    }
+
+    if ( !isset($passwordEntered) )
+    {
+            // Could not get the data that should have been sent.
+        $_SESSION['passworderror'] = errorBox("A password is required");
         $_noerrors = false;
     }
     if ($_noerrors)
     {
-        $userName = filter_input(INPUT_POST,'username',FILTER_SANITIZE_SPECIAL_CHARS);
-        $passwordEntered = filter_input(INPUT_POST,'password',FILTER_DEFAULT);
-
-        // Now we check if the data from the login form was submitted, isset() will check if the data exists.
-        if ( !isset($userName) )
-        {
-                // Could not get the data that should have been sent.
-            $_SESSION['usernameerror'] = errorBox("A user name is required");
-            $_noerrors = false;
-        }
-
-        if ( !isset($passwordEntered) )
-        {
-                // Could not get the data that should have been sent.
-            $_SESSION['passworderror'] = errorBox("A password is required");
-            $_noerrors = false;
-        }
-    }
-    if ($_noerrors)
-    {
         // Prepare our SQL, preparing the SQL statement will prevent SQL injection.
-        $stmt = $con->prepare('SELECT id, password, givenname, familyname, fistsize FROM userdata WHERE username = ?');
-        if ($stmt != null)
+        $userResult = $con->query('SELECT id, password FROM userdata '
+            . "WHERE username = '$userName'");
+        if ($userResult->rowCount() > 0)
         {
-            // Bind parameters (s = string, i = int, b = blob, etc), in our case the username is a string so we use "s"
-            $stmt->bind_param('s', $userName);
-            $stmt->execute();
-            // Store the result so we can check if the account exists in the database.
-            $stmt->store_result();
-            if ($stmt->num_rows > 0)
+            $row = $userResult->fetch();
+    // Account exists, now we verify the password.
+    // Note: remember to use password_hash in your registration file to store the hashed passwords.
+            if (password_verify($passwordEntered, $row['password']))
             {
-                $stmt->bind_result($id, $password, $givenname, $familyname, $fistsize);
-                $stmt->fetch();
-        // Account exists, now we verify the password.
-        // Note: remember to use password_hash in your registration file to store the hashed passwords.
-                if (password_verify($passwordEntered, $password))
-                {
-                // Verification success! User has loggedin!
-                // Create sessions so we know the user is logged in, they basically act like cookies but remember the data on the server.
-                    session_regenerate_id();
-                    $_SESSION['loggedin'] = TRUE;
-                    $_SESSION['name'] = $givenname;
-                    $_SESSION['username'] = $userName;
-                    $_SESSION['fistsize'] = $fistsize;
-                    $_SESSION['id'] = $id;
-                    $_SESSION['generalerror'] = null;
-                    $_SESSION['usernameerror'] = null;
-                    $_SESSION['passworderror'] = null;
+            // Verification success! User has loggedin!
+            // Create sessions so we know the user is logged in, they basically act like cookies but remember the data on the server.
+                session_regenerate_id();
+                $userData = new UserData($con, $userName);
+                $userData->serializeSession();
+                $_SESSION['loggedin'] = true;
+                $_SESSION['generalerror'] = null;
+                $_SESSION['usernameerror'] = null;
+                $_SESSION['passworderror'] = null;
 
-                    header('Location: home.php');
-                    exit();
-                }
-                else
-                {
-                    $_SESSION['passworderror'] = errorBox("The password does not match.");
-                }
+                header('Location: home.php');
+                exit();
+                $_SESSION['passworderror'] = errorBox("Success.");
             }
             else
             {
-                $_SESSION['usernameerror'] = errorBox("No user with this name has been found.");
+                $_SESSION['passworderror'] = errorBox("The password does not match.");
             }
-            $stmt->close();
+        }
+        else
+        {
+            $_SESSION['usernameerror'] = errorBox("No user with this name has been found.");
         }
     }
 }

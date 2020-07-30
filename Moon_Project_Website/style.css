@@ -223,3 +223,21 @@ body.loggedin {
 	background-color: #2868c7;
   	transition: background-color 0.2s;
 }
+
+a.button {
+    -webkit-appearance: button;
+    -moz-appearance: button;
+    appearance: button;
+
+    text-decoration: none;
+    color: initial;
+}
+
+.btn-default {
+    color: #fff;
+    background-color: #4C5F76;
+    border-color: #4C5F76;
+}
+.btn-group-lg>.btn, .btn-lg {
+    padding: 10px 46px;
+}

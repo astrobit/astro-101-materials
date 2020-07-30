@@ -33,27 +33,31 @@ if ($requestMethod === 'POST')
         
         
     $_SESSION['loggedin'] = false;
-    $_SESSION['name'] = $givenName;
-    $_SESSION['email'] = $email;
-    $_SESSION['username'] = $userName;
-    $_SESSION['fistsize'] = $fistsize;
 
-    // Try and connect to the database, if a connection has not been established yet
-   $con = mysqli_connect($config['servername'],$config['username'],$config['password'],$config['dbname']);
-    if (!isset($con) || $con === null || mysqli_connect_errno())
+    try
     {
-            // If there is an error with the connection, stop the script and display the error.
-        $_SESSION['generalerror'] = errorBox("There was a problem with the connection. Please try again or contact an administrator.");
-        $_noerrors = false;
+        $con = new PDO(
+            'mysql:host='.$config['servername'].
+            ';dbname='.$config['dbname'].';charset=utf8mb4',
+            $config['username'],
+            $config['password'],
+            array(
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_PERSISTENT => false,
+                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES   => false
+            )
+            );
     }
-    if ($_noerrors)
+    catch (\PDOException $e)
     {
-        $resultPermissions = $con->query('SELECT id FROM permissions WHERE name = "user"');
-        if (isset($resultPermissions) && $resultPermissions != null && $resultPermissions->num_rows > 0)
-        {
-            $row = $resultPermissions->fetch_assoc();
-            $permissionsID = $row['id'];
-        }
+        throw new \PDOException($e->getMessage(), (int)$e->getCode());
+    }
+    $resultPermissions = $con->query('SELECT id FROM permissions WHERE name = "user"');
+    if ($resultPermissions->num_rows > 0)
+    {
+        $row = $resultPermissions->fetch();
+        $permissionsID = $row['id'];
     }
 
     if ($_noerrors && (!isset($permissionsID) || empty($permissionsID)))
@@ -108,12 +112,12 @@ if ($requestMethod === 'POST')
         }
         else
         {
-            if ($fistsize < 3.0)
+            if ($fistsize < 5.0)
             {
                 $_SESSION['fistsizeerror'] = errorBox("Your fist size seems unusually small (". $fistsize . "). Please check your entry and/or check your fist size again.");
                 $_noerrors = false;
             }
-            else if ($fistsize > 6.0)
+            else if ($fistsize > 15.0)
             {
                 $_SESSION['fistsizeerror'] = errorBox("Your fist size seems unusually large (". $fistsize . "). Please check your entry and/or check your fist size again.");
                 $_noerrors = false;
@@ -149,172 +153,59 @@ if ($requestMethod === 'POST')
     // We need to check if the account with that username exists.
     if ($_noerrors)
     {
-        $stmt = $con->prepare('SELECT id FROM userdata WHERE username = ?');
-        if (isset($stmt) && $stmt != null)
+        $resultUser = $con->query("SELECT id FROM userdata WHERE username = $userName");
+        if ($resultUser->rowCount() > 0)
         {
-            // Bind parameters (s = string, i = int, b = blob, etc), hash the password using the PHP password_hash function.
-            $stmt->bind_param('s', $userName);
-            $stmt->execute();
-            $stmt->store_result();
-            // Store the result so we can check if the account exists in the database.
-            if ($stmt->num_rows > 0)
-            {
-                    // Username already exists
-                $_SESSION['usernameerror'] = errorBox("Username " . $userName . " already exists. Please choose another!");
-                $_noerrors = false;
-            }
-            $stmt->close();
+                // Username already exists
+            $_SESSION['usernameerror'] = errorBox("Username " . $userName . " already exists. Please choose another!");
+            $_noerrors = false;
         }
     }
     if ($_noerrors)
     {
-        $stmt = $con->prepare('SELECT id FROM userdata WHERE email = ?');
-        if ($stmt != null)
+        $resultEmail= $con->query("SELECT id FROM userdata WHERE email = $email");
+        if ($resultEmail->rowCount() > 0)
         {
-            // Bind parameters (s = string, i = int, b = blob, etc), hash the password using the PHP password_hash function.
-            $stmt->bind_param('s', $email);
-            $stmt->execute();
-            $stmt->store_result();
-            // Store the result so we can check if the account exists in the database.
-            if ($stmt->num_rows > 0)
-            {
-                    // email already exists
-                $_SESSION['emailerror'] = errorBox("This email already has an account associated with it. To reset your passord, select <a href=\"reset_password_request.php\">this</a> link");
-                $_noerrors = false;
-            }
-            $stmt->close();
+                // email already exists
+            $_SESSION['emailerror'] = errorBox("This email already has an account associated with it. To reset your passord, select <a href=\"reset_password_request.php\">this</a> link");
+            $_noerrors = false;
         }
     }
 	
     if ($_noerrors)
     {
         $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-        $stmt = $con->stmt_init();
-        if (isset($stmt) && $stmt != null)
+        $insertText = 'INSERT INTO userdata (username, email, '
+                    . 'emailVerified, password, givenname';
+        if ($familyname === null || !isset($familyname) || empty($familyname))
         {
-            $zero = 0;
-            $one = 1;
-            if (!isset($familyName) || empty($familyName))
-            {
-                if ($stmt->prepare('INSERT INTO userdata (username, email, emailVerified, password, givenname, fistsize, consentResearch, permissionsID, allowUseGeoIP, allowUseDevice, preferDefaultLocationOverClass) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'))
-                {
-                    if (!$stmt->bind_param('ssissdiiiii', $userName, $email, $zero, $passwordHash, $givenName, $fistsizeVal, $researchConsent, $permissionsID, $geoIPconsent, $deviceLocationConsent, $one))
-                    {
-                        $_SESSION['generalerror'] = errorBox("There was a accessing the database. X1 ".$stmt->error);
-                        $_noerrors = false;
-                    }
-                }
-                else
-                {
-                    $_SESSION['generalerror'] = errorBox("There was a accessing the database. X2 ".$stmt->error);
-                    $_noerrors = false;
-                }
-            }
-            else 
-            {
-                if ($stmt->prepare('INSERT INTO userdata (username, email, emailVerified, password, givenname, familyname, fistsize, consentResearch, permissionsID, allowUseGeoIP, allowUseDevice, preferDefaultLocationOverClass) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)'))
-                {
-                    if (!$stmt->bind_param('ssisssdiiiii', $userName, $email, $zero, $passwordHash, $givenName, $familyName, $fistsizeVal, $researchConsent, $permissionsID, $geoIPconsent, $deviceLocationConsent, $one))
-                    {
-                        $_SESSION['generalerror'] = errorBox("There was a accessing the database. X3 ".$stmt->error);
-                        $_noerrors = false;
-                    }
-                }
-                else
-                {
-                    $_SESSION['generalerror'] = errorBox("There was a accessing the database. X4 ".$stmt->error);
-                    $_noerrors = false;
-                }
-            }
-            if ($_noerrors)
-            {
-                if (!$stmt->execute())
-                {
-                    $_SESSION['generalerror'] = errorBox("There was a accessing the database. X6 ".$stmt->error);
-                    $_noerrors = false;
-                }
-            }
-            $stmt->close();
+            $insertText .= ', familyName';
+        }
+        $insertText .= ', fistsize, consentResearch, '
+            . 'permissionsID, allowUseGeoIP, allowUseDevice, '
+            . 'preferDefaultLocationOverClass) VALUES '
+            . "($userName, $email, 0, $passwordHash, $givenName";
+        if ($familyname === null || !isset($familyname) || empty($familyname))
+        {
+            $insertText .= ", $familyname";
+        }
+        $insertText .= ", $fistsizeVal, "
+            . "$researchConsent, $permissionsID$geoIPconsent, "
+            . "$deviceLocationConsent, 1)";
+        if ($con->exec($insertText) != 1)
+        {
+            $_SESSION['generalerror'] = errorBox("There was a problem adding the user. Please try again or contact an administrator.");
+            $_noerrors = false;
         }
         else
         {
-            $_SESSION['generalerror'] = errorBox("There was a accessing the database. X5");
-            $_noerrors = false;
+            $_SESSION['loggedin'] = true;
+            $userData = new UserData($con, $userName);
+            $userData->serializeSession();
         }
- 
-    }			
-
-    if ($_noerrors)
-    {
-        $stmt = $con->stmt_init();
-        if (isset($stmt) && $stmt != null && $stmt != false && !empty($stmt))
-        {
-            if ($stmt->prepare('SELECT id FROM userdata WHERE username = ?'))
-            {
-                // Bind parameters (s = string, i = int, b = blob, etc), in our case the username is a string so we use "s"
-                if (!$stmt->bind_param('s', $userName))
-                {
-                    $_SESSION['generalerror'] = errorBox("There was a accessing the database. Z1 " .$stmt->error);
-                    $_noerrors = false;
-                }
-                if ($_noerrors)
-                {
-                    if (!$stmt->execute())
-                    {
-                        $_SESSION['generalerror'] = errorBox("There was a accessing the database. Z1 " .$stmt->error);
-                        $_noerrors = false;
-                    }
-                }
-                // Store the result so we can check if the account exists in the database.
-                if ($_noerrors)
-                {
-                    if (!$stmt->store_result())
-                    {
-                        $_SESSION['generalerror'] = errorBox("There was a accessing the database. Z2 " .$stmt->error);
-                        $_noerrors = false;
-                    }
-                    else
-                    {
-                        if ($stmt->bind_result($id))
-                        {
-                            if ($stmt->fetch())
-                            {
-                                session_regenerate_id();
-                                $_SESSION['loggedin'] = true;
-                                $_SESSION['id'] = $id;
-                                header('Location: home.php');
-                                exit();
-                            }
-                            else
-                            {
-                                $_SESSION['generalerror'] = errorBox("There was a problem adding the user. Please try again or contact an administrator.");
-                                $_noerrors = false;
-                            }
-                        }
-                        else
-                        {
-                            $_SESSION['generalerror'] = errorBox("There was a problem adding the user. Please try again or contact an administrator.".$stmt->error);
-                            $_noerrors = false;
-                        }
-                    }
-                }
-            }
-            else
-            {
-                $_SESSION['generalerror'] = errorBox("There was a problem adding the user. Please try again or contact an administrator.".$stmt->error);
-                $_noerrors = false;
-            }
-            $stmt->close();
-        }
-    }
-    if (isset($con) && $con != null)
-    {
-        $con->close();
     }
 }
 ?>
-
-
 <!DOCTYPE html>
 <html>
     <head>
@@ -345,7 +236,7 @@ if ($requestMethod === 'POST')
                 <?php 
                     echo $_SESSION['givennameerror'];
                 ?>
-                <label for="lname">
+                <label for="familyname">
                     <i class="fas fa-users"></i>
                     <input type="text" name="familyname" placeholder="Family Name" id="familyname"  autocomplete="on">
                 </label>
@@ -375,7 +266,7 @@ if ($requestMethod === 'POST')
                 ?>
                 <label for="fistsize">
                     <i class="fas fa-hand-rock"></i>
-                    <input type="number" name="fistsize" placeholder="Size of your fist in degrees" id="fistsize" min="3" max="6" step="0.1" required/>
+                    <input type="number" name="fistsize" placeholder="Size of your fist in degrees" id="fistsize" min="5" max="15" step="0.1" required/>
                 </label>
                 <?php 
                     echo $_SESSION['fistsizeerror'];

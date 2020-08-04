@@ -37,8 +37,7 @@ else
     {
         throw new \PDOException($e->getMessage(), (int)$e->getCode());
     }
-    $userData = new UserData();
-    $userData->deserializeSession();
+    $userData = unserialize($_SESSION['userData']);
     $userID = $userData->_id;
     $name = $userData->_givenName;
 }
@@ -47,7 +46,7 @@ else
 <html>
     <head>
         <meta charset="utf-8">
-        <title>Home Page</title>
+        <title>Moon Project Home Page</title>
         <link href="style.css" rel="stylesheet" type="text/css">
         <script src="https://kit.fontawesome.com/210f2f19d7.js" crossorigin="anonymous"></script><!-- fontawesome kit -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.5/css/select2.css" />

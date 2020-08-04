@@ -181,7 +181,7 @@ body.loggedin {
 	margin-left: 15px;
 	display: flex;
 	flex-wrap: wrap;
-  	justify-content: left;
+        justify-content: flex-start;
   	align-items: center;
   	background-color: #ffffff;
   	width:250px;
@@ -192,6 +192,16 @@ body.loggedin {
 	display: flex;
   	justify-content: center;
   	align-items: baseline;
+  	width: 310px;
+  	height: 50px;
+  	border: 1px solid #dee0e4;
+  	margin-bottom: 20px;
+  	padding: 0 15px;
+}
+.register form input[type="date"], .register form input[type="time"] {
+	display: flex;
+  	justify-content: center;
+  	align-items: center;
   	width: 310px;
   	height: 50px;
   	border: 1px solid #dee0e4;
@@ -223,16 +233,6 @@ body.loggedin {
 	background-color: #2868c7;
   	transition: background-color 0.2s;
 }
-
-a.button {
-    -webkit-appearance: button;
-    -moz-appearance: button;
-    appearance: button;
-
-    text-decoration: none;
-    color: initial;
-}
-
 .btn-default {
     color: #fff;
     background-color: #4C5F76;

@@ -70,13 +70,21 @@ if ($requestMethod === 'POST')
             // Create sessions so we know the user is logged in, they basically act like cookies but remember the data on the server.
                 session_regenerate_id();
                 $userData = new UserData($con, $userName);
-                $userData->serializeSession();
+                $_SESSION['userData'] = serialize($userData);
                 $_SESSION['loggedin'] = true;
                 $_SESSION['generalerror'] = null;
                 $_SESSION['usernameerror'] = null;
                 $_SESSION['passworderror'] = null;
+                $_location = 'home.php';
+                if (isset($_SERVER['HTTP_REFERER']) && !empty($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER'] !== null)
+                {
+                    if ($_SERVER['HTTP_REFERER'] == 'createObservationManual.php')
+                    {
+                        $_location = 'createObservationManual.php';
 
-                header('Location: home.php');
+                    }
+                }
+                header('Location: ' . $_location);
                 exit();
                 $_SESSION['passworderror'] = errorBox("Success.");
             }

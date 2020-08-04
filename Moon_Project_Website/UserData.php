@@ -25,7 +25,7 @@ class UserData
     public bool $_useDeviceLocation;
     public float $_fistSize;
     public int $_timeZoneID;
-//    public int $_timeZoneName;
+    public string $_timeZoneName;
     public int $_locationID;
     public float $_locationLatitude;
     public float $_locationLongitude;
@@ -48,14 +48,14 @@ class UserData
                 . 'permissions.administrator AS p_admin, '
                 . 'permissions.researcher AS p_res '
                 . 'FROM userdata '
-                . 'LEFT JOIN permissions ON permissionsID = permissions.id ' 
+                . 'LEFT JOIN permissions ON permissionsID = permissions.id '
                 . "WHERE username = '$i_userNameSanitized' ");
             }
-       catch (\PDOException $e)
-        {
-           print('exception '. $e->getMessage() . ' ' . $e->getCode());
-            throw new \PDOException($e->getMessage(), (int)$e->getCode());
-        }
+            catch (\PDOException $e)
+            {
+               print('exception '. $e->getMessage() . ' ' . $e->getCode());
+                throw new \PDOException($e->getMessage(), (int)$e->getCode());
+            }
             if ($result->rowCount() > 0)
             {
                 $row = $result->fetch();
@@ -135,64 +135,23 @@ class UserData
                 {
                     $this->_defaultMeasurementUnits = -1;
                 }
+                if ($this->_timeZoneID !== null && $this->_timeZoneID >= 0)
+                {
+                    try
+                    {
+                        $result = $i_con->query('SELECT name'
+                            . 'FROM timezones'
+                            . "WHERE id = $this->_timeZoneID ");
+                    }
+                    catch (\PDOException $e)
+                    {
+                        print('exception '. $e->getMessage() . ' ' . $e->getCode());
+                        throw new \PDOException($e->getMessage(), (int)$e->getCode());
+                    }
+                    $row = $result->fetch();
+                    $this->_timeZoneName = $row['name'];
+                }
             }
         }
     }
-    
-    public function serializeSession(string $i_prefix = null)
-    {
-        $_prefix = '';
-        if (isset($i_prefix) && !empty($i_prefix) && $i_prefix !== null)
-        {
-            $_prefix = $i_prefix . '.UserData.';
-        }
-        else
-        {
-            $_prefix = '.UserData.';
-        }
-        $_SESSION[$_prefix . 'id'] = $this->_id;
-        $_SESSION[$_prefix . 'userName'] = $this->_userName;
-        $_SESSION[$_prefix . 'givenName'] = $this->_givenName;
-        $_SESSION[$_prefix . 'familyName'] = $this->_familyName;
-        $_SESSION[$_prefix . 'email'] = $this->_email;
-        $_SESSION[$_prefix . 'permissions'] = $this->_permissions;
-        $_SESSION[$_prefix . 'useGeoIP'] = $this->_useGeoIP;
-        $_SESSION[$_prefix . 'useDeviceLocation'] = $this->_useDeviceLocation;
-        $_SESSION[$_prefix . 'fistSize'] = $this->_fistSize;
-        $_SESSION[$_prefix . 'timeZoneID'] = $this->_timeZoneID;
-        $_SESSION[$_prefix . 'timeZoneName'] = $this->_timeZoneName;
-        $_SESSION[$_prefix . 'locationID'] = $this->_locationID;
-        $_SESSION[$_prefix . 'locationLatitude'] = $this->_locationLatitude;
-        $_SESSION[$_prefix . 'locationLongitude'] = $this->_locationLongitude;
-        $_SESSION[$_prefix . 'defaultMeasurementUnits'] = $this->_defaultMeasurementUnits;
-    }
-    public function deserializeSession(string $i_prefix = null)
-    {
-        $_prefix = '';
-        if (isset($i_prefix) && !empty($i_prefix) && $i_prefix != null)
-        {
-            $_prefix = $i_prefix.'.UserData.';
-        }
-        else
-        {
-            $_prefix = '.UserData.';
-        }
-        
-        $this->_id = $_SESSION[$_prefix . 'id'];
-        $this->_userName = $_SESSION[$_prefix . 'userName'];
-        $this->_givenName = $_SESSION[$_prefix . 'givenName'];
-        $this->_familyName = $_SESSION[$_prefix . 'familyName'];
-        $this->_email = $_SESSION[$_prefix . 'email'];
-        $this->_permissions = $_SESSION[$_prefix . 'permissions'];
-        $this->_useGeoIP = $_SESSION[$_prefix . 'useGeoIP'];
-        $this->_useDeviceLocation = $_SESSION[$_prefix . 'useDeviceLocation'];
-        $this->_fistSize = $_SESSION[$_prefix . 'fistSize'];
-        $this->_timeZoneID = $_SESSION[$_prefix . 'timeZoneID'];
-//        $this->_timeZoneName = $_SESSION[$_prefix . 'timeZoneName'];
-        $this->_locationID = $_SESSION[$_prefix . 'locationID'];
-        $this->_locationLatitude = $_SESSION[$_prefix . 'locationLatitude'];
-        $this->_locationLongitude = $_SESSION[$_prefix . 'locationLongitude'];
-        $this->_defaultMeasurementUnits = $_SESSION[$_prefix . 'defaultMeasurementUnits'];
-    }
-     
 }

@@ -31,8 +31,7 @@ catch (\PDOException $e)
 {
     throw new \PDOException($e->getMessage(), (int)$e->getCode());
 }
-$userData = new UserData();
-$userData->deserializeSession();
+$userData = unserialize($_SESSION['userData']);
 $userID = $userData->_id;
 $observationDataCSV = '';
 $myObservations = new UserObservations($userID, $con);

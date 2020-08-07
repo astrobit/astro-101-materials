@@ -14,7 +14,7 @@ $_SESSION['generalerror'] = '';
 // If the user is not logged in redirect to the login page...
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] == false) 
 {
-    header('Referer: createObservationManual.php');
+    header('Referer: editObservationManual.php');
     header('Location: authenticate.php');
     exit();
 }
@@ -47,59 +47,128 @@ else
     $userData = unserialize($_SESSION['userData']);
     $userID = $userData->_id;
     $name = $userData->_givenName;
-    $userLatitude = -91.0;
-    $userLongitude = -182.0;
-    $userTimezone = '';
-    $userDST = false;
-    if ($userData->_useGeoIP)
+}
+$requestMethod = filter_input(INPUT_SERVER,'REQUEST_METHOD',FILTER_DEFAULT);
+$ObsID = filter_input(INPUT_SESSION,'observationToEditID',FILTER_SANITIZE_NUMBER_INT);
+$stmt = $con->query('SELECT '
+    . 'observerID, obsDateZone, editOfID, '
+    . 'obsTimeZone, hourAngle, hourAngleUnitsID, phase, phaseDiagram, '
+    . 'latitude, longitude, timezoneID, isDST, mostRecentEdit, '
+    . 'potentialErrors '
+    . 'FROM observationRawManual '
+    . "WHERE id = $ObsID AND observerID = $userID");
+if ($stmt->rowCount() > 0)
+{
+    $row = $stmt->fetch();
+    if (array_key_exists('editOfID',$row))
     {
-        $apiKey = $config['geoIPkey'];
-        $ip = get_ip_address();
+        $obsOrigID = $row['editOfID'];
+    }
+    else
+    {
+        $obsOrigID = $ObsID;
+    }
+    $obsDate = $row['obsDateZone'];
+    $obsTime = $row['obsTimeZone'];
+    $obsHourAngle = $row['hourAngle'];
+    $obsPhase = $row['phase'];
+    $obsPhaseImage = $row['phaseDiagram'];
+    $obsLatitude = $row['latitude'];
+    $obsLongitude = $row['longitude'];
+    $obsTZID = $row['timezoneID'];
+    $obsIsDST = $row['isDST'];
+    $obsErrorCodes = $row['potentialErrors'];
+    try
+    {
+        $resultTZ = $con->query("SELECT name FROM timezones WHERE id = $obsTZID");
+    }
+    catch (\PDOException $e)
+    {
+        print($e->getMessage() . ' ' . $e->getCode());
+        throw new \PDOException($e->getMessage(), (int)$e->getCode());
+    }
+    $tzData = $resultTZ->fetch();
+    if ($tzData)
+    {
+        $obsTimezoneName = $tzData['name'];
+    }
+    else
+    {
+        $noError = false;
+        $_SESSION['generalerror'] = errorBox('Error retrieving ID for timezone.');
+    }
 
-        $location = get_geolocation($apiKey, $ip, 
-            'latitude,longitude,time_zone');
-        if ($location !== false)
-        {
-            $decodedLocation = json_decode($location);
+    switch ($obsPhaseImage)
+    {
+    case 0:
+    default:
+        $obsPhaseSelect = 'new';
+        break;
+    case 1:
+        $obsPhaseSelect = 'waxingCrescent';
+        break;
+    case 2:
+        $obsPhaseSelect = 'firstQuarter';
+        break;
+    case 3:
+        $obsPhaseSelect = 'waxingGibbous';
+        break;
+    case 4:
+        $obsPhaseSelect = 'full';
+        break;
+    case 5:
+        $obsPhaseSelect = 'waningGibbous';
+        break;
+    case 6:
+        $obsPhaseSelect = 'thirdQuarter';
+        break;
+    case 7:
+        $obsPhaseSelect = 'waningCrescent';
+        break;
+    }
 
-            $userLatitude = $decodedLocation->latitude;
-            $userLongitude = $decodedLocation->longitude;
-            $userTimezone = $decodedLocation->time_zone->name;
-            $userDST = $decodedLocation->time_zone->is_dst;
-        }
-    }
-    
-    if ($userLatitude == -91.0 || $userLongitude == -182.0)
+    if ($obsErrorCodes != 0)
     {
-        if (isset($userData->_locationLatitude) && !empty($userData->_locationLatitude) && $userData->_locationLatitude !== null &&
-            isset($userData->_locationLongitude) && !empty($userData->_locationLongitude) && $userData->_locationLongitude !== null)
+        if ($obsErrorCodes & ObservationValidationError::dst_flag_mismatch)
         {
-            $userLatitude = $userData->_locationLatitude;
-            $userLongitude = $userData->_locationLongitude;
+            $_SESSION['generalerror'] .= errorBox('DST flag does not match expected value.');
         }
-    }
-    if (empty($userTimezone) && isset($userData->_timeZoneName) && !empty($userData->_timeZoneName) && $userData->_timeZoneName !== null)
-    {
-        $userTimezone = $userData->_timeZoneName;
-        $tz = new DateTimeZone($userTimezone);
-        $now = new DateTime('now',$tz);
-        $userDST = ($now->format('I') == '1');
-    }
-    if ($userLatitude == -91.0 || $userLatitude == -182.0)
-    {
-        if (isset($userData->_locationID) && !empty($userData->_locationID) && $userData->_locationID !== -1)
+        if ($obsErrorCodes & ObservationValidationError::future_datetime)
         {
-            $userLocation = new Location($userData->_locationID,$con);
-            $userLatitude = $userLocation->_latitude;
-            $userLongitude = $userLocation->_longitude;
-            $userTimezone = $userLocation->_timezoneName;
-            $tz = new DateTimeZone($userTimezone);
-            $now = new DateTime('now',$tz);
-            $userDST = ($now->format('I') == '1');
+            $_SESSION['generalerror'] .= errorBox('The selected date or time is in the future.');
+        }
+        if ($obsErrorCodes & ObservationValidationError::hour_angle_below_horizon)
+        {
+            $_SESSION['generalerror'] .= errorBox('The provided hour angle (# of fists) is so large that the moon would be below the horizon. Check your fist size and your measurement.');
+        }
+        if ($obsErrorCodes & ObservationValidationError::large_hourangle_mismatch)
+        {
+            $_SESSION['generalerror'] .= errorBox('The provided hour angle (# of fists) doesn\'t match the expected value for the moon. Recheck your measurement and make sure you are measuring correctly.');
+        }
+        if ($obsErrorCodes & ObservationValidationError::moon_not_visible)
+        {
+            $_SESSION['generalerror'] .= errorBox('The moon is not visible in the location you recorded at this date and time.');
+        }
+        if ($obsErrorCodes & ObservationValidationError::moon_too_new_to_see)
+        {
+            $_SESSION['generalerror'] .= errorBox('The moon is so new as to be impossible to see at this date and time. You may ignore this if the observation was during an eclipse.');
+        }
+        if ($obsErrorCodes & ObservationValidationError::phase_disagree)
+        {
+            $_SESSION['generalerror'] .= errorBox('The phase number you recorded and the image you selected don\'t agree.');
+        }
+        if ($obsErrorCodes & ObservationValidationError::true_phase_disagree)
+        {
+            $_SESSION['generalerror'] .= errorBox('The recorded phase is significantly different than the expected phase on the given time and date. Check to ensure that you correctly selected waxing/waning or first/third quarter.');
         }
     }
 }
-$requestMethod = filter_input(INPUT_SERVER,'REQUEST_METHOD',FILTER_DEFAULT);
+else
+{
+    header('Location: home.php');
+    exit;
+}
+
 if ($requestMethod === 'POST')
 {
     $obsHourAngle = filter_input(INPUT_POST,'hourAngle',FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION);
@@ -201,8 +270,8 @@ if ($requestMethod === 'POST')
         $_SESSION['generalerror'] = errorBox('Invalid Phase Selected.');
     }
     if ($noError)
-    {
-        try
+    { //@@TODO: how to check for duplicate times when editing
+/*        try
         {
             $resFind = $con->query('SELECT id FROM observationRawManual '
                 . "WHERE observerID = '$userData->_id' "
@@ -216,9 +285,11 @@ if ($requestMethod === 'POST')
         }
         if ($resFind->rowCount() > 0)
         {
+            $row = $resFind->fetch();
+            if ($row['id'] != $ObsID)
             $noError = false;
             $_SESSION['generalerror'] = errorBox('An observation at this date and time already exist.');
-        }
+        }*/
     }
     if ($noError)
     {
@@ -227,11 +298,11 @@ if ($requestMethod === 'POST')
         try
         {
             $stmt = $con->prepare('INSERT INTO observationRawManual '
-                . '(observerID, entryDateTimeUT, obsDateZone, '
+                . '(observerID, entryDateTimeUT, editOfID, obsDateZone, '
                 . 'obsTimeZone, hourAngle, hourAngleUnitsID, phase, phaseDiagram, '
                 . 'latitude, longitude, timezoneID, isDST, mostRecentEdit, '
                 . 'potentialErrors, accepted) '
-                . 'VALUES (:observerID, :entryDateTime, :date, :time, :hourAngle, '
+                . 'VALUES (:observerID, :entryDateTime, :editID, :date, :time, :hourAngle, '
                 . ':hourAngleUnitsID, :phase, :phaseSelect, :latitude, :longitude, '
                 . ':timezoneID, :dstFlag, 1, :suspicious, 0)');
         }
@@ -244,6 +315,7 @@ if ($requestMethod === 'POST')
         try 
         {
             $stmt->bindParam(':observerID', $userData->_id, PDO::PARAM_INT);
+            $stmt->bindParam(':editID', $obsOrigID);
             $stmt->bindParam(':entryDateTime', $nowFmt);
             $stmt->bindParam(':date', $obsDate);
             $stmt->bindParam(':time', $obsTime);
@@ -328,7 +400,7 @@ if ($requestMethod === 'POST')
 <html>
     <head>
         <meta charset="utf-8">
-        <title>Moon Project: Record New Observation</title>
+        <title>Moon Project: Edit an Observation</title>
         <script src="https://kit.fontawesome.com/210f2f19d7.js" 
         crossorigin="anonymous"></script><!-- fontawesome kit -->
         <link href="style.css" rel="stylesheet" type="text/css">
@@ -408,29 +480,28 @@ if ($requestMethod === 'POST')
     </head>
     <body>
         <div class="register">
-            <h1>Record an Observation</h1>
+            <h1>Edit an Observation</h1>
             <?php 
                 echo $_SESSION['generalerror'];
             ?>
-            <form accept-charset="UTF-8" action="createObservationManual.php" method="post" autocomplete="off">
+            <form accept-charset="UTF-8" action="editObservation.php" method="post" autocomplete="off">
                 <label for="date">
                     <i class="fas fa-calendar-alt"></i>
-                    <input type="date" name="date" placeholder="Date of Observation" id="date" autocomplete="on" required>
+                    <input type="date" name="date" placeholder="Date of Observation" id="date" autocomplete="on"value="<?php echo htmlspecialchars($obsDate);?>" value=required>
                 </label>
                 <?php 
                     echo $_SESSION['dateerror'];
                 ?>
                 <label for="time">
                     <i class="fas fa-clock"></i>
-                    <input type="time" name="time" placeholder="Time of Observation" id="time" autocomplete="on" step="1" required>
+                    <input type="time" name="time" placeholder="Time of Observation" id="time" autocomplete="on" step="1" value=""<?php echo htmlspecialchars($obsTime);?>" required>
                 </label>
                 <?php 
                     echo $_SESSION['timeerror'];
                 ?>
-                <input type="button" name="getCurrentTime" id="getCurrentTime" onclick="fillTime();" value="Get Current Time">
                 <label for="hourAngle">
                     <i class="fas fa-drafting-compass"></i>
-                    <input type="number" name="hourAngle" placeholder="Fists" id="hourAngle" min="-15" max="15" step="0.25" autocomplete="on" required>
+                    <input type="number" name="hourAngle" placeholder="Fists" id="hourAngle" min="-15" max="15" step="0.25" autocomplete="on" value=""<?php echo htmlspecialchars($obsHourAngle);?>" required>
                 </label>
                 <?php 
                     echo $_SESSION['hourangleerror'];
@@ -438,14 +509,14 @@ if ($requestMethod === 'POST')
                 
                 <label for="phase">
                     <i class="fas fa-moon"></i>
-                    <input type="number" name="phase" placeholder="Phase Number" id="phase" min="0" max="7.75" step="0.25" autocomplete="off" required>
+                    <input type="number" name="phase" placeholder="Phase Number" id="phase" min="0" max="7.75" step="0.25" autocomplete="off" value="<?php echo htmlspecialchars($obsPhase);?>" required>
                 </label>
                 <?php 
                     echo $_SESSION['phaseerror'];
                 ?>
                 <label for="moonphaseSelect">
                     <i class="fas fa-moon"></i>
-                    <select name="moonphaseSelect" id="moonphaseSelect">
+                    <select name="moonphaseSelect" id="moonphaseSelect" value="<?php echo htmlspecialchars($obsPhaseSelect); ?>">
                         <option value="default" disabled>Select the Phase</option>
                         <option value="new" data-class="new-moon">New Moon</option>
                         <option value="waxingCrescent" data-class="waxing-crescent-moon">Waxing Crescent</option>
@@ -459,18 +530,15 @@ if ($requestMethod === 'POST')
                 </label>
                 <label for="latitude">
                     <i class="fas fa-globe"></i>
-                    <input type="number" name="latitude" placeholder="Latitude" id="latitude" min="-90" max="90.0" step="0.000003" autocomplete="off">
+                    <input type="number" name="latitude" placeholder="Latitude" id="latitude" min="-90" max="90.0" step="0.000003" value="<?php echo htmlspecialchars($obsLatitude);?>" autocomplete="off">
                 </label>
                 <label for="longitude">
                     <i class="fas fa-globe"></i>
-                    <input type="number" name="longitude" placeholder="Longitude" id="longitude" min="-180" max="180.0" step="0.000003" autocomplete="off">
-                </label>
-                <label for="getLocation">
-                    <input type="button" name="getLocation" id="getLocation" onclick="fillLocation();" value="Get My Location">
+                    <input type="number" name="longitude" placeholder="Longitude" id="longitude" min="-180" max="180.0" step="0.000003" value="<?php echo htmlspecialchars($obsLongitude);?>" autocomplete="off">
                 </label>
                 <label for="timezone">
                     <i class="fas fa-hourglass"></i>
-                    <select id="timezone" name="timezone" autocomplete="on">
+                    <select id="timezone" name="timezone" autocomplete="on" value="<?php echo htmlspecialchars($obsTimezoneName);?>" >
                         <option value="default" disabled>Select Your Current Timezone</option>
                     <?php
                         $tzList = DateTimeZone::listIdentifiers();
@@ -484,87 +552,11 @@ if ($requestMethod === 'POST')
                 <label for="isDST" class="checkboxprompt">
                     <i class="fas fa-sun"></i>
                     <p class="checkboxprompt">Daylight Saving Time<br></p>
-                <input type="checkbox" name="isDST" id="isDST" value="isDST">
+                <input type="checkbox" name="isDST" id="isDST" value="isDST" <?php echo $obsIsDST?'checked':''; ?> >
                 </label>
                 <input type="submit" value="Submit">
             </form>
         </div>
-        <script>
-            function roundLatLong(value, roundTo)
-            {
-                var roundUp = 0.5 * roundTo;
-                var roundDown = -0.5 * roundTo;
-                var small = value % roundTo;
-                var rounded = value - small;
-                if (small >= roundUp)
-                {
-                    rounded += roundTo;
-                }
-                else if (small <= roundDown)
-                {
-                    rounded -= roundTo;
-                }
-                return rounded;
-            }
-            <?php 
-                // if the user has authorized use of the geolocation data from
-                // their device, use the browser's geolocation data.
-                if ($userData->_useDeviceLocation)
-                {
-                    
-                    echo 'function fillPosition(position)'.PHP_EOL;
-                    echo '{'.PHP_EOL;
-                    echo '    var elemLat = document.getElementById(\'latitude\');'.PHP_EOL;
-                    echo '    elemLat.value = roundLatLong(position.coords.latitude,0.000003);'.PHP_EOL;
-                    echo '    var elemLong = document.getElementById(\'longitude\');'.PHP_EOL;
-                    echo '    elemLong.value = roundLatLong(position.coords.longitude,0.000003);'.PHP_EOL;
-                    echo '}'.PHP_EOL;
-                    echo 'function fillLocation()'.PHP_EOL;
-                    echo '{'.PHP_EOL;
-                    echo '    if (navigator.geolocation)'.PHP_EOL;
-                    echo '    {'.PHP_EOL;
-                    echo '        navigator.geolocation.getCurrentPosition(fillPosition);'.PHP_EOL;
-                    echo '    }'.PHP_EOL;
-                    echo '}'.PHP_EOL;
-                }
-                else
-                {
-                    echo 'function fillLocation()'.PHP_EOL;
-                    echo '{'.PHP_EOL;
-                    echo '    var elemLat = document.getElementById(\'latitude\');'.PHP_EOL;
-                    echo "    elemLat.value = roundLatLong($userLatitude,0.000003);".PHP_EOL;
-                    echo '    var elemLong = document.getElementById(\'longitude\');'.PHP_EOL;
-                    echo "    elemLong.value = roundLatLong($userLongitude,0.000003);".PHP_EOL;
-                    echo '}'.PHP_EOL;
-                }
-            ?>
-            var elemTZ = document.getElementById("timezone");
-            elemTZ.value = Intl.DateTimeFormat().resolvedOptions().timeZone;
-            var timeNow = new Date();
-            var JanOne = new Date(timeNow.getFullYear(),1,1);
-            var JulOne = new Date(timeNow.getFullYear(),7,1);
-            var JanOneOffset = JanOne.getTimezoneOffset();
-            var JulOneOffset = JulOne.getTimezoneOffset();
-            var isDSTNow = false;
-            if (JanOneOffset > JulOneOffset)
-            {
-                isDSTNow = (timeNow.getTimezoneOffset() === JulOneOffset);
-            }
-            else if (JulOneOffset < JanOneOffset)
-            {
-                isDSTNow = (timeNow.getTimezoneOffset() === JanOneOffset);
-            }
-            var elemDST = document.getElementById("isDST");
-            elemDST.checked = isDSTNow;
-            function fillTime()
-            {
-                var elemDate = document.getElementById("date");
-                var elemTime = document.getElementById("time");
-                var now = new Date();
-                elemDate.value = now.getFullYear() + "-" + (now.getMonth()+'').padStart(2,"0") + "-" + (now.getDate()+'').padStart(2,"0");
-                elemTime.value = (now.getHours()+'').padStart(2,"0")+ ":" + (now.getMinutes()+'').padStart(2,"0") + ":" + (now.getSeconds()+'').padStart(2,"0");
-            }
-        </script>
     </body>
 </html>
 

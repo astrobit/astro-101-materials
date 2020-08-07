@@ -10,7 +10,7 @@ require_once 'Location.php';
 mb_internal_encoding("UTF-8"); // ensure utf-8 functionality
 mb_http_output("UTF-8"); // ensure utf-8 functionality
 session_start();
-
+$_SESSION['generalerror'] = '';
 // If the user is not logged in redirect to the login page...
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] == false) 
 {
@@ -41,6 +41,7 @@ else
     }
     catch (\PDOException $e)
     {
+        print($e->getMessage() . ' ' . $e->getCode());
         throw new \PDOException($e->getMessage(), (int)$e->getCode());
     }
     $userData = unserialize($_SESSION['userData']);
@@ -98,12 +99,230 @@ else
         }
     }
 }
+$requestMethod = filter_input(INPUT_SERVER,'REQUEST_METHOD',FILTER_DEFAULT);
+if ($requestMethod === 'POST')
+{
+    $obsHourAngle = filter_input(INPUT_POST,'hourAngle',FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION);
+    $obsPhaseNumber = filter_input(INPUT_POST,'phase',FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION);
+    $obsDate = filter_input(INPUT_POST,'date',FILTER_SANITIZE_SPECIAL_CHARS);
+    $obsTime = filter_input(INPUT_POST,'time',FILTER_SANITIZE_SPECIAL_CHARS);
+    $obsPhaseSelect = filter_input(INPUT_POST,'moonphaseSelect',FILTER_SANITIZE_SPECIAL_CHARS);
+    $obsLatitude = filter_input(INPUT_POST,'latitude',FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION);
+    $obsLongitude = filter_input(INPUT_POST,'longitude',FILTER_SANITIZE_NUMBER_FLOAT,FILTER_FLAG_ALLOW_FRACTION);
+    $obsTimezoneName = filter_input(INPUT_POST,'timezone',FILTER_SANITIZE_SPECIAL_CHARS);
+    $obsIsDSTRaw = filter_input(INPUT_POST,'isDST',FILTER_SANITIZE_SPECIAL_CHARS);
+    
+    if (isset($obsIsDSTRaw))
+    {
+        $obsIsDST = 1;
+    }
+    else
+    {
+        $obsIsDST = 0;
+    }
+    $noError = true;
+    try
+    {
+        $resultFists = $con->query('SELECT id FROM angle_units '
+            . 'WHERE name = \'fists\'');
+    }
+    catch (\PDOException $e)
+    {
+        print($e->getMessage() . ' ' . $e->getCode());
+        throw new \PDOException($e->getMessage(), (int)$e->getCode());
+    }
+   
+    $fistsData = $resultFists->fetch();
+    if ($fistsData)
+    {
+        $obsHourAngleUnitsID = $fistsData['id'];
+    }
+    else
+    {
+        $noError = false;
+        $_SESSION['generalerror'] = errorBox('Error retrieving ID for hour angle units.');
+    }
+
+    try
+    {
+        $resultTZ = $con->query("SELECT id FROM timezones WHERE name = '$obsTimezoneName'");
+    }
+    catch (\PDOException $e)
+    {
+        print($e->getMessage() . ' ' . $e->getCode());
+        throw new \PDOException($e->getMessage(), (int)$e->getCode());
+    }
+    $tzData = $resultTZ->fetch();
+    if ($tzData)
+    {
+        $obsTimezoneID = $tzData['id'];
+    }
+    else
+    {
+        $noError = false;
+        $_SESSION['generalerror'] = errorBox('Error retrieving ID for timezone.');
+    }
+    
+    if ($obsPhaseSelect == 'new')
+    {
+        $obsPhaseSelectNumber = 0;
+    }
+    else if ($obsPhaseSelect == 'waxingCrescent')
+    {
+        $obsPhaseSelectNumber = 1;
+    }
+    else if ($obsPhaseSelect == 'firstQuarter')
+    {
+        $obsPhaseSelectNumber = 2;
+    }
+    else if ($obsPhaseSelect == 'waxingGibbous')
+    {
+        $obsPhaseSelectNumber = 3;
+    }
+    else if ($obsPhaseSelect == 'full')
+    {
+        $obsPhaseSelectNumber = 4;
+    }
+    else if ($obsPhaseSelect == 'waningGibbous')
+    {
+        $obsPhaseSelectNumber = 5;
+    }
+    else if ($obsPhaseSelect == 'thirdQuarter')
+    {
+        $obsPhaseSelectNumber = 6;
+    }
+    else if ($obsPhaseSelect == 'waningCrescent')
+    {
+        $obsPhaseSelectNumber = 7;
+    }
+    else
+    {
+        $noError = false;
+        $_SESSION['generalerror'] = errorBox('Invalid Phase Selected.');
+    }
+    if ($noError)
+    {
+        try
+        {
+            $resFind = $con->query('SELECT id FROM observationRawManual '
+                . "WHERE observerID = '$userData->_id' "
+                . "AND obsDateZone = '$obsDate' "
+                . "AND obsTimeZone = '$obsTime' ");
+        }
+        catch (\PDOException $e)
+        {
+            print($e->getMessage() . ' ' . $e->getCode());
+            throw new \PDOException($e->getMessage(), (int)$e->getCode());
+        }
+        if ($resFind->rowCount() > 0)
+        {
+            $noError = false;
+            $_SESSION['generalerror'] = errorBox('An observation at this date and time already exist.');
+        }
+    }
+    if ($noError)
+    {
+        $tzUT = new DateTimeZone('UTC');
+        $now = new DateTime('now',$tzUT);
+        try
+        {
+            $stmt = $con->prepare('INSERT INTO observationRawManual '
+                . '(observerID, entryDateTimeUT, obsDateZone, '
+                . 'obsTimeZone, hourAngle, hourAngleUnitsID, phase, phaseDiagram, '
+                . 'latitude, longitude, timezoneID, isDST, mostRecentEdit, '
+                . 'potentialErrors, accepted) '
+                . 'VALUES (:observerID, :entryDateTime, :date, :time, :hourAngle, '
+                . ':hourAngleUnitsID, :phase, :phaseSelect, :latitude, :longitude, '
+                . ':timezoneID, :dstFlag, 1, :suspicious, 0)');
+        }
+        catch (\PDOException $e)
+        {
+            print($e->getMessage() . ' ' . $e->getCode());
+            throw new \PDOException($e->getMessage(), (int)$e->getCode());
+        }
+        $nowFmt = $now->format('Y-m-d H:i:s');
+        try 
+        {
+            $stmt->bindParam(':observerID', $userData->_id, PDO::PARAM_INT);
+            $stmt->bindParam(':entryDateTime', $nowFmt);
+            $stmt->bindParam(':date', $obsDate);
+            $stmt->bindParam(':time', $obsTime);
+            $stmt->bindParam(':hourAngle', $obsHourAngle);
+            $stmt->bindParam(':hourAngleUnitsID', $obsHourAngleUnitsID, PDO::PARAM_INT);
+            $stmt->bindParam(':phase', $obsPhaseNumber);
+            $stmt->bindParam(':phaseSelect', $obsPhaseSelectNumber, PDO::PARAM_INT);
+            $stmt->bindParam(':latitude', $obsLatitude);
+            $stmt->bindParam(':longitude', $obsLongitude);
+            $stmt->bindParam(':timezoneID', $obsTimezoneID, PDO::PARAM_INT);
+            $stmt->bindParam(':dstFlag', $obsIsDST);
+            $suspicious = validateManualObservation(
+                $userData->_fistSize,
+                $obsDate,
+                $obsTime,
+                $obsTimezoneName,
+                $obsHourAngle,
+                $obsPhaseNumber,
+                $obsPhaseSelectNumber,
+                $obsLatitude,
+                $obsLongitude,
+                $obsIsDST
+                );
+             $stmt->bindParam(':suspicious',$one);
+        }
+        catch (\PDOException $suspicious)
+        {
+            print($e->getMessage() . ' ' . $e->getCode());
+            throw new \PDOException($e->getMessage(), (int)$e->getCode());
+        }
+        try 
+        {
+            if (!$stmt->execute())
+            {
+                $_SESSION['generalerror'] = errorBox($stmt->errorInfo() . ' ' . $stmt->errorCode());
+                $noError = false;
+            }
+        }
+        catch (\PDOException $e)
+        {
+            print($e->getMessage() . ' ' . $e->getCode());
+            throw new \PDOException($e->getMessage(), (int)$e->getCode());
+        }
+        if ($noError)
+        {
+            try
+            {
+                $resFind = $con->query('SELECT id FROM observationRawManual '
+                    . "WHERE observerID = '$userData->_id' "
+                    . "AND entryDateTimeUT = '$nowFmt' ");
+            }
+            catch (\PDOException $e)
+            {
+                print($e->getMessage() . ' ' . $e->getCode());
+                throw new \PDOException($e->getMessage(), (int)$e->getCode());
+            }
+
+            if ($resFind->rowCount() > 0)
+            {
+                $row = $resFind->fetch();
+                $_SESSION['observationToEditID'] = $row['id'];
+    //            header('Location: editValidateObservation.php');
+                header('Location: home.php');
+                exit();
+            }
+            else
+            {
+                $_SESSION['generalerror'] = errorBox('Error recording observation.');
+                $noError = false;
+            }
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html>
     <head>
         <meta charset="utf-8">
-        <title>Moon Project: Submit New Observation</title>
+        <title>Moon Project: Record New Observation</title>
         <script src="https://kit.fontawesome.com/210f2f19d7.js" 
         crossorigin="anonymous"></script><!-- fontawesome kit -->
         <link href="style.css" rel="stylesheet" type="text/css">
@@ -183,11 +402,11 @@ else
     </head>
     <body>
         <div class="register">
-            <h1>Add an Observation</h1>
+            <h1>Record an Observation</h1>
             <?php 
                 echo $_SESSION['generalerror'];
             ?>
-            <form accept-charset="UTF-8" action="newobservation.php" method="post" autocomplete="off">
+            <form accept-charset="UTF-8" action="createObservationManual.php" method="post" autocomplete="off">
                 <label for="date">
                     <i class="fas fa-calendar-alt"></i>
                     <input type="date" name="date" placeholder="Date of Observation" id="date" autocomplete="on" required>
@@ -197,14 +416,15 @@ else
                 ?>
                 <label for="time">
                     <i class="fas fa-clock"></i>
-                    <input type="time" name="time" placeholder="Time of Observation" id="time" autocomplete="on" required>
+                    <input type="time" name="time" placeholder="Time of Observation" id="time" autocomplete="on" step="1" required>
                 </label>
                 <?php 
                     echo $_SESSION['timeerror'];
                 ?>
+                <input type="button" name="getCurrentTime" id="getCurrentTime" onclick="fillTime();" value="Get Current Time">
                 <label for="hourAngle">
                     <i class="fas fa-drafting-compass"></i>
-                    <input type="number" name="hourAngle" placeholder="Fists" id="hourAngle" min="-15" max="15" step="0.25" autocomplete="on">
+                    <input type="number" name="hourAngle" placeholder="Fists" id="hourAngle" min="-15" max="15" step="0.25" autocomplete="on" required>
                 </label>
                 <?php 
                     echo $_SESSION['hourangleerror'];
@@ -212,80 +432,133 @@ else
                 
                 <label for="phase">
                     <i class="fas fa-moon"></i>
-                    <input type="number" name="phase" placeholder="Phase Number" id="phase" min="0" max="7.75" step="0.25" autocomplete="off">
+                    <input type="number" name="phase" placeholder="Phase Number" id="phase" min="0" max="7.75" step="0.25" autocomplete="off" required>
                 </label>
                 <?php 
                     echo $_SESSION['phaseerror'];
                 ?>
-                <select name="moonphaseSelect" id="moonphaseSelect">
-                    <option value="default" disabled>Select the Phase</option>
-                    <option value="new" data-class="new-moon">New Moon</option>
-                    <option value="waxingCrescent" data-class="waxing-crescent-moon">Waxing Crescent</option>
-                    <option value="firstQuarter" data-class="first-quarter-moon" >First Quarter</option>
-                    <option value="waxingGibbous" data-class="waxing-gibbous-moon" >Waxing Gibbous</option>
-                    <option value="full" data-class="full-moon" >Full Moon</option>
-                    <option value="waningGibbous" data-class="waning-gibbous-moon" >Waning Gibbous</option>
-                    <option value="thirdQuarter" data-class="third-quarter-moon" >Third Quarter</option>
-                    <option value="waningCrescent" data-class="waning-crescent-moon">Waning Crescent</option>
-                </select>
+                <label for="moonphaseSelect">
+                    <i class="fas fa-moon"></i>
+                    <select name="moonphaseSelect" id="moonphaseSelect">
+                        <option value="default" disabled>Select the Phase</option>
+                        <option value="new" data-class="new-moon">New Moon</option>
+                        <option value="waxingCrescent" data-class="waxing-crescent-moon">Waxing Crescent</option>
+                        <option value="firstQuarter" data-class="first-quarter-moon" >First Quarter</option>
+                        <option value="waxingGibbous" data-class="waxing-gibbous-moon" >Waxing Gibbous</option>
+                        <option value="full" data-class="full-moon" >Full Moon</option>
+                        <option value="waningGibbous" data-class="waning-gibbous-moon" >Waning Gibbous</option>
+                        <option value="thirdQuarter" data-class="third-quarter-moon" >Third Quarter</option>
+                        <option value="waningCrescent" data-class="waning-crescent-moon">Waning Crescent</option>
+                    </select>
+                </label>
                 <label for="latitude">
                     <i class="fas fa-globe"></i>
-                    <input type="number" name="latitude" placeholder="Latitude" id="latitude" min="-90" max="90.0" step="0.000003" autocomplete="off" value="<?php echo (isset($userLatitude) && $userLatitude >= -90.0)?$userLatitude:'';?>">
+                    <input type="number" name="latitude" placeholder="Latitude" id="latitude" min="-90" max="90.0" step="0.000003" autocomplete="off">
                 </label>
                 <label for="longitude">
                     <i class="fas fa-globe"></i>
-                    <input type="number" name="longitude" placeholder="Longitude" id="longitude" min="-180" max="180.0" step="0.000003" autocomplete="off"value="<?php echo (isset($userLongitude) && $userLongitude >= -180.0)?$userLongitude:'';?>">
+                    <input type="number" name="longitude" placeholder="Longitude" id="longitude" min="-180" max="180.0" step="0.000003" autocomplete="off">
+                </label>
+                <label for="getLocation">
+                    <input type="button" name="getLocation" id="getLocation" onclick="fillLocation();" value="Get My Location">
                 </label>
                 <label for="timezone">
-                    <i class="fas fa-hourglass-half"></i>
-                    <input type="text" name="timezone" placeholder="Timezone" id="timezone" autocomplete="on" value="<?php echo (isset($userTimeZone))?$userTimeZone:'';?>">
+                    <i class="fas fa-hourglass"></i>
+                    <select id="timezone" name="timezone" autocomplete="on">
+                        <option value="default" disabled>Select Your Current Timezone</option>
+                    <?php
+                        $tzList = DateTimeZone::listIdentifiers();
+                        foreach ($tzList as $tz)
+                        {
+                            echo "<option value=\"$tz\">$tz</option>".PHP_EOL;
+                        }
+                    ?>
+                    </select>
                 </label>
                 <label for="isDST" class="checkboxprompt">
                     <i class="fas fa-sun"></i>
                     <p class="checkboxprompt">Daylight Saving Time<br></p>
-                <input type="checkbox" name="isDST" id="isDST" value="isDST" <?php echo (isset($userDST) && $userDST)?checked:'';?> >
+                <input type="checkbox" name="isDST" id="isDST" value="isDST">
                 </label>
                 <input type="submit" value="Submit">
             </form>
         </div>
-        <?php 
-            // if the user has authorized use of the geolocation data from
-            // their device, use the browser's geolocation data.
-            if ($userData->_useDeviceLocation)
+        <script>
+            function roundLatLong(value, roundTo)
             {
-                echo '<script>'.PHP_EOL;
-                echo 'function fillPosition(position)'.PHP_EOL;
-                echo '{'.PHP_EOL;
-                echo '    var elemLat = document.getElementById("latitude");'.PHP_EOL;
-                echo '    elemLat.value = position.coords.latitude;';
-                echo '    var elemLong = document.getElementById("longitude");'.PHP_EOL;
-                echo '    elemLong.value = position.coords.longitude;'.PHP_EOL;
-                echo '}'.PHP_EOL;
-                echo 'if (navigator.geolocation)'.PHP_EOL;
-                echo '{'.PHP_EOL;
-                echo '    navigator.geolocation.getCurrentPosition(fillPosition);'.PHP_EOL;
-                echo '}'.PHP_EOL;
-                echo 'var elemTZ = document.getElementById("timezone");'.PHP_EOL;
-                echo 'elemTZ.value = Intl.DateTimeFormat().resolvedOptions().timeZone;'.PHP_EOL;
-                echo 'var timeNow = new Date();'.PHP_EOL;
-                echo 'var JanOne = new Date(timeNow.getFullYear(),1,1);'.PHP_EOL;
-                echo 'var JulOne = new Date(timeNow.getFullYear(),7,1);'.PHP_EOL;
-                echo 'var JanOneOffset = JanOne.getTimezoneOffset();'.PHP_EOL;
-                echo 'var JulOneOffset = JulOne.getTimezoneOffset();'.PHP_EOL;
-                echo 'var isDSTNow = false;'.PHP_EOL;
-                echo 'if (JanOneOffset > JulOneOffset)'.PHP_EOL;
-                echo '{'.PHP_EOL;
-                echo '    isDSTNow = (timeNow.getTimezoneOffset() == JulOneOffset);'.PHP_EOL;
-                echo '}'.PHP_EOL;
-                echo 'else if (JulOneOffset < JanOneOffset)'.PHP_EOL;
-                echo '{'.PHP_EOL;
-                echo '    isDSTNow = (timeNow.getTimezoneOffset() == JanOneOffset);'.PHP_EOL;
-                echo '}'.PHP_EOL;
-                echo 'var elemDST = document.getElementById("isDST");'.PHP_EOL;
-                echo 'elemDST.checked = isDSTNow;'.PHP_EOL;
-                echo '</script>'.PHP_EOL;
+                var roundUp = 0.5 * roundTo;
+                var roundDown = -0.5 * roundTo;
+                var small = value % roundTo;
+                var rounded = value - small;
+                if (small >= roundUp)
+                {
+                    rounded += roundTo;
+                }
+                else if (small <= roundDown)
+                {
+                    rounded -= roundTo;
+                }
+                return rounded;
             }
-        ?>
+            <?php 
+                // if the user has authorized use of the geolocation data from
+                // their device, use the browser's geolocation data.
+                if ($userData->_useDeviceLocation)
+                {
+                    
+                    echo 'function fillPosition(position)'.PHP_EOL;
+                    echo '{'.PHP_EOL;
+                    echo '    var elemLat = document.getElementById(\'latitude\');'.PHP_EOL;
+                    echo '    elemLat.value = roundLatLong(position.coords.latitude,0.000003);'.PHP_EOL;
+                    echo '    var elemLong = document.getElementById(\'longitude\');'.PHP_EOL;
+                    echo '    elemLong.value = roundLatLong(position.coords.longitude,0.000003);'.PHP_EOL;
+                    echo '}'.PHP_EOL;
+                    echo 'function fillLocation()'.PHP_EOL;
+                    echo '{'.PHP_EOL;
+                    echo '    if (navigator.geolocation)'.PHP_EOL;
+                    echo '    {'.PHP_EOL;
+                    echo '        navigator.geolocation.getCurrentPosition(fillPosition);'.PHP_EOL;
+                    echo '    }'.PHP_EOL;
+                    echo '}'.PHP_EOL;
+                }
+                else
+                {
+                    echo 'function fillLocation()'.PHP_EOL;
+                    echo '{'.PHP_EOL;
+                    echo '    var elemLat = document.getElementById(\'latitude\');'.PHP_EOL;
+                    echo "    elemLat.value = roundLatLong($userLatitude,0.000003);".PHP_EOL;
+                    echo '    var elemLong = document.getElementById(\'longitude\');'.PHP_EOL;
+                    echo "    elemLong.value = roundLatLong($userLongitude,0.000003);".PHP_EOL;
+                    echo '}'.PHP_EOL;
+                }
+            ?>
+            var elemTZ = document.getElementById("timezone");
+            elemTZ.value = Intl.DateTimeFormat().resolvedOptions().timeZone;
+            var timeNow = new Date();
+            var JanOne = new Date(timeNow.getFullYear(),1,1);
+            var JulOne = new Date(timeNow.getFullYear(),7,1);
+            var JanOneOffset = JanOne.getTimezoneOffset();
+            var JulOneOffset = JulOne.getTimezoneOffset();
+            var isDSTNow = false;
+            if (JanOneOffset > JulOneOffset)
+            {
+                isDSTNow = (timeNow.getTimezoneOffset() === JulOneOffset);
+            }
+            else if (JulOneOffset < JanOneOffset)
+            {
+                isDSTNow = (timeNow.getTimezoneOffset() === JanOneOffset);
+            }
+            var elemDST = document.getElementById("isDST");
+            elemDST.checked = isDSTNow;
+            function fillTime()
+            {
+                var elemDate = document.getElementById("date");
+                var elemTime = document.getElementById("time");
+                var now = new Date();
+                elemDate.value = now.getFullYear() + "-" + (now.getMonth()+'').padStart(2,"0") + "-" + (now.getDate()+'').padStart(2,"0");
+                elemTime.value = (now.getHours()+'').padStart(2,"0")+ ":" + (now.getMinutes()+'').padStart(2,"0") + ":" + (now.getSeconds()+'').padStart(2,"0");
+            }
+        </script>
     </body>
 </html>
 

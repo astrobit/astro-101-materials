@@ -16,9 +16,9 @@
         curl_close($cURL);
         return $_result;
     }
-    function get_astronomy($apiKey, $ip, $lat, $long, $date, $lang = 'en', $fields = '*', $excludes = '')
+    function get_astronomy($apiKey, $lat, $long, $date, $lang = 'en', $fields = '*', $excludes = '')
     {
-        $url = "https://api.ipgeolocation.io/astronomy?apiKey=$apiKey&ip=$ip&lang=$lang&fields=$fields&excludes=$excludes&lat=$lat&long=$long&date=$date";
+        $url = "https://api.ipgeolocation.io/astronomy?apiKey=$apiKey&lang=$lang&fields=$fields&excludes=$excludes&lat=$lat&long=$long&date=$date";
         $cURL = curl_init();
 
         curl_setopt($cURL, CURLOPT_URL, $url);

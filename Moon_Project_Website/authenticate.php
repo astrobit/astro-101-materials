@@ -76,17 +76,16 @@ if ($requestMethod === 'POST')
                 $_SESSION['usernameerror'] = null;
                 $_SESSION['passworderror'] = null;
                 $_location = 'home.php';
-                if (isset($_SERVER['HTTP_REFERER']) && !empty($_SERVER['HTTP_REFERER']) && $_SERVER['HTTP_REFERER'] !== null)
+                $sessReferrer = filter_input(INPUT_SERVER,'HTTP_REFERER',FILTER_SANITIZE_SPECIAL_CHARS);
+                if (isset($sessReferrer) && !empty($sessReferrer) && $sessReferrer !== null)
                 {
-                    if ($_SERVER['HTTP_REFERER'] == 'createObservationManual.php')
+                    if ($sessReferrer == 'createObservationManual.php')
                     {
                         $_location = 'createObservationManual.php';
-
                     }
                 }
                 header('Location: ' . $_location);
                 exit();
-                $_SESSION['passworderror'] = errorBox("Success.");
             }
             else
             {

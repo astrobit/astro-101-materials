@@ -1,0 +1,54 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Elongation</title>
+    </head>
+    <body style="font-family:sans-serif;font-size:15px;width:1000px;margin-left:auto;margin-right:auto;background-color:#cfcfff;">
+        <h1 style="font-size:24px;text-align:center;color:#000000;">Elongation</h1>
+        <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
+            <p> The animation below shows overhead view of the Solar System.</p>
+            <p> You can see each of the planets orbiting the Sun in a counterclockwise direction. From the Sun outwards, the planets are Mercury, Venus, Earth, Mars, Jupiter, Saturn, and Neptune.</p>
+            <p> A yellow line shows the planet selected for the elongation display below. The line goes from the Sun to the Earth to the planet of interest. You can use this to help see how the elongation relates to the relative positions of the planets.</p>
+        </div>
+        <div style="width:800px; margin-left:auto; margin-right:auto;height:800px;">
+            <canvas id="theCanvas" width="800" height="800">
+                Canvas not supported; please update your browser.
+            </canvas>
+        </div>
+        <div style="text-align:center;">
+            <button type="button" name="zoomin" onclick="zoomin();">Zoom In</button>
+            <button type="button" name="slowdown" onclick="slowdown();">Slower</button>
+            <button type="button" id="pause" name="pause" onclick="requestPause();">Pause</button>
+            <button type="button" name="speedup" onclick="speedup();">Faster</button>
+            <button type="button" name="zoomout" onclick="zoomout();">Zoom Out</button>
+        </div>
+        <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
+            <p> The display below shows a map of the sky with the ecliptic as a horizontal line along the middle. The right and left sides represent the sky opposite the Sun (to the right or left, respectively).</p>
+            <p> On this map, the Sun's position is fixed in the center. The elongation of the selected planet is the distance from the Sun to the planet. If it is about halfway to an edge, the elongation is &#xb1;90&#xb0;. If it is one-quarter the way to an edge, the elongation is &#xb1;45&#xb0; </p>
+            <p> Select a planet to see how the elongation changes with time.</p>
+        </div>
+        <div style="text-align:center;">
+            <input type="radio" id="mercury" name="observing" value="mercury">
+            <label for="male">Mercury</label>
+            <input type="radio" id="venus" name="observing" value="venus" checked="true">
+            <label for="female">Venus</label>
+            <input type="radio" id="mars" name="observing" value="mars">
+            <label for="other">Mars</label>
+            <input type="radio" id="jupiter" name="observing" value="jupiter">
+            <label for="other">Jupiter</label>
+            <input type="radio" id="saturn" name="observing" value="saturn">
+            <label for="other">Saturn</label>
+            <input type="radio" id="uranus" name="observing" value="uranus">
+            <label for="other">Uranus</label>
+            <input type="radio" id="neptune" name="observing" value="neptune">
+            <label for="other">Neptune</label>
+        </div>
+        <div style="width:800px; margin-left:auto; margin-right:auto;height:300px;">
+            <canvas id="elongation" width="800" height="300">
+                Canvas not supported; please update your browser.
+            </canvas>
+        </div>
+    </body>
+	<script  type="text/javascript" src="elongation.js"></script>     
+</html>

@@ -5,7 +5,8 @@ CREATE TABLE dst_rule_set (
 
 CREATE TABLE dst_rules (
 	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
-	rulesetID INT UNSIGNED, fromDate DATE NOT NULL, 
+	rulesetID INT UNSIGNED, 
+	fromDate DATE NOT NULL COMMENT 'The date when the rule starts', 
 	toDate DATE COMMENT 'The date when the rule expires',
 	month INT COMMENT 'The month the rule takes effect',
 	onDescr VARCHAR(32) NOT NULL COMMENT 'A description or code for when the rule takes effect ', 
@@ -29,7 +30,7 @@ CREATE TABLE timezones (
 CREATE TABLE timezone_details (
 	id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, 
 	tzID INT UNSIGNED NOT NULL COMMENT 'The timezone to which this detail applies', 
-	offset INT NOT NULL COMMENT 'The offset of the zone from UTC', 
+	offset TIME NOT NULL COMMENT 'The offset of the zone from UTC', 
 	DSTruleID INT UNSIGNED COMMENT 'The rule set that applies to this zone', 
 	format VARCHAR(16) COMMENT 'A code used to describe this zone, e.g. C%sT for U.S. central time ', 
 	until DATETIME COMMENT 'The date and time on which this detail cease',  
@@ -98,8 +99,8 @@ CREATE TABLE userdata (
 	email VARCHAR(512) NOT NULL UNIQUE COMMENT 'The users email address',
 	emailVerified TINYINT NOT NULL COMMENT 'A flag to indicate that the users email has been verified',
 	password VARCHAR(4096) NOT NULL COMMENT 'The users password, stored in an encrypted manor',
-	givenname VARCHAR(64) NOT NULL COMMENT 'The users given name',
-	familyname VARCHAR(64) COMMENT 'The users family name',
+	preferredname VARCHAR(1024) NOT NULL COMMENT 'The users preferred name',
+	fullname VARCHAR(1024) COMMENT 'The users full name',
 	fistsize FLOAT COMMENT 'The angular size of the users fist, in degrees',
 	consentResearch TINYINT NOT NULL COMMENT 'Authorize use of submitted observations for research purposes',
 	permissionsID INT UNSIGNED NOT NULL COMMENT 'The type of user permissions that this user has (e.g. user, administrator, instructor, etc.)',
@@ -150,8 +151,8 @@ CREATE TABLE class_members (
 	classID INT UNSIGNED NOT NULL COMMENT 'The class ID for the class',
 	userID INT UNSIGNED NOT NULL COMMENT 'The userdata ID of the member',
 	roleID INT UNSIGNED NOT NULL COMMENT 'The class_role ID of the member',
-	givenname VARCHAR(64) COMMENT 'The users preferred given name for the class; if NULL, the user\'s default given name should be used',
-	familyname VARCHAR(64) COMMENT 'The users preferred family name for the class; if NULL, the user\'s default family name should be used',
+	givenname VARCHAR(256) COMMENT 'The users preferred given name for the class; if NULL, the user\'s default given name should be used',
+	lastname VARCHAR(256) COMMENT 'The users preferred family name for the class; if NULL, the user\'s default family name should be used',
 	FOREIGN KEY (classID) REFERENCES classes(id),
 	FOREIGN KEY (userID) REFERENCES userdata(id),
 	FOREIGN KEY (roleID) REFERENCES class_roles(id)

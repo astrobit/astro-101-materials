@@ -948,9 +948,28 @@ function work(){
 	contextElongation.font = "15px Ariel";
 	drawTextRight(contextElongation,"Planet: ",mapCenterX - 150,mapCenterY + mapHeight * 0.5 + 35);
 	contextElongation.fillText(selectedPlanet,mapCenterX - 150,mapCenterY + mapHeight * 0.5 + 35);
-	drawTextCenter(contextElongation,"Elongation: " + Math.round(elongation).toString(),mapCenterX + 10,mapCenterY + mapHeight * 0.5 + 35);
-	var timerReadable = Math.round(timer * 10.0) / 10.0
-	contextElongation.fillText("Time: " + timerReadable.toString() + " years",mapCenterX + 150,mapCenterY + mapHeight * 0.5 + 35);
+	var elongationRounded = Math.round(elongation * 10.0) / 10.0
+	var elongationDisplay = elongationRounded.toString();
+	if (elongationDisplay.charAt(elongationDisplay.length - 2) != '.')
+		elongationDisplay = elongationDisplay + ".0"
+	drawTextRight(contextElongation,"Elongation: " ,mapCenterX,mapCenterY + mapHeight * 0.5 + 35);
+	drawTextRight(contextElongation,elongationDisplay,mapCenterX + 40,mapCenterY + mapHeight * 0.5 + 35);
+
+	var timerReadable = Math.round(timer * 100.0) / 100.0
+	var timerDisplay = timerReadable.toString();
+	if (timerDisplay.charAt(timerDisplay.length - 3) != '.')
+	{
+		if (timerDisplay.charAt(timerDisplay.length - 2) == '.')
+			timerDisplay = timerDisplay + '0'
+		else
+			timerDisplay = timerDisplay + '.00'
+	}
+	var timerReadableDays = Math.round(timer * 365.0)
+	var timerDisplayDays = timerReadableDays.toString();
+
+	contextElongation.fillText("Time: ",mapCenterX + 150,mapCenterY + mapHeight * 0.5 + 35);
+	drawTextRight(contextElongation,timerDisplay + " years",mapCenterX + 280,mapCenterY + mapHeight * 0.5 + 35);
+	drawTextRight(contextElongation,"("+ timerDisplayDays + " days)",mapCenterX + 380,mapCenterY + mapHeight * 0.5 + 35);
 
 
 

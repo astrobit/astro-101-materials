@@ -1,0 +1,246 @@
+
+class SkyMap
+{
+	project()
+	{
+		var projector;
+		if (this.projectionTypeInternal == "Equirectangular")
+			projector = new Equirectangular(this.centralRA,0.0)
+		else if (this.projectionTypeInternal == "Mercator")
+			projector = new Mercator(this.centralRA,0.0)
+		else
+			projector = new Mollweide(this.centralRA,0.0);
+
+		this.starsProjection = new Array();
+		var i;
+		for (i = 0; i < stars.length; i++)
+		{
+			var rgbB = UBVRItoRGB(stars[i].U,stars[i].B,stars[i].V,stars[i].R,stars[i].I)
+			var rgbB_U = UBVRItoRGB(stars[i].U,null,null,null,null);
+			var rgbB_B = UBVRItoRGB(null,stars[i].B,null,null,null);
+			var rgbB_V = UBVRItoRGB(null,null,stars[i].V,null,null);
+			var rgbB_R = UBVRItoRGB(null,null,null,stars[i].R,null);
+			var rgbB_I = UBVRItoRGB(null,null,null,null,stars[i].I);
+			var projection = projector.calculate(stars[i].dec,stars[i].ra);
+			stars[i].pidx = this.starsProjection.length;
+			this.starsProjection.push({x: projection.x, y:projection.y, style:RGBtoColor(rgbB), styleU:RGBtoColor(rgbB_U), styleB:RGBtoColor(rgbB_B), styleV:RGBtoColor(rgbB_V), styleR:RGBtoColor(rgbB_R), styleI:RGBtoColor(rgbB_I), idx:i,rgbB:rgbB});
+		}
+	}
+	constructor(context,x,y,width,height)
+	{
+//var projectionType = "Mollweide";
+//var displayConstellations = true;
+//var filter = "B"
+		this.xCenter = x;
+		this.yCenter = y;
+		this.width = width;
+		this.height = height;
+		this.context = context;
+		this.projectionType = "Mollweide";
+		this.displayConstellationLevel = "major";
+		this.filterInternal = "none";
+		this.centralRA = 0.0;
+		this.starsProjection = new Array();
+		this.project();
+	}
+	set projectionType(type)
+	{
+		this.projectionTypeInternal = type;
+		this.project();
+	}
+	get projectionType()
+	{
+		return this.projectionTypeInternal;
+	}
+	set filter(type)
+	{
+		this.filterInternal = type;
+	}
+	get filter()
+	{
+		return this.filterInternal;
+	}
+	set displayConstellations(type)
+	{
+		this.displayConstellationLevel = type;
+	}
+	get displayConstellations()
+	{
+		return this.displayConstellationLevel;
+	}
+	draw()
+	{
+		var mapWidth = this.width;
+		var mapHeight = this.height;
+		var mapCenterX = this.xCenter;
+		var mapCenterY = this.yCenter;
+
+	// draw a black square for the map area box
+		this.context.fillStyle = "#000000";
+		this.context.fillRect(mapCenterX - mapWidth / 2,mapCenterY - mapHeight / 2,mapWidth,mapHeight);
+
+	// draw the ellipse for the map
+		if (this.projectionTypeInternal == "Mollweide")
+		{
+			this.context.strokeStyle  = "#FFFFFF";
+			drawEllipseByCenter(this.context,mapCenterX,mapCenterY,mapWidth,mapHeight);
+		}
+	// draw the equator on the map
+		this.context.strokeStyle  = "#3F3F3F";
+		this.context.beginPath();
+		this.context.moveTo(mapCenterX - mapWidth * 0.5,mapCenterY );
+		this.context.lineTo(mapCenterX + mapWidth * 0.5,mapCenterY);
+		this.context.stroke();
+
+	// draw the stars on the map
+		var i;
+		for (i = 0; i < this.starsProjection.length; i++)
+		{
+			if (this.filterInternal == "none")
+				this.context.fillStyle  = this.starsProjection[i].style;
+			else if (this.filterInternal == "U")
+				this.context.fillStyle  = this.starsProjection[i].styleU;
+			else if (this.filterInternal == "B")
+				this.context.fillStyle  = this.starsProjection[i].styleB;
+			else if (this.filterInternal == "V")
+				this.context.fillStyle  = this.starsProjection[i].styleV;
+			else if (this.filterInternal == "R")
+				this.context.fillStyle  = this.starsProjection[i].styleR;
+			else if (this.filterInternal == "I")
+				this.context.fillStyle  = this.starsProjection[i].styleI;
+			var rad = 2.0 - stars[this.starsProjection[i].idx].V / 6.0 * 1.0;
+			if (rad < 1.0)
+				rad = 1.0;
+			if (rad > 3.0)
+				rad = 3.0;
+			this.context.beginPath();
+			this.context.arc(mapCenterX - this.starsProjection[i].x * mapWidth * 0.5,mapCenterY - this.starsProjection[i].y * mapHeight * 0.5,rad,0,2.0*Math.PI,true);
+			this.context.closePath();
+			this.context.fill();
+		}
+	// draw the constallations on the map
+		if (this.displayConstellationLevel != "none")
+		{
+			var constellationLevel = 0;
+			if (this.displayConstellationLevel == "zodiac")
+				constellationLevel = 4;
+			if (this.displayConstellationLevel == "major")
+				constellationLevel = 3;
+			if (this.displayConstellationLevel == "minor")
+				constellationLevel = 2;
+			if (this.displayConstellationLevel == "all")
+				constellationLevel = 1;
+
+			for (i = 0; i < constellationData.length; i++)
+			{
+				var j;
+				for (j = 0; j < constellationData[i].pathData.length; j++)
+				{
+					if ((constellationData[i].type == "zodiac" && constellationLevel <= 4) ||
+						(constellationData[i].type == "major" && constellationLevel <= 3) ||
+						(constellationData[i].type == "minor" && constellationLevel <= 2) ||
+						(constellationData[i].type == "obscure" && constellationLevel <= 1))
+					{
+						if (constellationData[i].type == "zodiac")
+							this.context.strokeStyle  = "#3F3F00"
+						if (constellationData[i].type == "major")
+							this.context.strokeStyle  = "#3F3F3F"
+						if (constellationData[i].type == "minor")
+							this.context.strokeStyle  = "#1F1F1F"
+						if (constellationData[i].type == "obscure")
+							this.context.strokeStyle  = "#0F0F0F"
+						this.context.beginPath();
+						var k;
+						var datacount = 0;
+						var xlast = null;
+						for (k = 0; k < constellationData[i].pathData[j].length; k++)
+						{
+							var idx = constellationData[i].pathData[j][k]
+							if (stars[idx].pidx !== null)
+							{
+								var pidx = stars[idx].pidx
+								var x = mapCenterX - this.starsProjection[pidx].x * mapWidth * 0.5;
+								var y = mapCenterY - this.starsProjection[pidx].y * mapHeight * 0.5;
+								if (xlast != null && Math.abs(x - xlast) > mapWidth * 0.25) // span map edges
+								{
+									this.context.stroke();
+									datacount = 0;
+								}
+								xlast = x;
+								if (datacount == 0)
+									this.context.moveTo(x,y);
+								else
+									this.context.lineTo(x,y);
+								datacount++;
+							}
+						}
+						this.context.stroke();
+					}
+				}
+			}
+		}
+
+	// draw the elongation reference on the map
+		this.context.font = "10px Ariel";
+
+		this.context.strokeStyle = "#FFFF00"
+		this.context.fillStyle = "#FFFF00"
+		this.context.beginPath();
+		if (this.projectionTypeInternal == "Mollweide")
+		{
+			this.context.moveTo(mapCenterX - mapWidth * 0.5,mapCenterY);
+			this.context.lineTo(mapCenterX - mapWidth * 0.5,mapCenterY + mapHeight * 0.5);
+		}
+		else
+		{
+			this.context.moveTo(mapCenterX - mapWidth * 0.5,mapCenterY + mapHeight * 0.5 - 20.0);
+			this.context.lineTo(mapCenterX - mapWidth * 0.5,mapCenterY + mapHeight * 0.5);
+		}
+			this.context.stroke();
+		drawTextCenter(this.context,"-180",mapCenterX - mapWidth * 0.5,mapCenterY + mapHeight * 0.5 + 10);
+
+		this.context.beginPath();
+		if (this.projectionTypeInternal == "Mollweide")
+		{
+			this.context.moveTo(mapCenterX - mapWidth * 0.25,mapCenterY + mapHeight * 0.5 * Math.sqrt(0.75));
+			this.context.lineTo(mapCenterX - mapWidth * 0.25,mapCenterY + mapHeight * 0.5);
+		}
+		else
+		{
+			this.context.moveTo(mapCenterX - mapWidth * 0.25,mapCenterY + mapHeight * 0.5 - 20.0);
+			this.context.lineTo(mapCenterX - mapWidth * 0.25,mapCenterY + mapHeight * 0.5);
+		}
+		this.context.stroke();
+		drawTextCenter(this.context,"-90",mapCenterX - mapWidth * 0.25,mapCenterY + mapHeight * 0.5 + 10);
+
+		drawTextCenter(this.context,"0",mapCenterX,mapCenterY + mapHeight * 0.5 + 10);
+		this.context.beginPath();
+		if (this.projectionTypeInternal == "Mollweide")
+		{
+			this.context.moveTo(mapCenterX + mapWidth * 0.25,mapCenterY + mapHeight * 0.5 * Math.sqrt(0.75));
+			this.context.lineTo(mapCenterX + mapWidth * 0.25,mapCenterY + mapHeight * 0.5);
+		}
+		else
+		{
+			this.context.moveTo(mapCenterX + mapWidth * 0.25,mapCenterY + mapHeight * 0.5 - 20.0);
+			this.context.lineTo(mapCenterX + mapWidth * 0.25,mapCenterY + mapHeight * 0.5);
+		}
+		this.context.stroke();
+		drawTextCenter(this.context,"+90",mapCenterX + mapWidth * 0.25,mapCenterY + mapHeight * 0.5 + 10);
+
+		this.context.beginPath();
+		if (this.projectionTypeInternal == "Mollweide")
+		{
+			this.context.moveTo(mapCenterX + mapWidth * 0.5,mapCenterY);
+			this.context.lineTo(mapCenterX + mapWidth * 0.5,mapCenterY + mapHeight * 0.5);
+		}
+		else
+		{
+			this.context.moveTo(mapCenterX + mapWidth * 0.5,mapCenterY + mapHeight * 0.5 - 20.0);
+			this.context.lineTo(mapCenterX + mapWidth * 0.5,mapCenterY + mapHeight * 0.5);
+	
+		}
+		this.context.stroke();
+		drawTextCenter(this.context,"+180",mapCenterX + mapWidth * 0.5,mapCenterY + mapHeight * 0.5 + 10);
+	}
+}

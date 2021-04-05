@@ -192,182 +192,59 @@ function scrollCallback()
 scrollCallback();
 
 
-function selectFilterNone()
+function selectFilter(value)
 {
-	filter = "none";
-	buttonNoFilter.insideStyle = "#007F00"
-	buttonFilterU.insideStyle = "#7F7F7F"
-	buttonFilterB.insideStyle = "#7F7F7F"
-	buttonFilterV.insideStyle = "#7F7F7F"
-	buttonFilterR.insideStyle = "#7F7F7F"
-	buttonFilterI.insideStyle = "#7F7F7F"
-	draw();
-}
-function selectFilterU()
-{
-	filter = "U";
-	buttonFilterU.insideStyle = "#007F00"
-	buttonNoFilter.insideStyle = "#7F7F7F"
-	buttonFilterB.insideStyle = "#7F7F7F"
-	buttonFilterV.insideStyle = "#7F7F7F"
-	buttonFilterR.insideStyle = "#7F7F7F"
-	buttonFilterI.insideStyle = "#7F7F7F"
-	draw();
-}
-function selectFilterB()
-{
-	filter = "B";
-	buttonFilterB.insideStyle = "#007F00"
-	buttonNoFilter.insideStyle = "#7F7F7F"
-	buttonFilterU.insideStyle = "#7F7F7F"
-	buttonFilterV.insideStyle = "#7F7F7F"
-	buttonFilterR.insideStyle = "#7F7F7F"
-	buttonFilterI.insideStyle = "#7F7F7F"
-	draw();
-}
-function selectFilterV()
-{
-	filter = "V";
-	buttonFilterV.insideStyle = "#007F00"
-	buttonNoFilter.insideStyle = "#7F7F7F"
-	buttonFilterU.insideStyle = "#7F7F7F"
-	buttonFilterB.insideStyle = "#7F7F7F"
-	buttonFilterR.insideStyle = "#7F7F7F"
-	buttonFilterI.insideStyle = "#7F7F7F"
-	draw();
-}
-function selectFilterR()
-{
-	filter = "R";
-	buttonFilterR.insideStyle = "#007F00"
-	buttonNoFilter.insideStyle = "#7F7F7F"
-	buttonFilterU.insideStyle = "#7F7F7F"
-	buttonFilterB.insideStyle = "#7F7F7F"
-	buttonFilterV.insideStyle = "#7F7F7F"
-	buttonFilterI.insideStyle = "#7F7F7F"
-	draw();
-}
-function selectFilterI()
-{
-	filter = "I";
-	buttonFilterI.insideStyle = "#007F00"
-	buttonNoFilter.insideStyle = "#7F7F7F"
-	buttonFilterU.insideStyle = "#7F7F7F"
-	buttonFilterB.insideStyle = "#7F7F7F"
-	buttonFilterV.insideStyle = "#7F7F7F"
-	buttonFilterR.insideStyle = "#7F7F7F"
-	draw();
-}
-var buttonNoFilter = new Button("No Filter",canvasMap.width / 2 - 145,canvasMap.height - 45,40,15,selectFilterNone);
-buttonNoFilter.insideStyle = "#007F00"
-buttonNoFilter.text = "No Filter";
-
-var buttonFilterU = new Button("U Filter",canvasMap.width / 2 - 95,canvasMap.height - 45,40,15,selectFilterU);
-buttonFilterU.insideStyle = "#7F7F7F"
-buttonFilterU.text = "U";
-
-var buttonFilterB = new Button("B Filter",canvasMap.width / 2 - 45,canvasMap.height - 45,40,15,selectFilterB);
-buttonFilterB.insideStyle = "#7F7F7F"
-buttonFilterB.text = "B";
-
-var buttonFilterV = new Button("V Filter",canvasMap.width / 2 + 5,canvasMap.height - 45,40,15,selectFilterV);
-buttonFilterV.insideStyle = "#7F7F7F"
-buttonFilterV.text = "V";
-
-var buttonFilterR = new Button("R Filter",canvasMap.width / 2 + 55,canvasMap.height - 45,40,15,selectFilterR);
-buttonFilterR.insideStyle = "#7F7F7F"
-buttonFilterR.text = "R";
-
-var buttonFilterI = new Button("I Filter",canvasMap.width / 2 + 105,canvasMap.height - 45,40,15,selectFilterI);
-buttonFilterI.insideStyle = "#7F7F7F"
-buttonFilterI.text = "I";
-
-
-function selectConstellationNone()
-{
-	displayConstellations = "none";
-	buttonConstellationNone.insideStyle = "#007F00"
-	buttonConstellationZodiac.insideStyle = "#7F7F7F"
-	buttonConstellationMajor.insideStyle = "#7F7F7F"
-	buttonConstellationMinor.insideStyle = "#7F7F7F"
-	buttonConstellationObscure.insideStyle = "#7F7F7F"
-	draw();
-}
-function selectConstellationZodiac()
-{
-	displayConstellations = "zodiac";
-	buttonConstellationNone.insideStyle = "#7F7F7F"
-	buttonConstellationZodiac.insideStyle = "#007F00"
-	buttonConstellationMajor.insideStyle = "#7F7F7F"
-	buttonConstellationMinor.insideStyle = "#7F7F7F"
-	buttonConstellationObscure.insideStyle = "#7F7F7F"
-	draw();
-}
-function selectConstellationMajor()
-{
-	displayConstellations = "major";
-	buttonConstellationNone.insideStyle = "#7F7F7F"
-	buttonConstellationZodiac.insideStyle = "#7F7F7F"
-	buttonConstellationMajor.insideStyle = "#007F00"
-	buttonConstellationMinor.insideStyle = "#7F7F7F"
-	buttonConstellationObscure.insideStyle = "#7F7F7F"
-	draw();
-}
-function selectConstellationMinor()
-{
-	displayConstellations = "minor";
-	buttonConstellationNone.insideStyle = "#7F7F7F"
-	buttonConstellationZodiac.insideStyle = "#7F7F7F"
-	buttonConstellationMajor.insideStyle = "#7F7F7F"
-	buttonConstellationMinor.insideStyle = "#007F00"
-	buttonConstellationObscure.insideStyle = "#7F7F7F"
-	draw();
-}
-function selectConstellationObscure()
-{
-	displayConstellations = "obscure";
-	buttonConstellationNone.insideStyle = "#7F7F7F"
-	buttonConstellationZodiac.insideStyle = "#7F7F7F"
-	buttonConstellationMajor.insideStyle = "#7F7F7F"
-	buttonConstellationMinor.insideStyle = "#7F7F7F"
-	buttonConstellationObscure.insideStyle = "#007F00"
+	filter = value;
 	draw();
 }
 
-var buttonConstellationNone = new Button("No Constellations",canvasMap.width / 2 - 120,canvasMap.height - 25,40,15,selectConstellationNone);
-buttonConstellationNone.insideStyle = "#7F7F7F"
-buttonConstellationNone.text = "None";
+var radButtons = new Array();
+radButtons.push(new RadioButton("No Filter","none",canvasMap.width / 2 - 145,canvasMap.height - 45,40,15));
+radButtons[radButtons.length - 1].text = "No Filter";
 
-var buttonConstellationZodiac = new Button("Zodiac Constellations",canvasMap.width / 2 - 70,canvasMap.height - 25,40,15,selectConstellationZodiac);
-buttonConstellationZodiac.insideStyle = "#007F00"
-buttonConstellationZodiac.text = "Zodiac";
+radButtons.push(new RadioButton("U Filter","U",canvasMap.width / 2 - 95,canvasMap.height - 45,40,15));
+radButtons[radButtons.length - 1].text = "U";
 
-var buttonConstellationMajor = new Button("Major Constellations",canvasMap.width / 2 - 20,canvasMap.height - 25,40,15,selectConstellationMajor);
-buttonConstellationMajor.insideStyle = "#7F7F7F"
-buttonConstellationMajor.text = "Major";
+radButtons.push(new RadioButton("B Filter","B",canvasMap.width / 2 - 45,canvasMap.height - 45,40,15));
+radButtons[radButtons.length - 1].text = "B";
 
-var buttonConstellationMinor = new Button("Major Constellations",canvasMap.width / 2 + 30,canvasMap.height - 25,40,15,selectConstellationMinor);
-buttonConstellationMinor.insideStyle = "#7F7F7F"
-buttonConstellationMinor.text = "Major";
+radButtons.push(new RadioButton("V Filter","V",canvasMap.width / 2 + 5,canvasMap.height - 45,40,15));
+radButtons[radButtons.length - 1].text = "V";
 
-var buttonConstellationObscure = new Button("Obscure Constellations",canvasMap.width / 2 + 80,canvasMap.height - 25,40,15,selectConstellationObscure);
-buttonConstellationObscure.insideStyle = "#7F7F7F"
-buttonConstellationObscure.text = "Obscure";
+radButtons.push(new RadioButton("R Filter","R",canvasMap.width / 2 + 55,canvasMap.height - 45,40,15));
+radButtons[radButtons.length - 1].text = "R";
+
+radButtons.push(new RadioButton("I Filter","I",canvasMap.width / 2 + 105,canvasMap.height - 45,40,15));
+radButtons[radButtons.length - 1].text = "I";
 
 
-commonUIRegister(buttonNoFilter);
-commonUIRegister(buttonFilterU);
-commonUIRegister(buttonFilterB);
-commonUIRegister(buttonFilterV);
-commonUIRegister(buttonFilterR);
-commonUIRegister(buttonFilterI);
+commonUIRegister(new Radio("Filter","none",selectFilter,radButtons));
 
-commonUIRegister(buttonConstellationNone);
-commonUIRegister(buttonConstellationZodiac);
-commonUIRegister(buttonConstellationMajor);
-commonUIRegister(buttonConstellationMinor);
-commonUIRegister(buttonConstellationObscure);
 
+function selectConstellation(constellation)
+{
+	displayConstellations = constellation;
+	draw();
+}
+
+var radButtonsConst = new Array();
+
+radButtonsConst.push(new RadioButton("No Constellations","none",canvasMap.width / 2 - 120,canvasMap.height - 25,40,15));
+radButtonsConst[radButtonsConst.length - 1].text = "None";
+
+radButtonsConst.push(new RadioButton("Zodiac Constellations","zodiac",canvasMap.width / 2 - 70,canvasMap.height - 25,40,15));
+radButtonsConst[radButtonsConst.length - 1].text = "Zodiac";
+
+radButtonsConst.push(new RadioButton("Major Constellations","major",canvasMap.width / 2 - 20,canvasMap.height - 25,40,15));
+radButtonsConst[radButtonsConst.length - 1].text = "Major";
+
+radButtonsConst.push(new RadioButton("Major Constellations","minor",canvasMap.width / 2 + 30,canvasMap.height - 25,40,15));
+radButtonsConst[radButtonsConst.length - 1].text = "Minor";
+
+radButtonsConst.push(new RadioButton("Obscure Constellations","obscure",canvasMap.width / 2 + 80,canvasMap.height - 25,40,15));
+radButtonsConst[radButtonsConst.length - 1].text = "Obscure";
+
+commonUIRegister(new Radio("Contstellations","zodiac",selectConstellation,radButtonsConst));
 
 function draw(){
 	var mapWidth = (canvasMap.width - 100) * zoom;

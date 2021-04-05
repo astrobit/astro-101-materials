@@ -78,20 +78,32 @@ class Button
 	}
 }
 
-class Radio
+
+class RadioButton
 {
-	constructor(name,onClicker,buttonArray)
+	constructor(name,value,x,y,width,height)
 	{
 		this.name = name;
+		this.value = value;
+		this.x = x;
+		this.y = y;
+		this.width = width;
+		this.height = height;
+		this.depth = 0;
 		this.drawer = null;
-		this.onClicker = onClicker;
-		if (typeof onClicker === undefined || onClicker === null)
-		{
-			console.log("Warning: Radio " + name + " was instantiated without an onclick action.")
-		}
+		this.selected = false;
 		this.visible = true;
 		this.disabled = false;
-		this.buttonArray = buttonArray;
+		this.text = null;
+		this.alt = null;
+		this.autofocus = null;
+		this.insideStyle = "#7F7F7F";
+		this.insideStyleSelected = "#007F00";
+		this.borderStyle = "#FFFFFF";
+		this.insideTransparency = 1.0;
+		this.borderTransparency = 1.0;
+		this.textStyle = "#FFFFFF";
+		this.textFont = "10px Ariel";
 	}
 
 	draw(context)
@@ -104,7 +116,10 @@ class Radio
 		else
 		{
 			context.globalAlpha = this.insideTransparency;
-			context.fillStyle  = this.insideStyle;
+			if (!this.selected)
+				context.fillStyle  = this.insideStyle;
+			else
+				context.fillStyle  = this.insideStyleSelected;
 			context.fillRect(this.x,this.y,this.width,this.height);
 
 			context.globalAlpha = this.borderTransparency;
@@ -125,17 +140,75 @@ class Radio
 		}
 		context.restore();
 	}
+	test(event)
+	{
+		return (this.visible && this.x <= event.offsetX && (this.x + this.width) >= event.offsetX && this.y <= event.offsetY && (this.y + this.height) >= event.offsetY)
+	}
+}
+
+
+class Radio
+{
+	constructor(name,initalValue,onClicker,radioButtonArray)
+	{
+		this.name = name;
+		this.drawer = null;
+		this.onClicker = onClicker;
+		if (typeof onClicker === undefined || onClicker === null)
+		{
+			console.log("Warning: Radio " + name + " was instantiated without an onclick action.")
+		}
+		this.visible = true;
+		this.disabled = false;
+		this.radioButtonArray = radioButtonArray;
+		var i;
+		for (i = 0; i < this.radioButtonArray.length; i++)
+		{
+			this.radioButtonArray[i].selected = (this.radioButtonArray[i].value == initalValue);
+		}
+		this.value = initalValue;
+	}
+
+	draw(context)
+	{
+		var i;
+		for (i = 0; i < this.radioButtonArray.length; i++)
+		{
+			this.radioButtonArray[i].draw(context);
+		}
+	}
 	onClick(event)
 	{
 		if (!this.disabled)
 		{
-			this.onClicker(event);
+			var found = -1;
+			var i;
+			for (i = 0; i < this.radioButtonArray.length && found == -1; i++)
+			{
+				if (this.radioButtonArray[i].test(event))
+				{
+					found = i;
+				}
+			}
+			if (found != -1)
+			{
+				for (i = 0; i < this.radioButtonArray.length; i++)
+				{
+					this.radioButtonArray[i].selected = (i == found);
+				}
+				this.onClicker(this.radioButtonArray[found].value);
+			}
 		}
 	}
 	test(event)
 	{
-		
-		return (this.visible && this.x <= event.offsetX && (this.x + this.width) >= event.offsetX && this.y <= event.offsetY && (this.y + this.height) >= event.offsetY)
+		var i;
+		var ret = false;
+		for (i = 0; i < this.radioButtonArray.length && !ret; i++)
+		{
+			ret = this.radioButtonArray[i].test(event);
+		}
+		return ret;
 	}
 }
 

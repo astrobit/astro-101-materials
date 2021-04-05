@@ -15,12 +15,12 @@ class SkyMap
 		var i;
 		for (i = 0; i < stars.length; i++)
 		{
-			var rgbB = UBVRItoRGB(stars[i].U,stars[i].B,stars[i].V,stars[i].R,stars[i].I)
-			var rgbB_U = UBVRItoRGB(stars[i].U,null,null,null,null);
-			var rgbB_B = UBVRItoRGB(null,stars[i].B,null,null,null);
-			var rgbB_V = UBVRItoRGB(null,null,stars[i].V,null,null);
-			var rgbB_R = UBVRItoRGB(null,null,null,stars[i].R,null);
-			var rgbB_I = UBVRItoRGB(null,null,null,null,stars[i].I);
+			var rgbB = UBVRItoRGB(stars[i].U,stars[i].B,stars[i].V,stars[i].R,stars[i].I,0,6)
+			var rgbB_U = UBVRItoRGB(stars[i].U,null,null,null,null,0,6);
+			var rgbB_B = UBVRItoRGB(null,stars[i].B,null,null,null,0,6);
+			var rgbB_V = UBVRItoRGB(null,null,stars[i].V,null,null,0,6);
+			var rgbB_R = UBVRItoRGB(null,null,null,stars[i].R,null,0,6);
+			var rgbB_I = UBVRItoRGB(null,null,null,null,stars[i].I,0,6);
 			var projection = projector.calculate(stars[i].dec,stars[i].ra);
 			stars[i].pidx = this.starsProjection.length;
 			this.starsProjection.push({x: projection.x, y:projection.y, style:RGBtoColor(rgbB), styleU:RGBtoColor(rgbB_U), styleB:RGBtoColor(rgbB_B), styleV:RGBtoColor(rgbB_V), styleR:RGBtoColor(rgbB_R), styleI:RGBtoColor(rgbB_I), idx:i,rgbB:rgbB});
@@ -179,68 +179,5 @@ class SkyMap
 				}
 			}
 		}
-
-	// draw the elongation reference on the map
-		this.context.font = "10px Ariel";
-
-		this.context.strokeStyle = "#FFFF00"
-		this.context.fillStyle = "#FFFF00"
-		this.context.beginPath();
-		if (this.projectionTypeInternal == "Mollweide")
-		{
-			this.context.moveTo(mapCenterX - mapWidth * 0.5,mapCenterY);
-			this.context.lineTo(mapCenterX - mapWidth * 0.5,mapCenterY + mapHeight * 0.5);
-		}
-		else
-		{
-			this.context.moveTo(mapCenterX - mapWidth * 0.5,mapCenterY + mapHeight * 0.5 - 20.0);
-			this.context.lineTo(mapCenterX - mapWidth * 0.5,mapCenterY + mapHeight * 0.5);
-		}
-			this.context.stroke();
-		drawTextCenter(this.context,"-180",mapCenterX - mapWidth * 0.5,mapCenterY + mapHeight * 0.5 + 10);
-
-		this.context.beginPath();
-		if (this.projectionTypeInternal == "Mollweide")
-		{
-			this.context.moveTo(mapCenterX - mapWidth * 0.25,mapCenterY + mapHeight * 0.5 * Math.sqrt(0.75));
-			this.context.lineTo(mapCenterX - mapWidth * 0.25,mapCenterY + mapHeight * 0.5);
-		}
-		else
-		{
-			this.context.moveTo(mapCenterX - mapWidth * 0.25,mapCenterY + mapHeight * 0.5 - 20.0);
-			this.context.lineTo(mapCenterX - mapWidth * 0.25,mapCenterY + mapHeight * 0.5);
-		}
-		this.context.stroke();
-		drawTextCenter(this.context,"-90",mapCenterX - mapWidth * 0.25,mapCenterY + mapHeight * 0.5 + 10);
-
-		drawTextCenter(this.context,"0",mapCenterX,mapCenterY + mapHeight * 0.5 + 10);
-		this.context.beginPath();
-		if (this.projectionTypeInternal == "Mollweide")
-		{
-			this.context.moveTo(mapCenterX + mapWidth * 0.25,mapCenterY + mapHeight * 0.5 * Math.sqrt(0.75));
-			this.context.lineTo(mapCenterX + mapWidth * 0.25,mapCenterY + mapHeight * 0.5);
-		}
-		else
-		{
-			this.context.moveTo(mapCenterX + mapWidth * 0.25,mapCenterY + mapHeight * 0.5 - 20.0);
-			this.context.lineTo(mapCenterX + mapWidth * 0.25,mapCenterY + mapHeight * 0.5);
-		}
-		this.context.stroke();
-		drawTextCenter(this.context,"+90",mapCenterX + mapWidth * 0.25,mapCenterY + mapHeight * 0.5 + 10);
-
-		this.context.beginPath();
-		if (this.projectionTypeInternal == "Mollweide")
-		{
-			this.context.moveTo(mapCenterX + mapWidth * 0.5,mapCenterY);
-			this.context.lineTo(mapCenterX + mapWidth * 0.5,mapCenterY + mapHeight * 0.5);
-		}
-		else
-		{
-			this.context.moveTo(mapCenterX + mapWidth * 0.5,mapCenterY + mapHeight * 0.5 - 20.0);
-			this.context.lineTo(mapCenterX + mapWidth * 0.5,mapCenterY + mapHeight * 0.5);
-	
-		}
-		this.context.stroke();
-		drawTextCenter(this.context,"+180",mapCenterX + mapWidth * 0.5,mapCenterY + mapHeight * 0.5 + 10);
 	}
 }

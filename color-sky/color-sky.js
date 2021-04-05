@@ -37,14 +37,14 @@ var dragging = false;
 
 function onMouseDown(event)
 {
-	if (event.which == 1 && event.offsetX >= 50 && event.offsetX <= (canvasMap.width - 100) && event.offsetY >= 50 && event.offsetY <= (canvasMap.height - 100))
+	if (event.which == 1 && event.offsetX >= 50 && event.offsetX <= (canvasMap.width - 100) && event.offsetY >= 0 && event.offsetY <= (canvasMap.height - 100))
 	{
 		dragging = true;
 	}
 }
 function onMouseMove(event)
 {
-	if (dragging && zoom > 1.0 && event.offsetX >= 50 && event.offsetX <= (canvasMap.width - 100) && event.offsetY >= 50 && event.offsetY <= (canvasMap.height - 100))
+	if (dragging && zoom > 1.0 && event.offsetX >= 50 && event.offsetX <= (canvasMap.width - 100) && event.offsetY >= 0 && event.offsetY <= (canvasMap.height - 100))
 	{
 		zoomCenterX -= event.movementX / zoom
 		zoomCenterY -= event.movementY / zoom
@@ -370,7 +370,12 @@ commonUIRegister(buttonConstellationObscure);
 
 
 function draw(){
-	var skyMap = new SkyMap(contextMap,canvasMap.width / 2 - zoomCenterX * zoom ,canvasMap.height / 2 - zoomCenterY* zoom,(canvasMap.width - 100)  * zoom,(canvasMap.height - 100) * zoom);
+	var mapWidth = (canvasMap.width - 100) * zoom;
+	var mapHeight = (canvasMap.height - 100) * zoom;
+	var mapCenterX = canvasMap.width / 2 - zoomCenterX * zoom;
+	var mapCenterY = (canvasMap.height - 100) / 2 - zoomCenterY * zoom;
+
+	var skyMap = new SkyMap(contextMap,mapCenterX,mapCenterY,mapWidth,mapHeight);
 	skyMap.filter = filter;
 	skyMap.displayConstellations = displayConstellations;
 
@@ -379,14 +384,111 @@ function draw(){
 	contextMap.fillRect(0,0,canvasMap.width,canvasMap.height);
 
 	contextMap.save()
-	contextMap.rect(50,50,canvasMap.width - 100,canvasMap.height - 100);
+	contextMap.rect(50,0,canvasMap.width - 100,canvasMap.height - 100);
 	contextMap.clip();
 	skyMap.draw();
 	contextMap.restore();
 
+
+// draw the elongation reference on the map
+	contextMap.save()
+	contextMap.rect(25,0,canvasMap.width - 75,canvasMap.height - 50);
+	contextMap.clip();
+	contextMap.font = "10px Ariel";
+
+	contextMap.strokeStyle = "#FFFF00"
+	contextMap.fillStyle = "#FFFF00"
+	contextMap.beginPath();
+	if (projectionType== "Mollweide")
+	{
+		contextMap.moveTo(mapCenterX - mapWidth * 0.5,mapCenterY);
+		contextMap.lineTo(mapCenterX - mapWidth * 0.5,mapCenterY + mapHeight * 0.5);
+	}
+	else
+	{
+		contextMap.moveTo(mapCenterX - mapWidth * 0.5,mapCenterY + mapHeight * 0.5 - 20.0);
+		contextMap.lineTo(mapCenterX - mapWidth * 0.5,mapCenterY + mapHeight * 0.5);
+	}
+		contextMap.stroke();
+	drawTextCenter(contextMap,"-180",mapCenterX - mapWidth * 0.5,mapCenterY + mapHeight * 0.5 + 10);
+
+	contextMap.beginPath();
+	if (projectionType == "Mollweide")
+	{
+		contextMap.moveTo(mapCenterX - mapWidth * 0.25,mapCenterY + mapHeight * 0.5 * Math.sqrt(0.75));
+		contextMap.lineTo(mapCenterX - mapWidth * 0.25,mapCenterY + mapHeight * 0.5);
+	}
+	else
+	{
+		contextMap.moveTo(mapCenterX - mapWidth * 0.25,mapCenterY + mapHeight * 0.5 - 20.0);
+		contextMap.lineTo(mapCenterX - mapWidth * 0.25,mapCenterY + mapHeight * 0.5);
+	}
+	contextMap.stroke();
+	drawTextCenter(contextMap,"-90",mapCenterX - mapWidth * 0.25,mapCenterY + mapHeight * 0.5 + 10);
+
+	drawTextCenter(contextMap,"0",mapCenterX,mapCenterY + mapHeight * 0.5 + 10);
+	contextMap.beginPath();
+	if (projectionType == "Mollweide")
+	{
+		contextMap.moveTo(mapCenterX + mapWidth * 0.25,mapCenterY + mapHeight * 0.5 * Math.sqrt(0.75));
+		contextMap.lineTo(mapCenterX + mapWidth * 0.25,mapCenterY + mapHeight * 0.5);
+	}
+	else
+	{
+		contextMap.moveTo(mapCenterX + mapWidth * 0.25,mapCenterY + mapHeight * 0.5 - 20.0);
+		contextMap.lineTo(mapCenterX + mapWidth * 0.25,mapCenterY + mapHeight * 0.5);
+	}
+	contextMap.stroke();
+	drawTextCenter(contextMap,"+90",mapCenterX + mapWidth * 0.25,mapCenterY + mapHeight * 0.5 + 10);
+
+	contextMap.beginPath();
+	if (projectionType == "Mollweide")
+	{
+		contextMap.moveTo(mapCenterX + mapWidth * 0.5,mapCenterY);
+		contextMap.lineTo(mapCenterX + mapWidth * 0.5,mapCenterY + mapHeight * 0.5);
+	}
+	else
+	{
+		contextMap.moveTo(mapCenterX + mapWidth * 0.5,mapCenterY + mapHeight * 0.5 - 20.0);
+		contextMap.lineTo(mapCenterX + mapWidth * 0.5,mapCenterY + mapHeight * 0.5);
+	
+	}
+	contextMap.stroke();
+	drawTextCenter(contextMap,"+180",mapCenterX + mapWidth * 0.5,mapCenterY + mapHeight * 0.5 + 10);
+	contextMap.restore();
+
 	commonUIdraw(contextMap);
-//	window.setTimeout(work, 1000.0/30.0);
 }
 
-draw();
+var waitForReadyTimer = 0.0;
+
+function waitForReady()
+{
+	if (!constellationsReady || !starsReady)
+	{
+		contextMap.fillStyle = "#000000";
+		contextMap.fillRect(0,0,canvasMap.width,canvasMap.height);
+		waitForReadyTimer += 0.25;
+		contextMap.fillStyle = "#FFFFFF";
+		contextMap.fillStyle = "#FFFFFF";
+		contextMap.font = "20px Ariel";
+		drawTextCenter(contextMap,"Please Wait",canvasMap.width * 0.5,canvasMap.height * 0.5 - 15);
+		var timerDots = Math.floor(waitForReadyTimer * 4.0) % 4;
+		var dots = "";
+		if (timerDots == 0)
+			dots = "."
+		else if (timerDots == 1)
+			dots = ".."
+		else 
+			dots = "..."
+		contextMap.fillText("Scanning the Sky " + dots,canvasMap.width * 0.5 - contextMap.measureText("Scanning the Sky ").width * 0.5,canvasMap.height * 0.5 + 15);
+		drawTextCenter(contextMap,"This may take a minute or two.",canvasMap.width * 0.5,canvasMap.height * 0.5 + 45);
+		window.setTimeout(waitForReady, 333.0);
+	}
+	else
+	{
+		draw();
+	}
+}
+waitForReady();
 

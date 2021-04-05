@@ -454,7 +454,7 @@ function createConstellations()
 				var found = false;
 				for (l = 0; l < stars.length && !found; l++)
 				{
-					if (stars[l].id == constellationData[i].paths[j][k])
+					if (stars[l].main_id == constellationData[i].paths[j][k])
 					{
 //						console.log("Found " + constellationData[i].paths[j][k])
 						found = true;
@@ -470,4 +470,18 @@ function createConstellations()
 		}
 	}
 }
-createConstellations();
+var constellationsReady = false;
+
+function prepareConstellations()
+{
+	if (!starsReady)
+	{
+		window.setTimeout(prepareConstellations, 1000.0); // wait 1 second and try again
+	}
+	else
+	{
+		createConstellations();
+		constellationsReady = true;
+	}
+}
+prepareConstellations();

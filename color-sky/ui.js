@@ -13,7 +13,7 @@ class Button
 		this.depth = 0;
 		this.drawer = null;
 		this.onClicker = onClicker;
-		if (onClicker === null || typeof onClicker === undefined)
+		if (typeof onClicker === undefined || onClicker === null)
 		{
 			console.log("Warning: Button " + name + " was instantiated without an onclick action.")
 		}
@@ -68,15 +68,77 @@ class Button
 			this.onClicker(event);
 		}
 	}
-	mouseOver(event)
-	{
-		this.mouseOver(event);
-	}
+//	mouseOver(event)
+//	{
+//		this.mouseOverInternal(event);
+//	}
 	test(event)
 	{
 		return (this.visible && this.x <= event.offsetX && (this.x + this.width) >= event.offsetX && this.y <= event.offsetY && (this.y + this.height) >= event.offsetY)
 	}
 }
+
+class Radio
+{
+	constructor(name,onClicker,buttonArray)
+	{
+		this.name = name;
+		this.drawer = null;
+		this.onClicker = onClicker;
+		if (typeof onClicker === undefined || onClicker === null)
+		{
+			console.log("Warning: Radio " + name + " was instantiated without an onclick action.")
+		}
+		this.visible = true;
+		this.disabled = false;
+		this.buttonArray = buttonArray;
+	}
+
+	draw(context)
+	{
+		context.save();
+//		context.translate(this.x,this.y);
+//		context.scale(this.width,this.height);
+		if (this.drawer !== null)
+			this.drawer();
+		else
+		{
+			context.globalAlpha = this.insideTransparency;
+			context.fillStyle  = this.insideStyle;
+			context.fillRect(this.x,this.y,this.width,this.height);
+
+			context.globalAlpha = this.borderTransparency;
+			context.strokeStyle = this.borderColor;
+			context.beginPath();
+			context.rect(this.x,this.y,this.width,this.height);
+			context.stroke();
+
+			if (this.text !== null || this.name !== null)
+			{
+				context.fillStyle  = this.textStyle;
+				context.font = this.textFont;
+				if (this.text !== null)
+					drawTextCenter(context,this.text,this.x + this.width / 2,this.y + this.height / 2 + 3);
+				else
+					drawTextCenter(context,this.name,this.x + this.width / 2,this.y + this.height / 2 + 3);
+			}
+		}
+		context.restore();
+	}
+	onClick(event)
+	{
+		if (!this.disabled)
+		{
+			this.onClicker(event);
+		}
+	}
+	test(event)
+	{
+		
+		return (this.visible && this.x <= event.offsetX && (this.x + this.width) >= event.offsetX && this.y <= event.offsetY && (this.y + this.height) >= event.offsetY)
+	}
+}
+
 class Slider
 {
 	constructor(x,y,width,height,depth,visible,disabled,value,min,max,drawer,vertical)

@@ -199,22 +199,22 @@ function selectFilter(value)
 }
 
 var radButtons = new Array();
-radButtons.push(new RadioButton("No Filter","none",canvasMap.width / 2 - 145,canvasMap.height - 45,40,15));
+radButtons.push(new RadioButton("No Filter","none",canvasMap.width / 2 - 145,canvasMap.height - 65,40,15));
 radButtons[radButtons.length - 1].text = "No Filter";
 
-radButtons.push(new RadioButton("U Filter","U",canvasMap.width / 2 - 95,canvasMap.height - 45,40,15));
+radButtons.push(new RadioButton("U Filter","U",canvasMap.width / 2 - 95,canvasMap.height - 65,40,15));
 radButtons[radButtons.length - 1].text = "U";
 
-radButtons.push(new RadioButton("B Filter","B",canvasMap.width / 2 - 45,canvasMap.height - 45,40,15));
+radButtons.push(new RadioButton("B Filter","B",canvasMap.width / 2 - 45,canvasMap.height - 65,40,15));
 radButtons[radButtons.length - 1].text = "B";
 
-radButtons.push(new RadioButton("V Filter","V",canvasMap.width / 2 + 5,canvasMap.height - 45,40,15));
+radButtons.push(new RadioButton("V Filter","V",canvasMap.width / 2 + 5,canvasMap.height - 65,40,15));
 radButtons[radButtons.length - 1].text = "V";
 
-radButtons.push(new RadioButton("R Filter","R",canvasMap.width / 2 + 55,canvasMap.height - 45,40,15));
+radButtons.push(new RadioButton("R Filter","R",canvasMap.width / 2 + 55,canvasMap.height - 65,40,15));
 radButtons[radButtons.length - 1].text = "R";
 
-radButtons.push(new RadioButton("I Filter","I",canvasMap.width / 2 + 105,canvasMap.height - 45,40,15));
+radButtons.push(new RadioButton("I Filter","I",canvasMap.width / 2 + 105,canvasMap.height - 65,40,15));
 radButtons[radButtons.length - 1].text = "I";
 
 
@@ -333,6 +333,10 @@ function draw(){
 	contextMap.stroke();
 	drawTextCenter(contextMap,"+180",mapCenterX + mapWidth * 0.5,mapCenterY + mapHeight * 0.5 + 10);
 	contextMap.restore();
+	contextMap.font = "15px Arial"
+	contextMap.fillStyle = "#FFFFFF"
+	drawTextCenter(contextMap,"Select Filter:",canvasMap.width * 0.5,canvasMap.height - 70);
+	drawTextCenter(contextMap,"Show Constellations:",canvasMap.width * 0.5,canvasMap.height - 30);
 
 	commonUIdraw(contextMap);
 }

@@ -42,6 +42,10 @@ class SkyMap
 		this.centralRA = 0.0;
 		this.starsProjection = new Array();
 		this.project();
+		this.majorConstellationStyle = "#FFFFFF";
+		this.zodiacConstellationStyle = "#FFFF00";
+		this.minorConstellationStyle = "#7F7F7F";
+		this.obscureConstellationStyle = "#3F3F3F";
 	}
 	set projectionType(type)
 	{
@@ -142,13 +146,13 @@ class SkyMap
 						(constellationData[i].type == "obscure" && constellationLevel <= 1))
 					{
 						if (constellationData[i].type == "zodiac")
-							this.context.strokeStyle  = "#3F3F00"
+							this.context.strokeStyle  = this.zodiacConstellationStyle;
 						if (constellationData[i].type == "major")
-							this.context.strokeStyle  = "#3F3F3F"
+							this.context.strokeStyle  = this.majorConstellationStyle;
 						if (constellationData[i].type == "minor")
-							this.context.strokeStyle  = "#1F1F1F"
+							this.context.strokeStyle  = this.minorConstellationStyle;
 						if (constellationData[i].type == "obscure")
-							this.context.strokeStyle  = "#0F0F0F"
+							this.context.strokeStyle  = this.obscureConstellationStyle;
 						this.context.beginPath();
 						var k;
 						var datacount = 0;

@@ -74,6 +74,8 @@ if (starsRawJSONData == null)
 			if (this.readyState == 4 && this.status == 200)
 			{
 				starsRawJSONData = starsXHTTP.responseText;
+		 		localStorage.setItem("starsData",starsRawJSONData);
+				localStorage.setItem("starsUpdateDateTime",currDateTime);
 				starsProcess();
 			}
 		}

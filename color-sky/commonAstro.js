@@ -4,7 +4,7 @@ var commonAstroLogRegister = 0;
 function UBVRItoRGB(U,B,V,R,I,brightMag,dimMag)
 {
 	var brightMagInternal = brightMag;
-	if (typeof brightMag === undefined || brightMag === null)
+	if (typeof brightMag === 'undefined' || brightMag === null)
 	{
 		brightMagInternal = 0.0;
 		if (!(commonAstroLogRegister & 0x01))
@@ -14,7 +14,7 @@ function UBVRItoRGB(U,B,V,R,I,brightMag,dimMag)
 		}
 	}
 	var dimMagInternal = dimMag;
-	if (typeof dimMag === undefined || dimMag === null)
+	if (typeof dimMag === 'undefined' || dimMag === null)
 	{
 		dimMagInternal = 6.0;
 		if (!(commonAstroLogRegister & 0x02))

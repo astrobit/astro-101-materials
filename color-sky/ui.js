@@ -13,7 +13,7 @@ class Button
 		this.depth = 0;
 		this.drawer = null;
 		this.onClicker = onClicker;
-		if (typeof onClicker === undefined || onClicker === null)
+		if (typeof onClicker === 'undefined' || onClicker === null)
 		{
 			console.log("Warning: Button " + name + " was instantiated without an onclick action.")
 		}
@@ -154,7 +154,7 @@ class Radio
 		this.name = name;
 		this.drawer = null;
 		this.onClicker = onClicker;
-		if (typeof onClicker === undefined || onClicker === null)
+		if (typeof onClicker === 'undefined' || onClicker === null)
 		{
 			console.log("Warning: Radio " + name + " was instantiated without an onclick action.")
 		}
@@ -236,7 +236,7 @@ class Slider
 		context.save();
 		context.translate(this.x,this.y);
 		context.scale(this.width,this.height)
-		if (this.drawer !== null && typeof this.drawer !== undefined)
+		if (this.drawer !== null && typeof this.drawer !== 'undefined')
 			this.drawer();
 		else
 		{

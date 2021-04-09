@@ -20,33 +20,10 @@ if ("starsUpdateDateTime" in localStorage)
 
 var starsReady = false;
 var stars = new Array();
+
 function starFindByID(main_id)
 {
-	var imin = 0;
-	var imax = stars.length - 1;
-	var ret = null;
-	if (stars.length > 0)
-	{
-		var i;
-		do
-		{
-			i = Math.floor((imax + imin) / 2);
-			if (main_id < stars[i].main_id)
-			{
-				imax = i;
-			}
-			else if (main_id > stars[i].main_id)
-			{
-				imin = i;
-			}
-		}
-		while (imin < imax && stars[i].main_id != main_id);
-		if (stars[i].main_id == main_id)
-		{
-			ret = i;
-		}
-	}
-	return ret;
+	return binarySearch(stars,main_id,"main_id");
 }
 
 
@@ -90,14 +67,27 @@ else
 
 function starsProcess()
 {
+	var radians = Math.PI / 180.0;
+	var degrees = 180.0 / Math.PI;
 	var starsJSON = JSON.parse(starsRawJSONData);
+	var NGPdec = 27.13 * radians;
+	var NGPra = (12.0 + 51.4 / 60.0) * 15.0 * radians;
+	var galCosNGP = Math.cos(NGPdec)
+	var galSinNGP = Math.sin(NGPdec)
+	var JC = ((Date.now() / 86400000.0 + 2440587.50000) - 2451545.50000) / 36525.0;
+	var obliquity = (23.0 + 26.0 / 60 + 21.45 / 3600.0 - JC / 3600.0 * (46.815 + JC * (-0.0006 - 0.00181 * JC))) * radians;
+	var cosTilt = Math.cos(obliquity);
+	var sinTilt = Math.sin(obliquity);
+
 	var keywords = new Array();
 	var i;
-	for (i = 0; i < starsJSON.metadata.length; i++)
+	var len = starsJSON.metadata.length;
+	for (i = 0; i < len; i++)
 	{
 		keywords.push(starsJSON.metadata[i].name);
 	}
-	for (i = 0; i < starsJSON.data.length; i++)
+	len = starsJSON.data.length;
+	for (i = 0; i < len; i++)
 	{
 		var star = new Object();
 		var j;
@@ -105,6 +95,21 @@ function starsProcess()
 		{
 			Object.defineProperty(star, keywords[j], {value:starsJSON.data[i][j]});
 		}
+		var decRad = star.dec * radians;
+		var raRad = star.ra * radians;
+		var cosDec = Math.cos(decRad);
+		var sinDec = Math.sin(decRad);
+		var cosRA = Math.cos(raRad);
+		var sinRA = Math.sin(raRad);
+		var sinB = cosDec * galCosNGP * Math.cos(raRad - NGPra) + sinDec * galSinNGP
+		//var cosB = Math.sqrt(1.0 - sinB * sinB)
+		// calculate galactic latitude and longitude
+		star.gallat = Math.asin(sinB) * degrees;
+		star.gallong = (Math.atan2(sinDec - sinB * galSinNGP,cosDec * Math.sin(raRad - NGPra) * galCosNGP ) * degrees + 393) % 360.0;
+		// calculate ecliptic coorinates
+		var sinBeta = sinDec * cosTilt - cosDec * sinTilt * sinRA;
+		star.eclat = Math.asin(sinBeta) * degrees;
+		star.eclong = (Math.atan2(sinRA * cosTilt + Math.tan(decRad) * sinTilt,cosRA)* degrees + 363) % 360.0;
 		stars.push(star);
 	}
 	stars.sort(function (a,b){if (a.main_id < b.main_id) return -1; else if (a.main_id > b.main_id) return 1; else return 0;});

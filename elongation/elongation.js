@@ -104,7 +104,7 @@ function work(){
 		theContext.closePath();
 		theContext.fill();
 	}
-	var sunLongitude = 360.0 - currPosition[2] * 180.0 / Math.PI;
+	var sunLongitude = currPosition[2] * 180.0 / Math.PI - 360.0;
 	var projection = new Mollweide(sunLongitude,0.0);
 // draw the stars on the map
 	if (starsReady)
@@ -210,7 +210,7 @@ function work(){
 	var phi = (currPosition[selectedElongation] - currPosition[2]) % (Math.PI * 2.0);
 // determine the elongation of the selected planet
 	var elongation = -Math.atan2(orbitalRadii[selectedElongation] * Math.sin(phi),1.0 - orbitalRadii[selectedElongation] * Math.cos(phi)) * 180.0 / Math.PI;
-	var planetProj = projection.calculate(0.0,elongation)
+	var planetProj = projection.calculate(0.0,elongation + sunLongitude)
 
 // draw the selected planet on the map
 	contextElongation.fillStyle  = pStyle[selectedElongation];

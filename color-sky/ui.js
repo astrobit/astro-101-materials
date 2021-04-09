@@ -27,7 +27,7 @@ class Button
 		this.insideTransparency = 1.0;
 		this.borderTransparency = 1.0;
 		this.textStyle = "#FFFFFF";
-		this.textFont = "10px Ariel";
+		this.textFont = "18px Ariel";
 	}
 
 	draw(context)
@@ -103,7 +103,7 @@ class RadioButton
 		this.insideTransparency = 1.0;
 		this.borderTransparency = 1.0;
 		this.textStyle = "#FFFFFF";
-		this.textFont = "10px Ariel";
+		this.textFont = "18px Ariel";
 	}
 
 	draw(context)
@@ -133,9 +133,9 @@ class RadioButton
 				context.fillStyle  = this.textStyle;
 				context.font = this.textFont;
 				if (this.text !== null)
-					drawTextCenter(context,this.text,this.x + this.width / 2,this.y + this.height / 2 + 3);
+					drawTextCenter(context,this.text,this.x + this.width / 2,this.y + this.height / 2 + 5);
 				else
-					drawTextCenter(context,this.name,this.x + this.width / 2,this.y + this.height / 2 + 3);
+					drawTextCenter(context,this.name,this.x + this.width / 2,this.y + this.height / 2 + 5);
 			}
 		}
 		context.restore();

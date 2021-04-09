@@ -8,6 +8,7 @@ var timer = 0;
 var projectionType = "Mollweide";
 var displayConstellations = "zodiac";
 var filter = "none"
+var displayCoordinates = "Equatorial"
 var zoom = 1.0;
 var zoomCenterX = 0;
 var zoomCenterY = 0;
@@ -37,14 +38,14 @@ var dragging = false;
 
 function onMouseDown(event)
 {
-	if (event.which == 1 && event.offsetX >= 50 && event.offsetX <= (canvasMap.width - 100) && event.offsetY >= 0 && event.offsetY <= (canvasMap.height - 100))
+	if (event.which == 1 && event.offsetX >= 50 && event.offsetX <= (canvasMap.width - 100) && event.offsetY >= 0 && event.offsetY <= (canvasMap.height - 175))
 	{
 		dragging = true;
 	}
 }
 function onMouseMove(event)
 {
-	if (dragging && zoom > 1.0 && event.offsetX >= 50 && event.offsetX <= (canvasMap.width - 100) && event.offsetY >= 0 && event.offsetY <= (canvasMap.height - 100))
+	if (dragging && zoom > 1.0 && event.offsetX >= 50 && event.offsetX <= (canvasMap.width - 100) && event.offsetY >= 0 && event.offsetY <= (canvasMap.height - 175))
 	{
 		zoomCenterX -= event.movementX / zoom
 		zoomCenterY -= event.movementY / zoom
@@ -199,22 +200,24 @@ function selectFilter(value)
 }
 
 var radButtons = new Array();
-radButtons.push(new RadioButton("No Filter","none",canvasMap.width / 2 - 145,canvasMap.height - 65,40,15));
+var filterButtonY = canvasMap.height - 130;
+
+radButtons.push(new RadioButton("No Filter","none",canvasMap.width / 2 - 265,filterButtonY,80,25));
 radButtons[radButtons.length - 1].text = "No Filter";
 
-radButtons.push(new RadioButton("U Filter","U",canvasMap.width / 2 - 95,canvasMap.height - 65,40,15));
+radButtons.push(new RadioButton("U Filter","U",canvasMap.width / 2 - 175,filterButtonY,80,25));
 radButtons[radButtons.length - 1].text = "U";
 
-radButtons.push(new RadioButton("B Filter","B",canvasMap.width / 2 - 45,canvasMap.height - 65,40,15));
+radButtons.push(new RadioButton("B Filter","B",canvasMap.width / 2 - 85,filterButtonY,80,25));
 radButtons[radButtons.length - 1].text = "B";
 
-radButtons.push(new RadioButton("V Filter","V",canvasMap.width / 2 + 5,canvasMap.height - 65,40,15));
+radButtons.push(new RadioButton("V Filter","V",canvasMap.width / 2 + 5,filterButtonY,80,25));
 radButtons[radButtons.length - 1].text = "V";
 
-radButtons.push(new RadioButton("R Filter","R",canvasMap.width / 2 + 55,canvasMap.height - 65,40,15));
+radButtons.push(new RadioButton("R Filter","R",canvasMap.width / 2 + 95,filterButtonY,80,25));
 radButtons[radButtons.length - 1].text = "R";
 
-radButtons.push(new RadioButton("I Filter","I",canvasMap.width / 2 + 105,canvasMap.height - 65,40,15));
+radButtons.push(new RadioButton("I Filter","I",canvasMap.width / 2 + 185,filterButtonY,80,25));
 radButtons[radButtons.length - 1].text = "I";
 
 
@@ -228,40 +231,63 @@ function selectConstellation(constellation)
 }
 
 var radButtonsConst = new Array();
+var constellationButtonsY = canvasMap.height - 80
 
-radButtonsConst.push(new RadioButton("No Constellations","none",canvasMap.width / 2 - 120,canvasMap.height - 25,40,15));
+radButtonsConst.push(new RadioButton("No Constellations","none",canvasMap.width / 2 - 210,constellationButtonsY,80,25));
 radButtonsConst[radButtonsConst.length - 1].text = "None";
 
-radButtonsConst.push(new RadioButton("Zodiac Constellations","zodiac",canvasMap.width / 2 - 70,canvasMap.height - 25,40,15));
+radButtonsConst.push(new RadioButton("Zodiac Constellations","zodiac",canvasMap.width / 2 - 125,constellationButtonsY,80,25));
 radButtonsConst[radButtonsConst.length - 1].text = "Zodiac";
 
-radButtonsConst.push(new RadioButton("Major Constellations","major",canvasMap.width / 2 - 20,canvasMap.height - 25,40,15));
+radButtonsConst.push(new RadioButton("Major Constellations","major",canvasMap.width / 2 - 40,constellationButtonsY,80,25));
 radButtonsConst[radButtonsConst.length - 1].text = "Major";
 
-radButtonsConst.push(new RadioButton("Major Constellations","minor",canvasMap.width / 2 + 30,canvasMap.height - 25,40,15));
+radButtonsConst.push(new RadioButton("Major Constellations","minor",canvasMap.width / 2 + 45,constellationButtonsY,80,25));
 radButtonsConst[radButtonsConst.length - 1].text = "Minor";
 
-radButtonsConst.push(new RadioButton("Obscure Constellations","obscure",canvasMap.width / 2 + 80,canvasMap.height - 25,40,15));
+radButtonsConst.push(new RadioButton("Obscure Constellations","all",canvasMap.width / 2 + 130,constellationButtonsY,80,25));
 radButtonsConst[radButtonsConst.length - 1].text = "Obscure";
 
 commonUIRegister(new Radio("Contstellations","zodiac",selectConstellation,radButtonsConst));
 
+
+
+function selectCoordinateSystem(coordinates)
+{
+	displayCoordinates = coordinates;
+	draw();
+}
+var coordinatesButtonsY = canvasMap.height - 25
+var coordButtonsConst = new Array();
+
+coordButtonsConst.push(new RadioButton("Equatorial","Equatorial",canvasMap.width / 2 - 125,coordinatesButtonsY,80,25));
+coordButtonsConst[coordButtonsConst.length - 1].text = "Equatorial";
+
+coordButtonsConst.push(new RadioButton("Ecliptic","Ecliptic",canvasMap.width / 2 - 40,coordinatesButtonsY,80,25));
+coordButtonsConst[coordButtonsConst.length - 1].text = "Ecliptic";
+
+coordButtonsConst.push(new RadioButton("Galactic","Galactic",canvasMap.width / 2 + 45,coordinatesButtonsY,80,25));
+coordButtonsConst[coordButtonsConst.length - 1].text = "Galactic";
+
+commonUIRegister(new Radio("Coordinate System","Equatorial",selectCoordinateSystem,coordButtonsConst));
+
 function draw(){
 	var mapWidth = (canvasMap.width - 100) * zoom;
-	var mapHeight = (canvasMap.height - 100) * zoom;
+	var mapHeight = (canvasMap.height - 175) * zoom;
 	var mapCenterX = canvasMap.width / 2 - zoomCenterX * zoom;
-	var mapCenterY = (canvasMap.height - 100) / 2 - zoomCenterY * zoom;
+	var mapCenterY = (canvasMap.height - 175) / 2 - zoomCenterY * zoom;
 
 	var skyMap = new SkyMap(contextMap,mapCenterX,mapCenterY,mapWidth,mapHeight);
 	skyMap.filter = filter;
 	skyMap.displayConstellations = displayConstellations;
+	skyMap.coordinates = displayCoordinates;
 
 // draw a black square for the map area box
 	contextMap.fillStyle = "#000000";
 	contextMap.fillRect(0,0,canvasMap.width,canvasMap.height);
 
 	contextMap.save()
-	contextMap.rect(50,0,canvasMap.width - 100,canvasMap.height - 100);
+	contextMap.rect(50,0,canvasMap.width - 100,canvasMap.height - 175);
 	contextMap.clip();
 	skyMap.draw();
 	contextMap.restore();
@@ -269,7 +295,7 @@ function draw(){
 
 // draw the elongation reference on the map
 	contextMap.save()
-	contextMap.rect(25,0,canvasMap.width - 75,canvasMap.height - 50);
+	contextMap.rect(25,0,canvasMap.width - 75,canvasMap.height - 125);
 	contextMap.clip();
 	contextMap.font = "10px Ariel";
 
@@ -333,10 +359,11 @@ function draw(){
 	contextMap.stroke();
 	drawTextCenter(contextMap,"+180",mapCenterX + mapWidth * 0.5,mapCenterY + mapHeight * 0.5 + 10);
 	contextMap.restore();
-	contextMap.font = "15px Arial"
+	contextMap.font = "20px Arial"
 	contextMap.fillStyle = "#FFFFFF"
-	drawTextCenter(contextMap,"Select Filter:",canvasMap.width * 0.5,canvasMap.height - 70);
-	drawTextCenter(contextMap,"Show Constellations:",canvasMap.width * 0.5,canvasMap.height - 30);
+	drawTextCenter(contextMap,"Select Filter:",canvasMap.width * 0.5,canvasMap.height - 140);
+	drawTextCenter(contextMap,"Show Constellations:",canvasMap.width * 0.5,canvasMap.height - 85);
+	drawTextCenter(contextMap,"Select Coordinate System:",canvasMap.width * 0.5,canvasMap.height - 30);
 
 	commonUIdraw(contextMap);
 }

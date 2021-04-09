@@ -450,18 +450,12 @@ function createConstellations()
 			var pathCurr = new Array();
 			for (k = 0; k < constellationData[i].paths[j].length; k++)
 			{
-				var l;
-				var found = false;
-				for (l = 0; l < stars.length && !found; l++)
+				var idx = starFindByID(constellationData[i].paths[j][k]);
+				if (idx !== null)
 				{
-					if (stars[l].main_id == constellationData[i].paths[j][k])
-					{
-//						console.log("Found " + constellationData[i].paths[j][k])
-						found = true;
-						pathCurr.push(l);
-					}
+					pathCurr.push(idx);
 				}
-				if (!found)
+				else
 				{
 					console.log("Did not find " + constellationData[i].paths[j][k])
 				}

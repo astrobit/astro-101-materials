@@ -10,7 +10,6 @@ class SkyMap
 			projector = new Mercator(this.centralRA,0.0)
 		else
 			projector = new Mollweide(this.centralRA,0.0);
-
 		this.starsProjection = new Array();
 		var i;
 		for (i = 0; i < stars.length; i++)
@@ -21,7 +20,20 @@ class SkyMap
 			var rgbB_V = UBVRItoRGB(null,null,stars[i].V,null,null,0,6);
 			var rgbB_R = UBVRItoRGB(null,null,null,stars[i].R,null,0,6);
 			var rgbB_I = UBVRItoRGB(null,null,null,null,stars[i].I,0,6);
-			var projection = projector.calculate(stars[i].dec,stars[i].ra);
+			var projection;
+			switch (this.coordinatesInternal)
+			{
+			case "Equatorial":
+			default:
+				projection = projector.calculate(stars[i].dec,stars[i].ra);
+				break;
+			case "Ecliptic":
+				projection = projector.calculate(stars[i].eclat,stars[i].eclong);
+				break;
+			case "Galactic":
+				projection = projector.calculate(stars[i].gallat,stars[i].gallong);
+				break;
+			}
 			stars[i].pidx = this.starsProjection.length;
 			this.starsProjection.push({x: projection.x, y:projection.y, style:RGBtoColor(rgbB), styleU:RGBtoColor(rgbB_U), styleB:RGBtoColor(rgbB_B), styleV:RGBtoColor(rgbB_V), styleR:RGBtoColor(rgbB_R), styleI:RGBtoColor(rgbB_I), idx:i,rgbB:rgbB});
 		}
@@ -36,6 +48,7 @@ class SkyMap
 		this.width = width;
 		this.height = height;
 		this.context = context;
+		this.coordinatesInternal = "Equatorial";
 		this.projectionType = "Mollweide";
 		this.displayConstellationLevel = "major";
 		this.filterInternal = "none";
@@ -49,8 +62,17 @@ class SkyMap
 	}
 	set projectionType(type)
 	{
-		this.projectionTypeInternal = type;
-		this.project();
+		switch (type)
+		{
+		case "Mollweide":
+		case "Equirectangular":
+		case "Mercator":
+			this.projectionTypeInternal = type;
+			this.project();
+			break;
+		default:
+			console.log("Invalid SkyMap projection " + type + ". Only Mollweide, Equirectangular, or Mercator are allowed.")
+		}
 	}
 	get projectionType()
 	{
@@ -58,15 +80,56 @@ class SkyMap
 	}
 	set filter(type)
 	{
-		this.filterInternal = type;
+		switch (type)
+		{
+		case "none":
+		case "U":
+		case "B":
+		case "V":
+		case "R":
+		case "I":
+			this.filterInternal = type;
+			break;
+		default:
+			console.log("Invalid SkyMap filter " + type + ". Only U, V, B, R, I, or none are allowed.")
+		}
 	}
 	get filter()
 	{
 		return this.filterInternal;
 	}
+	set coordinates(type)
+	{
+		switch (type)
+		{
+		case "Equatorial":
+		case "Galactic":
+		case "Ecliptic":
+			this.coordinatesInternal = type;
+			this.project();
+			break;
+		default:
+			console.log("Invalid SkyMap coordinate system " + type + ". Only Equatorial, Galactic, or Ecliptic are allowed.")
+		}
+	}
+	get coordinates()
+	{
+		return this.coordinatesInternal;
+	}
 	set displayConstellations(type)
 	{
-		this.displayConstellationLevel = type;
+		switch (type)
+		{
+		case "none":
+		case "zodiac":
+		case "major":
+		case "minor":
+		case "all":
+			this.displayConstellationLevel = type;
+			break;
+		default:
+			console.log("Invalid SkyMap constellation display " + type + ". Only none, zodiac, major, minor, or all are allowed.")
+		}
 	}
 	get displayConstellations()
 	{

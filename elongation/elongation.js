@@ -18,44 +18,115 @@ var zoom = 100.0;
 
 // draw ellipse functions from https://stackoverflow.com/questions/2172798/how-to-draw-an-oval-in-html5-canvas
 
-function requestPause()
-{
-	pause = !pause;
-	var button = document.getElementById("pause");
-	if (!pause)
-	{
-		button.innerHTML = ' Pause  ';
-	}
-	else
-	{
-		button.innerHTML = 'Continue';
-	}
-
-}
-function speedup()
+function speedup(event)
 {
 	speed *= 2.0;
 }
-function slowdown()
+function slowdown(event)
 {
 	speed *= 0.5;
 }
 
-function zoomin()
+function zoomin(event)
 {
 	zoom *= 2.0;
 }
-function zoomout()
+function zoomout(event)
 {
 	zoom *= 0.5;
 }
 
+var selectedElongation = 1; // Venus
+var selectedPlanet = "Venus"
+function selectPlanet(value)
+{
+	selectedPlanet = value;
+	switch (value)
+	{
+	case "Mercury":
+		selectedElongation  = 0;
+		break;
+	case "Venus":
+	default:
+		selectedElongation  = 1;
+		break;
+	case "Mars":
+		selectedElongation  = 3;
+		break;
+	case "Jupiter":
+		selectedElongation  = 4;
+		break;
+	case "Saturn":
+		selectedElongation  = 5;
+		break;
+	case "Uranus":
+		selectedElongation  = 6;
+		break;
+	case "Neptune":
+		selectedElongation  = 7;
+		break;
+	}
+}
+
+var radButtons = new Array();
+var planetButtonY = theCanvas.height - 30;
+
+radButtons.push(new RadioButton("Mercury","Mercury",theCanvas.width / 2 - 295,planetButtonY,80,25));
+radButtons.push(new RadioButton("Venus","Venus",theCanvas.width / 2 - 210,planetButtonY,80,25));
+radButtons.push(new RadioButton("Mars","Mars",theCanvas.width / 2 - 125,planetButtonY,80,25));
+radButtons.push(new RadioButton("Jupiter","Jupiter",theCanvas.width / 2 - 40,planetButtonY,80,25));
+radButtons.push(new RadioButton("Saturn","Saturn",theCanvas.width / 2 + 45,planetButtonY,80,25));
+radButtons.push(new RadioButton("Uranus","Uranus",theCanvas.width / 2 + 130,planetButtonY,80,25));
+radButtons.push(new RadioButton("Neptune","Neptune",theCanvas.width / 2 + 215,planetButtonY,80,25));
+
+
+commonUIRegister(new Radio("Planet","Venus",selectPlanet,radButtons));
+var button = new Button("ZoomIn",theCanvas.width - 45,5,40,40,zoomin);
+button.text = "+";
+button.textFont = "30px Arial";
+button.insideStyle = "#000000"
+commonUIRegister(button)
+button = new Button("ZoomOut",theCanvas.width - 45,45,40,40,zoomout);
+button.text = "-";
+button.textFont = "30px Arial";
+button.insideStyle = "#000000"
+commonUIRegister(button);
+
+var button = new Button("fast",theCanvas.width / 2 + 25,theCanvas.height - 75,40,40,speedup);
+button.text = "x2";
+button.textFont = "16px Arial";
+button.insideStyle = "#000000"
+commonUIRegister(button)
+button = new Button("slow",theCanvas.width / 2 - 65,theCanvas.height - 75,40,40,slowdown);
+button.text = "x1/2";
+button.textFont = "16px Arial";
+button.insideStyle = "#000000"
+commonUIRegister(button);
+
+
+function requestPause(event)
+{
+	pause = !pause;
+	if (!pause)
+	{
+		playButton.text = '| |';
+	}
+	else
+	{
+		playButton.text = '>';
+	}
+
+}
+var playButton = new Button("Pause",theCanvas.width / 2 - 20,theCanvas.height - 75,40,40,requestPause);
+playButton.text = "| |";
+playButton.textFont = "24px Arial";
+commonUIRegister(playButton);
 
 function work(){
 
-	var mapWidth = canvasElongation.width - 100;
+	var mapWidth = canvasElongation.width - 150;
 	var mapHeight = canvasElongation.height - 100;
-	var mapCenterX = canvasElongation.width / 2;
+	var mapCenterX = mapWidth / 2;
 	var mapCenterY = canvasElongation.height / 2;
 
 // clear the canvas
@@ -122,6 +193,12 @@ function work(){
 			contextElongation.fill();
 		}
 	}
+	else
+	{
+		contextElongation.fillStyle = "#7F7F7F"
+		contextElongation.font = "15px Arial";
+		drawTextCenter(contextElongation,"Loading stars. Standby.",mapCenterX,mapCenterY - 60);
+	}
 
 // draw the ellipse for the map
 	contextElongation.strokeStyle  = "#FFFFFF";
@@ -139,7 +216,7 @@ function work(){
 	contextElongation.closePath();
 	contextElongation.fill();
 // draw the elongation reference on the map
-	contextElongation.font = "10px Ariel";
+	contextElongation.font = "10px Arial";
 
 	contextElongation.strokeStyle = "#7F7F7F"
 	contextElongation.beginPath();
@@ -167,50 +244,43 @@ function work(){
 	contextElongation.stroke();
 	drawTextCenter(contextElongation,"+180",mapCenterX + mapWidth * 0.5,mapCenterY + mapHeight * 0.5 + 10);
 // determine which planet is currently selected
-	var selectedElongation = 1; // Venus
 
-	var radios = document.getElementById("mercury");
-	var selectedPlanet = "Venus";
-	if (radios.checked === true)
-	{
-		selectedElongation  = 0;
-		selectedPlanet = "Mercury"
-	}
-	radios = document.getElementById("mars");
-	if (radios.checked === true)
-	{
-		selectedElongation  = 3;
-		selectedPlanet = "Mars"
-	}
-	radios = document.getElementById("jupiter");
-	if (radios.checked === true)
-	{
-		selectedElongation  = 4;
-		selectedPlanet = "Jupiter"
-	}
-	radios = document.getElementById("saturn");
-	if (radios.checked === true)
-	{
-		selectedElongation  = 5;
-		selectedPlanet = "Saturn"
-	}
-	radios = document.getElementById("uranus");
-	if (radios.checked === true)
-	{
-		selectedElongation  = 6;
-		selectedPlanet = "Uranus"
-	}
-	radios = document.getElementById("neptune");
-	if (radios.checked === true)
-	{
-		selectedElongation  = 7;
-		selectedPlanet = "Neptune"
-	}
+	var twoPi = Math.PI * 2.0;
+	var degrees = 180.0 / Math.PI;
+
+	var phiEarth = currPosition[2];
+	var phiPlanet = currPosition[selectedElongation];
+	var phiPlanetDisplay = (Math.round(phiPlanet * degrees * 10.0) / 10.0).toString()
+
 // determine the relative orbital phase angles between the planet and Earth
-	var phi = (currPosition[selectedElongation] - currPosition[2]) % (Math.PI * 2.0);
+	var deltaPhi = (currPosition[selectedElongation] - currPosition[2]) % (Math.PI * 2.0);
+	var phiDisplay = (Math.round(deltaPhi * 10.0 * 180.0 / Math.PI) / 10.0).toString();
 // determine the elongation of the selected planet
-	var elongation = -Math.atan2(orbitalRadii[selectedElongation] * Math.sin(phi),1.0 - orbitalRadii[selectedElongation] * Math.cos(phi)) * 180.0 / Math.PI;
-	var planetProj = projection.calculate(0.0,elongation + sunLongitude)
+	var elongationRad = -Math.atan2(orbitalRadii[selectedElongation] * Math.sin(deltaPhi),1.0 - orbitalRadii[selectedElongation] * Math.cos(deltaPhi));
+	var elongation = elongationRad * 180.0 / Math.PI;
+
+	var delPhiTrue = Math.abs(deltaPhi);
+	if (delPhiTrue > Math.PI)
+		delPhiTrue = twoPi - delPhiTrue;
+
+	var delPhiTrueDisplay = (Math.round(delPhiTrue * 10.0 * 180.0 / Math.PI) / 10.0).toString();
+
+	var planetProj = projection.calculate(0.0,elongation + sunLongitude);
+	var planetPhase = Math.PI - delPhiTrue - Math.abs(elongationRad);
+	if (elongationRad < 0.0)
+		planetPhase *= -1.0;
+	var planetPhaseDeg = planetPhase * degrees;
+	var planetPhaseDegNorm = planetPhaseDeg;
+	if (planetPhaseDegNorm< 0.0)
+		planetPhaseDegNorm += 360.0;
+
+	var planetPhaseNum = (planetPhaseDegNorm / 45.0) - 4.0;
+	if (planetPhaseNum < 0.0)
+		planetPhaseNum = 8.0 + planetPhaseNum;	
+	var planetPhaseDisplay = (Math.round(planetPhaseNum * 10.0) / 10.0).toString();
+	if (planetPhaseDisplay.charAt(planetPhaseDisplay.length - 2) != '.')
+		planetPhaseDisplay = planetPhaseDisplay + ".0"
+	
 
 // draw the selected planet on the map
 	contextElongation.fillStyle  = pStyle[selectedElongation];
@@ -220,15 +290,15 @@ function work(){
 	contextElongation.fill();
 // draw planet information on the map
 	contextElongation.fillStyle = "#FFFF00"
-	contextElongation.font = "15px Ariel";
-	drawTextRight(contextElongation,"Planet: ",mapCenterX - 150,mapCenterY + mapHeight * 0.5 + 35);
-	contextElongation.fillText(selectedPlanet,mapCenterX - 150,mapCenterY + mapHeight * 0.5 + 35);
+	contextElongation.font = "15px Arial";
+	drawTextRight(contextElongation,"Planet: ",mapCenterX - 310,mapCenterY + mapHeight * 0.5 + 35);
+	contextElongation.fillText(selectedPlanet,mapCenterX - 305,mapCenterY + mapHeight * 0.5 + 35);
 	var elongationRounded = Math.round(elongation * 10.0) / 10.0
 	var elongationDisplay = elongationRounded.toString();
 	if (elongationDisplay.charAt(elongationDisplay.length - 2) != '.')
 		elongationDisplay = elongationDisplay + ".0"
-	drawTextRight(contextElongation,"Elongation: " ,mapCenterX,mapCenterY + mapHeight * 0.5 + 35);
-	drawTextRight(contextElongation,elongationDisplay,mapCenterX + 40,mapCenterY + mapHeight * 0.5 + 35);
+	drawTextRight(contextElongation,"Elongation: " ,mapCenterX - 145,mapCenterY + mapHeight * 0.5 + 35);
+	drawTextRight(contextElongation,elongationDisplay,mapCenterX - 105,mapCenterY + mapHeight * 0.5 + 35);
 
 	var timerReadable = Math.round(timer * 100.0) / 100.0
 	var timerDisplay = timerReadable.toString();
@@ -246,6 +316,51 @@ function work(){
 	drawTextRight(contextElongation,timerDisplay + " years",mapCenterX + 280,mapCenterY + mapHeight * 0.5 + 35);
 	drawTextRight(contextElongation,"("+ timerDisplayDays + " days)",mapCenterX + 380,mapCenterY + mapHeight * 0.5 + 35);
 
+	if (planetPhase != 0.0)
+	{
+		contextElongation.save();
+		contextElongation.translate(mapCenterX + mapWidth * 0.5 + 75.0,mapCenterY);
+		contextElongation.fillStyle = "#FFFF00"
+		drawTextCenter(contextElongation,"View of Planet",0.0,-mapHeight * 0.5 + 20);
+		drawTextRight(contextElongation,"Phase: ",-2,mapHeight * 0.5 + 35);
+		contextElongation.fillText(planetPhaseDisplay,2,mapHeight * 0.5 + 35);
+
+		contextElongation.fillStyle = pStyle[selectedElongation];
+		contextElongation.beginPath();
+		contextElongation.moveTo(0.0,-50.0);
+		if (planetPhase <= 0.0)
+		{
+			for (i = 1; i <= 180; i++)
+			{
+				var thetaRad = i * Math.PI / 180.0;
+				contextElongation.lineTo(50.0 * Math.sin(thetaRad),-50.0 * Math.cos(thetaRad));
+			}
+			var radX = (1.0 - planetPhaseDeg / -90.0) * -50.0;
+			for (i = 180; i > 0; i--)
+			{
+				var thetaRad = i * Math.PI / 180.0;
+				contextElongation.lineTo(radX * Math.sin(thetaRad),-50.0 * Math.cos(thetaRad));
+			}
+		}
+		else
+		{
+			for (i = 1; i <= 180; i++)
+			{
+				var thetaRad = i * Math.PI / 180.0;
+				contextElongation.lineTo(-50.0 * Math.sin(thetaRad),-50.0 * Math.cos(thetaRad));
+			}
+			var radX = (1.0 - planetPhaseDeg / 90.0) * 50.0;
+			for (i = 180; i > 0; i--)
+			{
+				var thetaRad = i * Math.PI / 180.0;
+				contextElongation.lineTo(radX * Math.sin(thetaRad),-50.0 * Math.cos(thetaRad));
+			}
+		}
+		contextElongation.closePath();
+		contextElongation.fill();
+		contextElongation.restore();
+	}
+
 
 
 // draw the lines onto the overhead view to demonstrate the elongation
@@ -257,6 +372,7 @@ function work(){
 	theContext.stroke();
 
 
+	commonUIdraw(theContext);
 	
 	window.setTimeout(work, 1000.0/30.0);
 }

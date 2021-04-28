@@ -7,36 +7,12 @@
 <body style="font-family:sans-serif;font-size:15px;width:1000px;margin-left:auto;margin-right:auto;background-color:#000000;">
     <!--<h1 style="font-size:24px;text-align:center;color:#FFFFFF;">Elongation</h1>-->
     <div style="width:1000px; margin-left:auto; margin-right:auto;height:500px;">
-        <canvas id="theCanvas" width="1000" height="500">
+        <canvas id="theCanvas" width="1000" height="500" onclick="commonUIOnClick(event);">
             Canvas not supported; please update your browser.
         </canvas>
     </div>
-    <div style="text-align:center;">
-        <button type="button" name="zoomin" onclick="zoomin();">Zoom In</button>
-        <button type="button" name="slowdown" onclick="slowdown();">Slower</button>
-        <button type="button" id="pause" name="pause" onclick="requestPause();">Pause</button>
-        <button type="button" name="speedup" onclick="speedup();">Faster</button>
-        <button type="button" name="zoomout" onclick="zoomout();">Zoom Out</button>
-    </div>
-    <div style="text-align:center;">
-        <p style="color:#FFFFFF;"> Select a planet to see how the elongation changes with time.</p>
-        <input type="radio" id="mercury" name="observing" value="mercury">
-        <label for="mercury" style="color:#7F7F7F">Mercury</label>
-        <input type="radio" id="venus" name="observing" value="venus" checked="true">
-        <label for="venus" style="color:#FFA500">Venus</label>
-        <input type="radio" id="mars" name="observing" value="mars">
-        <label for="mars" style="color:#FF0000">Mars</label>
-        <input type="radio" id="jupiter" name="observing" value="jupiter">
-        <label for="jupiter" style="color:#D2B48C">Jupiter</label>
-        <input type="radio" id="saturn" name="observing" value="saturn">
-        <label for="saturn" style="color:#FFA500">Saturn</label>
-        <input type="radio" id="uranus" name="observing" value="uranus">
-        <label for="uranus" style="color:#93B8BE">Uranus</label>
-        <input type="radio" id="neptune" name="observing" value="neptune">
-        <label for="neptune" style="color:#3E66F9">Neptune</label>
-    </div>
-    <div style="width:800px; margin-left:auto; margin-right:auto;height:300px;">
-        <canvas id="elongation" width="800" height="300">
+    <div style="width:1000px; margin-left:auto; margin-right:auto;height:300px;">
+        <canvas id="elongation" width="1000" height="300">
             Canvas not supported; please update your browser.
         </canvas>
     </div>
@@ -52,6 +28,8 @@
     <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
         <p style="color: gray;font-size:75%">Copyright (c) 2020,2021 Brian W. Mulligan</p>
     </div>
+    <script src="jquery-3.6.0.min.js"></script>
+    <script type="text/javascript" src="ui.js"></script>
     <script type="text/javascript" src="commonGP.js"></script>
     <script type="text/javascript" src="commonAstro.js"></script>
     <script type="text/javascript" src="common.js"></script>

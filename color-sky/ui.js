@@ -1,5 +1,34 @@
 // JavaScript source code
 
+var getTextHeight = function(font) {
+
+  var text = $('<span>Hg</span>').css({ fontFamily: font });
+  var block = $('<div style="display: inline-block; width: 1px; height: 0px;"></div>');
+
+  var div = $('<div></div>');
+  div.append(text, block);
+
+  var body = $('body');
+  body.append(div);
+
+  try {
+
+    var result = {};
+
+    block.css({ verticalAlign: 'baseline' });
+    result.ascent = block.offset().top - text.offset().top;
+
+    block.css({ verticalAlign: 'bottom' });
+    result.height = block.offset().top - text.offset().top;
+
+    result.descent = result.height - result.ascent;
+
+  } finally {
+    div.remove();
+  }
+
+  return result;
+};
 
 class Button
 {
@@ -27,7 +56,7 @@ class Button
 		this.insideTransparency = 1.0;
 		this.borderTransparency = 1.0;
 		this.textStyle = "#FFFFFF";
-		this.textFont = "18px Ariel";
+		this.textFont = "18px Arial";
 	}
 
 	draw(context)
@@ -53,10 +82,12 @@ class Button
 			{
 				context.fillStyle  = this.textStyle;
 				context.font = this.textFont;
+				var th = getTextHeight(this.textFont);
+
 				if (this.text !== null)
-					drawTextCenter(context,this.text,this.x + this.width / 2,this.y + this.height / 2 + 3);
+					drawTextCenter(context,this.text,this.x + this.width / 2,this.y + this.height / 2 + th.descent );
 				else
-					drawTextCenter(context,this.name,this.x + this.width / 2,this.y + this.height / 2 + 3);
+					drawTextCenter(context,this.name,this.x + this.width / 2,this.y + this.height / 2 + th.descent );
 			}
 		}
 		context.restore();
@@ -103,7 +134,7 @@ class RadioButton
 		this.insideTransparency = 1.0;
 		this.borderTransparency = 1.0;
 		this.textStyle = "#FFFFFF";
-		this.textFont = "18px Ariel";
+		this.textFont = "18px Arial";
 	}
 
 	draw(context)
@@ -132,10 +163,11 @@ class RadioButton
 			{
 				context.fillStyle  = this.textStyle;
 				context.font = this.textFont;
+				var th = getTextHeight(this.textFont);
 				if (this.text !== null)
-					drawTextCenter(context,this.text,this.x + this.width / 2,this.y + this.height / 2 + 5);
+					drawTextCenter(context,this.text,this.x + this.width / 2,this.y + this.height / 2 + th.descent);
 				else
-					drawTextCenter(context,this.name,this.x + this.width / 2,this.y + this.height / 2 + 5);
+					drawTextCenter(context,this.name,this.x + this.width / 2,this.y + this.height / 2 + th.descent);
 			}
 		}
 		context.restore();

@@ -1,35 +1,5 @@
 // JavaScript source code
 
-var getTextHeight = function(font) {
-
-  var text = $('<span>Hg</span>').css({ fontFamily: font });
-  var block = $('<div style="display: inline-block; width: 1px; height: 0px;"></div>');
-
-  var div = $('<div></div>');
-  div.append(text, block);
-
-  var body = $('body');
-  body.append(div);
-
-  try {
-
-    var result = {};
-
-    block.css({ verticalAlign: 'baseline' });
-    result.ascent = block.offset().top - text.offset().top;
-
-    block.css({ verticalAlign: 'bottom' });
-    result.height = block.offset().top - text.offset().top;
-
-    result.descent = result.height - result.ascent;
-
-  } finally {
-    div.remove();
-  }
-
-  return result;
-};
-
 class Button
 {
 	constructor(name,x,y,width,height,onClicker)
@@ -73,7 +43,7 @@ class Button
 			context.fillRect(this.x,this.y,this.width,this.height);
 
 			context.globalAlpha = this.borderTransparency;
-			context.strokeStyle = this.borderColor;
+			context.strokeStyle = this.borderStyle;
 			context.beginPath();
 			context.rect(this.x,this.y,this.width,this.height);
 			context.stroke();
@@ -82,12 +52,11 @@ class Button
 			{
 				context.fillStyle  = this.textStyle;
 				context.font = this.textFont;
-				var th = getTextHeight(this.textFont);
-
+				context.textBaseline = "middle";
 				if (this.text !== null)
-					drawTextCenter(context,this.text,this.x + this.width / 2,this.y + this.height / 2 + th.descent );
+					drawTextCenter(context,this.text,this.x + this.width / 2,this.y + this.height / 2 );
 				else
-					drawTextCenter(context,this.name,this.x + this.width / 2,this.y + this.height / 2 + th.descent );
+					drawTextCenter(context,this.name,this.x + this.width / 2,this.y + this.height / 2);
 			}
 		}
 		context.restore();
@@ -154,7 +123,7 @@ class RadioButton
 			context.fillRect(this.x,this.y,this.width,this.height);
 
 			context.globalAlpha = this.borderTransparency;
-			context.strokeStyle = this.borderColor;
+			context.strokeStyle = this.borderStyle;
 			context.beginPath();
 			context.rect(this.x,this.y,this.width,this.height);
 			context.stroke();
@@ -163,11 +132,11 @@ class RadioButton
 			{
 				context.fillStyle  = this.textStyle;
 				context.font = this.textFont;
-				var th = getTextHeight(this.textFont);
+				context.textBaseline = "middle";
 				if (this.text !== null)
-					drawTextCenter(context,this.text,this.x + this.width / 2,this.y + this.height / 2 + th.descent);
+					drawTextCenter(context,this.text,this.x + this.width / 2,this.y + this.height / 2);
 				else
-					drawTextCenter(context,this.name,this.x + this.width / 2,this.y + this.height / 2 + th.descent);
+					drawTextCenter(context,this.name,this.x + this.width / 2,this.y + this.height / 2);
 			}
 		}
 		context.restore();
@@ -345,11 +314,21 @@ class CommonUIContainer
 
 
 var commonUIContainer = new CommonUIContainer()
+var commonUITutorialContainer = new CommonUIContainer()
 
 function commonUIRegister(uiObject)
 {
-	var idx = commonUIContainer.registry.length;
-	commonUIContainer.registry.push(uiObject);
+	var otype = uiObject instanceof Tutorial;
+	if (otype)
+	{
+		var idx = commonUITutorialContainer.registry.length;
+		commonUITutorialContainer.registry.push(uiObject);
+	}
+	else
+	{
+		var idx = commonUIContainer.registry.length;
+		commonUIContainer.registry.push(uiObject);
+	}
 	return idx;
 }
 function commonUIRegisterOnClick(onClick)
@@ -364,22 +343,40 @@ function commonUIResetOnClick()
 function commonUIOnClick(event)
 {
 	var i;
-	for (i = 0; i < commonUIContainer.registry.length; i++)
+	var tutorialActive = false;
+	for (i = 0; i < commonUITutorialContainer.registry.length && !tutorialActive; i++)
 	{
-		if (commonUIContainer.registry[i].test(event))
+		if (commonUITutorialContainer.registry[i].active)
 		{
-			commonUIContainer.registry[i].onClick(event);
+			tutorialActive = commonUITutorialContainer.registry[i].standardUIDisable;
+			commonUITutorialContainer.registry[i].onClick(event);
 		}
 	}
-	if (commonUIContainer.userOnClick != null)
-		commonUIContainer.userOnClick(event);
+	if (!tutorialActive)
+	{
+		for (i = 0; i < commonUIContainer.registry.length; i++)
+		{
+			if (commonUIContainer.registry[i].test(event))
+			{
+				commonUIContainer.registry[i].onClick(event);
+			}
+		}
+		if (commonUIContainer.userOnClick != null)
+			commonUIContainer.userOnClick(event);
+	}
 }
 
 function commonUIdraw(context)
 {
+	// check for active tutorials
 	var i;
 	for (i = 0; i < commonUIContainer.registry.length; i++)
 	{
 		commonUIContainer.registry[i].draw(context);
+	}
+	for (i = 0; i < commonUITutorialContainer.registry.length; i++)
+	{
+		if (commonUITutorialContainer.registry[i].active)
+			commonUITutorialContainer.registry[i].draw(context);
 	}
 }

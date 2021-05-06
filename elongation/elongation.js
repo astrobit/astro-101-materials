@@ -1,17 +1,41 @@
 var theCanvas = document.getElementById("theCanvas");
-var canvasElongation = document.getElementById("elongation");
-
 var theContext = theCanvas.getContext("2d");
-var contextElongation = canvasElongation.getContext("2d");
 
-var timer = 0;
-var speed = 0.25;
-var pause = false;
-var positions = [Math.random() * Math.PI * 2.0,Math.random() * Math.PI * 2.0,Math.random() * Math.PI * 2.0,Math.random() * Math.PI * 2.0,Math.random() * Math.PI * 2.0,Math.random() * Math.PI * 2.0,Math.random() * Math.PI * 2.0,Math.random() * Math.PI * 2.0];
-var orbitalRadii = [0.387098, 0.723332, 1.0, 1.523679, 5.2044, 9.5826, 19.2184, 30.07];
-var currPosition = [0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0];
-var pStyle = ["#7F7F7F", "#FFA500", "#0000FF", "#FF0000", "#D2B48C", "#FFA500", "#93B8BE", "#3E66F9"];
+var elongationMapHeight = 300;
+var elongationMapWidth = theCanvas.width - 50;
+var SSmapWidth = 400;
+var SSmapHeight = 400;
+var phaseWidth = 400;
+var phaseHeight = 400;
+
+var elongationMapX = elongationMapWidth / 2 + 25;
+var elongationMapY = elongationMapHeight / 2;
+
+var buttonsTimeY = elongationMapY + elongationMapHeight / 2 + 45;
+var buttonsPlanetsY = buttonsTimeY + 50;
+
+var bottomSpace = theCanvas.width - SSmapWidth - phaseWidth
+
+var modelButtonsY = buttonsPlanetsY + 50 + SSmapHeight + 10
+
+var phaseX = theCanvas.width - bottomSpace / 3 - phaseWidth / 2;
+var phaseY = buttonsPlanetsY + 50 + phaseHeight / 2;
+
+var SSmapX = bottomSpace / 3.0 + SSmapWidth * 0.5;
+var SSmapY = buttonsPlanetsY + 50 + SSmapHeight / 2;
+
+var tutorialControlsY0 = modelButtonsY;
+var tutorialControlsY1 = 50;
+
+var speed = 4.0;//0.25;
+var pause = true;
 var zoom = 100.0;
+
+var g_simpleSolarSystem = true;
+var g_planetView = new Object();
+
+const kRadians = Math.PI / 180.0;
+const kDegrees = 180.0 / Math.PI;
 
 // fmod from https://gist.github.com/wteuber/6241786
 //Math.fmod = function (a,b) { return Number((a - (Math.floor(a / b) * b)).toPrecision(8)); };
@@ -69,80 +93,387 @@ function selectPlanet(value)
 }
 
 var radButtons = new Array();
-var planetButtonY = theCanvas.height - 30;
 
-radButtons.push(new RadioButton("Mercury","Mercury",theCanvas.width / 2 - 295,planetButtonY,80,25));
-radButtons.push(new RadioButton("Venus","Venus",theCanvas.width / 2 - 210,planetButtonY,80,25));
-radButtons.push(new RadioButton("Mars","Mars",theCanvas.width / 2 - 125,planetButtonY,80,25));
-radButtons.push(new RadioButton("Jupiter","Jupiter",theCanvas.width / 2 - 40,planetButtonY,80,25));
-radButtons.push(new RadioButton("Saturn","Saturn",theCanvas.width / 2 + 45,planetButtonY,80,25));
-radButtons.push(new RadioButton("Uranus","Uranus",theCanvas.width / 2 + 130,planetButtonY,80,25));
-radButtons.push(new RadioButton("Neptune","Neptune",theCanvas.width / 2 + 215,planetButtonY,80,25));
+radButtons.push(new RadioButton("Mercury","Mercury",theCanvas.width / 2 - 295,buttonsPlanetsY,80,25));
+radButtons.push(new RadioButton("Venus","Venus",theCanvas.width / 2 - 210,buttonsPlanetsY,80,25));
+radButtons.push(new RadioButton("Mars","Mars",theCanvas.width / 2 - 125,buttonsPlanetsY,80,25));
+radButtons.push(new RadioButton("Jupiter","Jupiter",theCanvas.width / 2 - 40,buttonsPlanetsY,80,25));
+radButtons.push(new RadioButton("Saturn","Saturn",theCanvas.width / 2 + 45,buttonsPlanetsY,80,25));
+radButtons.push(new RadioButton("Uranus","Uranus",theCanvas.width / 2 + 130,buttonsPlanetsY,80,25));
+radButtons.push(new RadioButton("Neptune","Neptune",theCanvas.width / 2 + 215,buttonsPlanetsY,80,25));
 
 
-commonUIRegister(new Radio("Planet","Venus",selectPlanet,radButtons));
-var button = new Button("ZoomIn",theCanvas.width - 45,5,40,40,zoomin);
+commonUIRegister(new Radio("Planet",selectedPlanet,selectPlanet,radButtons));
+
+function selectComplexity(value)
+{
+	g_simpleSolarSystem = (value == "Simple Solar System");
+}
+var modelButtons = new Array();
+modelButtons.push(new RadioButton("Simple Solar System","Simple Solar System",SSmapX - 200 - 5,modelButtonsY,200,25));
+modelButtons.push(new RadioButton("Real Solar System","Real Solar System",SSmapX + 5,modelButtonsY,200,25));
+if (g_simpleSolarSystem)
+	commonUIRegister(new Radio("Model","Simple Solar System",selectComplexity,modelButtons));
+else
+	commonUIRegister(new Radio("Model","Real Solar System",selectComplexity,modelButtons));
+
+
+
+var button = new Button("ZoomIn",SSmapX + SSmapHeight / 2 - 45,SSmapY - SSmapHeight / 2 + 5,40,40,zoomin);
 button.text = "+";
 button.textFont = "30px Arial";
 button.insideStyle = "#000000"
 commonUIRegister(button)
-button = new Button("ZoomOut",theCanvas.width - 45,45,40,40,zoomout);
+button = new Button("ZoomOut",SSmapX + SSmapHeight / 2 - 45,SSmapY - SSmapHeight / 2 + 45,40,40,zoomout);
 button.text = "-";
 button.textFont = "30px Arial";
 button.insideStyle = "#000000"
 commonUIRegister(button);
 
-var button = new Button("fast",theCanvas.width / 2 + 25,theCanvas.height - 75,40,40,speedup);
-button.text = "x2";
-button.textFont = "16px Arial";
-button.insideStyle = "#000000"
-commonUIRegister(button)
-button = new Button("slow",theCanvas.width / 2 - 65,theCanvas.height - 75,40,40,slowdown);
-button.text = "x1/2";
-button.textFont = "16px Arial";
-button.insideStyle = "#000000"
-commonUIRegister(button);
+var times = String.fromCharCode(0x00d7)
+var timesOne = times + '1'
+var timesFour = times + '4'
+var timesSixteen = times + '16'
+var timesSixtyFour = times + '64'
+var timesTwoFiftySix = times + '256'
+function selectSpeed(value)
+{
+	switch (value)
+	{
+	case timesOne:
+	default:
+		speed = 2.0;
+		break;
+	case timesFour:
+		speed = 8.0;
+		break;
+	case timesSixteen:
+		speed = 32.0;
+		break;
+	case timesSixtyFour:
+		speed = 128.0;
+		break;
+	case timesSixtyFour:
+		speed = 128.0;
+		break;
+	case timesTwoFiftySix:
+		speed = 512.0;
+		break;
+	}
+}
 
+var speedButtons = new Array();
+speedButtons.push(new RadioButton(timesOne,timesOne,theCanvas.width / 2 + 30,buttonsTimeY,40,40));
+speedButtons.push(new RadioButton(timesFour,timesFour,theCanvas.width / 2 +70,buttonsTimeY,40,40));
+speedButtons.push(new RadioButton(timesSixteen,timesSixteen,theCanvas.width / 2 +110,buttonsTimeY,40,40));
+speedButtons.push(new RadioButton(timesSixtyFour,timesSixtyFour,theCanvas.width / 2 +150,buttonsTimeY,40,40));
+speedButtons.push(new RadioButton(timesTwoFiftySix,timesTwoFiftySix,theCanvas.width / 2 +190,buttonsTimeY,40,40));
+commonUIRegister(new Radio("Speed",timesOne,selectSpeed,speedButtons));
+
+function tutorialDraw(context,state)
+{
+	switch (state)
+	{
+	case 0:
+	default:
+		context.globalAlpha = 0.9;
+		context.fillStyle = "#000000";
+		context.fillRect(0,0,theCanvas.width,theCanvas.height);
+		context.globalAlpha = 1.0;
+		context.fillStyle = "#FFFFFF";
+		context.font = "30px Arial";
+		drawTextCenter(context,ElongationStrings.titleState0,theCanvas.width * 0.5,250);
+		context.font = "20px Arial";
+		drawTextCenter(context,ElongationStrings.line1State0,theCanvas.width * 0.5,350);
+		drawTextCenter(context,ElongationStrings.line2State0,theCanvas.width * 0.5,400);
+		drawTextCenter(context,ElongationStrings.lineContinue,theCanvas.width * 0.5,450);
+		break;
+	case 1:
+		context.globalAlpha = 0.9;
+		context.fillStyle = "#000000";
+		context.fillRect(0,buttonsTimeY,theCanvas.width,theCanvas.height - buttonsTimeY);
+		context.globalAlpha = 1.0;
+		context.fillStyle = "#FFFFFF";
+		context.font = "24px Arial";
+		drawTextCenter(context,ElongationStrings.line1State1,theCanvas.width * 0.5,buttonsTimeY + 20);
+		context.font = "20px Arial";
+		drawTextCenter(context,ElongationStrings.line2State1,theCanvas.width * 0.5,buttonsTimeY + 70);
+		drawTextCenter(context,ElongationStrings.line3State1,theCanvas.width * 0.5,buttonsTimeY + 100);
+		drawTextCenter(context,ElongationStrings.line4State1,theCanvas.width * 0.5,buttonsTimeY + 130);
+		drawTextCenter(context,ElongationStrings.line5State1,theCanvas.width * 0.5,buttonsTimeY + 160);
+		drawTextCenter(context,ElongationStrings.line6State1,theCanvas.width * 0.5,buttonsTimeY + 190);
+		drawTextCenter(context,ElongationStrings.line7State1,theCanvas.width * 0.5,buttonsTimeY + 220);
+		drawTextCenter(context,ElongationStrings.line8State1,theCanvas.width * 0.5,buttonsTimeY + 250);
+		drawTextCenter(context,ElongationStrings.line9State1pt1 + selectedPlanet + ElongationStrings.line9State1pt2,theCanvas.width * 0.5,buttonsTimeY + 280);
+		drawTextCenter(context,ElongationStrings.line10State1,theCanvas.width * 0.5,buttonsTimeY + 310);
+
+		drawTextCenter(context,ElongationStrings.lineContinue,theCanvas.width * 0.5,buttonsTimeY + 400);
+		break;
+	case 2:
+		context.globalAlpha = 0.9;
+		context.fillStyle = "#000000";
+		context.fillRect(0,0,theCanvas.width,buttonsTimeY);
+		context.fillRect(0,buttonsPlanetsY,theCanvas.width,theCanvas.height - buttonsPlanetsY);
+		context.globalAlpha = 1.0;
+		context.fillStyle = "#FFFFFF";
+		context.font = "24px Arial";
+		drawTextCenter(context,ElongationStrings.line1State2,theCanvas.width * 0.5,buttonsTimeY - 40);
+		context.font = "20px Arial";
+		drawTextCenter(context,ElongationStrings.line2State2,theCanvas.width * 0.5,buttonsPlanetsY + 20);
+		drawTextCenter(context,ElongationStrings.line3State2,theCanvas.width * 0.5,buttonsPlanetsY + 50);
+
+		drawTextCenter(context,ElongationStrings.lineContinue,theCanvas.width * 0.5,buttonsTimeY + 400);
+		break;
+	case 3:
+		context.globalAlpha = 0.9;
+		context.fillStyle = "#000000";
+		context.fillRect(0,0,theCanvas.width,buttonsPlanetsY);
+		context.fillRect(0,buttonsPlanetsY + 26,theCanvas.width,theCanvas.height - buttonsPlanetsY - 26);
+		context.globalAlpha = 1.0;
+		context.fillStyle = "#FFFFFF";
+		context.font = "20px Arial";
+		drawTextCenter(context,ElongationStrings.line1State3,theCanvas.width * 0.5,buttonsPlanetsY - 40);
+
+		drawTextCenter(context,ElongationStrings.lineContinue,theCanvas.width * 0.5,buttonsPlanetsY + 80);
+		break;
+	case 4:
+		context.globalAlpha = 0.9;
+		context.fillStyle = "#000000";
+		context.fillRect(0,0,theCanvas.width,buttonsPlanetsY + 50);
+		context.fillRect(0,buttonsPlanetsY + 50,phaseX - phaseWidth / 2 - 50,theCanvas.height - buttonsPlanetsY - 50);
+		context.fillRect(0,modelButtonsY,theCanvas.width,theCanvas.height - modelButtonsY);
+		context.globalAlpha = 1.0;
+		context.fillStyle = "#FFFFFF";
+		context.font = "24px Arial";
+		drawTextCenter(context,ElongationStrings.line1State4,theCanvas.width * 0.5,30);
+		drawTextCenter(context,ElongationStrings.line2State4,theCanvas.width * 0.5,55);
+		context.font = "20px Arial";
+		drawTextCenter(context,ElongationStrings.line3State4,theCanvas.width * 0.5,110);
+		drawTextCenter(context,ElongationStrings.line4State4,theCanvas.width * 0.5,160);
+		drawTextCenter(context,ElongationStrings.line5State4,theCanvas.width * 0.5,180);
+		context.font = "16px Arial";
+		drawTextCenter(context,ElongationStrings.line6State4,theCanvas.width * 0.5 - 180,200);
+		drawTextCenter(context,ElongationStrings.line7State4,theCanvas.width * 0.5 - 180,220);
+		drawTextCenter(context,ElongationStrings.line8State4,theCanvas.width * 0.5 - 180,240);
+		drawTextCenter(context,ElongationStrings.line9State4,theCanvas.width * 0.5 - 180,260);
+		drawTextCenter(context,ElongationStrings.line10State4,theCanvas.width * 0.5 + 180,200);
+		drawTextCenter(context,ElongationStrings.line11State4,theCanvas.width * 0.5 + 180,220);
+		drawTextCenter(context,ElongationStrings.line12State4,theCanvas.width * 0.5 + 180,240);
+		drawTextCenter(context,ElongationStrings.line13State4,theCanvas.width * 0.5 + 180,260);
+
+		context.font = "20px Arial";
+		drawTextCenter(context,ElongationStrings.lineContinue,theCanvas.width * 0.5,400);
+		break;
+	case 5:
+		context.globalAlpha = 0.9;
+		context.fillStyle = "#000000";
+		context.fillRect(0,0,theCanvas.width,buttonsPlanetsY + 50);
+		context.fillRect(phaseX - phaseWidth / 2,buttonsPlanetsY + 50,theCanvas.width - phaseX + phaseWidth / 2,theCanvas.height - buttonsPlanetsY - 50);
+		context.fillRect(0,modelButtonsY,theCanvas.width,theCanvas.height - modelButtonsY);
+		context.globalAlpha = 1.0;
+		context.fillStyle = "#FFFFFF";
+		context.font = "24px Arial";
+		drawTextCenter(context,ElongationStrings.line1State5,theCanvas.width * 0.5,30);
+		context.font = "20px Arial";
+		drawTextCenter(context,ElongationStrings.line2State5,theCanvas.width * 0.5,80);
+		drawTextCenter(context,ElongationStrings.line3State5,theCanvas.width * 0.5,110);
+		drawTextCenter(context,ElongationStrings.line5State5,theCanvas.width * 0.5,140);
+		drawTextCenter(context,ElongationStrings.line6State5,theCanvas.width * 0.5,170);
+		drawTextCenter(context,ElongationStrings.line7State5,theCanvas.width * 0.5,230);
+
+		context.font = "20px Arial";
+		drawTextCenter(context,ElongationStrings.lineContinue,theCanvas.width * 0.5,400);
+		break;
+	case 6:
+		context.globalAlpha = 0.9;
+		context.fillStyle = "#000000";
+		context.fillRect(0,0,theCanvas.width,modelButtonsY - 5);
+		context.fillRect(theCanvas.width / 2,modelButtonsY - 5,theCanvas.width / 2,theCanvas.height - modelButtonsY + 5);
+		context.globalAlpha = 1.0;
+		context.fillStyle = "#FFFFFF";
+		context.font = "24px Arial";
+		drawTextCenter(context,ElongationStrings.line1State6,theCanvas.width * 0.5,400);
+		context.font = "20px Arial";
+		drawTextCenter(context,ElongationStrings.line2State6,theCanvas.width * 0.5,450);
+		drawTextCenter(context,ElongationStrings.line3State6,theCanvas.width * 0.5,480);
+		drawTextCenter(context,ElongationStrings.line4State6,theCanvas.width * 0.5,510);
+
+		context.font = "20px Arial";
+		drawTextCenter(context,ElongationStrings.lineContinueAbove,theCanvas.width * 0.5,600);
+		break;
+	case 7:
+		context.globalAlpha = 0.9;
+		context.fillStyle = "#000000";
+		context.fillRect(0,0,theCanvas.width,theCanvas.height);
+		context.globalAlpha = 1.0;
+		context.fillStyle = "#FFFFFF";
+		context.font = "40px Arial";
+		drawTextCenter(context,ElongationStrings.line1StateFinal,theCanvas.width * 0.5,100);
+		context.font = "20px Arial";
+		drawTextCenter(context,ElongationStrings.line2StateFinal,theCanvas.width * 0.5,200);
+		drawTextCenter(context,ElongationStrings.line3StateFinal,theCanvas.width * 0.5,280);
+		drawTextCenter(context,ElongationStrings.line4StateFinal,theCanvas.width * 0.5,360);
+		break;
+	}
+}
+
+var g_tutorial = new Tutorial();
+
+function tutorialSkip(event)
+{
+	g_tutorial.deactivate();
+}
+function tutorialStart(event)
+{
+	g_tutorial.activate();
+}
+function tutorialAdvance(event)
+{
+	g_tutorial.advanceState();
+	if (g_tutorial.state > 7)
+	{
+		g_tutorial.complete();
+		window.localStorage.setItem("tutorialComplete",true);
+	}
+}
+function tutorialRewind(event)
+{
+	g_tutorial.rewindState();
+}
+
+g_tutorial.drawer = tutorialDraw;
+var tutorialSkipButton = new Button("Skip Tutorial",theCanvas.width / 2 - 60,tutorialControlsY0,120,25,tutorialSkip);
+var tutorialAdvanceButton = new Button("Next",theCanvas.width / 2 + 70,tutorialControlsY0,40,25,tutorialAdvance);
+var tutorialRewindButton = new Button("Prev",theCanvas.width / 2 - 110,tutorialControlsY0,40,25,tutorialRewind);
+
+var tutorialSkipButtonModel = new Button("Skip Tutorial",theCanvas.width / 2 - 60,tutorialControlsY1,120,25,tutorialSkip);
+var tutorialAdvanceButtonModel = new Button("Next",theCanvas.width / 2 + 70,tutorialControlsY1,40,25,tutorialAdvance);
+var tutorialRewindButtonModel = new Button("Prev",theCanvas.width / 2 - 110,tutorialControlsY1,40,25,tutorialRewind);
+
+g_tutorial.disableStandardUI();
+g_tutorial.addUI(0,tutorialSkipButton);
+g_tutorial.addUI(0,tutorialAdvanceButton);
+
+g_tutorial.addUI(1,tutorialSkipButton);
+g_tutorial.addUI(1,tutorialAdvanceButton);
+g_tutorial.addUI(1,tutorialRewindButton);
+
+g_tutorial.addUI(2,tutorialSkipButton);
+g_tutorial.addUI(2,tutorialAdvanceButton);
+g_tutorial.addUI(2,tutorialRewindButton);
+
+g_tutorial.addUI(3,tutorialSkipButton);
+g_tutorial.addUI(3,tutorialAdvanceButton);
+g_tutorial.addUI(3,tutorialRewindButton);
+
+g_tutorial.addUI(4,tutorialSkipButton);
+g_tutorial.addUI(4,tutorialAdvanceButton);
+g_tutorial.addUI(4,tutorialRewindButton);
+
+g_tutorial.addUI(5,tutorialSkipButton);
+g_tutorial.addUI(5,tutorialAdvanceButton);
+g_tutorial.addUI(5,tutorialRewindButton);
+
+g_tutorial.addUI(6,tutorialSkipButtonModel);
+g_tutorial.addUI(6,tutorialAdvanceButtonModel);
+g_tutorial.addUI(6,tutorialRewindButtonModel);
+
+g_tutorial.addUI(7,tutorialAdvanceButton);
+g_tutorial.addUI(7,tutorialRewindButton);
+
+
+var tutorialCompleted = window.localStorage.getItem("tutorialComplete");
+console.log("tutorial status " + tutorialCompleted);
+if (!tutorialCompleted)
+	g_tutorial.activate();
+
+commonUIRegister(g_tutorial);
+
+var pauseButtonText = '| |'
+var playButtonText = String.fromCharCode(0x25b6);
 
 function requestPause(event)
 {
 	pause = !pause;
 	if (!pause)
 	{
-		playButton.text = '| |';
+		playButton.text = pauseButtonText;
 	}
 	else
 	{
-		playButton.text = '>';
+		playButton.text = playButtonText
 	}
-
 }
-var playButton = new Button("Pause",theCanvas.width / 2 - 20,theCanvas.height - 75,40,40,requestPause);
-playButton.text = "| |";
+
+var playButton = new Button("Pause",theCanvas.width / 2 - 20,buttonsTimeY,40,40,requestPause);
+if (pause)
+	playButton.text = playButtonText;
+else
+	playButton.text = pauseButtonText;
 playButton.textFont = "24px Arial";
 commonUIRegister(playButton);
 
-function work(){
+var replayTutorialButton = new Button("Replay Tutorial",theCanvas.width - 310,modelButtonsY,200,25,tutorialStart);
+replayTutorialButton.textFont = "24px Arial";
+commonUIRegister(replayTutorialButton);
 
-	var mapWidth = canvasElongation.width - 150;
-	var mapHeight = canvasElongation.height - 100;
-	var mapCenterX = mapWidth / 2;
-	var mapCenterY = canvasElongation.height / 2;
+var g_about = new Tutorial();
 
-// clear the canvas
-	theContext.clearRect(0, 0, theCanvas.width, theCanvas.height);
+function aboutShow(event)
+{
+	g_about.activate();
+}
+function aboutDone(event)
+{
+	g_about.complete();
+}
+function aboutDraw(context,state)
+{
+	context.globalAlpha = 0.9;
+	context.fillStyle = "#000000";
+	context.fillRect(0,0,theCanvas.width,theCanvas.height);
+	context.globalAlpha = 1.0;
+	context.fillStyle = "#FFFFFF";
+	context.font = "30px Arial";
+	drawTextCenter(context,ElongationStrings.aboutLine1,theCanvas.width * 0.5,250);
+	context.font = "20px Arial";
+	drawTextCenter(context,ElongationStrings.aboutLine2,theCanvas.width * 0.5,290);
+	drawTextCenter(context,ElongationStrings.aboutLine3,theCanvas.width * 0.5,400);
+	drawTextCenter(context,ElongationStrings.aboutLine4,theCanvas.width * 0.5,430);
+	drawTextCenter(context,ElongationStrings.aboutLine5,theCanvas.width * 0.5,460);
+	drawTextCenter(context,ElongationStrings.aboutLine6,theCanvas.width * 0.5,490);
+//	drawTextCenter(context,ElongationStrings.aboutLine7,theCanvas.width * 0.5,520);
+}
+
+g_about.drawer = aboutDraw;
+
+var aboutOKButton= new Button("OK",theCanvas.width / 2,modelButtonsY,40,25,aboutDone);
+aboutOKButton.textFont = "24px Arial";
+
+g_about.disableStandardUI();
+g_about.addUI(0,aboutOKButton);
+commonUIRegister(g_about);
+
+var aboutButton= new Button("About",theCanvas.width - 100,modelButtonsY,80,25,aboutShow);
+aboutButton.textFont = "24px Arial";
+commonUIRegister(aboutButton);
 
 
-// as long as it isn't paussed, advance the timer
-	if (!pause)
-		timer = timer + 1.0 / 30.0 * speed;
+var g_SelectedPlanetData = {};
+var twoPi = Math.PI * 2.0;
+var degrees = 180.0 / Math.PI;
+var g_SunLongitude = 0;
+var g_timer = 2456084.50000; //2451545.0;
 
-// draw a black sqaure for the orbit area box
-	theContext.fillStyle = "#000000";
-	theContext.fillRect(0,0,theCanvas.width,theCanvas.height);
-// draw a black square for the map area box
-	contextElongation.fillStyle = "#000000";
-	contextElongation.fillRect(0,0,canvasElongation.width,canvasElongation.height);
+function drawSSmap()
+{
+	theContext.save();
+	theContext.strokeStyle = "#FFFFFF";
+	theContext.rect(SSmapX-SSmapWidth/2, SSmapY-SSmapHeight/2, SSmapWidth, SSmapHeight);
+	theContext.stroke();
+	theContext.clip();
+
+	theContext.translate(SSmapX,SSmapY);
 // set the size of the Sun based on the Zoom level
 	var sunSize = 0.03 * zoom;
 	if (sunSize < 3.0)
@@ -150,32 +481,87 @@ function work(){
 // draw the Sun
 	theContext.fillStyle  = "#FFFF00";
 	theContext.beginPath();
-	theContext.arc(theCanvas.width / 2,theCanvas.height / 2,sunSize,0,2.0*Math.PI,true);
+	theContext.arc(0,0,sunSize,0,2.0*Math.PI,true);
 	theContext.closePath();
 	theContext.fill();
-// calculate the position of each planet
-	for (pi = 0; pi < 8; pi++)
-	{
-		var period = Math.pow(orbitalRadii[pi],1.5);
-		currPosition[pi] = (-timer / period * Math.PI + positions[pi]) % (2.0 * Math.PI);
-	}
 // draw the orbit and symbol for each planet
-	for (pi = 0; pi < 8; pi++)
-	{
+	for (const [key, value] of Object.entries(Planets)) {
+		if (!g_simpleSolarSystem)
+		{
+			theContext.save();
+			var e =value.orbitalEccentricity
+			var d = value.semiMajorAxis * e * zoom;
+			var longPerRad = value.longPerihelion * kRadians;
+			var longPerSin = Math.sin(longPerRad);
+			var longPerCos = Math.cos(longPerRad);
+			var semiMajorAxis = zoom * value.semiMajorAxis * Math.cos(value.orbitalInclination * kRadians);
+			var semiMinorAxis = zoom * value.semiMajorAxis * Math.sqrt(1.0 - e * e);
+//			theContext.scale(zoom * value.semiMajorAxis,zoom * value.semiMajorAxis);
+//			theContext.translate(-e * semiMajorAxis,0);
+			theContext.strokeStyle  = "#3F3F3F";
+			var j;
+			theContext.beginPath();
+			for (j = 0; j <= 360.0; j++)
+			{
+				var x = semiMajorAxis * Math.cos(-j * kRadians) - e * semiMajorAxis;
+				var y = semiMinorAxis * Math.sin(-j * kRadians);
 
-		theContext.strokeStyle  = "#3F3F3F";
+				if (j == 0)
+				{
+					theContext.moveTo(x * longPerCos + y * longPerSin,-x * longPerSin + y * longPerCos);
+				}
+				else
+				{
+					theContext.lineTo(x * longPerCos + y * longPerSin,-x * longPerSin + y * longPerCos);
+				}
+			}
+			theContext.closePath();
+			theContext.stroke();
+			theContext.restore();
+		
+		}
+		else
+		{
+			// orbit
+			theContext.strokeStyle  = "#3F3F3F";
+			theContext.beginPath();
+			theContext.arc(0,0,zoom * value.semiMajorAxis ,0,2.0*Math.PI,true);
+			theContext.closePath();
+			theContext.stroke();
+		}
+	}
+	//@@NOTE: the projection may be slightly off due to inclination.
+	for (const [key, value] of Object.entries(g_planetView)) {
+		// symbol
+		theContext.fillStyle  = value.style;
 		theContext.beginPath();
-		theContext.arc(theCanvas.width / 2,theCanvas.height / 2,zoom * orbitalRadii[pi] ,0,2.0*Math.PI,true);
-		theContext.closePath();
-		theContext.stroke();
-
-		theContext.fillStyle  = pStyle[pi];
-		theContext.beginPath();
-		theContext.arc(theCanvas.width / 2 + zoom * orbitalRadii[pi] * Math.cos(currPosition[pi]),theCanvas.height / 2 + zoom * orbitalRadii[pi] * Math.sin(currPosition[pi]),2,0,2.0*Math.PI,true);
+		theContext.arc(zoom * value.planetHelio.radius * Math.cos(-value.planetHelio.theta),zoom * value.planetHelio.radius * Math.sin(-value.planetHelio.theta),2,0,2.0*Math.PI,true);
 		theContext.closePath();
 		theContext.fill();
-	}
-	var sunLongitude = currPosition[2] * 180.0 / Math.PI - 360.0;
+}
+
+
+// draw the lines onto the overhead view to demonstrate the elongation
+	theContext.strokeStyle = "#FFFF00"
+	theContext.beginPath();
+	theContext.moveTo(0,0);
+	theContext.lineTo(zoom*g_planetView["Earth"].planetHelio.radius * Math.cos(-g_planetView["Earth"].planetHelio.theta),zoom*g_planetView["Earth"].planetHelio.radius * Math.sin(-g_planetView["Earth"].planetHelio.theta));
+	theContext.lineTo(zoom*g_planetView[selectedPlanet].planetHelio.radius * Math.cos(-g_planetView[selectedPlanet].planetHelio.theta),zoom*g_planetView[selectedPlanet].planetHelio.radius * Math.sin(-g_planetView[selectedPlanet].planetHelio.theta));
+	theContext.stroke();
+
+	theContext.restore();
+
+}
+
+function drawElongationMap()
+{
+	var halfHeight = elongationMapHeight * 0.5;
+	var halfWidth = elongationMapWidth * 0.5;
+	var qtrWidth = elongationMapWidth * 0.25;
+
+	theContext.save();
+	theContext.translate(elongationMapX,elongationMapY);
+	var sunLongitude = -g_planetView["Earth"].planetHelio.theta * degrees;
 	var projection = new Mollweide(sunLongitude,0.0);
 // draw the stars on the map
 	if (starsReady)
@@ -186,121 +572,95 @@ function work(){
 		{
 			//console.log("here " + stars[i].latitude + " " + stars[i].longitude + " " + projection.x + " " + projection.y);
 			var starProj = projection.calculate(stars[i].eclat,stars[i].eclong)
-			contextElongation.fillStyle  = RGBtoColor(UBVRItoRGB(stars[i].U,stars[i].B,stars[i].V,stars[i].R,stars[i].I));
-			contextElongation.beginPath();
-			contextElongation.arc(mapCenterX + starProj.x * mapWidth * 0.5,mapCenterY + starProj.y * mapHeight * 0.5,1,0,2.0*Math.PI,true);
-			contextElongation.closePath();
-			contextElongation.fill();
+			theContext.fillStyle  = RGBtoColor(UBVRItoRGB(stars[i].U,stars[i].B,stars[i].V,stars[i].R,stars[i].I));
+			theContext.beginPath();
+			theContext.arc(starProj.x * halfWidth,starProj.y * halfHeight,1,0,2.0*Math.PI,true);
+			theContext.closePath();
+			theContext.fill();
 		}
 	}
 	else
 	{
-		contextElongation.fillStyle = "#7F7F7F"
-		contextElongation.font = "15px Arial";
-		drawTextCenter(contextElongation,"Loading stars. Standby.",mapCenterX,mapCenterY - 60);
+		theContext.fillStyle = "#7F7F7F"
+		theContext.font = "15px Arial";
+		drawTextCenter(theContext,"Loading stars. Standby.",0,-60);
 	}
 
 // draw the ellipse for the map
-	contextElongation.strokeStyle  = "#FFFFFF";
-	drawEllipseByCenter(contextElongation,mapCenterX,mapCenterY,mapWidth,mapHeight);
+	theContext.strokeStyle  = "#FFFFFF";
+	drawEllipseByCenter(theContext,0,0,elongationMapWidth,elongationMapHeight);
 // draw the ecliptic on the map
-	contextElongation.strokeStyle  = "#3F3F3F";
-	contextElongation.beginPath();
-	contextElongation.moveTo(mapCenterX - mapWidth * 0.5,mapCenterY );
-	contextElongation.lineTo(mapCenterX + mapWidth * 0.5,mapCenterY);
-	contextElongation.stroke();
+	theContext.strokeStyle  = "#3F3F3F";
+	theContext.beginPath();
+	theContext.moveTo(-halfWidth,0 );
+	theContext.lineTo(halfWidth,0);
+	theContext.stroke();
 // draw the Sun on the map
-	contextElongation.fillStyle  = "#FFFF00";
-	contextElongation.beginPath();
-	contextElongation.arc(mapCenterX,mapCenterY,1,0,2.0*Math.PI,true);
-	contextElongation.closePath();
-	contextElongation.fill();
-// draw the elongation reference on the map
-	contextElongation.font = "10px Arial";
-
-	contextElongation.strokeStyle = "#7F7F7F"
-	contextElongation.beginPath();
-	contextElongation.moveTo(mapCenterX - mapWidth * 0.5,mapCenterY);
-	contextElongation.lineTo(mapCenterX - mapWidth * 0.5,mapCenterY + mapHeight * 0.5);
-	contextElongation.stroke();
-	drawTextCenter(contextElongation,"-180",mapCenterX - mapWidth * 0.5,mapCenterY + mapHeight * 0.5 + 10);
-
-	contextElongation.beginPath();
-	contextElongation.moveTo(mapCenterX - mapWidth * 0.25,mapCenterY + mapHeight * 0.5 * Math.sqrt(0.75));
-	contextElongation.lineTo(mapCenterX - mapWidth * 0.25,mapCenterY + mapHeight * 0.5);
-	contextElongation.stroke();
-	drawTextCenter(contextElongation,"-90",mapCenterX - mapWidth * 0.25,mapCenterY + mapHeight * 0.5 + 10);
-
-	drawTextCenter(contextElongation,"0",mapCenterX,mapCenterY + mapHeight * 0.5 + 10);
-	contextElongation.beginPath();
-	contextElongation.moveTo(mapCenterX + mapWidth * 0.25,mapCenterY + mapHeight * 0.5 * Math.sqrt(0.75));
-	contextElongation.lineTo(mapCenterX + mapWidth * 0.25,mapCenterY + mapHeight * 0.5);
-	contextElongation.stroke();
-	drawTextCenter(contextElongation,"+90",mapCenterX + mapWidth * 0.25,mapCenterY + mapHeight * 0.5 + 10);
-
-	contextElongation.beginPath();
-	contextElongation.moveTo(mapCenterX + mapWidth * 0.5,mapCenterY);
-	contextElongation.lineTo(mapCenterX + mapWidth * 0.5,mapCenterY + mapHeight * 0.5);
-	contextElongation.stroke();
-	drawTextCenter(contextElongation,"+180",mapCenterX + mapWidth * 0.5,mapCenterY + mapHeight * 0.5 + 10);
-// determine which planet is currently selected
-
-	var twoPi = Math.PI * 2.0;
-	var degrees = 180.0 / Math.PI;
-
-	var phiEarth = currPosition[2];
-	var phiPlanet = currPosition[selectedElongation];
-	var phiPlanetDisplay = (Math.round(phiPlanet * degrees * 10.0) / 10.0).toString()
-
-// determine the relative orbital phase angles between the planet and Earth
-	var deltaPhi = (currPosition[selectedElongation] - currPosition[2]) % (Math.PI * 2.0);
-	var phiDisplay = (Math.round(deltaPhi * 10.0 * 180.0 / Math.PI) / 10.0).toString();
-// determine the elongation of the selected planet
-	var elongationRad = -Math.atan2(orbitalRadii[selectedElongation] * Math.sin(deltaPhi),1.0 - orbitalRadii[selectedElongation] * Math.cos(deltaPhi));
-	var elongation = elongationRad * 180.0 / Math.PI;
-
-	var delPhiTrue = Math.abs(deltaPhi);
-	if (delPhiTrue > Math.PI)
-		delPhiTrue = twoPi - delPhiTrue;
-
-	var delPhiTrueDisplay = (Math.round(delPhiTrue * 10.0 * 180.0 / Math.PI) / 10.0).toString();
-
-	var planetProj = projection.calculate(0.0,elongation + sunLongitude);
-	var planetPhase = Math.PI - delPhiTrue - Math.abs(elongationRad);
-	if (elongationRad < 0.0)
-		planetPhase *= -1.0;
-	var planetPhaseDeg = planetPhase * degrees;
-	var planetPhaseDegNorm = planetPhaseDeg;
-	if (planetPhaseDegNorm< 0.0)
-		planetPhaseDegNorm += 360.0;
-
-	var planetPhaseNum = (planetPhaseDegNorm / 45.0) - 4.0;
-	if (planetPhaseNum < 0.0)
-		planetPhaseNum = 8.0 + planetPhaseNum;	
-	var planetPhaseDisplay = (Math.round(planetPhaseNum * 10.0) / 10.0).toString();
-	if (planetPhaseDisplay.charAt(planetPhaseDisplay.length - 2) != '.')
-		planetPhaseDisplay = planetPhaseDisplay + ".0"
-	
+	var sunSize = 0.5 * halfWidth / 180.0;
+	theContext.fillStyle  = "#FFFF00";
+	theContext.beginPath();
+	theContext.arc(0,0,sunSize,0,2.0*Math.PI,true);
+	theContext.closePath();
+	theContext.fill();
 
 // draw the selected planet on the map
-	contextElongation.fillStyle  = pStyle[selectedElongation];
-	contextElongation.beginPath();
-	contextElongation.arc(planetProj.x * mapWidth * 0.5 + mapCenterX,planetProj.y * mapHeight * 0.5 + mapCenterY,2,0,2.0*Math.PI,true);
-	contextElongation.closePath();
-	contextElongation.fill();
-// draw planet information on the map
-	contextElongation.fillStyle = "#FFFF00"
-	contextElongation.font = "15px Arial";
-	drawTextRight(contextElongation,"Planet: ",mapCenterX - 310,mapCenterY + mapHeight * 0.5 + 35);
-	contextElongation.fillText(selectedPlanet,mapCenterX - 305,mapCenterY + mapHeight * 0.5 + 35);
-	var elongationRounded = Math.round(elongation * 10.0) / 10.0
-	var elongationDisplay = elongationRounded.toString();
+	var planetProj = projection.calculate(g_planetView[selectedPlanet].elongLat * degrees,g_planetView[selectedPlanet].elongLong * degrees + sunLongitude);
+	theContext.fillStyle  = g_planetView[selectedPlanet].style;
+	theContext.beginPath();
+	theContext.arc(planetProj.x * halfWidth,planetProj.y * halfHeight,2,0,2.0*Math.PI,true);
+	theContext.closePath();
+	theContext.fill();
+
+
+// move to below map
+	theContext.translate(0,halfHeight);
+
+// draw the elongation reference on the map
+	theContext.font = "10px Arial";
+
+	theContext.strokeStyle = "#7F7F7F"
+	theContext.fillStyle  = "#FFFF00";
+	theContext.beginPath();
+	theContext.moveTo(-halfWidth,-halfHeight);
+	theContext.lineTo(-halfWidth,0);
+	theContext.stroke();
+	drawTextCenter(theContext,"-180",-halfWidth,10);
+
+	theContext.beginPath();
+	theContext.moveTo(-qtrWidth,-halfHeight * (1.0 - Math.sqrt(0.75)));
+	theContext.lineTo(-qtrWidth,0);
+	theContext.stroke();
+	drawTextCenter(theContext,"-90",-qtrWidth,10);
+
+	drawTextCenter(theContext,"0",0,10);
+
+	theContext.beginPath();
+	theContext.moveTo(qtrWidth,-halfHeight * (1.0 - Math.sqrt(0.75)));
+	theContext.lineTo(qtrWidth,0);
+	theContext.stroke();
+	drawTextCenter(theContext,"+90",qtrWidth,10);
+
+	theContext.beginPath();
+	theContext.moveTo(halfWidth,-halfHeight);
+	theContext.lineTo(halfWidth,0);
+	theContext.stroke();
+	drawTextCenter(theContext,"+180",halfWidth,10);
+	
+	var elongationDisplayValue = g_planetView[selectedPlanet].elongLong * degrees;
+	if (elongationDisplayValue > 180.0)
+		elongationDisplayValue = elongationDisplayValue - 360.0;
+	var elongationDisplay = (Math.round(elongationDisplayValue * 10.0) / 10.0).toString();
 	if (elongationDisplay.charAt(elongationDisplay.length - 2) != '.')
 		elongationDisplay = elongationDisplay + ".0"
-	drawTextRight(contextElongation,"Elongation: " ,mapCenterX - 145,mapCenterY + mapHeight * 0.5 + 35);
-	drawTextRight(contextElongation,elongationDisplay,mapCenterX - 105,mapCenterY + mapHeight * 0.5 + 35);
+// draw planet information on the map
+	theContext.fillStyle = "#FFFF00"
+	theContext.font = "15px Arial";
+	drawTextRight(theContext,"Planet: ",-310,35);
+	theContext.fillText(selectedPlanet,-305,35);
+	drawTextRight(theContext,"Elongation: " ,-145,35);
+	drawTextRight(theContext,elongationDisplay + String.fromCharCode(0x00b0),-105,35);
 
-	var timerReadable = Math.round(timer * 100.0) / 100.0
+	var timerReadable = Math.round(g_timer / 365.0 * 100.0 - 6716.0) / 100.0
 	var timerDisplay = timerReadable.toString();
 	if (timerDisplay.charAt(timerDisplay.length - 3) != '.')
 	{
@@ -309,37 +669,77 @@ function work(){
 		else
 			timerDisplay = timerDisplay + '.00'
 	}
-	var timerReadableDays = Math.round(timer * 365.0)
+	var timerReadableDays = Math.round(g_timer)
 	var timerDisplayDays = timerReadableDays.toString();
 
-	contextElongation.fillText("Time: ",mapCenterX + 150,mapCenterY + mapHeight * 0.5 + 35);
-	drawTextRight(contextElongation,timerDisplay + " years",mapCenterX + 280,mapCenterY + mapHeight * 0.5 + 35);
-	drawTextRight(contextElongation,"("+ timerDisplayDays + " days)",mapCenterX + 380,mapCenterY + mapHeight * 0.5 + 35);
 
-	if (planetPhase != 0.0)
+	theContext.fillText("Date: ",150,35);
+	var calend = JDtoGregorian(g_timer);
+	var monthDisplay = calend.month.toString();
+	if (calend.month < 10)
+		monthDisplay = "0" + monthDisplay;
+	var dayDisplay = Math.floor(calend.day).toString()
+	if (calend.day < 10)
+		dayDisplay = "0" + dayDisplay;
+	drawTextRight(theContext,calend.year + "/" + monthDisplay + '/' + dayDisplay,280,35);
+	drawTextRight(theContext,"(JD "+ timerDisplayDays + ")",380,35);
+
+	theContext.restore();
+}
+
+function drawPhase()
+{
+	var halfHeight = phaseHeight * 0.5;
+//	var halfWidth = phaseWidth * 0.5;
+
+	theContext.save();
+	theContext.translate(phaseX,phaseY);
+	theContext.fillStyle = "#FFFF00"
+	theContext.font = "18px Arial";
+	theContext.textBaseline = "top";
+	drawTextCenter(theContext,"View of Planet",0.0,-halfHeight);
+	theContext.textBaseline = "bottom";
+	drawTextRight(theContext,"Phase: ",-142,halfHeight);
+	var phaseDisplay = (Math.round(g_planetView[selectedPlanet].phase*10.0)/10.0).toString();
+	if (phaseDisplay.charAt(phaseDisplay.length - 2) != '.')
+		phaseDisplay = phaseDisplay + ".0"
+	theContext.fillText(phaseDisplay,-138,halfHeight);
+
+	drawTextRight(theContext,"V: ",128,halfHeight);
+	var appBrightDisplay = (Math.round(g_planetView[selectedPlanet].appBright*10.0)/10.0).toString();
+	if (appBrightDisplay.charAt(appBrightDisplay.length - 2) != '.')
+		appBrightDisplay = appBrightDisplay + ".0"
+	theContext.fillText(appBrightDisplay,132,halfHeight);
+
+	var angSizeDisplay = (Math.round(g_planetView[selectedPlanet].angSizeEq * 2.0 * 180.0 * 3600.0 / Math.PI * 10.0) / 10.0).toString();
+	if (angSizeDisplay.charAt(angSizeDisplay.length - 2) != '.')
+		angSizeDisplay = angSizeDisplay + ".0"
+	angSizeDisplay += '"';
+	drawTextRight(theContext,"Apparent Size: ",38,halfHeight);
+	theContext.fillText(angSizeDisplay,42,halfHeight);
+
+
+	var sizeEq = 50.0 * g_planetView[selectedPlanet].angSizeEq / g_planetView[selectedPlanet].angSizeAvg;
+	var sizePol = 50.0 * g_planetView[selectedPlanet].angSizePolar / g_planetView[selectedPlanet].angSizeAvg;
+
+	if (g_planetView[selectedPlanet].phase != 0.0)
 	{
-		contextElongation.save();
-		contextElongation.translate(mapCenterX + mapWidth * 0.5 + 75.0,mapCenterY);
-		contextElongation.fillStyle = "#FFFF00"
-		drawTextCenter(contextElongation,"View of Planet",0.0,-mapHeight * 0.5 + 20);
-		drawTextRight(contextElongation,"Phase: ",-2,mapHeight * 0.5 + 35);
-		contextElongation.fillText(planetPhaseDisplay,2,mapHeight * 0.5 + 35);
 
-		contextElongation.fillStyle = pStyle[selectedElongation];
-		contextElongation.beginPath();
-		contextElongation.moveTo(0.0,-50.0);
-		if (planetPhase <= 0.0)
+		theContext.fillStyle = g_planetView[selectedPlanet].style;
+		theContext.beginPath();
+		theContext.moveTo(0.0,-sizePol);
+		if (g_planetView[selectedPlanet].phase <= 4.0)
 		{
 			for (i = 1; i <= 180; i++)
 			{
 				var thetaRad = i * Math.PI / 180.0;
-				contextElongation.lineTo(50.0 * Math.sin(thetaRad),-50.0 * Math.cos(thetaRad));
+				theContext.lineTo(sizeEq * Math.sin(thetaRad),-sizePol * Math.cos(thetaRad));
 			}
-			var radX = (1.0 - planetPhaseDeg / -90.0) * -50.0;
+			var radX = (g_planetView[selectedPlanet].phase - 2.0) * 0.5;
 			for (i = 180; i > 0; i--)
 			{
 				var thetaRad = i * Math.PI / 180.0;
-				contextElongation.lineTo(radX * Math.sin(thetaRad),-50.0 * Math.cos(thetaRad));
+				theContext.lineTo(-sizeEq * radX * Math.sin(thetaRad),-sizePol * Math.cos(thetaRad));
 			}
 		}
 		else
@@ -347,30 +747,70 @@ function work(){
 			for (i = 1; i <= 180; i++)
 			{
 				var thetaRad = i * Math.PI / 180.0;
-				contextElongation.lineTo(-50.0 * Math.sin(thetaRad),-50.0 * Math.cos(thetaRad));
+				theContext.lineTo(-sizeEq * Math.sin(thetaRad),-sizePol * Math.cos(thetaRad));
 			}
-			var radX = (1.0 - planetPhaseDeg / 90.0) * 50.0;
+			var radX = (g_planetView[selectedPlanet].phase - 6.0) * 0.5;
 			for (i = 180; i > 0; i--)
 			{
 				var thetaRad = i * Math.PI / 180.0;
-				contextElongation.lineTo(radX * Math.sin(thetaRad),-50.0 * Math.cos(thetaRad));
+				theContext.lineTo(-sizeEq * radX * Math.sin(thetaRad),-sizePol * Math.cos(thetaRad));
 			}
 		}
-		contextElongation.closePath();
-		contextElongation.fill();
-		contextElongation.restore();
+		//theContext.closePath();
+		theContext.fill();
 	}
+	theContext.restore();
+}
+
+var datechange;
+function work(){
 
 
+// as long as it isn't paussed, advance the timer
+	if (!pause)
+		g_timer = g_timer + 1.0 / 30.0 * speed;
 
-// draw the lines onto the overhead view to demonstrate the elongation
-	theContext.strokeStyle = "#FFFF00"
-	theContext.beginPath();
-	theContext.moveTo(theCanvas.width / 2,theCanvas.height / 2);
-	theContext.lineTo(theCanvas.width / 2 + zoom * orbitalRadii[2] * Math.cos(currPosition[2]),theCanvas.height / 2 + zoom * orbitalRadii[2] * Math.sin(currPosition[2]));
-	theContext.lineTo(theCanvas.width / 2 + zoom * orbitalRadii[selectedElongation] * Math.cos(currPosition[selectedElongation]),theCanvas.height / 2 + zoom * orbitalRadii[selectedElongation] * Math.sin(currPosition[selectedElongation]));
-	theContext.stroke();
+// determine which planet is currently selected
 
+	var dateJD = g_timer;
+	if (g_simpleSolarSystem)
+	{
+		g_planetView['Mercury'] = Planets.Mercury.getSimplePosition(dateJD);
+		g_planetView['Venus'] = Planets.Venus.getSimplePosition(dateJD);
+		g_planetView['Earth'] = Planets.Earth.getSimplePosition(dateJD);
+		g_planetView['Mars'] = Planets.Mars.getSimplePosition(dateJD);
+		g_planetView['Jupiter'] = Planets.Jupiter.getSimplePosition(dateJD);
+		g_planetView['Saturn'] = Planets.Saturn.getSimplePosition(dateJD);
+		g_planetView['Uranus'] = Planets.Uranus.getSimplePosition(dateJD);
+		g_planetView['Neptune'] = Planets.Neptune.getSimplePosition(dateJD);
+	}
+	else
+	{
+		g_planetView['Mercury'] = Planets.Mercury.getTruePosition(dateJD);
+		g_planetView['Venus'] = Planets.Venus.getTruePosition(dateJD);
+		g_planetView['Earth'] = Planets.Earth.getTruePosition(dateJD);
+		g_planetView['Mars'] = Planets.Mars.getTruePosition(dateJD);
+		g_planetView['Jupiter'] = Planets.Jupiter.getTruePosition(dateJD);
+		g_planetView['Saturn'] = Planets.Saturn.getTruePosition(dateJD);
+		g_planetView['Uranus'] = Planets.Uranus.getTruePosition(dateJD);
+		g_planetView['Neptune'] = Planets.Neptune.getTruePosition(dateJD);
+	}
+//	if (typeof datechange == 'undefined' || Math.floor(g_timer) > datechange)
+//	{
+//		console.log(dateJD);
+//		console.log(g_planetView[selectedPlanet].elongLong + ' ' + g_planetView[selectedPlanet].elongLat + ' ' + g_planetView[selectedPlanet].phase + ' ' + g_planetView[selectedPlanet].appBright + ' ' + g_planetView[selectedPlanet].dist )
+//		datechange = Math.floor(g_timer);
+//	}
+
+	// clear the canvas
+	theContext.clearRect(0, 0, theCanvas.width, theCanvas.height);
+	theContext.fillStyle = "#000000";
+	theContext.fillRect(0,0,theCanvas.width,theCanvas.height);
+
+
+	drawElongationMap();
+	drawSSmap();
+	drawPhase();
 
 	commonUIdraw(theContext);
 	

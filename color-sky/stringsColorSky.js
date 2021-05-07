@@ -50,7 +50,10 @@ const ColorSkyStringInternal =
 	aboutLine1: "The Sky in Color",
 	aboutLine2: "Copyright 2020, 2021 Brian W. Mulligan, Ph.D.",
 	aboutLine3: "Star data aquired using SIMBAD databases.",
-	aboutLine4: "For additional information or to request features or changes, contact bwmulligan@astronaos.com."
+	aboutLine4: "Constellations based on IAU maps (https://www.iau.org/public/themes/constellations/)",
+	aboutLine5: "For additional information or to request features or changes, contact bwmulligan@astronaos.com.",
+
+	throwawayLine: ""
 	}
 }
 

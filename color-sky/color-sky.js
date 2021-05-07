@@ -116,13 +116,13 @@ function selectCoordinateSystem(coordinates)
 }
 var coordButtonsConst = new Array();
 
-coordButtonsConst.push(new RadioButton("Equatorial","Equatorial",theCanvas.width / 2 - 125,coordinatesButtonsY,80,25));
+coordButtonsConst.push(new RadioButton("Equatorial","Equatorial",theCanvas.width / 2 - 140,coordinatesButtonsY,90,25));
 coordButtonsConst[coordButtonsConst.length - 1].text = "Equatorial";
 
-coordButtonsConst.push(new RadioButton("Ecliptic","Ecliptic",theCanvas.width / 2 - 40,coordinatesButtonsY,80,25));
+coordButtonsConst.push(new RadioButton("Ecliptic","Ecliptic",theCanvas.width / 2 - 45,coordinatesButtonsY,90,25));
 coordButtonsConst[coordButtonsConst.length - 1].text = "Ecliptic";
 
-coordButtonsConst.push(new RadioButton("Galactic","Galactic",theCanvas.width / 2 + 45,coordinatesButtonsY,80,25));
+coordButtonsConst.push(new RadioButton("Galactic","Galactic",theCanvas.width / 2 + 50,coordinatesButtonsY,90,25));
 coordButtonsConst[coordButtonsConst.length - 1].text = "Galactic";
 
 var radioCoord = new Radio("Coordinate System","Equatorial",selectCoordinateSystem,coordButtonsConst);
@@ -209,6 +209,7 @@ function tutorialDraw(context,state)
 		context.globalAlpha = 0.9;
 		context.fillStyle = "#000000";
 		context.fillRect(0,0,theCanvas.width,coordinatesTextY  + 3);
+		context.fillRect(0,tutorialControlsY0 - 3,theCanvas.width,theCanvas.height - tutorialControlsY0 + 3);
 
 		context.globalAlpha = 1.0;
 		context.fillStyle = "#FFFFFF";
@@ -227,6 +228,7 @@ function tutorialDraw(context,state)
 		context.globalAlpha = 0.9;
 		context.fillStyle = "#000000";
 		context.fillRect(0,filterTextY - 3 + tutorialTextOffset,theCanvas.width,coordinatesTextY - filterTextY);
+		context.fillRect(0,tutorialControlsY0 - 3,theCanvas.width,theCanvas.height - tutorialControlsY0 + 3);
 		context.globalAlpha = 1.0;
 		context.fillStyle = "#FFFFFF";
 		context.font = "20px Arial";
@@ -240,6 +242,7 @@ function tutorialDraw(context,state)
 		context.globalAlpha = 0.9;
 		context.fillStyle = "#000000";
 		context.fillRect(0,filterTextY - 3 + tutorialTextOffset,theCanvas.width,coordinatesTextY - filterTextY);
+		context.fillRect(0,tutorialControlsY0 - 3,theCanvas.width,theCanvas.height - tutorialControlsY0 + 3);
 		context.globalAlpha = 1.0;
 		context.fillStyle = "#FFFFFF";
 		context.font = "20px Arial";
@@ -254,6 +257,7 @@ function tutorialDraw(context,state)
 		context.globalAlpha = 0.9;
 		context.fillStyle = "#000000";
 		context.fillRect(0,filterTextY - 3 + tutorialTextOffset,theCanvas.width,coordinatesTextY - filterTextY);
+		context.fillRect(0,tutorialControlsY0 - 3,theCanvas.width,theCanvas.height - tutorialControlsY0 + 3);
 		context.globalAlpha = 1.0;
 		context.fillStyle = "#FFFFFF";
 		context.font = "20px Arial";
@@ -449,7 +453,7 @@ function aboutDraw(context,state)
 	drawTextCenter(context,ColorSkyStrings.aboutLine2,theCanvas.width * 0.5,290);
 	drawTextCenter(context,ColorSkyStrings.aboutLine3,theCanvas.width * 0.5,400);
 	drawTextCenter(context,ColorSkyStrings.aboutLine4,theCanvas.width * 0.5,430);
-//	drawTextCenter(context,ColorSkyStrings.aboutLine5,theCanvas.width * 0.5,460);
+	drawTextCenter(context,ColorSkyStrings.aboutLine5,theCanvas.width * 0.5,490);
 //	drawTextCenter(context,ColorSkyStrings.aboutLine6,theCanvas.width * 0.5,490);
 //	drawTextCenter(context,ColorSkyStrings.aboutLine7,theCanvas.width * 0.5,520);
 }
@@ -555,9 +559,9 @@ function draw(){
 
 	theContext.font = "20px Arial"
 	theContext.fillStyle = "#FFFFFF"
-	drawTextCenter(theContext,"Select Filter:",theCanvas.width * 0.5,filterTextY);
-	drawTextCenter(theContext,"Show Constellations:",theCanvas.width * 0.5,constellationTextY);
-	drawTextCenter(theContext,"Select Coordinate System:",theCanvas.width * 0.5,coordinatesTextY);
+	drawTextCenter(theContext,"Filter",theCanvas.width * 0.5,filterTextY);
+	drawTextCenter(theContext,"Constellations",theCanvas.width * 0.5,constellationTextY);
+	drawTextCenter(theContext,"Coordinate System",theCanvas.width * 0.5,coordinatesTextY);
 
 	commonUIdraw(theContext);
 }

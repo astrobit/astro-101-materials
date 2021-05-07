@@ -5,18 +5,19 @@
         <title>The Sky in (Astronomical) Color</title>
     </head>
     <body style="font-family:sans-serif;font-size:15px;width:1200px;margin-left:auto;margin-right:auto;background-color:#000000;">
-        <h1 style="font-size:24px;text-align:center;color:#FFFFFF;">The Sky in (Astronomical) Color</h1>
-        <div style="width:1200px; margin-left:auto; margin-right:auto;height:675px;">
-            <canvas id="mapCanvas" width="1200" height="675" onwheel="onWheel(event);" onmousedown="onMouseDown(event);" onmousemove="onMouseMove(event);" onmouseup="onMouseUp(event);" onclick="commonUIOnClick(event);">
+        <div style="width:1200px; margin-left:auto; margin-right:auto;height:900px;">
+            <canvas id="mapCanvas" width="1200" height="900" onclick="commonUIOnClick(event);">
                 Canvas not supported; please update your browser.
             </canvas>
         </div>
-        <div>
+<!--        <div>
             <p style="font-size:24px;text-align:center;color:#FFFFFF;">Use page up and page down or the mouse scroll wheel to zoom in and out</p>
             <p style="font-size:24px;text-align:center;color:#FFFFFF;">Use the W,S,A,D, arrow keys, or click and drag with the mouse to move around the map when zoomed in.</p>
             <p style="font-size:18px;text-align:center;color:#FFFFFF;">"No Filter" shows roughly how the sky appears to a camera without a filter, or your eye.</p>
             <p style="font-size:18px;text-align:center;color:#FFFFFF;">Selected filters show the sky as it appears to a camera with the selected filter.</p>
         </div>
+-->
+        <script type="text/javascript" src="stringsColorSky.js"></script>
         <script type="text/javascript" src="tutorial.js"></script>
         <script type="text/javascript" src="commonGP.js"></script>
         <script type="text/javascript" src="commonAstro.js"></script>

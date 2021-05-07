@@ -1,6 +1,6 @@
 
-var canvasMap = document.getElementById("mapCanvas");
-var contextMap = canvasMap.getContext("2d");
+var theCanvas = document.getElementById("mapCanvas");
+var theContext = theCanvas.getContext("2d");
 
 var timer = 0;
 
@@ -14,13 +14,30 @@ var zoomCenterX = 0;
 var zoomCenterY = 0;
 
 
+const offsetButtonsText = 10;
+const offsetTextButtons = 50;
+var mapWidth = theCanvas.width - 80;
+var mapHeight = 0.5 * mapWidth;
+var mapCenterX = theCanvas.width / 2;
+var mapCenterY = mapHeight / 2 + 5;
+var filterTextY = mapHeight + offsetTextButtons;
+var filterButtonY = filterTextY + offsetButtonsText;
+var constellationTextY = filterButtonY + offsetTextButtons;
+var constellationButtonsY = constellationTextY + offsetButtonsText;
+var coordinatesTextY = constellationButtonsY + offsetTextButtons;
+var coordinatesButtonsY = coordinatesTextY + offsetButtonsText;
+var tutorialControlsY0 = coordinatesButtonsY + offsetTextButtons + 10;
+var aboutTutorialButtonsY = tutorialControlsY0;
+var tutorialTextOffset = -20;
+
+
 
 function onWheel(event)
 {
 	if (event.deltaY != 0)
 	{
-//		var Xeffective = ((event.offsetX - canvasMap.width / 2)) / zoom + zoomCenterX
-//		var Yeffective = ((event.offsetY - canvasMap.height / 2)) / zoom + zoomCenterY
+//		var Xeffective = ((event.offsetX - theCanvas.width / 2)) / zoom + zoomCenterX
+//		var Yeffective = ((event.offsetY - theCanvas.height / 2)) / zoom + zoomCenterY
 //		zoomCenterX = Xeffective;
 //		zoomCenterY = Yeffective;
 		zoom *= Math.pow(2.0,-event.deltaY / 200.0);
@@ -34,164 +51,6 @@ function onWheel(event)
 		draw();
 	}
 }
-var dragging = false;
-
-function onMouseDown(event)
-{
-	if (event.which == 1 && event.offsetX >= 50 && event.offsetX <= (canvasMap.width - 100) && event.offsetY >= 0 && event.offsetY <= (canvasMap.height - 175))
-	{
-		dragging = true;
-	}
-}
-function onMouseMove(event)
-{
-	if (dragging && zoom > 1.0 && event.offsetX >= 50 && event.offsetX <= (canvasMap.width - 100) && event.offsetY >= 0 && event.offsetY <= (canvasMap.height - 175))
-	{
-		zoomCenterX -= event.movementX / zoom
-		zoomCenterY -= event.movementY / zoom
-		draw();
-	}
-}
-function onMouseUp(event)
-{
-	if (event.which == 1)
-	{
-		dragging = false;
-	}
-}
-var scrollW = false;
-var scrollA = false;
-var scrollS = false;
-var scrollD = false;
-
-var scrollArrowL = false;
-var scrollArrowR = false;
-var scrollArrowU = false;
-var scrollArrowD = false;
-
-document.addEventListener("keydown", event=> 
-{
-	var redraw = false;
-	if (event.code == "KeyW")
-	{
-		scrollW = true;
-	}
-	if (event.code == "KeyA")
-	{
-		scrollA = true;
-	}
-	if (event.code == "KeyS")
-	{
-		scrollS = true;
-	}
-	if (event.code == "KeyD")
-	{
-		scrollD = true;
-	}
-	if (event.code == "ArrowLeft")
-	{
-		scrollArrowL = true;
-	}
-	if (event.code == "ArrowRight")
-	{
-		scrollArrowR= true;
-	}
-	if (event.code == "ArrowUp")
-	{
-		scrollArrowU = true;
-	}
-	if (event.code == "ArrowDown")
-	{
-		scrollArrowD = true;
-	}
-	if (event.code == "PageUp")
-	{
-		zoom *= Math.pow(2.0,0.5);
-		redraw = true;
-	}
-	if (event.code == "PageDown")
-	{
-		zoom *= Math.pow(2.0,-0.5);
-		redraw = true;
-	}
-//	console.log(event.code);
-	if (redraw)
-	{
-		draw();
-	}
-});
-
-document.addEventListener("keyup", event=> 
-{
-	if (event.code == "KeyW")
-	{
-		scrollW = false;
-	}
-	if (event.code == "KeyA")
-	{
-		scrollA = false;
-	}
-	if (event.code == "KeyS")
-	{
-		scrollS = false;
-	}
-	if (event.code == "KeyD")
-	{
-		scrollD = false;
-	}
-	if (event.code == "ArrowLeft")
-	{
-		scrollArrowL = false;
-	}
-	if (event.code == "ArrowRight")
-	{
-		scrollArrowR= false;
-	}
-	if (event.code == "ArrowUp")
-	{
-		scrollArrowU = false;
-	}
-	if (event.code == "ArrowDown")
-	{
-		scrollArrowD = false;
-	}
-}
-)
-
-function scrollCallback()
-{
-	var redraw = false;
-	if (zoom > 1.0)
-	{
-		if (scrollD || scrollArrowR)
-		{
-			zoomCenterX += 1.0;
-			redraw = true;
-		}
-		if (scrollA || scrollArrowL)
-		{
-			zoomCenterX -= 1.0;
-			redraw = true;
-		}
-		if (scrollW || scrollArrowU)
-		{
-			zoomCenterY -= 1.0;
-			redraw = true;
-		}
-		if (scrollS || scrollArrowD)
-		{
-			zoomCenterY += 1.0;
-			redraw = true;
-		}
-	}
-	if (redraw)
-	{
-		draw();
-	}
-	window.setTimeout(scrollCallback,1000.0/30.0);
-}
-scrollCallback();
-
 
 function selectFilter(value)
 {
@@ -200,28 +59,27 @@ function selectFilter(value)
 }
 
 var radButtons = new Array();
-var filterButtonY = canvasMap.height - 130;
 
-radButtons.push(new RadioButton("No Filter","none",canvasMap.width / 2 - 265,filterButtonY,80,25));
+radButtons.push(new RadioButton("No Filter","none",theCanvas.width / 2 - 265,filterButtonY,80,25));
 radButtons[radButtons.length - 1].text = "No Filter";
 
-radButtons.push(new RadioButton("U Filter","U",canvasMap.width / 2 - 175,filterButtonY,80,25));
+radButtons.push(new RadioButton("U Filter","U",theCanvas.width / 2 - 175,filterButtonY,80,25));
 radButtons[radButtons.length - 1].text = "U";
 
-radButtons.push(new RadioButton("B Filter","B",canvasMap.width / 2 - 85,filterButtonY,80,25));
+radButtons.push(new RadioButton("B Filter","B",theCanvas.width / 2 - 85,filterButtonY,80,25));
 radButtons[radButtons.length - 1].text = "B";
 
-radButtons.push(new RadioButton("V Filter","V",canvasMap.width / 2 + 5,filterButtonY,80,25));
+radButtons.push(new RadioButton("V Filter","V",theCanvas.width / 2 + 5,filterButtonY,80,25));
 radButtons[radButtons.length - 1].text = "V";
 
-radButtons.push(new RadioButton("R Filter","R",canvasMap.width / 2 + 95,filterButtonY,80,25));
+radButtons.push(new RadioButton("R Filter","R",theCanvas.width / 2 + 95,filterButtonY,80,25));
 radButtons[radButtons.length - 1].text = "R";
 
-radButtons.push(new RadioButton("I Filter","I",canvasMap.width / 2 + 185,filterButtonY,80,25));
+radButtons.push(new RadioButton("I Filter","I",theCanvas.width / 2 + 185,filterButtonY,80,25));
 radButtons[radButtons.length - 1].text = "I";
 
-
-commonUIRegister(new Radio("Filter","none",selectFilter,radButtons));
+var filterRadio = new Radio("Filter","none",selectFilter,radButtons);
+commonUIRegister(filterRadio);
 
 
 function selectConstellation(constellation)
@@ -231,21 +89,20 @@ function selectConstellation(constellation)
 }
 
 var radButtonsConst = new Array();
-var constellationButtonsY = canvasMap.height - 80
 
-radButtonsConst.push(new RadioButton("No Constellations","none",canvasMap.width / 2 - 210,constellationButtonsY,80,25));
+radButtonsConst.push(new RadioButton("No Constellations","none",theCanvas.width / 2 - 210,constellationButtonsY,80,25));
 radButtonsConst[radButtonsConst.length - 1].text = "None";
 
-radButtonsConst.push(new RadioButton("Zodiac Constellations","zodiac",canvasMap.width / 2 - 125,constellationButtonsY,80,25));
+radButtonsConst.push(new RadioButton("Zodiac Constellations","zodiac",theCanvas.width / 2 - 125,constellationButtonsY,80,25));
 radButtonsConst[radButtonsConst.length - 1].text = "Zodiac";
 
-radButtonsConst.push(new RadioButton("Major Constellations","major",canvasMap.width / 2 - 40,constellationButtonsY,80,25));
+radButtonsConst.push(new RadioButton("Major Constellations","major",theCanvas.width / 2 - 40,constellationButtonsY,80,25));
 radButtonsConst[radButtonsConst.length - 1].text = "Major";
 
-radButtonsConst.push(new RadioButton("Major Constellations","minor",canvasMap.width / 2 + 45,constellationButtonsY,80,25));
+radButtonsConst.push(new RadioButton("Major Constellations","minor",theCanvas.width / 2 + 45,constellationButtonsY,80,25));
 radButtonsConst[radButtonsConst.length - 1].text = "Minor";
 
-radButtonsConst.push(new RadioButton("Obscure Constellations","all",canvasMap.width / 2 + 130,constellationButtonsY,80,25));
+radButtonsConst.push(new RadioButton("Obscure Constellations","all",theCanvas.width / 2 + 130,constellationButtonsY,80,25));
 radButtonsConst[radButtonsConst.length - 1].text = "Obscure";
 
 commonUIRegister(new Radio("Contstellations","zodiac",selectConstellation,radButtonsConst));
@@ -257,116 +114,454 @@ function selectCoordinateSystem(coordinates)
 	displayCoordinates = coordinates;
 	draw();
 }
-var coordinatesButtonsY = canvasMap.height - 25
 var coordButtonsConst = new Array();
 
-coordButtonsConst.push(new RadioButton("Equatorial","Equatorial",canvasMap.width / 2 - 125,coordinatesButtonsY,80,25));
+coordButtonsConst.push(new RadioButton("Equatorial","Equatorial",theCanvas.width / 2 - 125,coordinatesButtonsY,80,25));
 coordButtonsConst[coordButtonsConst.length - 1].text = "Equatorial";
 
-coordButtonsConst.push(new RadioButton("Ecliptic","Ecliptic",canvasMap.width / 2 - 40,coordinatesButtonsY,80,25));
+coordButtonsConst.push(new RadioButton("Ecliptic","Ecliptic",theCanvas.width / 2 - 40,coordinatesButtonsY,80,25));
 coordButtonsConst[coordButtonsConst.length - 1].text = "Ecliptic";
 
-coordButtonsConst.push(new RadioButton("Galactic","Galactic",canvasMap.width / 2 + 45,coordinatesButtonsY,80,25));
+coordButtonsConst.push(new RadioButton("Galactic","Galactic",theCanvas.width / 2 + 45,coordinatesButtonsY,80,25));
 coordButtonsConst[coordButtonsConst.length - 1].text = "Galactic";
 
-commonUIRegister(new Radio("Coordinate System","Equatorial",selectCoordinateSystem,coordButtonsConst));
+var radioCoord = new Radio("Coordinate System","Equatorial",selectCoordinateSystem,coordButtonsConst);
+commonUIRegister(radioCoord);
+
+
+
+function tutorialDraw(context,state)
+{
+	switch (state)
+	{
+	case 0:
+	default:
+		context.globalAlpha = 0.9;
+		context.fillStyle = "#000000";
+		context.fillRect(0,0,theCanvas.width,theCanvas.height);
+		context.globalAlpha = 1.0;
+		context.fillStyle = "#FFFFFF";
+		context.font = "30px Arial";
+		drawTextCenter(context,ColorSkyStrings.titleState0,theCanvas.width * 0.5,250);
+		context.font = "20px Arial";
+		drawTextCenter(context,ColorSkyStrings.line1State0,theCanvas.width * 0.5,350);
+		drawTextCenter(context,ColorSkyStrings.line2State0,theCanvas.width * 0.5,400);
+		drawTextCenter(context,ColorSkyStrings.lineContinue,theCanvas.width * 0.5,450);
+		break;
+	case 1:
+		context.globalAlpha = 0.9;
+		context.fillStyle = "#000000";
+		context.fillRect(0,filterTextY + tutorialTextOffset - 3,theCanvas.width,theCanvas.height - filterTextY + 3 - tutorialTextOffset);
+		context.globalAlpha = 1.0;
+		context.fillStyle = "#FFFFFF";
+		context.font = "24px Arial";
+		drawTextCenter(context,ColorSkyStrings.line1State1,theCanvas.width * 0.5,filterButtonY + tutorialTextOffset + 20);
+		context.font = "20px Arial";
+		drawTextCenter(context,ColorSkyStrings.line2State1,theCanvas.width * 0.5,filterButtonY + tutorialTextOffset  + 70);
+		drawTextCenter(context,ColorSkyStrings.line3State1,theCanvas.width * 0.5,filterButtonY + tutorialTextOffset  + 100);
+		drawTextCenter(context,ColorSkyStrings.line4State1,theCanvas.width * 0.5,filterButtonY + tutorialTextOffset  + 130);
+
+		drawTextCenter(context,ColorSkyStrings.lineContinue,theCanvas.width * 0.5,tutorialControlsY0 - 15);
+		break;
+	case 2:
+		context.globalAlpha = 0.9;
+		context.fillStyle = "#000000";
+		context.fillRect(0,0,theCanvas.width,filterButtonY - 3);
+		context.fillRect(0,constellationTextY + tutorialTextOffset - 3,theCanvas.width,theCanvas.height - constellationTextY + 3 - tutorialTextOffset);
+		context.globalAlpha = 1.0;
+		context.fillStyle = "#FFFFFF";
+		context.font = "24px Arial";
+		drawTextCenter(context,ColorSkyStrings.line1State2,theCanvas.width * 0.5,filterButtonY - 10);
+		context.font = "20px Arial";
+		drawTextCenter(context,ColorSkyStrings.line2State2,theCanvas.width * 0.5,constellationTextY + 20);
+		drawTextCenter(context,ColorSkyStrings.line3State2,theCanvas.width * 0.5,constellationTextY + 50);
+
+		drawTextCenter(context,ColorSkyStrings.lineContinue,theCanvas.width * 0.5,tutorialControlsY0 - 15);
+		break;
+	case 3:
+		context.globalAlpha = 0.9;
+		context.fillStyle = "#000000";
+		context.fillRect(0,constellationTextY + tutorialTextOffset - 3,theCanvas.width,theCanvas.height - constellationTextY + 3 - tutorialTextOffset);
+		context.globalAlpha = 1.0;
+		context.fillStyle = "#FFFFFF";
+		context.font = "20px Arial";
+		drawTextCenter(context,ColorSkyStrings.line1State3,theCanvas.width * 0.5,constellationTextY + tutorialTextOffset + 20);
+		drawTextCenter(context,ColorSkyStrings.line2State3,theCanvas.width * 0.5,constellationTextY + tutorialTextOffset + 50);
+
+		drawTextCenter(context,ColorSkyStrings.lineContinue,theCanvas.width * 0.5,tutorialControlsY0 - 15);
+		break;
+	case 4:
+		context.globalAlpha = 0.9;
+		context.fillStyle = "#000000";
+		context.fillRect(0,0,theCanvas.width,constellationButtonsY - 3);
+		context.fillRect(0,coordinatesTextY - 3 + tutorialTextOffset,theCanvas.width,theCanvas.height - coordinatesTextY + 3 - tutorialTextOffset);
+		context.globalAlpha = 1.0;
+		context.fillStyle = "#FFFFFF";
+		context.font = "24px Arial";
+		drawTextCenter(context,ColorSkyStrings.line1State4,theCanvas.width * 0.5,constellationButtonsY - 10);
+		context.font = "20px Arial";
+		drawTextCenter(context,ColorSkyStrings.line2State4,theCanvas.width * 0.5,coordinatesTextY + 15 + tutorialTextOffset);
+		drawTextCenter(context,ColorSkyStrings.line3State4,theCanvas.width * 0.5,coordinatesTextY + 35 + tutorialTextOffset);
+
+		drawTextCenter(context,ColorSkyStrings.lineContinue,theCanvas.width * 0.5,tutorialControlsY0 - 15);
+		break;
+	case 5:
+		context.globalAlpha = 0.9;
+		context.fillStyle = "#000000";
+		context.fillRect(0,0,theCanvas.width,coordinatesTextY  + 3);
+
+		context.globalAlpha = 1.0;
+		context.fillStyle = "#FFFFFF";
+		context.font = "24px Arial";
+		drawTextCenter(context,ColorSkyStrings.line1State5,theCanvas.width * 0.5,coordinatesTextY + tutorialTextOffset - 150);
+		context.font = "20px Arial";
+		drawTextCenter(context,ColorSkyStrings.line2State5,theCanvas.width * 0.5,coordinatesTextY + tutorialTextOffset - 80);
+		drawTextCenter(context,ColorSkyStrings.line3State5,theCanvas.width * 0.5,coordinatesTextY + tutorialTextOffset - 60);
+		drawTextCenter(context,ColorSkyStrings.line4State5,theCanvas.width * 0.5,coordinatesTextY + tutorialTextOffset - 40);
+		drawTextCenter(context,ColorSkyStrings.line5State5,theCanvas.width * 0.5,coordinatesTextY + tutorialTextOffset - 0);
+
+		context.font = "20px Arial";
+		drawTextCenter(context,ColorSkyStrings.lineContinue,theCanvas.width * 0.5,tutorialControlsY0 - 15);
+		break;
+	case 6:
+		context.globalAlpha = 0.9;
+		context.fillStyle = "#000000";
+		context.fillRect(0,filterTextY - 3 + tutorialTextOffset,theCanvas.width,coordinatesTextY - filterTextY);
+		context.globalAlpha = 1.0;
+		context.fillStyle = "#FFFFFF";
+		context.font = "20px Arial";
+		drawTextCenter(context,ColorSkyStrings.line1State6,theCanvas.width * 0.5,filterTextY + 50 + tutorialTextOffset);
+		drawTextCenter(context,ColorSkyStrings.line2State6,theCanvas.width * 0.5,filterTextY + 70 + tutorialTextOffset);
+
+		context.font = "20px Arial";
+		drawTextCenter(context,ColorSkyStrings.lineContinue,theCanvas.width * 0.5,tutorialControlsY0 - 15);
+		break;
+	case 7:
+		context.globalAlpha = 0.9;
+		context.fillStyle = "#000000";
+		context.fillRect(0,filterTextY - 3 + tutorialTextOffset,theCanvas.width,coordinatesTextY - filterTextY);
+		context.globalAlpha = 1.0;
+		context.fillStyle = "#FFFFFF";
+		context.font = "20px Arial";
+		drawTextCenter(context,ColorSkyStrings.line1State7,theCanvas.width * 0.5,filterTextY + 50 + tutorialTextOffset);
+		drawTextCenter(context,ColorSkyStrings.line2State7,theCanvas.width * 0.5,filterTextY + 70 + tutorialTextOffset);
+		drawTextCenter(context,ColorSkyStrings.line3State7,theCanvas.width * 0.5,filterTextY + 90 + tutorialTextOffset);
+
+		context.font = "20px Arial";
+		drawTextCenter(context,ColorSkyStrings.lineContinue,theCanvas.width * 0.5,tutorialControlsY0 - 15);
+		break;
+	case 8:
+		context.globalAlpha = 0.9;
+		context.fillStyle = "#000000";
+		context.fillRect(0,filterTextY - 3 + tutorialTextOffset,theCanvas.width,coordinatesTextY - filterTextY);
+		context.globalAlpha = 1.0;
+		context.fillStyle = "#FFFFFF";
+		context.font = "20px Arial";
+		drawTextCenter(context,ColorSkyStrings.line1State8,theCanvas.width * 0.5,filterTextY + 50 + tutorialTextOffset);
+		drawTextCenter(context,ColorSkyStrings.line2State8,theCanvas.width * 0.5,filterTextY + 70 + tutorialTextOffset);
+		drawTextCenter(context,ColorSkyStrings.line3State8,theCanvas.width * 0.5,filterTextY + 90 + tutorialTextOffset);
+
+		context.font = "20px Arial";
+		drawTextCenter(context,ColorSkyStrings.lineContinue,theCanvas.width * 0.5,tutorialControlsY0 - 15);
+		break;
+	case 9:
+		context.globalAlpha = 0.9;
+		context.fillStyle = "#000000";
+		context.fillRect(0,0,theCanvas.width,theCanvas.height);
+		context.globalAlpha = 1.0;
+		context.fillStyle = "#FFFFFF";
+		context.font = "40px Arial";
+		drawTextCenter(context,ColorSkyStrings.line1StateFinal,theCanvas.width * 0.5,100);
+		context.font = "20px Arial";
+		drawTextCenter(context,ColorSkyStrings.line2StateFinal,theCanvas.width * 0.5,200);
+		drawTextCenter(context,ColorSkyStrings.line3StateFinal,theCanvas.width * 0.5,280);
+		drawTextCenter(context,ColorSkyStrings.line4StateFinal,theCanvas.width * 0.5,360);
+		break;
+	}
+}
+
+var g_tutorial = new Tutorial();
+
+function tutorialSkip(event)
+{
+	g_tutorial.deactivate();
+	draw();
+}
+function tutorialStart(event)
+{
+	g_tutorial.activate();
+	draw();
+}
+function tutorialAdvance(event)
+{
+	g_tutorial.advanceState();
+	switch (g_tutorial.state)
+	{
+	case 0:
+	case 1:
+	case 2:
+		break;
+	case 3:
+		filterRadio.setState("V");
+		break;
+	case 4:
+		filterRadio.setState("none");
+		break;
+	case 5:
+		break;
+	case 6:
+		radioCoord.setState("Equatorial");
+		break;
+	case 7:
+		radioCoord.setState("Ecliptic");
+		break;
+	case 8:
+		radioCoord.setState("Galactic");
+		break;
+	case 9:
+		radioCoord.setState("Equatorial");
+		break;
+	default:
+	case 10:
+		g_tutorial.complete();
+		window.localStorage.setItem("tutorialCompleteColorSky",true);
+		break;
+	}
+	draw();
+}
+function tutorialRewind(event)
+{
+	g_tutorial.rewindState();
+	switch (g_tutorial.state)
+	{
+	case 0:
+	case 1:
+	case 2:
+		filterRadio.setState("none");
+		break;
+	case 3:
+		filterRadio.setState("V");
+		break;
+	case 4:
+		filterRadio.setState("none");
+		break;
+	case 5:
+		break;
+	case 6:
+		radioCoord.setState("Equatorial");
+		break;
+	case 7:
+		radioCoord.setState("Ecliptic");
+		break;
+	case 8:
+		radioCoord.setState("Galactic");
+		break;
+	case 9:
+		radioCoord.setState("Equatorial");
+		break;
+	default:
+	case 10:
+		g_tutorial.complete();
+		window.localStorage.setItem("tutorialCompleteColorSky",true);
+		break;
+	}
+	draw();
+}
+
+g_tutorial.drawer = tutorialDraw;
+var tutorialSkipButton = new Button("Skip Tutorial",theCanvas.width / 2 - 60,tutorialControlsY0,120,25,tutorialSkip);
+var tutorialAdvanceButton = new Button("Next",theCanvas.width / 2 + 70,tutorialControlsY0,40,25,tutorialAdvance);
+var tutorialRewindButton = new Button("Prev",theCanvas.width / 2 - 110,tutorialControlsY0,40,25,tutorialRewind);
+
+g_tutorial.disableStandardUI();
+g_tutorial.addUI(0,tutorialSkipButton);
+g_tutorial.addUI(0,tutorialAdvanceButton);
+
+g_tutorial.addUI(1,tutorialSkipButton);
+g_tutorial.addUI(1,tutorialAdvanceButton);
+g_tutorial.addUI(1,tutorialRewindButton);
+
+g_tutorial.addUI(2,tutorialSkipButton);
+g_tutorial.addUI(2,tutorialAdvanceButton);
+g_tutorial.addUI(2,tutorialRewindButton);
+
+g_tutorial.addUI(3,tutorialSkipButton);
+g_tutorial.addUI(3,tutorialAdvanceButton);
+g_tutorial.addUI(3,tutorialRewindButton);
+
+g_tutorial.addUI(4,tutorialSkipButton);
+g_tutorial.addUI(4,tutorialAdvanceButton);
+g_tutorial.addUI(4,tutorialRewindButton);
+
+g_tutorial.addUI(5,tutorialSkipButton);
+g_tutorial.addUI(5,tutorialAdvanceButton);
+g_tutorial.addUI(5,tutorialRewindButton);
+
+g_tutorial.addUI(6,tutorialSkipButton);
+g_tutorial.addUI(6,tutorialAdvanceButton);
+g_tutorial.addUI(6,tutorialRewindButton);
+
+g_tutorial.addUI(7,tutorialSkipButton);
+g_tutorial.addUI(7,tutorialAdvanceButton);
+g_tutorial.addUI(7,tutorialRewindButton);
+
+g_tutorial.addUI(8,tutorialSkipButton);
+g_tutorial.addUI(8,tutorialAdvanceButton);
+g_tutorial.addUI(8,tutorialRewindButton);
+
+g_tutorial.addUI(9,tutorialAdvanceButton);
+g_tutorial.addUI(9,tutorialRewindButton);
+
+
+
+var tutorialCompleted = window.localStorage.getItem("tutorialCompleteColorSky");
+if (!tutorialCompleted)
+	g_tutorial.activate();
+
+commonUIRegister(g_tutorial);
+
+var replayTutorialButton = new Button("Tutorial",theCanvas.width - 210,aboutTutorialButtonsY,100,25,tutorialStart);
+replayTutorialButton.textFont = "24px Arial";
+commonUIRegister(replayTutorialButton);
+
+var g_about = new Tutorial();
+
+function aboutShow(event)
+{
+	g_about.activate();
+	draw();
+}
+function aboutDone(event)
+{
+	g_about.complete();
+	draw();
+}
+function aboutDraw(context,state)
+{
+	context.globalAlpha = 0.9;
+	context.fillStyle = "#000000";
+	context.fillRect(0,0,theCanvas.width,theCanvas.height);
+	context.globalAlpha = 1.0;
+	context.fillStyle = "#FFFFFF";
+	context.font = "30px Arial";
+	drawTextCenter(context,ColorSkyStrings.aboutLine1,theCanvas.width * 0.5,250);
+	context.font = "20px Arial";
+	drawTextCenter(context,ColorSkyStrings.aboutLine2,theCanvas.width * 0.5,290);
+	drawTextCenter(context,ColorSkyStrings.aboutLine3,theCanvas.width * 0.5,400);
+	drawTextCenter(context,ColorSkyStrings.aboutLine4,theCanvas.width * 0.5,430);
+//	drawTextCenter(context,ColorSkyStrings.aboutLine5,theCanvas.width * 0.5,460);
+//	drawTextCenter(context,ColorSkyStrings.aboutLine6,theCanvas.width * 0.5,490);
+//	drawTextCenter(context,ColorSkyStrings.aboutLine7,theCanvas.width * 0.5,520);
+}
+
+g_about.drawer = aboutDraw;
+
+var aboutOKButton= new Button("OK",theCanvas.width / 2,tutorialControlsY0,40,25,aboutDone);
+aboutOKButton.textFont = "24px Arial";
+
+g_about.disableStandardUI();
+g_about.addUI(0,aboutOKButton);
+commonUIRegister(g_about);
+
+var aboutButton= new Button("About",theCanvas.width - 100,aboutTutorialButtonsY,80,25,aboutShow);
+aboutButton.textFont = "24px Arial";
+commonUIRegister(aboutButton);
 
 function draw(){
-	var mapWidth = (canvasMap.width - 100) * zoom;
-	var mapHeight = (canvasMap.height - 175) * zoom;
-	var mapCenterX = canvasMap.width / 2 - zoomCenterX * zoom;
-	var mapCenterY = (canvasMap.height - 175) / 2 - zoomCenterY * zoom;
 
-	var skyMap = new SkyMap(contextMap,mapCenterX,mapCenterY,mapWidth,mapHeight);
+	var mapWidthDraw = mapWidth * zoom;
+	var mapHeightDraw = mapHeight * zoom;
+	var mapCenterXDraw = mapCenterX - zoomCenterX * zoom;
+	var mapCenterYDraw = mapCenterY - zoomCenterY * zoom;
+
+	var skyMap = new SkyMap(theContext,mapCenterXDraw,mapCenterYDraw,mapWidthDraw,mapHeightDraw);
 	skyMap.filter = filter;
 	skyMap.displayConstellations = displayConstellations;
 	skyMap.coordinates = displayCoordinates;
 
 // draw a black square for the map area box
-	contextMap.fillStyle = "#000000";
-	contextMap.fillRect(0,0,canvasMap.width,canvasMap.height);
+	theContext.fillStyle = "#000000";
+	theContext.fillRect(0,0,theCanvas.width,theCanvas.height);
 
-	contextMap.save()
-	contextMap.rect(50,0,canvasMap.width - 100,canvasMap.height - 175);
-	contextMap.clip();
+	theContext.save()
+	theContext.rect(mapCenterX - 0.5 * mapWidth,mapCenterY - 0.5 * mapHeight,mapWidth,mapHeight);
+	theContext.clip();
 	skyMap.draw();
-	contextMap.restore();
+	theContext.restore();
 
 
 // draw the elongation reference on the map
-	contextMap.save()
-	contextMap.rect(25,0,canvasMap.width - 75,canvasMap.height - 125);
-	contextMap.clip();
-	contextMap.font = "10px Ariel";
+	theContext.font = "10px Ariel";
 
-	contextMap.strokeStyle = "#FFFF00"
-	contextMap.fillStyle = "#FFFF00"
-	contextMap.beginPath();
+	theContext.strokeStyle = "#FFFF00"
+	theContext.fillStyle = "#FFFF00"
+	theContext.beginPath();
 	if (projectionType== "Mollweide")
 	{
-		contextMap.moveTo(mapCenterX - mapWidth * 0.5,mapCenterY);
-		contextMap.lineTo(mapCenterX - mapWidth * 0.5,mapCenterY + mapHeight * 0.5);
+		theContext.moveTo(mapCenterXDraw - mapWidthDraw * 0.5,mapCenterYDraw);
+		theContext.lineTo(mapCenterXDraw - mapWidthDraw * 0.5,mapCenterYDraw + mapHeightDraw * 0.5);
 	}
 	else
 	{
-		contextMap.moveTo(mapCenterX - mapWidth * 0.5,mapCenterY + mapHeight * 0.5 - 20.0);
-		contextMap.lineTo(mapCenterX - mapWidth * 0.5,mapCenterY + mapHeight * 0.5);
+		theContext.moveTo(mapCenterXDraw - mapWidthDraw * 0.5,mapCenterYDraw + mapHeightDraw * 0.5 - 20.0);
+		theContext.lineTo(mapCenterXDraw - mapWidthDraw * 0.5,mapCenterYDraw + mapHeightDraw * 0.5);
 	}
-		contextMap.stroke();
-	drawTextCenter(contextMap,"-180",mapCenterX - mapWidth * 0.5,mapCenterY + mapHeight * 0.5 + 10);
+		theContext.stroke();
+	drawTextCenter(theContext,"-180",mapCenterXDraw - mapWidthDraw * 0.5,mapCenterYDraw + mapHeightDraw * 0.5 + 10);
 
-	contextMap.beginPath();
+	theContext.beginPath();
 	if (projectionType == "Mollweide")
 	{
-		contextMap.moveTo(mapCenterX - mapWidth * 0.25,mapCenterY + mapHeight * 0.5 * Math.sqrt(0.75));
-		contextMap.lineTo(mapCenterX - mapWidth * 0.25,mapCenterY + mapHeight * 0.5);
+		theContext.moveTo(mapCenterXDraw - mapWidthDraw * 0.25,mapCenterYDraw + mapHeightDraw * 0.5 * Math.sqrt(0.75));
+		theContext.lineTo(mapCenterXDraw - mapWidthDraw * 0.25,mapCenterYDraw + mapHeightDraw * 0.5);
 	}
 	else
 	{
-		contextMap.moveTo(mapCenterX - mapWidth * 0.25,mapCenterY + mapHeight * 0.5 - 20.0);
-		contextMap.lineTo(mapCenterX - mapWidth * 0.25,mapCenterY + mapHeight * 0.5);
+		theContext.moveTo(mapCenterXDraw - mapWidthDraw * 0.25,mapCenterYDraw + mapHeightDraw * 0.5 - 20.0);
+		theContext.lineTo(mapCenterXDraw - mapWidthDraw * 0.25,mapCenterYDraw + mapHeightDraw * 0.5);
 	}
-	contextMap.stroke();
-	drawTextCenter(contextMap,"-90",mapCenterX - mapWidth * 0.25,mapCenterY + mapHeight * 0.5 + 10);
+	theContext.stroke();
+	drawTextCenter(theContext,"-90",mapCenterXDraw - mapWidthDraw * 0.25,mapCenterYDraw + mapHeightDraw * 0.5 + 10);
 
-	drawTextCenter(contextMap,"0",mapCenterX,mapCenterY + mapHeight * 0.5 + 10);
-	contextMap.beginPath();
+	drawTextCenter(theContext,"0",mapCenterXDraw,mapCenterYDraw + mapHeightDraw * 0.5 + 10);
+	theContext.beginPath();
 	if (projectionType == "Mollweide")
 	{
-		contextMap.moveTo(mapCenterX + mapWidth * 0.25,mapCenterY + mapHeight * 0.5 * Math.sqrt(0.75));
-		contextMap.lineTo(mapCenterX + mapWidth * 0.25,mapCenterY + mapHeight * 0.5);
+		theContext.moveTo(mapCenterXDraw + mapWidthDraw * 0.25,mapCenterYDraw + mapHeightDraw * 0.5 * Math.sqrt(0.75));
+		theContext.lineTo(mapCenterXDraw + mapWidthDraw * 0.25,mapCenterYDraw + mapHeightDraw * 0.5);
 	}
 	else
 	{
-		contextMap.moveTo(mapCenterX + mapWidth * 0.25,mapCenterY + mapHeight * 0.5 - 20.0);
-		contextMap.lineTo(mapCenterX + mapWidth * 0.25,mapCenterY + mapHeight * 0.5);
+		theContext.moveTo(mapCenterXDraw + mapWidthDraw * 0.25,mapCenterYDraw + mapHeightDraw * 0.5 - 20.0);
+		theContext.lineTo(mapCenterXDraw + mapWidthDraw * 0.25,mapCenterYDraw + mapHeightDraw * 0.5);
 	}
-	contextMap.stroke();
-	drawTextCenter(contextMap,"+90",mapCenterX + mapWidth * 0.25,mapCenterY + mapHeight * 0.5 + 10);
+	theContext.stroke();
+	drawTextCenter(theContext,"+90",mapCenterXDraw + mapWidthDraw * 0.25,mapCenterY + mapHeightDraw * 0.5 + 10);
 
-	contextMap.beginPath();
+	theContext.beginPath();
 	if (projectionType == "Mollweide")
 	{
-		contextMap.moveTo(mapCenterX + mapWidth * 0.5,mapCenterY);
-		contextMap.lineTo(mapCenterX + mapWidth * 0.5,mapCenterY + mapHeight * 0.5);
+		theContext.moveTo(mapCenterXDraw + mapWidthDraw * 0.5,mapCenterYDraw);
+		theContext.lineTo(mapCenterXDraw + mapWidthDraw * 0.5,mapCenterYDraw + mapHeightDraw * 0.5);
 	}
 	else
 	{
-		contextMap.moveTo(mapCenterX + mapWidth * 0.5,mapCenterY + mapHeight * 0.5 - 20.0);
-		contextMap.lineTo(mapCenterX + mapWidth * 0.5,mapCenterY + mapHeight * 0.5);
+		theContext.moveTo(mapCenterXDraw + mapWidthDraw * 0.5,mapCenterYDraw + mapHeightDraw * 0.5 - 20.0);
+		theContext.lineTo(mapCenterXDraw + mapWidthDraw * 0.5,mapCenterYDraw + mapHeightDraw * 0.5);
 	
 	}
-	contextMap.stroke();
-	drawTextCenter(contextMap,"+180",mapCenterX + mapWidth * 0.5,mapCenterY + mapHeight * 0.5 + 10);
-	contextMap.restore();
-	contextMap.font = "20px Arial"
-	contextMap.fillStyle = "#FFFFFF"
-	drawTextCenter(contextMap,"Select Filter:",canvasMap.width * 0.5,canvasMap.height - 140);
-	drawTextCenter(contextMap,"Show Constellations:",canvasMap.width * 0.5,canvasMap.height - 85);
-	drawTextCenter(contextMap,"Select Coordinate System:",canvasMap.width * 0.5,canvasMap.height - 30);
+	theContext.stroke();
+	drawTextCenter(theContext,"+180",mapCenterXDraw + mapWidthDraw * 0.5,mapCenterYDraw + mapHeightDraw * 0.5 + 10);
 
-	commonUIdraw(contextMap);
+	theContext.font = "20px Arial"
+	theContext.fillStyle = "#FFFFFF"
+	drawTextCenter(theContext,"Select Filter:",theCanvas.width * 0.5,filterTextY);
+	drawTextCenter(theContext,"Show Constellations:",theCanvas.width * 0.5,constellationTextY);
+	drawTextCenter(theContext,"Select Coordinate System:",theCanvas.width * 0.5,coordinatesTextY);
+
+	commonUIdraw(theContext);
 }
+
 
 var waitForReadyTimer = 0.0;
 
@@ -374,13 +569,13 @@ function waitForReady()
 {
 	if (!constellationsReady || !starsReady)
 	{
-		contextMap.fillStyle = "#000000";
-		contextMap.fillRect(0,0,canvasMap.width,canvasMap.height);
+		theContext.fillStyle = "#000000";
+		theContext.fillRect(0,0,theCanvas.width,theCanvas.height);
 		waitForReadyTimer += 0.25;
-		contextMap.fillStyle = "#FFFFFF";
-		contextMap.fillStyle = "#FFFFFF";
-		contextMap.font = "20px Ariel";
-		drawTextCenter(contextMap,"Please Wait",canvasMap.width * 0.5,canvasMap.height * 0.5 - 15);
+		theContext.fillStyle = "#FFFFFF";
+		theContext.fillStyle = "#FFFFFF";
+		theContext.font = "20px Ariel";
+		drawTextCenter(theContext,"Please Wait",theCanvas.width * 0.5,theCanvas.height * 0.5 - 15);
 		var timerDots = Math.floor(waitForReadyTimer * 4.0) % 4;
 		var dots = "";
 		if (timerDots == 0)
@@ -389,8 +584,8 @@ function waitForReady()
 			dots = ".."
 		else 
 			dots = "..."
-		contextMap.fillText("Scanning the Sky " + dots,canvasMap.width * 0.5 - contextMap.measureText("Scanning the Sky ").width * 0.5,canvasMap.height * 0.5 + 15);
-		drawTextCenter(contextMap,"This may take a minute or two.",canvasMap.width * 0.5,canvasMap.height * 0.5 + 45);
+		theContext.fillText("Scanning the Sky " + dots,theCanvas.width * 0.5 - theContext.measureText("Scanning the Sky ").width * 0.5,theCanvas.height * 0.5 + 15);
+		drawTextCenter(theContext,"This may take a minute or two.",theCanvas.width * 0.5,theCanvas.height * 0.5 + 45);
 		window.setTimeout(waitForReady, 333.0);
 	}
 	else

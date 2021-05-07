@@ -489,13 +489,13 @@ function drawSSmap()
 		if (!g_simpleSolarSystem)
 		{
 			theContext.save();
-			var e =value.orbitalEccentricity
-			var d = value.semiMajorAxis * e * zoom;
-			var longPerRad = value.longPerihelion * kRadians;
+			var e =value.orbitalParameters.orbitalEccentricity
+			var d = value.orbitalParameters.semiMajorAxis * e * zoom;
+			var longPerRad = value.orbitalParameters.longitudePerihelion;
 			var longPerSin = Math.sin(longPerRad);
 			var longPerCos = Math.cos(longPerRad);
-			var semiMajorAxis = zoom * value.semiMajorAxis * Math.cos(value.orbitalInclination * kRadians);
-			var semiMinorAxis = zoom * value.semiMajorAxis * Math.sqrt(1.0 - e * e);
+			var semiMajorAxis = zoom * value.orbitalParameters.semiMajorAxis * Math.cos(value.orbitalParameters.orbitalInclination);
+			var semiMinorAxis = zoom * value.orbitalParameters.semiMajorAxis * Math.sqrt(1.0 - e * e);
 //			theContext.scale(zoom * value.semiMajorAxis,zoom * value.semiMajorAxis);
 //			theContext.translate(-e * semiMajorAxis,0);
 			theContext.strokeStyle  = "#3F3F3F";
@@ -525,7 +525,7 @@ function drawSSmap()
 			// orbit
 			theContext.strokeStyle  = "#3F3F3F";
 			theContext.beginPath();
-			theContext.arc(0,0,zoom * value.semiMajorAxis ,0,2.0*Math.PI,true);
+			theContext.arc(0,0,zoom * value.orbitalParameters.semiMajorAxis ,0,2.0*Math.PI,true);
 			theContext.closePath();
 			theContext.stroke();
 		}

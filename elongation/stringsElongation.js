@@ -53,7 +53,7 @@ const ElongationStringInternal =
 
 	line1StateFinal: "Congratulations!",
 	line2StateFinal: "You're done with the tutorial.",
-	line3StateFinal: "You can replay this tutorial later using the `Replay Tutorial' button.",
+	line3StateFinal: "You can replay this tutorial later using the `Tutorial' button.",
 	line4StateFinal: "You can use the 'Prev' button below to go back, or 'Next' to finish the tutorial.",
 
 	lineContinueAbove: "To continue, select the 'Next' button above.",

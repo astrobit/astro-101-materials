@@ -383,7 +383,6 @@ g_tutorial.addUI(7,tutorialRewindButton);
 
 
 var tutorialCompleted = window.localStorage.getItem("tutorialComplete");
-console.log("tutorial status " + tutorialCompleted);
 if (!tutorialCompleted)
 	g_tutorial.activate();
 
@@ -413,7 +412,7 @@ else
 playButton.textFont = "24px Arial";
 commonUIRegister(playButton);
 
-var replayTutorialButton = new Button("Replay Tutorial",theCanvas.width - 310,modelButtonsY,200,25,tutorialStart);
+var replayTutorialButton = new Button("Tutorial",theCanvas.width - 210,modelButtonsY,200,25,tutorialStart);
 replayTutorialButton.textFont = "24px Arial";
 commonUIRegister(replayTutorialButton);
 

@@ -412,7 +412,7 @@ else
 playButton.textFont = "24px Arial";
 commonUIRegister(playButton);
 
-var replayTutorialButton = new Button("Tutorial",theCanvas.width - 210,modelButtonsY,200,25,tutorialStart);
+var replayTutorialButton = new Button("Tutorial",theCanvas.width - 210,modelButtonsY,100,25,tutorialStart);
 replayTutorialButton.textFont = "24px Arial";
 commonUIRegister(replayTutorialButton);
 

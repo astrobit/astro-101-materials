@@ -211,6 +211,23 @@ class Radio
 		}
 		return ret;
 	}
+	setState(value)
+	{
+		var found = null;
+		for (i = 0; i < this.radioButtonArray.length; i++)
+		{
+			if (value == this.radioButtonArray[i].value)
+				found = i;
+		}
+		if (found !== null)
+		{
+			this.onClicker(this.radioButtonArray[found].value);
+			for (i = 0; i < this.radioButtonArray.length; i++)
+			{
+				this.radioButtonArray[i].selected = (i == found);
+			}
+		}
+	}
 }
 
 class Slider

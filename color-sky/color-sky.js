@@ -13,11 +13,21 @@ var zoom = 1.0;
 var zoomCenterX = 0;
 var zoomCenterY = 0;
 
+const minimumButtonsHeight = 280;
+theCanvas.height = window.innerHeight - 60;
+theCanvas.width = window.innerWidth - 20;
 
 const offsetButtonsText = 10;
 const offsetTextButtons = 50;
-var mapWidth = theCanvas.width - 80;
-var mapHeight = 0.5 * mapWidth;
+var mapHeight = theCanvas.height - minimumButtonsHeight;
+var mapWidth = 2 * mapHeight;
+if (mapWidth > theCanvas.width - 80)
+{
+	mapWidth = theCanvas.width - 80;
+	mapHeight = 0.5 * mapWidth;
+}
+
+
 var mapCenterX = theCanvas.width / 2;
 var mapCenterY = mapHeight / 2 + 5;
 var filterTextY = mapHeight + offsetTextButtons;

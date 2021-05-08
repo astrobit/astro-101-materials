@@ -1,14 +1,19 @@
 var theCanvas = document.getElementById("theCanvas");
 var theContext = theCanvas.getContext("2d");
 
-var elongationMapHeight = 300;
-var elongationMapWidth = theCanvas.width - 50;
-var SSmapWidth = 400;
-var SSmapHeight = 400;
-var phaseWidth = 400;
-var phaseHeight = 400;
+var minimumControlsHeightTop = 130;
 
-var elongationMapX = elongationMapWidth / 2 + 25;
+theCanvas.height = window.innerHeight - 60;
+theCanvas.width = theCanvas.height;
+
+var elongationMapHeight = theCanvas.height / 2 - minimumControlsHeightTop;
+var elongationMapWidth = elongationMapHeight * 2;
+var SSmapWidth = elongationMapHeight
+var SSmapHeight = elongationMapHeight
+var phaseWidth = elongationMapHeight
+var phaseHeight = elongationMapHeight
+
+var elongationMapX = theCanvas.width / 2
 var elongationMapY = elongationMapHeight / 2;
 
 var buttonsTimeY = elongationMapY + elongationMapHeight / 2 + 45;
@@ -24,8 +29,8 @@ var phaseY = buttonsPlanetsY + 50 + phaseHeight / 2;
 var SSmapX = bottomSpace / 3.0 + SSmapWidth * 0.5;
 var SSmapY = buttonsPlanetsY + 50 + SSmapHeight / 2;
 
-var tutorialControlsY0 = modelButtonsY;
-var tutorialControlsY1 = 50;
+var tutorialControlsY0 = theCanvas.height - 30;
+var tutorialControlsY1 = theCanvas.height - 30;
 
 var speed = 4.0;//0.25;
 var pause = true;
@@ -191,7 +196,7 @@ function tutorialDraw(context,state)
 	case 1:
 		context.globalAlpha = 0.9;
 		context.fillStyle = "#000000";
-		context.fillRect(0,buttonsTimeY,theCanvas.width,theCanvas.height - buttonsTimeY);
+		context.fillRect(0,buttonsTimeY - 3,theCanvas.width,theCanvas.height - buttonsTimeY + 3);
 		context.globalAlpha = 1.0;
 		context.fillStyle = "#FFFFFF";
 		context.font = "24px Arial";
@@ -212,8 +217,8 @@ function tutorialDraw(context,state)
 	case 2:
 		context.globalAlpha = 0.9;
 		context.fillStyle = "#000000";
-		context.fillRect(0,0,theCanvas.width,buttonsTimeY);
-		context.fillRect(0,buttonsPlanetsY,theCanvas.width,theCanvas.height - buttonsPlanetsY);
+		context.fillRect(0,0,theCanvas.width,buttonsTimeY - 3);
+		context.fillRect(0,buttonsPlanetsY - 3,theCanvas.width,theCanvas.height - buttonsPlanetsY + 3);
 		context.globalAlpha = 1.0;
 		context.fillStyle = "#FFFFFF";
 		context.font = "24px Arial";
@@ -227,7 +232,7 @@ function tutorialDraw(context,state)
 	case 3:
 		context.globalAlpha = 0.9;
 		context.fillStyle = "#000000";
-		context.fillRect(0,0,theCanvas.width,buttonsPlanetsY);
+		context.fillRect(0,0,theCanvas.width,buttonsPlanetsY - 3);
 		context.fillRect(0,buttonsPlanetsY + 26,theCanvas.width,theCanvas.height - buttonsPlanetsY - 26);
 		context.globalAlpha = 1.0;
 		context.fillStyle = "#FFFFFF";
@@ -239,9 +244,9 @@ function tutorialDraw(context,state)
 	case 4:
 		context.globalAlpha = 0.9;
 		context.fillStyle = "#000000";
-		context.fillRect(0,0,theCanvas.width,buttonsPlanetsY + 50);
-		context.fillRect(0,buttonsPlanetsY + 50,phaseX - phaseWidth / 2 - 50,theCanvas.height - buttonsPlanetsY - 50);
-		context.fillRect(0,modelButtonsY,theCanvas.width,theCanvas.height - modelButtonsY);
+		context.fillRect(0,0,theCanvas.width,buttonsPlanetsY + 47);
+		context.fillRect(0,buttonsPlanetsY + 47,phaseX - phaseWidth / 2 - 50,theCanvas.height - buttonsPlanetsY - 47);
+		context.fillRect(0,modelButtonsY - 3,theCanvas.width,theCanvas.height - modelButtonsY + 3);
 		context.globalAlpha = 1.0;
 		context.fillStyle = "#FFFFFF";
 		context.font = "24px Arial";
@@ -267,9 +272,9 @@ function tutorialDraw(context,state)
 	case 5:
 		context.globalAlpha = 0.9;
 		context.fillStyle = "#000000";
-		context.fillRect(0,0,theCanvas.width,buttonsPlanetsY + 50);
-		context.fillRect(phaseX - phaseWidth / 2,buttonsPlanetsY + 50,theCanvas.width - phaseX + phaseWidth / 2,theCanvas.height - buttonsPlanetsY - 50);
-		context.fillRect(0,modelButtonsY,theCanvas.width,theCanvas.height - modelButtonsY);
+		context.fillRect(0,0,theCanvas.width,buttonsPlanetsY + 47);
+		context.fillRect(SSmapX + SSmapWidth * 0.5 + 3,buttonsPlanetsY + 47,theCanvas.width - (SSmapX + SSmapWidth * 0.5 + 3),theCanvas.height - buttonsPlanetsY - 47);
+		context.fillRect(0,modelButtonsY - 3,theCanvas.width,theCanvas.height - modelButtonsY + 3);
 		context.globalAlpha = 1.0;
 		context.fillStyle = "#FFFFFF";
 		context.font = "24px Arial";
@@ -299,7 +304,7 @@ function tutorialDraw(context,state)
 		drawTextCenter(context,ElongationStrings.line4State6,theCanvas.width * 0.5,510);
 
 		context.font = "20px Arial";
-		drawTextCenter(context,ElongationStrings.lineContinueAbove,theCanvas.width * 0.5,600);
+		drawTextCenter(context,ElongationStrings.lineContinue,theCanvas.width * 0.5,600);
 		break;
 	case 7:
 		context.globalAlpha = 0.9;
@@ -718,8 +723,8 @@ function drawPhase()
 	theContext.fillText(angSizeDisplay,42,halfHeight);
 
 
-	var sizeEq = 50.0 * g_planetView[selectedPlanet].angSizeEq / g_planetView[selectedPlanet].angSizeAvg;
-	var sizePol = 50.0 * g_planetView[selectedPlanet].angSizePolar / g_planetView[selectedPlanet].angSizeAvg;
+	var sizeEq = (halfHeight - 60) * g_planetView[selectedPlanet].angSizeEq / 1.5029224114395615801287337173096e-4;// / g_planetView[selectedPlanet].angSizeAvg;
+	var sizePol = (halfHeight - 60) * g_planetView[selectedPlanet].angSizePolar / 1.5029224114395615801287337173096e-4;// / g_planetView[selectedPlanet].angSizeAvg;
 
 	if (g_planetView[selectedPlanet].phase != 0.0)
 	{

@@ -112,15 +112,15 @@ commonUIRegister(new Radio("Planet",selectedPlanet,selectPlanet,radButtons));
 
 function selectComplexity(value)
 {
-	g_simpleSolarSystem = (value == "Simple Solar System");
+	g_simpleSolarSystem = (value == "Simple Model");
 }
 var modelButtons = new Array();
-modelButtons.push(new RadioButton("Simple Solar System","Simple Solar System",SSmapX - 200 - 5,modelButtonsY,200,25));
-modelButtons.push(new RadioButton("Real Solar System","Real Solar System",SSmapX + 5,modelButtonsY,200,25));
+modelButtons.push(new RadioButton("Simple Model","Simple Model",SSmapX - 140 - 5,modelButtonsY,140,25));
+modelButtons.push(new RadioButton("Real Model","Real Model",SSmapX + 5,modelButtonsY,140,25));
 if (g_simpleSolarSystem)
-	commonUIRegister(new Radio("Model","Simple Solar System",selectComplexity,modelButtons));
+	commonUIRegister(new Radio("Model","Simple Model",selectComplexity,modelButtons));
 else
-	commonUIRegister(new Radio("Model","Real Solar System",selectComplexity,modelButtons));
+	commonUIRegister(new Radio("Model","Real Model",selectComplexity,modelButtons));
 
 
 
@@ -659,10 +659,10 @@ function drawElongationMap()
 // draw planet information on the map
 	theContext.fillStyle = "#FFFF00"
 	theContext.font = "15px Arial";
-	drawTextRight(theContext,"Planet: ",-310,35);
-	theContext.fillText(selectedPlanet,-305,35);
-	drawTextRight(theContext,"Elongation: " ,-145,35);
-	drawTextRight(theContext,elongationDisplay + String.fromCharCode(0x00b0),-105,35);
+	drawTextRight(theContext,"Planet: ",-210,35);
+	theContext.fillText(selectedPlanet,-205,35);
+	drawTextRight(theContext,"Elongation: " ,-55,35);
+	drawTextRight(theContext,elongationDisplay + String.fromCharCode(0x00b0),-5,35);
 
 	var timerReadable = Math.round(g_timer / 365.0 * 100.0 - 6716.0) / 100.0
 	var timerDisplay = timerReadable.toString();
@@ -677,7 +677,7 @@ function drawElongationMap()
 	var timerDisplayDays = timerReadableDays.toString();
 
 
-	theContext.fillText("Date: ",150,35);
+	theContext.fillText("Date: ",50,35);
 	var calend = JDtoGregorian(g_timer);
 	var monthDisplay = calend.month.toString();
 	if (calend.month < 10)
@@ -685,8 +685,8 @@ function drawElongationMap()
 	var dayDisplay = Math.floor(calend.day).toString()
 	if (calend.day < 10)
 		dayDisplay = "0" + dayDisplay;
-	drawTextRight(theContext,calend.year + "/" + monthDisplay + '/' + dayDisplay,280,35);
-	drawTextRight(theContext,"(JD "+ timerDisplayDays + ")",380,35);
+	drawTextRight(theContext,calend.year + "/" + monthDisplay + '/' + dayDisplay,180,35);
+	drawTextRight(theContext,"(JD "+ timerDisplayDays + ")",280,35);
 
 	theContext.restore();
 }
@@ -703,24 +703,22 @@ function drawPhase()
 	theContext.textBaseline = "top";
 	drawTextCenter(theContext,"View of Planet",0.0,-halfHeight);
 	theContext.textBaseline = "bottom";
-	drawTextRight(theContext,"Phase: ",-142,halfHeight);
 	var phaseDisplay = (Math.round(g_planetView[selectedPlanet].phase*10.0)/10.0).toString();
 	if (phaseDisplay.charAt(phaseDisplay.length - 2) != '.')
 		phaseDisplay = phaseDisplay + ".0"
-	theContext.fillText(phaseDisplay,-138,halfHeight);
+	drawTextRight(theContext,"Phase: " + phaseDisplay,-70,halfHeight);
 
-	drawTextRight(theContext,"V: ",128,halfHeight);
 	var appBrightDisplay = (Math.round(g_planetView[selectedPlanet].appBright*10.0)/10.0).toString();
 	if (appBrightDisplay.charAt(appBrightDisplay.length - 2) != '.')
 		appBrightDisplay = appBrightDisplay + ".0"
-	theContext.fillText(appBrightDisplay,132,halfHeight);
+	theContext.fillText("V: " + appBrightDisplay,70,halfHeight);
 
 	var angSizeDisplay = (Math.round(g_planetView[selectedPlanet].angSizeEq * 2.0 * 180.0 * 3600.0 / Math.PI * 10.0) / 10.0).toString();
 	if (angSizeDisplay.charAt(angSizeDisplay.length - 2) != '.')
 		angSizeDisplay = angSizeDisplay + ".0"
 	angSizeDisplay += '"';
-	drawTextRight(theContext,"Apparent Size: ",38,halfHeight);
-	theContext.fillText(angSizeDisplay,42,halfHeight);
+	drawTextRight(theContext,"Size: ",-2,halfHeight);
+	theContext.fillText(angSizeDisplay,2,halfHeight);
 
 
 	var sizeEq = (halfHeight - 60) * g_planetView[selectedPlanet].angSizeEq / 1.5029224114395615801287337173096e-4;// / g_planetView[selectedPlanet].angSizeAvg;

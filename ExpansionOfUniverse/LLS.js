@@ -1,5 +1,4 @@
-// JavaScript source code
-
+// linear least squares fitting
 
 class LLS
 {

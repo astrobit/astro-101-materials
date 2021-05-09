@@ -2,7 +2,13 @@
 // written by Brian W. Mulligan, except randn_bm function 
 // Copyright (c) 2020, Brian W. Mulligan
 
-
+function fixColorHex(color)
+{
+	out = color.toString(16);
+	if (out.length < 2)
+		out = '0' + out;
+	return out;
+}
 function scaleColor(x,color)
 {
 	var rg = Math.round((224.0 * (1.0 - color) + 31.0) * x);
@@ -16,8 +22,22 @@ function scaleColor(x,color)
 	else if (b < 0.0)
 		b = 0.0;
 
-	var rgOut = rg.toString(16);
-	return '#' + rgOut + rgOut + b.toString(16);
+	var rgOut = fixColorHex(rg);
+	return '#' + rgOut + rgOut + fixColorHex(b);
+}
+function scaleColorElliptical(x,color)
+{
+	var r = Math.min(Math.floor(256.0 * x),255);
+	var g = Math.min(Math.floor(color / 0.3 * 256.0 * x),255);
+	var b = Math.max(Math.min(Math.floor((color - 0.3) / 0.7 * 256.0 * x),255),0);
+	return '#' + fixColorHex(r) + fixColorHex(g) + fixColorHex(b);
+}
+function scaleColorSpiral(x,color)
+{
+	var b = Math.min(Math.floor(256.0 * x),255);
+	var rg = Math.min(Math.floor(256.0 * (1.0 - color) * x),255);
+	var rgOut = fixColorHex(rg);
+	return '#' + rgOut + rgOut + fixColorHex(b);
 }
 
 
@@ -120,21 +140,47 @@ function drawTelescopeField(cx,cy,radius)
 				var flux = universe[idxLcl]._luminosity * Math.pow(dist * 2.06265e11,-2);
 				var Mv = -2.5 * Math.log10(flux) - 26.75;
 
+				var invDist = 1.0 / dist;
 
-				var angSize = universe[idxLcl]._luminosity / 2.0e10 * 0.03 / dist
+				var angSize = universe[idxLcl]._sizeBasis * invDist;
 				var size = angSize * telescopes[0]._magnification / radius;
 
 				var bright = (20.0 - Mv) / 3.0;
-				theContext.fillStyle = scaleColor(bright,universe[idxLcl]._color);
 				var lclSave = theContext.save();
 				theContext.translate(mx,my);
 				theContext.rotate(universe[idxLcl]._orientation);
-				theContext.scale(1.0,universe[idxLcl]._faceon);
-				theContext.scale(size,size);
-				theContext.beginPath();
-				theContext.arc(0,0,1.0,0,2.0 * Math.PI);
-				theContext.closePath();
-				theContext.fill();
+				if (universe[idxLcl]._galaxyType == 0) // elliptical
+				{
+					var sizeY = universe[idxLcl]._radiusPolar / universe[idxLcl]._radiusEquatorial * size;
+					var grd = theContext.createRadialGradient(0, 0, 0, 0, 0, size);
+					grd.addColorStop(0, scaleColorElliptical(bright,universe[idxLcl]._color));
+					grd.addColorStop(1, "#000000");
+					theContext.fillStyle = grd;
+					theContext.scale(size,sizeY);
+					theContext.beginPath();
+					theContext.arc(0,0,1.0,0,2.0 * Math.PI);
+					theContext.closePath();
+					theContext.fill();
+				}
+				else
+				{
+					var sizeBulge = universe[idxLcl]._bulgeSize / universe[idxLcl]._diskSize * size;
+					var grd = theContext.createRadialGradient(0, 0, 0, 0, 0, sizeBulge);
+					grd.addColorStop(0, scaleColorElliptical(bright,universe[idxLcl]._color));
+					grd.addColorStop(1, "#000000");
+					theContext.fillStyle = grd;
+					theContext.scale(sizeBulge,sizeBulge);
+					theContext.beginPath();
+					theContext.arc(0,0,1.0,0,2.0 * Math.PI);
+					theContext.closePath();
+					theContext.fill();
+				}
+//				theContext.scale(1.0,universe[idxLcl]._faceon);
+//				theContext.scale(size,size);
+//				theContext.beginPath();
+//				theContext.arc(0,0,1.0,0,2.0 * Math.PI);
+//				theContext.closePath();
+//				theContext.fill();
 				theContext.restore(lclSave);
 
 				inView.push(idxLcl);

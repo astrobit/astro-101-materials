@@ -140,7 +140,22 @@ class Galaxy
 		this._vpec_z = (Math.random() - 0.5) * 2.0 * 700.0; // km/s
 
 		this._orientation = Math.random() * Math.PI;
-		this._faceon = Math.random() * 0.75 + 0.25;
+		this._galaxyType = Math.floor(Math.random() + 0.5); // 0 or 1
+		this._sizeBasis = this._luminosity / 2.0e10 * 0.03;
+
+		if (this._galaxyType == 0) // elliptical
+		{
+			this._radiusEquatorial = this._sizeBasis;
+			this._radiusPolar = this._sizeBasis * (Math.random() * 0.25 + 0.75);
+		}
+		else
+		{
+			this._bulgeSize = this._sizeBasis * (Math.random() * 0.25 + 0.75);
+			this._diskSize = this._sizeBasis;
+			this._orientationFace = Math.random() * Math.PI;
+		}
+
+		//this._faceon = Math.random() * 0.75 + 0.25;
 		this._color = Math.random();
 
 		this._id = 'NSiGC ' + Math.round(Math.random() * 1000000);

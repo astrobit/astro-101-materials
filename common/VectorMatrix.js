@@ -81,14 +81,14 @@ class ThreeVector
 		this.x += vector.x;
 		this.y += vector.y;
 		this.z += vector.z;
-		calcPolar();
+		this.calcPolar();
 	}
 	selfSubtract(vector)
 	{
 		this.x -= vector.x;
 		this.y -= vector.y;
 		this.z -= vector.z;
-		calcPolar();
+		this.calcPolar();
 	}
 	selfScale(scalar)
 	{
@@ -121,32 +121,32 @@ class ThreeVector
 	set x(val)
 	{
 		this._x = val;
-		calcPolar();
+		this.calcPolar();
 	}
 	set y(val)
 	{
 		this._y = val;
-		calcPolar();
+		this.calcPolar();
 	}
 	set z(val)
 	{
 		this._z = val;
-		calcPolar();
+		this.calcPolar();
 	}
 	set r(val)
 	{
 		this._r = val;
-		calcRectangular();
+		this.calcRectangular();
 	}
 	set theta(val)
 	{
 		this._theta = val;
-		calcRectangular();
+		this.calcRectangular();
 	}
 	set psi(val)
 	{
 		this._psi = val;
-		calcRectangular();
+		this.calcRectangular();
 	}
 	get x()
 	{

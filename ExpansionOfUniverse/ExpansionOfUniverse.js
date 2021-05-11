@@ -1,7 +1,68 @@
 ﻿// Galaxy Rotation simulation for introductory astronomy
 // written by Brian W. Mulligan, except randn_bm function 
-// Copyright (c) 2020, Brian W. Mulligan
+// Copyright (c) 2020,2021, Brian W. Mulligan
 
+class RGB
+{
+	constructor()
+	{
+		this._r = 0;
+		this._g = 0;
+		this._b = 0;
+	}
+	set r(value)
+	{
+		this._r = value;
+		if (value < 1)
+			this._r = 0;
+		else if (value > 255)
+			this._r = 255;
+	}
+	set g(value)
+	{
+		this._g = value;
+		if (value < 1)
+			this._g = 0;
+		else if (value > 255)
+			this._g = 255;
+	}
+	set b(value)
+	{
+		this._b = value;
+		if (value < 1)
+			this._b = 0;
+		else if (value > 255)
+			this._b = 255;
+	}
+	get r()
+	{
+		return this._r;
+	}
+	get g()
+	{
+		return this._g;
+	}
+	get b()
+	{
+		return this._b;
+	}
+	get style()
+	{
+		// create an HTML color style based on RGB values
+		var sR = Math.floor(this._r).toString(16);
+		if (this._r < 16) // if the value is small enough for one hex digit, add a leading zero
+			sR = "0" + sR;
+
+		var sG = Math.floor(this._g).toString(16);
+		if (this._g < 16) // if the value is small enough for one hex digit, add a leading zero
+			sG = "0" + sG;
+
+		var sB = Math.floor(this._b).toString(16);
+		if (this._b < 16) // if the value is small enough for one hex digit, add a leading zero
+			sB = "0" + sB;
+		return "#" + sR + sG + sB;
+	}
+}
 function fixColorHex(color)
 {
 	out = color.toString(16);
@@ -11,38 +72,56 @@ function fixColorHex(color)
 }
 function scaleColor(x,color)
 {
-	var rg = Math.round((224.0 * (1.0 - color) + 31.0) * x);
-	if (rg > 255.0)
-		rg = 255.0;
-	else if (rg < 0.0)
-		rg = 0.0;
-	var b = Math.round((128.0 * color + 127.0) * x);
-	if (b > 255.0)
-		b = 255.0;
-	else if (b < 0.0)
-		b = 0.0;
-
-	var rgOut = fixColorHex(rg);
-	return '#' + rgOut + rgOut + fixColorHex(b);
+	var ret = new RGB();
+	ret.r = Math.floor((224.0 * (1.0 - color) + 32.0) * x);
+	ret.g = ret.r;
+	ret.b = Math.floor((128.0 * color + 128.0) * x);
+	return ret;
 }
 function scaleColorElliptical(x,color)
 {
-	var r = Math.min(Math.floor(256.0 * x),255);
-	var g = Math.min(Math.floor(color / 0.3 * 256.0 * x),255);
-	var b = Math.max(Math.min(Math.floor((color - 0.3) / 0.7 * 256.0 * x),255),0);
-	return '#' + fixColorHex(r) + fixColorHex(g) + fixColorHex(b);
+	var ret = new RGB();
+	ret.r = Math.floor(256.0 * x);
+	ret.g = Math.floor(color / 0.3 * 256.0 * x);
+	ret.b = Math.floor((color - 0.3) / 0.7 * 256.0 * x);
+	return ret;
 }
 function scaleColorSpiral(x,color)
 {
-	var b = Math.min(Math.floor(256.0 * x),255);
-	var rg = Math.min(Math.floor(256.0 * (1.0 - color) * x),255);
-	var rgOut = fixColorHex(rg);
-	return '#' + rgOut + rgOut + fixColorHex(b);
+	var ret = new RGB();
+	ret.b = Math.floor(256.0 * x);
+	ret.r = Math.floor(256.0 * (1.0 - color) * x);
+	ret.g = ret.r;
+	return ret;
 }
 
+function drawElliptical(context,size,color,x)
+{
+	var effSize = Math.floor(size);
+	var midX = effSize * 0.5;
+	var midY = effSize * 0.5;
+	var imgData = context.createImageData(effSize, effSize);
+	var color = scaleColorElliptical(x,color)
+	var i;
+	for (i = 0; i < imgData.data.length; i += 4) 
+	{
+		var x = ((i * 0.25) % effSize) - midX;
+		var y = Math.floor((i * 0.25) / effSize) - midY;
+		var r = Math.sqrt(x * x + y * y) / size * 2.0;
 
-var inView;
-var inViewDist;
+		imgData.data[i+0] = color.r;
+		imgData.data[i+1] = color.g;
+		imgData.data[i+2] = color.b;
+		var alpha = Math.floor((1.0 - r) * 256.0);
+		if (alpha > 255)
+			alpha = 255;
+		else if (alpha < 0)
+			alpha = 0;
+		imgData.data[i+3] = alpha;
+	}
+	context.drawImage(imgData, 0, 0);
+}
+
 
 
 function drawMap(cx,cy,width,height)
@@ -59,12 +138,10 @@ function drawMap(cx,cy,width,height)
 	{
 		if (idxLcl != currentHome)
 		{
-			var x = universe[idxLcl]._x - universe[currentHome]._x;
-			var y = universe[idxLcl]._y - universe[currentHome]._y;
-			var z = universe[idxLcl]._z - universe[currentHome]._z;
-			var dist = Math.sqrt(x * x + y * y + z * z);
-			var long = Math.atan2(universe[idxLcl]._y - universe[currentHome]._y,universe[idxLcl]._x - universe[currentHome]._x);
-			var lat = Math.asin(z / dist);
+			var relPos = universe[idxLcl]._position.subtract(universe[currentHome]._position)
+			var dist = relPos.radius;
+			var long = relPos.theta;//Math.atan2(universe[idxLcl]._position.y - universe[currentHome]._position.y,universe[idxLcl]._position.x - universe[currentHome]._position.x);
+			var lat = relPos.psi;//Math.asin(z / dist);
 			var mx = ((long / Math.PI * 0.5 + 0.5) % 1.0) * 2.0 - 1.0;
 			var my = -lat / Math.PI * 2.0;
 
@@ -74,7 +151,7 @@ function drawMap(cx,cy,width,height)
 			var size = angSize / (2.0 * Math.PI) * 100.0;
 
 			var bright = (22.0 - Mv) / 3.0;
-			theContext.fillStyle = scaleColor(bright,universe[idxLcl]._color);
+			theContext.fillStyle = scaleColor(bright,universe[idxLcl]._color).style;
 
 
 //			console.log(mx + ' ' + my + ' ' + flux + ' ' + Mv);
@@ -107,87 +184,106 @@ function drawTelescopeField(cx,cy,radius)
 	var state = theContext.save();
 
 	theContext.translate(cx,cy);
-	theContext.scale(radius,radius);
+	// draw black background for image
 	theContext.fillStyle = "#000000";
+	theContext.fillRect(-radius,-radius,2.0 * radius,2.0 * radius);
+	// draw white frame around view
+	theContext.strokeStyle = "#FFFFFF";
 	theContext.beginPath();
-	theContext.arc(0,0,1,0,2.0 * Math.PI);
+	theContext.rect(-radius - 1,-radius - 1,2.0 * radius + 2,2.0 * radius + 2);
 	theContext.closePath();
-	theContext.fill();
-	theContext.clip();
+	theContext.stroke();
+
+	var imgData = theContext.getImageData(cx - radius, cy - radius, 2 * radius, 2 * radius);
+	var lclList = new Array();
+
 	var idxLcl;
-	for (idxLcl = 0; idxLcl < universe.length; idxLcl++)
+	for (idxLcl = 0; idxLcl < inViewList.length; idxLcl++)
 	{
-		if (idxLcl != currentHome)
+		var curr = universe[inViewList[idxLcl].idx];
+		var currLcl = new Object();
+		currLcl.eqDiskSize = null;
+		currLcl.polDiskSize = null;
+		currLcl.colorDisk = null;
+		if (curr._galaxyType == 0) // elliptical
 		{
-			var x = universe[idxLcl]._x - universe[currentHome]._x;
-			var y = universe[idxLcl]._y - universe[currentHome]._y;
-			var z = universe[idxLcl]._z - universe[currentHome]._z;
-			var dist = Math.sqrt(x * x + y * y + z * z);
-			var long = Math.atan2(universe[idxLcl]._y - universe[currentHome]._y,universe[idxLcl]._x - universe[currentHome]._x);
-			var lat = Math.asin(z / dist);
+			currLcl.eqSize = curr._radiusEquatorial * inViewList[idxLcl].pixelScale;
+			currLcl.polSize = curr._radiusPolar * inViewList[idxLcl].pixelScale;
+			currLcl.color = scaleColorElliptical(inViewList[idxLcl].bright,curr._color)
+		}
+		else
+		{
+			currLcl.eqSize = curr._bulgeSize * inViewList[idxLcl].pixelScale;
+			currLcl.polSize = curr._bulgeSize * inViewList[idxLcl].pixelScale;
+			currLcl.eqDiskSize = curr._diskSize * inViewList[idxLcl].pixelScale;
+			currLcl.polDiskSize = curr._diskSize * inViewList[idxLcl].pixelScale * curr._cosOrientationFace;
+			currLcl.color = scaleColorElliptical(inViewList[idxLcl].bright,curr._color)
+			currLcl.colorDisk = scaleColorSpiral(inViewList[idxLcl].bright,curr._color)
+		}
+		currLcl.x = inViewList[idxLcl].x;
+		currLcl.y = inViewList[idxLcl].y;
+		currLcl.bright = inViewList[idxLcl].bright;
+		currLcl._cosOrientation = curr._cosOrientation;
+		currLcl._sinOrientation = curr._sinOrientation;
+		lclList.push(currLcl);
+	}
 
-			var dl = long - viewLong;
-			if (dl >= Math.PI)
-				dl = -2.0 * Math.PI + dl;
-			else if (dl <= -Math.PI)
-				dl = 2.0 * Math.PI + dl;
-			var mx = (((dl / Math.PI * 0.5 + 0.5) % 1.0) * 2.0 - 1.0) * 100.0;
-			var my = (-(lat - viewLat) / Math.PI * 2.0) * 100.0;
-
-			var mr = Math.sqrt(mx * mx + my * my);
-			if (mr < 1.5)
+	for (x = 0; x < 2 * radius; x++)
+	{
+		for (y = 0; y < 2 * radius; y++)
+		{
+			for (idxLcl = 0; idxLcl < lclList.length; idxLcl++)
 			{
-				var flux = universe[idxLcl]._luminosity * Math.pow(dist * 2.06265e11,-2);
-				var Mv = -2.5 * Math.log10(flux) - 26.75;
+				var curr = lclList[idxLcl];
 
-				var invDist = 1.0 / dist;
-
-				var angSize = universe[idxLcl]._sizeBasis * invDist;
-				var size = angSize * telescopes[0]._magnification / radius;
-
-				var bright = (20.0 - Mv) / 3.0;
-				var lclSave = theContext.save();
-				theContext.translate(mx,my);
-				theContext.rotate(universe[idxLcl]._orientation);
-				if (universe[idxLcl]._galaxyType == 0) // elliptical
+				var coordDisk = null;
+				var reDisk = null;
+				if (curr.eqDiskSize !== null)
 				{
-					var sizeY = universe[idxLcl]._radiusPolar / universe[idxLcl]._radiusEquatorial * size;
-					var grd = theContext.createRadialGradient(0, 0, 0, 0, 0, size);
-					grd.addColorStop(0, scaleColorElliptical(bright,universe[idxLcl]._color));
-					grd.addColorStop(1, "#000000");
-					theContext.fillStyle = grd;
-					theContext.scale(size,sizeY);
-					theContext.beginPath();
-					theContext.arc(0,0,1.0,0,2.0 * Math.PI);
-					theContext.closePath();
-					theContext.fill();
+					coordDisk = getPointInEllipse((x - radius) - curr.x,(y - radius) - curr.y,curr.eqDiskSize,curr.polDiskSize,curr._cosOrientation,curr._sinOrientation);
+					reDisk = Math.sqrt(coordDisk.xe * coordDisk.xe + coordDisk.ye * coordDisk.ye);
+					if (reDisk <= 1.0)// && coordDisk.ye < 0) // point is in the ellipse
+					{
+						var alpha = Math.exp(-reDisk * reDisk * reDisk * reDisk * 4.5); // std. dev = 1/3
+						var imgIdx = (y * 2 * radius + x) * 4;
+						imgData.data[imgIdx + 0] = Math.floor((1.0 - alpha) * imgData.data[imgIdx + 0] + alpha * curr.colorDisk.r);
+						imgData.data[imgIdx + 1] = Math.floor((1.0 - alpha) * imgData.data[imgIdx + 1] + alpha * curr.colorDisk.g);
+						imgData.data[imgIdx + 2] = Math.floor((1.0 - alpha) * imgData.data[imgIdx + 2] + alpha * curr.colorDisk.b);
+	//					imgData.data[imgIdx + 3] = imgData.data[imgIdx + 3]; // don't adjust alpha'
+					}
 				}
-				else
-				{
-					var sizeBulge = universe[idxLcl]._bulgeSize / universe[idxLcl]._diskSize * size;
-					var grd = theContext.createRadialGradient(0, 0, 0, 0, 0, sizeBulge);
-					grd.addColorStop(0, scaleColorElliptical(bright,universe[idxLcl]._color));
-					grd.addColorStop(1, "#000000");
-					theContext.fillStyle = grd;
-					theContext.scale(sizeBulge,sizeBulge);
-					theContext.beginPath();
-					theContext.arc(0,0,1.0,0,2.0 * Math.PI);
-					theContext.closePath();
-					theContext.fill();
-				}
-//				theContext.scale(1.0,universe[idxLcl]._faceon);
-//				theContext.scale(size,size);
-//				theContext.beginPath();
-//				theContext.arc(0,0,1.0,0,2.0 * Math.PI);
-//				theContext.closePath();
-//				theContext.fill();
-				theContext.restore(lclSave);
 
-				inView.push(idxLcl);
-				inViewDist.push(mr);
+				var coord = getPointInEllipse((x - radius) - curr.x,(y - radius) - curr.y,curr.eqSize,curr.polSize,curr._cosOrientation,curr._sinOrientation);
+				var re = Math.sqrt(coord.xe * coord.xe + coord.ye * coord.ye);
+				if (re <= 1.0) // point is in the ellipse
+				{
+					var alpha = Math.exp(-re * re * 4.5); // std. dev = 1/3
+					var imgIdx = (y * 2 * radius + x) * 4;
+					imgData.data[imgIdx + 0] = Math.floor((1.0 - alpha) * imgData.data[imgIdx + 0] + alpha * curr.color.r);
+					imgData.data[imgIdx + 1] = Math.floor((1.0 - alpha) * imgData.data[imgIdx + 1] + alpha * curr.color.g);
+					imgData.data[imgIdx + 2] = Math.floor((1.0 - alpha) * imgData.data[imgIdx + 2] + alpha * curr.color.b);
+//					imgData.data[imgIdx + 3] = imgData.data[imgIdx + 3]; // don't adjust alpha'
+				}
+
+/*				if (eqDiskSize !== null)
+				{
+					if (reDisk <= 1.0 && coordDisk.ye > 0) // point is in the ellipse
+					{
+						var alpha = Math.exp(-reDisk * 9); // std. dev = 1/3
+						var imgIdx = (y * 2 * radius + x) * 4;
+						imgData.data[imgIdx + 0] = Math.floor((1.0 - alpha) * imgData.data[imgIdx + 0] + alpha * colorDisk.r);
+						imgData.data[imgIdx + 1] = Math.floor((1.0 - alpha) * imgData.data[imgIdx + 1] + alpha * colorDisk.g);
+						imgData.data[imgIdx + 2] = Math.floor((1.0 - alpha) * imgData.data[imgIdx + 2] + alpha * colorDisk.b);
+	//					imgData.data[imgIdx + 3] = imgData.data[imgIdx + 3]; // don't adjust alpha'
+					}
+				}*/
 			}
 		}
 	}
+		
+//		theContext.restore(lclSave);
+
+	theContext.putImageData(imgData,cx - radius, cy - radius);
 	theContext.restore(state);
 }
 
@@ -209,24 +305,25 @@ function drawCurrentTargetInfo(cx,ty,size)
 	theContext.lineTo(330,size * 0.125);
 	theContext.stroke();
 	var idxLcl;
-	for (idxLcl = 0; idxLcl < inView.length; idxLcl++)
+	for (idxLcl = 0; idxLcl < inViewList.length; idxLcl++)
 	{
-		var id = universe[inView[idxLcl]]._id;
-		var x = universe[inView[idxLcl]]._x - universe[currentHome]._x;
-		var y = universe[inView[idxLcl]]._y - universe[currentHome]._y;
-		var z = universe[inView[idxLcl]]._z - universe[currentHome]._z;
+		var curr = universe[inViewList[idxLcl].idx]
+		var id = curr._id;
+		var x = curr._position.x - universe[currentHome]._position.x;
+		var y = curr._position.y - universe[currentHome]._position.y;
+		var z = curr._position.z - universe[currentHome]._position.z;
 		var dist = Math.sqrt(x * x + y * y + z * z);
 		theContext.fillText(id,-180,(idxLcl + 1.25) * size);
-		if (universe[inView[idxLcl]]._Mv_u != -1)
+		if (curr._Mv_u != -1)
 		{
-			theContext.fillText(universe[inView[idxLcl]]._Mv.toFixed(3) + '±' + universe[inView[idxLcl]]._Mv_u.toFixed(3),0,(idxLcl + 1.25) * size);
+			theContext.fillText(curr._Mv.toFixed(3) + '±' + curr._Mv_u.toFixed(3),0,(idxLcl + 1.25) * size);
 		}
-		if (universe[inView[idxLcl]]._redshift_u != -1)
+		if (curr._redshift_u != -1)
 		{
-			theContext.fillText(universe[inView[idxLcl]]._redshift.toFixed(3),150,(idxLcl + 1.25) * size);
+			theContext.fillText(curr._redshift.toFixed(3),150,(idxLcl + 1.25) * size);
 		}
-		if (universe[inView[idxLcl]]._dist_u != -1)
-			theContext.fillText(universe[inView[idxLcl]]._dist.toFixed(0) + '±' + universe[inView[idxLcl]]._dist_u.toFixed(0),240,(idxLcl + 1.25) * size);
+		if (curr._dist_u != -1)
+			theContext.fillText(curr._dist.toFixed(0) + '±' + curr._dist_u.toFixed(0),240,(idxLcl + 1.25) * size);
 	}
 	theContext.restore(state);
 }

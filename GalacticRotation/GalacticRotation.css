@@ -1,0 +1,73 @@
+﻿h1 {
+font-size:24px;
+text-align:center;
+color:#ffffff;
+}
+
+body {
+font-family:sans-serif;
+font-size:15px;
+width:100%;
+margin-left:auto;
+margin-right:auto;
+background-color:#000000;
+text-align:center;
+}
+
+legend {
+color: #ffffff;
+}
+div {
+margin-left: auto;
+margin-right: auto;
+text-align: center;
+}
+
+table {
+border: 1px solid white;
+text-align: center;
+}
+td {
+align-content: center;
+color: #ffffff;
+}
+
+.slidecontainer {
+width: 100%; /* Width of the outside container */
+}
+
+
+/* Mouse-over effects */
+.slider:hover {
+    opacity: 1; /* Fully shown on mouse-over */
+}
+
+.slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 16px;
+    border-radius: 8px;
+    background: #d3d3d3;
+    outline: none;
+    opacity: 0.7;
+    -webkit-transition: .2s;
+    transition: opacity .2s;
+}
+
+    .slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #4CAF50;
+        cursor: pointer;
+    }
+
+    .slider::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #4CAF50;
+        cursor: pointer;
+    }

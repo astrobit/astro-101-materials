@@ -137,7 +137,7 @@ int main(void)
 			fclose(fileIn);
 	}
 	
-	FILE * fileOut = fopen("data.json","wt");
+	FILE * fileOut = fopen("galaxyRotationData.js","wt");
 	if (fileOut != nullptr)
 	{
 		fprintf(fileOut,"const galaxyData = {\n");

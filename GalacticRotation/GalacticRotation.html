@@ -2,11 +2,15 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <meta name="description" content="A site geared toward astronmy education to explore the rotation curve and surface brightness profiles from galaxies in the <a href="http://astroweb.cwru.edu/SPARC/">SPARC</a> sample, and see how the mass and shape of the disk, bulge, and dark matter halo of galaxies affect the velocity and surface brightness.">
+    <meta name="keywords" content="astronomy, education, galaxies, rotation curve, dark matter">
+    <meta name="author" content="Brian W. Mulligan">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galactic Rotation Curves</title>
     <link rel="stylesheet" href="GalacticRotation.css">
 </head>
 <body>
-    <h1 >Galactic Rotation</h1>
+    <h1>Galactic Rotation Curves</h1>
     <div style="
         margin-left: auto;
         margin-right: auto;
@@ -28,7 +32,7 @@
             <input type="button" id="getGalaxy" onclick="chooseGalaxy();" value="Get New Galaxy">
         </fieldset>
     </div>
-    <div style ="width:1200px;">
+    <div style="width:1200px;">
         <div style="width:400px;float:left">
             <fieldset>
                 <legend>Total Galaxy Mass</legend>
@@ -43,37 +47,6 @@
             </fieldset>
         </div>
         <div style="width: 400px;float:right;">
-            <fieldset>
-                <legend>Component Relative Masses</legend>
-                <label>
-                    Bulge
-                    <input type="range" min="0" max="100" value="50" class="slider" id="bulgeMass">
-                </label>
-                <label>
-                    Disk
-                    <input type="range" min="0" max="100" value="50" class="slider" id="diskMass">
-                </label>
-                <label>
-                    Dark Matter
-                    <input type="range" min="0" max="100" value="50" class="slider" id="DMMass">
-                </label>
-                <table style="width: 350px;">
-                    <tbody>
-                        <tr>
-                            <td style="width:100px;">Bulge</td>
-                            <td style="width:100px;">Disk</td>
-                            <td style="width:100px;">Dark Matter</td>
-                        </tr>
-                        <tr>
-                            <td id="tdBulgeMass">0.3</td>
-                            <td id="tdDiskMass">0.3</td>
-                            <td id="tdDMMass"">0.4</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </fieldset>
-        </div>
-        <div style="width: 400px;">
             <fieldset>
                 <legend>Component Shapes</legend>
                 <label>
@@ -105,7 +78,38 @@
 
             </fieldset>
         </div>
+        <div style="width: 400px;">
+            <fieldset>
+                <legend>Component Relative Masses</legend>
+                <label>
+                    Bulge
+                    <input type="range" min="0" max="100" value="50" class="slider" id="bulgeMass">
+                </label>
+                <label>
+                    Disk
+                    <input type="range" min="0" max="100" value="50" class="slider" id="diskMass">
+                </label>
+                <label>
+                    Dark Matter
+                    <input type="range" min="0" max="100" value="50" class="slider" id="DMMass">
+                </label>
+                <table style="width: 350px;">
+                    <tbody>
+                        <tr>
+                            <td style="width:100px;">Bulge</td>
+                            <td style="width:100px;">Disk</td>
+                            <td style="width:100px;">Dark Matter</td>
+                        </tr>
+                        <tr>
+                            <td id="tdBulgeMass">0.3</td>
+                            <td id="tdDiskMass">0.3</td>
+                            <td id="tdDMMass" ">0.4</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </fieldset>
         </div>
+    </div>
         <div style="width:500px;">
             <p style="color: gray;font-size:75%">Copyright (c) 2020,2021 Brian W. Mulligan</p>
         </div>

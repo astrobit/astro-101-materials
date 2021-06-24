@@ -90,7 +90,7 @@ function scaleColorSpiral(x,color)
 {
 	var ret = new RGB();
 	ret.b = Math.floor(256.0 * x);
-	ret.r = Math.floor(256.0 * (1.0 - color) * x);
+	ret.r = Math.floor((color - 0.3) / 0.7 * 256.0 * x);//Math.floor(256.0 * (1.0 - color) * x);
 	ret.g = ret.r;
 	return ret;
 }

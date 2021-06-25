@@ -1,5 +1,6 @@
 
 var theCanvas = document.getElementById("mapCanvas");
+theCanvas.onselectstart = function () { return false; } // prevent selection of text below the canvas when you click on it
 var theContext = theCanvas.getContext("2d");
 
 var timer = 0;

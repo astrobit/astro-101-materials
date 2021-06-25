@@ -5,6 +5,8 @@
 
 
 var theCanvas = document.getElementById("theCanvas");
+theCanvas.onselectstart = function () { return false; } // prevent selection of text below the canvas when you click on it
+
 var theContext = theCanvas.getContext("2d");
 
 var listGalaxies = new Array();

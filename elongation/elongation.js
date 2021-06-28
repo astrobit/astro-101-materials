@@ -578,7 +578,7 @@ function drawElongationMap()
 		{
 			//console.log("here " + stars[i].latitude + " " + stars[i].longitude + " " + projection.x + " " + projection.y);
 			var starProj = projection.calculate(stars[i].eclat,stars[i].eclong)
-			theContext.fillStyle  = RGBtoColor(UBVRItoRGB(stars[i].U,stars[i].B,stars[i].V,stars[i].R,stars[i].I));
+			theContext.fillStyle  = UBVRItoRGB(stars[i].U,stars[i].B,stars[i].V,stars[i].R,stars[i].I).style;
 			theContext.beginPath();
 			theContext.arc(starProj.x * halfWidth,starProj.y * halfHeight,1,0,2.0*Math.PI,true);
 			theContext.closePath();

@@ -51,7 +51,7 @@ var hDisk = 0.5; // 0.5 kpc scale height for disk - @@TODO consider parameterizi
 var massToLight = 10.0; // assume a mass-to-light ratio //@@TODO consider making this a user controlled parameter
 
 
-function getMassFactor(x,n)
+function getIntegral(x,a)
 {
 	var i = 0;
 	var sum = 0.0;
@@ -65,13 +65,27 @@ function getMassFactor(x,n)
 
 		if (i != 0)
 			factorial *= i;
-		var constTerm = 1.0 / (2.0 * n + i);
-		var xTerm = Math.pow(x, 2.0 * n + 1 + i);
+		var constTerm = 1.0 / (a + i + 1);
+		var xTerm = Math.pow(x, a + 1 + i);
 		delta = xTerm * constTerm / factorial * sign;
 		sum += delta;
 		i++;
 	} while (Math.abs(delta / sum) > 0.1);
 	return sum;
+}
+
+function getMassFactor(x,n)
+{
+	return getIntegral(x,2.0 * n);
+}
+
+function gammaFunction(a)
+{
+	var ret = 1;
+	var i;
+	for (i = 2; i < (a - 1); i++)
+		ret *= i;
+	return ret;
 }
 
 function getUserFitParameters()
@@ -101,8 +115,8 @@ function getUserFitParameters()
 		}
 	}
 
-	var Imin = Math.pow(10.0, 21.572 + 3.24 - minMu);
-	var Imax = Math.pow(10.0, 21.572 + 3.24 - maxMu);
+	var Imin = Math.pow(10.0, (21.572 + 3.24 - minMu)*0.4);
+	var Imax = Math.pow(10.0, (21.572 + 3.24 - maxMu)*0.4);
 	var invNbulge = 1.0 / bulgeIndex;
 	var invNdisk = 1.0 / diskIndex;
 	var invNdm = 1.0 / dmIndex;

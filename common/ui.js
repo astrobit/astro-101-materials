@@ -405,8 +405,8 @@ class Clickable
 	{
 		if (this.onClicker !== null)
 		{
-			var x = (event.clientX - this.x) / this.width;
-			var y = (event.clientY - this.y) / this.height;
+			var x = (event.offsetX - this.x) / this.width;
+			var y = (event.offsetY - this.y) / this.height;
 			this.onClicker(event,x,y);
 		}
 	}

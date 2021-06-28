@@ -1,6 +1,7 @@
 ﻿
 
 var theCanvas = document.getElementById("theCanvas");
+theCanvas.onselectstart = function () { return false; }
 
 var theContext = theCanvas.getContext("2d");
 var timer = 0;
@@ -413,23 +414,71 @@ var viewLat = 0.0;
 
 function createUniverse()
 {
+	var debug = false;
 	var home = new Galaxy();
 	home._position.x = 0;
 	home._position.y = 0;
 	home._position.z = 0;
+	home._luminosity = 1.2e10;
+	home._sizeBasis = this._luminosity / 2.0e10 * 0.03;
+	home._galaxyType = 1;
+	home._bulgeSize = home._sizeBasis * (Math.random() * 0.25 + 0.05);
+	home._diskSize = home._sizeBasis;
+	home._orientationFace = Math.random() * Math.PI;
+	home._cosOrientationFace = Math.cos(home._orientationFace);
+	home._sinOrientationFace = Math.sin(home._orientationFace);
 	home._id = 'Milky Way';
 	universe.push(home);
+	if (debug) {
+		var tempX = new Galaxy();
+		tempX._position.x = 100;
+		tempX._position.y = 0;
+		tempX._position.z = 0;
+		tempX._id = 'Test x';
+		universe.push(tempX);
 
-/*	var temp = new Galaxy();
-	temp._position.x = 0;
-	temp._position.y = 100;
-	temp._position.z = 0;
-	temp._id = 'Test';
-	universe.push(temp);*/
-	var idxLcl;
-	for (idxLcl = 0; idxLcl < 999; idxLcl++)
+		var tempMX = new Galaxy();
+		tempMX._position.x = -100;
+		tempMX._position.y = 0;
+		tempMX._position.z = 0;
+		tempMX._id = 'Test -x';
+		universe.push(tempMX);
+
+		var tempZ = new Galaxy();
+		tempZ._position.x = 0;
+		tempZ._position.y = 0;
+		tempZ._position.z = 100;
+		tempZ._id = 'Test Z';
+		universe.push(tempZ);
+
+		var tempMZ = new Galaxy();
+		tempMZ._position.x = 0;
+		tempMZ._position.y = 0;
+		tempMZ._position.z = -100;
+		tempMZ._id = 'Test -Z';
+		universe.push(tempMZ);
+
+		var tempY = new Galaxy();
+		tempY._position.x = 0;
+		tempY._position.y = 100;
+		tempY._position.z = 0;
+		tempY._id = 'Test Y';
+		universe.push(tempY);
+
+		var tempMY = new Galaxy();
+		tempMY._position.x = 0;
+		tempMY._position.y = -100;
+		tempMY._position.z = 0;
+		tempMY._id = 'Test -Y';
+		universe.push(tempMY);
+	}
+	else
 	{
-		universe.push(new Galaxy());
+		var idxLcl;
+		for (idxLcl = 0; idxLcl < 999; idxLcl++)
+		{
+			universe.push(new Galaxy());
+		}
 	}
 }
 
@@ -504,7 +553,8 @@ function findHome()
 {
 	if (currentHome != 0)
 	{
-		var relPos = universe[0]._position.subtract(universe[currentHome]._position);
+		var relPos = new ThreeVector(universe[currentHome]._position);
+		relPos.selfScale(-1.0);
 //		var x = relPos.x;
 //		var y = relPos.y;
 //		var z = relPos.z;
@@ -712,6 +762,30 @@ function checkUpdate()
 		update = false;
 		inViewList = new Array();
 
+        var cosLong = Math.cos(viewLong);
+        var sinLong = Math.sin(viewLong);
+        var cosLat = Math.cos(viewLat);
+		var sinLat = Math.sin(viewLat);
+
+		var cosLongp90 = Math.cos(viewLong + Math.PI*0.5);
+		var sinLongp90 = Math.sin(viewLong + Math.PI * 0.5);
+
+
+		var viewZ = new ThreeVector(cosLong * cosLat, sinLong * cosLat, sinLat);
+        //viewZ.selfScale(-1.0); // make sure it is unit
+		var viewX = new ThreeVector(cosLongp90, sinLongp90, 0.0);
+		var viewY = viewZ.cross(viewX);
+
+		var viewMatrix = new ThreeMatrix();
+		viewMatrix.setRowVector(0, viewX);
+		viewMatrix.setRowVector(1, viewY);
+		viewMatrix.setRowVector(2, viewZ);
+
+		const kRadians = Math.PI / 180.0;
+		const kDegrees = 180.0 / Math.PI;
+
+		var halfTelRes = 0.5 * telescopes[0]._CCDresolution;
+
 		var idxLcl;
 		for (idxLcl = 0; idxLcl < universe.length; idxLcl++)
 		{
@@ -724,81 +798,67 @@ function checkUpdate()
 	//			var dist = Math.sqrt(x * x + y * y + z * z);
 	//			var long = relPos.theta; //Math.atan2(universe[idxLcl]._y - universe[currentHome]._y,universe[idxLcl]._x - universe[currentHome]._x);
 	//			var lat = relPos.psi;//Math.asin(z / dist);
-				const kRadians = Math.PI / 180.0;
-				const kDegrees = 180.0 / Math.PI;
-				var viewZ = new ThreeVector(1,0,0);
-				viewZ.theta = viewLong;
-				viewZ.psi = viewLat;
-
-				var viewY = new ThreeVector(1,0,0);
-				if (viewZ.psi >= 0.0)
-					viewY.psi = Math.PI * 0.5 - viewZ.psi;
-				else
-					viewY.psi = -Math.PI * 0.5 + viewZ.psi;
-				viewY.theta = viewZ.theta + 0.5 * Math.PI;
-
-				var viewMatrix = new ThreeMatrix();
-				viewMatrix.loadBasis(null,viewY,viewZ);
-				viewMatrix.selfTranspose();
-
 
 				var viewPos = viewMatrix.dot(relPos.unit); // transform relative position into view coordinates
-				var scalar = viewPos.psi / telescopes[0]._pixelSizeSky;
-				viewPos.selfScale(scalar);
-
-	//				var invDist = 1.0 / relPos.radius;
-	//				var angSize = universe[idxLcl]._sizeBasis * invDist; // calculate the angular size of the object on the sky
-				var angSizePx =  1.0 / (telescopes[0]._pixelSizeSky * relPos.radius); // calculate the size of the object on the sky in pixels
-				var viewGalaxy = {}
-				var inView = false;
-				// center of the galaxy is within the field of view of the telescope
-				if (viewPos.x >= telescopes[0]._CCDresolution * -0.5 && viewPos.x <= telescopes[0]._CCDresolution * 0.5 &&
-					viewPos.y >= telescopes[0]._CCDresolution * -0.5 && viewPos.y <= telescopes[0]._CCDresolution * 0.5)
-
+				if (viewPos.psi > 0.0) // needs to be in front of telescope
 				{
-					inView = true;
-				}
-				else
-				{
-					var eqSize;
-					var polSize;
-					// calculate if the corners of the CCD are within the ellipse of the galaxy, disk, or bulge
-					if (universe[idxLcl]._galaxyType == 0) // elliptical
+					var scalar = (0.5 * Math.PI - viewPos.psi) / telescopes[0]._pixelSizeSky;
+					viewPos.selfScale(scalar);
+
+		//				var invDist = 1.0 / relPos.radius;
+		//				var angSize = universe[idxLcl]._sizeBasis * invDist; // calculate the angular size of the object on the sky
+					var angSizePx =  1.0 / (telescopes[0]._pixelSizeSky * relPos.radius); // calculate the size of the object on the sky in pixels
+					var viewGalaxy = {}
+					var inView = false;
+					// center of the galaxy is within the field of view of the telescope
+					if (viewPos.x >= -halfTelRes && viewPos.x <= halfTelRes &&
+						viewPos.y >= -halfTelRes && viewPos.y <= halfTelRes)
+
 					{
-						eqSize = universe[idxLcl]._radiusEquatorial * angSizePx;
-						polSize = universe[idxLcl]._radiusPolar * angSizePx;
+						inView = true;
 					}
 					else
 					{
-						eqSize = universe[idxLcl]._diskSize * angSizePx;
-						polSize = universe[idxLcl]._diskSize * angSizePx * universe[idxLcl]._cosOrientationFace;
-						var bulgeSize = universe[idxLcl]._bulgeSize * angSizePx;
-						if (polSize < bulgeSize)
-							polSize = bulgeSize;
+						var eqSize;
+						var polSize;
+						// calculate if the corners of the CCD are within the ellipse of the galaxy, disk, or bulge
+						if (universe[idxLcl]._galaxyType == 0) // elliptical
+						{
+							eqSize = universe[idxLcl]._radiusEquatorial * angSizePx;
+							polSize = universe[idxLcl]._radiusPolar * angSizePx;
+						}
+						else
+						{
+							eqSize = universe[idxLcl]._diskSize * angSizePx;
+							polSize = universe[idxLcl]._diskSize * angSizePx * universe[idxLcl]._cosOrientationFace;
+							var bulgeSize = universe[idxLcl]._bulgeSize * angSizePx;
+							if (polSize < bulgeSize)
+								polSize = bulgeSize;
+						}
+						var CosOr = universe[idxLcl]._cosOrientation;
+						var SinOr = universe[idxLcl]._sinOrientation;
+						inView = testPointInEllipse(-telescopes[0]._CCDresolution * 0.5 - viewPos.x,-telescopes[0]._CCDresolution * 0.5 - viewPos.y,eqSize,polSize,CosOr,SinOr);
+						if (!inView)
+							inView = testPointInEllipse(telescopes[0]._CCDresolution * 0.5 - viewPos.x,-telescopes[0]._CCDresolution * 0.5 - viewPos.y,eqSize,polSize,CosOr,SinOr);
+						if (!inView)
+							inView = testPointInEllipse(telescopes[0]._CCDresolution * 0.5 + viewPos.x,-telescopes[0]._CCDresolution * 0.5 - viewPos.y,eqSize,polSize,CosOr,SinOr);
+						if (!inView)
+							inView = testPointInEllipse(-telescopes[0]._CCDresolution * 0.5 + viewPos.x,-telescopes[0]._CCDresolution * 0.5 - viewPos.y,eqSize,polSize,CosOr,SinOr);
 					}
-					var CosOr = universe[idxLcl]._cosOrientation;
-					var SinOr = universe[idxLcl]._sinOrientation;
-					inView = testPointInEllipse(-telescopes[0]._CCDresolution * 0.5 - viewPos.x,-telescopes[0]._CCDresolution * 0.5 - viewPos.y,eqSize,polSize,CosOr,SinOr);
-					if (!inView)
-						inView = testPointInEllipse(telescopes[0]._CCDresolution * 0.5 - viewPos.x,-telescopes[0]._CCDresolution * 0.5 - viewPos.y,eqSize,polSize,CosOr,SinOr);
-					if (!inView)
-						inView = testPointInEllipse(telescopes[0]._CCDresolution * 0.5 + viewPos.x,-telescopes[0]._CCDresolution * 0.5 - viewPos.y,eqSize,polSize,CosOr,SinOr);
-					if (!inView)
-						inView = testPointInEllipse(-telescopes[0]._CCDresolution * 0.5 + viewPos.x,-telescopes[0]._CCDresolution * 0.5 - viewPos.y,eqSize,polSize,CosOr,SinOr);
-				}
 
-				if (inView)
-				{
-					viewGalaxy.idx = idxLcl;
-					viewGalaxy.x = viewPos.x;
-					viewGalaxy.y = viewPos.y;
-					var flux = universe[idxLcl]._luminosity * Math.pow(relPos.radius * 2.06265e11,-2);
-					var Mv = -2.5 * Math.log10(flux) - 26.75;
+					if (inView)
+					{
+						viewGalaxy.idx = idxLcl;
+						viewGalaxy.x = viewPos.x;
+						viewGalaxy.y = -viewPos.y;
+						var flux = universe[idxLcl]._luminosity * Math.pow(relPos.radius * 2.06265e11,-2);
+						var Mv = -2.5 * Math.log10(flux) - 26.75;
 
 
-					viewGalaxy.pixelScale = angSizePx;
-					viewGalaxy.bright = (20.0 - Mv) / 3.0;
-					inViewList.push(viewGalaxy);
+						viewGalaxy.pixelScale = angSizePx;
+						viewGalaxy.bright = (20.0 - Mv) / 3.0;
+						inViewList.push(viewGalaxy);
+					}
 				}
 			}
 		}

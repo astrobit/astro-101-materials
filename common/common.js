@@ -94,19 +94,71 @@ function drawEllipse(ctx, x, y, w, h) {
 }
 
 
-function RGBtoColor(rgb)
+class RGB
 {
-	// create an HTML color style based on RGB values
-	var sR = Math.floor(rgb.r).toString(16);
-	if (rgb.r < 16) // if the value is small enough for one hex digit, add a leading zero
-		sR = "0" + sR;
+	constructor(r,g,b)
+	{
+		this._r = 0;
+		if (r !== null)
+			this._r = r;
+		this._g = 0;
+		if (g !== null)
+			this._g = g;
+		this._b = 0;
+		if (b !== null)
+			this._b = b;
+	}
+	set r(value)
+	{
+		this._r = value;
+		if (value < 1)
+			this._r = 0;
+		else if (value > 255)
+			this._r = 255;
+	}
+	set g(value)
+	{
+		this._g = value;
+		if (value < 1)
+			this._g = 0;
+		else if (value > 255)
+			this._g = 255;
+	}
+	set b(value)
+	{
+		this._b = value;
+		if (value < 1)
+			this._b = 0;
+		else if (value > 255)
+			this._b = 255;
+	}
+	get r()
+	{
+		return this._r;
+	}
+	get g()
+	{
+		return this._g;
+	}
+	get b()
+	{
+		return this._b;
+	}
+	get style()
+	{
+		// create an HTML color style based on RGB values
+		var sR = Math.floor(this._r).toString(16);
+		if (this._r < 16) // if the value is small enough for one hex digit, add a leading zero
+			sR = "0" + sR;
 
-	var sG = Math.floor(rgb.g).toString(16);
-	if (rgb.g < 16) // if the value is small enough for one hex digit, add a leading zero
-		sG = "0" + sG;
+		var sG = Math.floor(this._g).toString(16);
+		if (this._g < 16) // if the value is small enough for one hex digit, add a leading zero
+			sG = "0" + sG;
 
-	var sB = Math.floor(rgb.b).toString(16);
-	if (rgb.b < 16) // if the value is small enough for one hex digit, add a leading zero
-		sB = "0" + sB;
-	return "#" + sR + sG + sB;
+		var sB = Math.floor(this._b).toString(16);
+		if (this._b < 16) // if the value is small enough for one hex digit, add a leading zero
+			sB = "0" + sB;
+		return "#" + sR + sG + sB;
+	}
 }
+

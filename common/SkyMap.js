@@ -14,7 +14,7 @@ class SkyMap
 		var i;
 		for (i = 0; i < stars.length; i++)
 		{
-			var rgbB = UBVRItoRGB(stars[i].U,stars[i].B,stars[i].V,stars[i].R,stars[i].I,0,6)
+			var rgb = UBVRItoRGB(stars[i].U,stars[i].B,stars[i].V,stars[i].R,stars[i].I,0,6)
 			var rgbB_U = UBVRItoRGB(stars[i].U,null,null,null,null,0,6);
 			var rgbB_B = UBVRItoRGB(null,stars[i].B,null,null,null,0,6);
 			var rgbB_V = UBVRItoRGB(null,null,stars[i].V,null,null,0,6);
@@ -35,7 +35,7 @@ class SkyMap
 				break;
 			}
 			stars[i].pidx = this.starsProjection.length;
-			this.starsProjection.push({x: projection.x, y:projection.y, style:RGBtoColor(rgbB), styleU:RGBtoColor(rgbB_U), styleB:RGBtoColor(rgbB_B), styleV:RGBtoColor(rgbB_V), styleR:RGBtoColor(rgbB_R), styleI:RGBtoColor(rgbB_I), idx:i,rgbB:rgbB});
+			this.starsProjection.push({x: projection.x, y:projection.y, style:rgbB.style, styleU:rgbB_U.style, styleB:rgbB_B.style, styleV:rgbB_V.style, styleR:rgbB_R.style, styleI:rgbB_I.style, idx:i, rgb:rgb});
 		}
 	}
 	constructor(context,x,y,width,height)

@@ -49,7 +49,7 @@ function binarySearch(sortedArray,findValue,key)
 // random Gaussian disribution
 //Source: https://stackoverflow.com/questions/25582882/javascript-math-random-normal-distribution-gaussian-bell-curve/36481059#36481059
 // modified to allow a mean and standard deviation
-function rand_gaussian(mean, stdev) { 
+function random_gaussian(mean, stdev) { 
     var u = 0, v = 0;
     while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
     while(v === 0) v = Math.random();

@@ -118,3 +118,111 @@ function UBVRItoRGB(U,B,V,R,I,brightMag,dimMag)
 	
 	return RGB(Math.round(cR), Math.round(cG), Math.round(cB));//, bright:bright};
 }
+
+
+const MonthDays = {
+	dayStart: [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334],
+	dayStartLeap: [0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335]
+}
+
+function findMonthDay(day, leapYear) {
+	var monthMax = 12;
+	var monthMin = 0;
+	var pDays = MonthDays.dayStart;
+	if (leapYear)
+		pDays = MonthDays.dayStartLeap;
+	do {
+		var month = Math.floor((monthMax + monthMin) * 0.5);
+		if (pDays[month] <= day)
+			monthMin = month;
+		else
+			monthMax = month;
+	} while (monthMin < (monthMax - 1));
+	var monthIdx;
+	if (pDays[monthMin] <= day)
+		monthIdx = monthMin;
+	else
+		monthIdx = monthMin + 1;
+	return { month: monthIdx + 1, day: day - pDays[monthIdx] + 1 };
+}
+
+function JDtoGregorian(jd) {
+	var dayInYear = 0;
+	var year = 0;
+	var leapYear = false;
+	var DN = Math.floor(jd + 0.5);
+	var F = jd - DN + 0.5;
+	var B = DN;
+	if (DN > 2299160) {
+		var A = Math.floor((DN - 1867216.25) / 36524.25);
+		B = DN + 1 + A - Math.floor(A / 4);
+	}
+	var C = B + 1524;
+	var D = Math.floor((C - 122.1) / 365.25);
+	var E = Math.floor(365.25 * D);
+	var G = Math.floor((C - E) / 30.6001);
+	var d = C - E + F - Math.floor(G * 30.6001);
+	var m = G - 1;
+	if (G > 13.5)
+		m = G - 13;
+	y = D - 4715;
+	if (m > 2.5)
+		y--;
+	/*
+		if (jd > 2299160.50000) // truly Gregorian
+		{
+			var julianQuadCenturies = Math.floor((jd - 2305447.50000) / 146097);
+			year = 1600 + julianQuadCenturies * 400;
+			dayInYear = jd - 2305447.50000 - julianQuadCenturies * 146097;
+			var julianCenturies = Math.floor(dayInYear / 36524);
+			year += julianCenturies * 100;
+			dayInYear -= 36524;
+	
+			if (dayInYear > 36525)
+			{
+				year += 100;
+				dayInYear -= 36525;
+			}
+			while (dayInYear >= 36524)
+			{
+				year += 100;
+				dayInYear -= 36524;
+			}
+			var julianQuads = Math.floor(dayInYear / 1461);
+			year += julianQuads * 4;
+			dayInYear -= julianQuads * 1461;
+			if (dayInYear >= 366)
+			{
+				year += 1;
+				dayInYear -= 366;
+			}
+			while (dayInYear >= 365)
+			{
+				year += 1;
+				dayInYear -= 365;
+			}
+			leapYear = Math.floor(year / 4) == year/4
+		}
+		else
+		{
+			var julianQuads = Math.floor(jd / 1461);
+			var year = julianQuads * 4 - 4712;
+			if (jd < 1721058)
+				year--; // there is no year 0 
+			dayInYear = jd - julianQuads * 1461;
+			if (dayInYear >= 366)
+			{
+				year++;
+				dayInYear -= 366;
+			}
+			while (dayInYear >= 365)
+			{
+				year++;
+				dayInYear -= 365;
+			}
+			leapYear = Math.floor(year / 4) == year/4
+		}
+		var md = findMonthDay(dayInYear,leapYear)
+		*/
+	return { year: y, month: m, day: d };
+}

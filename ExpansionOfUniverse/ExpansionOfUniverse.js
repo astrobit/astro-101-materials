@@ -1,75 +1,154 @@
 ﻿// Galaxy Rotation simulation for introductory astronomy
-// written by Brian W. Mulligan, except randn_bm function 
+// written by Brian W. Mulligan
 // Copyright (c) 2020,2021, Brian W. Mulligan
 
-class RGB
-{
-	constructor()
-	{
-		this._r = 0;
-		this._g = 0;
-		this._b = 0;
-	}
-	set r(value)
-	{
-		this._r = value;
-		if (value < 1)
-			this._r = 0;
-		else if (value > 255)
-			this._r = 255;
-	}
-	set g(value)
-	{
-		this._g = value;
-		if (value < 1)
-			this._g = 0;
-		else if (value > 255)
-			this._g = 255;
-	}
-	set b(value)
-	{
-		this._b = value;
-		if (value < 1)
-			this._b = 0;
-		else if (value > 255)
-			this._b = 255;
-	}
-	get r()
-	{
-		return this._r;
-	}
-	get g()
-	{
-		return this._g;
-	}
-	get b()
-	{
-		return this._b;
-	}
-	get style()
-	{
-		// create an HTML color style based on RGB values
-		var sR = Math.floor(this._r).toString(16);
-		if (this._r < 16) // if the value is small enough for one hex digit, add a leading zero
-			sR = "0" + sR;
 
-		var sG = Math.floor(this._g).toString(16);
-		if (this._g < 16) // if the value is small enough for one hex digit, add a leading zero
-			sG = "0" + sG;
+var theCanvas = document.getElementById("theCanvas");
+theCanvas.onselectstart = function () { return false; }
+theCanvas.onmousedown = commonUIOnMouseDown;
+theCanvas.onmouseup = commonUIOnMouseUp;
+theCanvas.onclick = commonUIOnClick;
+theCanvas.onmousemove = commonUIOnMouseMove;
+theCanvas.onmouseleave = commonUIOnMouseLeave;
 
-		var sB = Math.floor(this._b).toString(16);
-		if (this._b < 16) // if the value is small enough for one hex digit, add a leading zero
-			sB = "0" + sB;
-		return "#" + sR + sG + sB;
-	}
-}
-function fixColorHex(color)
+
+//theCanvas.height = window.innerHeight - 60;
+//theCanvas.width = theCanvas.height;
+
+var theContext = theCanvas.getContext("2d");
+
+
+var btnCurr = new SpringButton("SlewNorth",theCanvas.width * 0.5 + 375,50,50,50,function(){latDir = 1;},function(){latDir = 0;});
+btnCurr.text = "🡡";
+commonUIRegister(btnCurr);
+
+btnCurr = new SpringButton("SlewSouth",theCanvas.width * 0.5 + 375,150,50,50,function(){latDir = -1;},function(){latDir = 0;});
+btnCurr.text = "🡣";
+commonUIRegister(btnCurr);
+
+var btnCurr = new SpringButton("SlewEast",theCanvas.width * 0.5 + 425,100,50,50,function(){longDir = 1;},function(){longDir = 0;});
+btnCurr.text = "🡢";
+commonUIRegister(btnCurr);
+
+btnCurr = new SpringButton("SlewWest",theCanvas.width * 0.5 + 325,100,50,50,function(){longDir = -1;},function(){longDir = 0;});
+btnCurr.text = "🡠";
+commonUIRegister(btnCurr);
+
+var slewButtonArray = new Array();
+
+var slewFast = new RadioButton("Fast","Fast",theCanvas.width * 0.5 + 335,210,60,40);
+var slewSlow = new RadioButton("Slow","Slow",theCanvas.width * 0.5 + 405,210,60,40);
+
+slewButtonArray.push(slewFast);
+slewButtonArray.push(slewSlow);
+
+var radioSlew = new Radio("Slew","Fast",slewSelect,slewButtonArray);
+
+commonUIRegister(radioSlew);
+
+btnFindMilkyWay = new Button("Find Milky Way",theCanvas.width * 0.5 + 330,260,140,30,findHome);
+btnFindMilkyWay.disabled = true;
+commonUIRegister(btnFindMilkyWay);
+
+btnCurr = new Button("Take Image",theCanvas.width * 0.5 + 330,355,140,30,takeImage);
+commonUIRegister(btnCurr);
+
+btnCurr = new Button("Take Spectrum",theCanvas.width * 0.5 + 330,410,140,30,takeSpectrum);
+commonUIRegister(btnCurr);
+
+btnCurr = new Button("Download Measurements",theCanvas.width * 0.5 + 280,465,240,30,downloadMeasurements);
+commonUIRegister(btnCurr);
+
+btnCurr = new Button("Download Dist/Vel Data",50,350,240,30,downloadAnalysis);
+commonUIRegister(btnCurr);
+
+btnCurr = new Button("Download Hubble Data",50,400,240,30,downloadHubbleAnalysis);
+commonUIRegister(btnCurr);
+
+btnReturnMilkyWay = new Button("Return to the Milky Way",theCanvas.width * 0.5 - 225,775,220,30,function(){moveHome(true);});
+btnReturnMilkyWay.disabled = true;
+commonUIRegister(btnReturnMilkyWay);
+
+btnMoveHome = new Button("Move to a New Galaxy",theCanvas.width * 0.5 + 5,775,220,30,function(){moveHome(false);});
+commonUIRegister(btnMoveHome);
+
+
+function drawMap(context,width,height)//cx,cy,width,height)
 {
-	out = color.toString(16);
-	if (out.length < 2)
-		out = '0' + out;
-	return out;
+	context.save();
+	context.scale(width * 0.5,height * 0.5);
+	context.translate(1.0,1.0);
+	context.fillStyle = "#0F0F0F";
+	context.fillRect(-1,-1,2,2);
+
+	context.fillStyle = "#FFFFFF";
+	var idxLcl;
+	for (idxLcl = 0; idxLcl < universe.length; idxLcl++)
+	{
+		if (idxLcl != currentHome)
+		{
+			var relPos = universe[idxLcl]._position.subtract(universe[currentHome]._position)
+			var dist = relPos.radius;
+			var long = relPos.theta;//Math.atan2(universe[idxLcl]._position.y - universe[currentHome]._position.y,universe[idxLcl]._position.x - universe[currentHome]._position.x);
+			var lat = relPos.psi;//Math.asin(z / dist);
+			var mx = ((long / Math.PI * 0.5 + 0.5) % 1.0) * 2.0 - 1.0;
+			var my = -lat / Math.PI * 2.0;
+
+			var flux = universe[idxLcl]._luminosity * Math.pow(dist * 2.06265e11,-2);
+			var Mv = -2.5 * Math.log10(flux) - 26.75;
+			var angSize = universe[idxLcl]._luminosity / 2.0e10 * 0.03 / dist
+			var size = angSize / (2.0 * Math.PI) * 100.0;
+
+			var bright = (22.0 - Mv) / 3.0;
+			context.fillStyle = scaleColor(bright,universe[idxLcl]._color).style;
+
+
+//			console.log(mx + ' ' + my + ' ' + flux + ' ' + Mv);
+			context.beginPath();
+			context.arc(mx,my,size,0,2.0 * Math.PI);
+			context.closePath();
+			context.fill();
+
+
+		}
+	}
+	context.restore();
+	
+	context.strokeStyle = '#FFFF00';
+	var mx = ((viewLong / Math.PI) + 1.0) * width * 0.5;
+	var my = (1.0 - (viewLat / Math.PI * 2.0)) * height * 0.5;
+	var radius = Math.max(telescopes[0]._FOVdegrees * 0.5 / 360.0 * width,3);
+	context.beginPath();
+	context.arc(mx,my,radius,0,2.0 * Math.PI);
+	context.stroke();
 }
+
+function clickMap(event,x,y)
+{
+	var lat = (0.5 - y) * Math.PI;
+	var long = (x - 0.5) * 2.0 * Math.PI;
+	setSlewTarget(lat,long);
+}
+
+var viewMap = new Clickable("Sky Map",theCanvas.width * 0.5 - 250,40,500,250,clickMap,drawMap);
+commonUIRegister(viewMap);
+
+
+/*
+
+buttons.push(new Button(theContext, theCanvas.width * 0.5 + 375,260,"Find Milky Way",40,findHome,function(){},function(){return this._isDown;},false,false,true));
+
+buttons.push(new Button(theContext, theCanvas.width * 0.5 + 375,355,"Take Image",40,takeImage,function(){},function(){return this._isDown;},false,false,false));
+buttons.push(new Button(theContext, theCanvas.width * 0.5 + 375,410,"Take Spectrum",40,takeSpectrum,function(){},function(){return this._isDown;},false,false,false));
+buttons.push(new Button(theContext, theCanvas.width * 0.5 + 375,465,"Download Measurements",30,downloadMeasurements,function(){},function(){return this._isDown;},false,false,false));
+buttons.push(new Button(theContext, 175,350,"Download Dist/Vel Data",30,downloadAnalysis,function(){},function(){return this._isDown;},false,false,false));
+buttons.push(new Button(theContext, 175,400,"Download Hubble Data",30,downloadHubbleAnalysis,function(){},function(){return this._isDown;},false,false,false));
+
+buttons.push(new Button(theContext, theCanvas.width * 0.5 - 105,775,"Return to the Milky Way",24,function(){moveHome(true);},function(){},function(){return this._isDown;},false,false,true));
+buttons.push(new Button(theContext, theCanvas.width * 0.5 + 105,775,"Move to a New Galaxy",24,function(){moveHome(false);},function(){},function(){return this._isDown;},false,false,false));
+*/
+
+
 function scaleColor(x,color)
 {
 	var ret = new RGB();
@@ -80,11 +159,9 @@ function scaleColor(x,color)
 }
 function scaleColorElliptical(x,color)
 {
-	var ret = new RGB();
-	ret.r = Math.floor(256.0 * x);
-	ret.g = Math.floor(color / 0.3 * 256.0 * x);
-	ret.b = Math.floor((color - 0.3) / 0.7 * 256.0 * x);
-	return ret;
+	return new RGB(Math.floor(256.0 * x),
+						Math.floor(color / 0.3 * 256.0 * x),
+						Math.floor((color - 0.3) / 0.7 * 256.0 * x));
 }
 function scaleColorSpiral(x,color)
 {
@@ -123,57 +200,8 @@ function drawElliptical(context,size,color,x)
 }
 
 
-
-function drawMap(cx,cy,width,height)
-{
-	var state = theContext.save();
-
-	theContext.translate(cx,cy);
-	theContext.scale(width * 0.5,height * 0.5);
-	theContext.fillRect(-1,-1,2,2);
-
-	theContext.fillStyle = "#FFFFFF";
-	var idxLcl;
-	for (idxLcl = 0; idxLcl < universe.length; idxLcl++)
-	{
-		if (idxLcl != currentHome)
-		{
-			var relPos = universe[idxLcl]._position.subtract(universe[currentHome]._position)
-			var dist = relPos.radius;
-			var long = relPos.theta;//Math.atan2(universe[idxLcl]._position.y - universe[currentHome]._position.y,universe[idxLcl]._position.x - universe[currentHome]._position.x);
-			var lat = relPos.psi;//Math.asin(z / dist);
-			var mx = ((long / Math.PI * 0.5 + 0.5) % 1.0) * 2.0 - 1.0;
-			var my = -lat / Math.PI * 2.0;
-
-			var flux = universe[idxLcl]._luminosity * Math.pow(dist * 2.06265e11,-2);
-			var Mv = -2.5 * Math.log10(flux) - 26.75;
-			var angSize = universe[idxLcl]._luminosity / 2.0e10 * 0.03 / dist
-			var size = angSize / (2.0 * Math.PI) * 100.0;
-
-			var bright = (22.0 - Mv) / 3.0;
-			theContext.fillStyle = scaleColor(bright,universe[idxLcl]._color).style;
-
-
-//			console.log(mx + ' ' + my + ' ' + flux + ' ' + Mv);
-			theContext.beginPath();
-			theContext.arc(mx,my,size,0,2.0 * Math.PI);
-			theContext.closePath();
-			theContext.fill();
-
-//			theContext
-		}
-	}
-
-	theContext.restore(state);
-}
 function drawMapTelescopeCursor(cx,cy,width,height)
 {
-	theContext.strokeStyle = '#FFFF00';
-	var mx = ((viewLong / Math.PI * 0.5 + 0.5) % 1.0)* width + cx - 0.5 * width;
-	var my = (1.0 - viewLat / Math.PI * 2.0) * height * 0.5 + cy - 0.5 * height;
-	theContext.beginPath();
-	theContext.arc(mx,my,3,0,2.0 * Math.PI);
-	theContext.stroke();
 
 }
 function drawTelescopeField(cx,cy,radius)
@@ -360,7 +388,7 @@ function drawHubble(cx,ty,width,height)
 	{
 		var y = -gh / 5.0 * idxLcl;
 		theContext.strokeStyle = '#000000';
-		theContext.fillStyle = '#1F1F1F';
+		theContext.fillStyle = '#FFFFFF';
 		theContext.beginPath();
 		theContext.moveTo(0,y);
 		theContext.lineTo(-10,y);
@@ -369,7 +397,7 @@ function drawHubble(cx,ty,width,height)
 		theContext.fillText(text,-15 - theContext.measureText(text).width,y);
 	}
 	var stateX = theContext.save();
-	theContext.translate(-40,-0.5 * gh);
+	theContext.translate(-50,-0.5 * gh);
 	theContext.rotate(-Math.PI * 0.5);
 	var text = "Velocity (1000 km/s)"
 	theContext.fillText(text, -theContext.measureText(text).width * 0.5,0);
@@ -377,11 +405,11 @@ function drawHubble(cx,ty,width,height)
 	theContext.restore(stateX);
 
 	theContext.textBaseline = "top";
-	for (idxLcl = 0; idxLcl < 16; idxLcl++)
+	for (idxLcl = 0; idxLcl < 16; idxLcl+=2)
 	{
 		var x = gw / 15.0 * idxLcl;
 		theContext.strokeStyle = '#000000';
-		theContext.fillStyle = '#1F1F1F';
+		theContext.fillStyle = '#FFFFFF';
 		theContext.beginPath();
 		theContext.moveTo(x,0);
 		theContext.lineTo(x,10);
@@ -426,7 +454,7 @@ function draw()
 
 	theContext.lineWidth = 2;
 	theContext.strokeStyle = "#000000";
-	theContext.fillStyle = "#1F1F1F";
+	theContext.fillStyle = "#FFFFFF";
 
 	theContext.textBaseline = "bottom";
 	theContext.font = "24px Arial";
@@ -436,11 +464,11 @@ function draw()
 	var text = "Yellow circle shows where the telescope is pointing."
 	theContext.fillText(text,(theCanvas.width - theContext.measureText(text).width) * 0.5,38);
 
-	drawMap(theCanvas.width * 0.5,170,500,250);
+//	drawMap(theCanvas.width * 0.5,170,500,250);
 	drawMapTelescopeCursor(theCanvas.width * 0.5,170,500,250);
 
 
-	theContext.fillStyle = "#1F1F1F";
+	theContext.fillStyle = "#FFFFFF";
 	theContext.textBaseline = "bottom";
 	theContext.font = "24px Arial";
 	var text = "Telescope View";
@@ -479,17 +507,18 @@ function draw()
 		theContext.fillText(text,x,300);
 	}
 
-	theContext.fillStyle = "#1F1F1F";
+	theContext.fillStyle = "#7F7F7F";
 	theContext.textBaseline = "bottom";
 	theContext.font = "24px Arial";
 	var text = "Telescope Controls";
 	theContext.fillText(text,theCanvas.width * 0.5 + 375 - theContext.measureText(text).width * 0.5,24);
 
-	var idxLcl;
+	commonUIdraw(theContext);
+/*	var idxLcl;
 	for (idxLcl = 0; idxLcl < buttons.length; idxLcl++)
 	{
 		buttons[idxLcl].draw();
-	}
+	}*/
 
 //	theContext.fillStyle = "#1F1F1F";
 //	theContext.font = "18px Arial";

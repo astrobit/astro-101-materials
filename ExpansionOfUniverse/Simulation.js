@@ -1,23 +1,9 @@
 ﻿
 
-var theCanvas = document.getElementById("theCanvas");
-theCanvas.onselectstart = function () { return false; }
 
-var theContext = theCanvas.getContext("2d");
-var timer = 0;
 
-// random Gaussian disribution
-//Source: https://stackoverflow.com/questions/25582882/javascript-math-random-normal-distribution-gaussian-bell-curve/36481059#36481059
-// modified to allow a mean and standard deviation
-function randn_bm(mean, stdev) { 
-    var u = 0, v = 0;
-    while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
-    while(v === 0) v = Math.random();
-    return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v ) * stdev / Math.PI * 0.5 + mean;
-}
-
-var H0 = (Math.random() - 0.5) * 2.0 + 72.0;
-var currentHome = 0;
+var H0 = (Math.random() - 0.5) * 2.0 + 72.0; // the value of the Hubble constant in this universe
+var currentHome = 0; // set the default home galaxy to the Milky Way
 
 class LuminosityFunction
 {
@@ -311,13 +297,13 @@ class Galaxy
 		var relPos = this._position.subtract(universe[currentHome]._position)
 		var dist = relPos.radius;
 		var flux = this._luminosity * Math.pow(dist * 2.06265e11,-2) * 0.25 / Math.PI;
-		var measFlux = flux * (1.0 + randn_bm(0,1.0 / SN));
+		var measFlux = flux * (1.0 + random_gaussian(0,1.0 / SN));
 		var measFlux_err = flux / SN;
 		var measDist = 0;
 		var measDist_err = -1;
 		if (dist < 35.0)
 		{
-			measDist = dist * (1.0 + randn_bm(0,1.0 / SN));
+			measDist = dist * (1.0 + random_gaussian(0,1.0 / SN));
 			measDist_err = measDist / SN;
 		}
 		this._measurements.push(new Measurement(measFlux,measFlux_err,measDist,measDist_err,0,-1,0,-1));
@@ -343,14 +329,14 @@ class Galaxy
 		var rv_Hubble = H0 * dist;
 		var rv_pec = (vx * ux + vy * uy + vz * uz) * vPec;
 		var rv = rv_Hubble + rv_pec;
-		var measRv = randn_bm(rv,resolution);
+		var measRv = random_gaussian(rv,resolution);
 
 		var redshift = measRv / 299792.458;
 
 // Tully-Fisher
 //L = 4e10 * Math.pow(v / 200.0,4.0); // solar luminosities, v in km/s
 		var vrot = Math.pow(this._luminosity / 4.0e10,0.25) * 200.0;
-		var measVrot = randn_bm(vrot,resolution);
+		var measVrot = random_gaussian(vrot,resolution);
 
 		this._measurements.push(new Measurement(0,-1,0,-1,measRv,resolution,measVrot,resolution));
 		this.computeValues();
@@ -487,9 +473,19 @@ var latDir = 0.0;
 var longDir = 0.0;
 var slew = 32.0;
 
+function slewSelect(value)
+{
+	if (value == "Fast")
+		slew = 32.0;
+	else
+		slew = 1.0;
+	draw();
+}
 
 
-
+var btnReturnMilkyWay;
+var btnMoveHome;
+var btnFindMilkyWay;
 
 function moveHome(toMW)
 {
@@ -497,6 +493,9 @@ function moveHome(toMW)
 	if (toMW)
 	{
 		currentHome = 0;
+		btnReturnMilkyWay.disabled = true;
+		btnMoveHome.disabled = false;
+		btnFindMilkyWay.disabled = true;
 	}
 	else
 	{
@@ -529,17 +528,10 @@ function moveHome(toMW)
 	viewLong = 0.0;
 	viewLat = 0.0;
 
-	for (idxLcl = 0; idxLcl < buttons.length; idxLcl++)
-	{
-		if (buttons[idxLcl]._text == "Find Milky Way")
-		{
-			buttons[idxLcl]._disabled = currentHome == 0;
-		}
-		if (buttons[idxLcl]._text == "Return to the Milky Way")
-		{
-			buttons[idxLcl]._disabled = currentHome == 0;
-		}
-	}
+	btnFindMilkyWay.disabled = false;
+	btnReturnMilkyWay.disabled = false;
+	btnMoveHome.disabled = true;
+
 	measH0 = -1;
 	measH0u = -1;
 	for (idxLcl = 0; idxLcl < universe.length; idxLcl++)
@@ -565,28 +557,75 @@ function findHome()
 	draw();
 }
 
+var targetLat = null;
+var targetLong = null;
+
+function setSlewTarget(lat,long)
+{
+	if (targetLat === null && targetLong === null)
+	{
+		targetLat = lat;
+		targetLong = long;
+		slewToTarget();
+	}
+}
+
+var autoSlewSpeed = 0.0;
+var autoSlewTimer = 0.0;
+
+function slewToTarget()
+{
+	if(targetLat !== null && targetLong !== null)
+	{
+	
+		var delLat = targetLat - viewLat;
+
+		var delLong = targetLong - viewLong;
+		if (delLong > Math.PI)
+			delLong = -2.0 * Math.PI + delLong;
+		else if (delLong < -Math.PI)
+			delLong = 2.0 * Math.PI + delLong;
+			
+		var modLong = delLong;// * Math.cos(delLat);
+		var distRemaining = Math.sqrt(modLong * modLong + delLat * delLat);
+		if (distRemaining > 0.00007) // ~15 arc-sec
+		{
+			var timerEffect = Math.min(autoSlewTimer / 2.0,1.0);
+			var timestep = 1.0 / 30.0;
+			autoSlewSpeed = Math.min(Math.max(15.0 * distRemaining / 0.10 * timerEffect,0.01),15.0);
+			
+			var currDel = autoSlewSpeed * timestep / distRemaining;
+			if (currDel > 0.9)
+				currDel = 0.9;
+			viewLat += delLat * currDel;
+			viewLong += delLong * currDel;
+
+			var vL = viewLong % (2.0 * Math.PI);
+			if (vL >= Math.PI)
+				vL -= 2.0 * Math.PI;
+			else if (vL < -Math.PI)
+				vL += 2.0 * Math.PI;
+			viewLong = vL;
 
 
+			window.setTimeout(slewToTarget, 1000.0/30.0);
+			autoSlewTimer += timestep;
 
+		}
+		else
+		{
+			viewLat = targetLat;
+			viewLong = targetLong;
+			targetLat = null;
+			targetLong = null;
+			autoSlewSpeed = 0.0;
+			autoSlewTimer = 0.0;
+		}
+		update = true;
+		draw();
+	}
+}
 
-buttons.push(new Button(theContext, theCanvas.width * 0.5 + 375,50,"🡡",50,function(){latDir = 1;},function(){latDir = 0;},function(){return latDir == 1;},true,false,false));
-buttons.push(new Button(theContext, theCanvas.width * 0.5 + 375,150,"🡣",50,function(){latDir = -1;},function(){latDir = 0;},function(){return latDir == -1;},true,false,false));
-buttons.push(new Button(theContext, theCanvas.width * 0.5 + 425,100,"🡢",50,function(){longDir = 1;},function(){longDir = 0;},function(){return longDir == 1;},true,false,false));
-buttons.push(new Button(theContext, theCanvas.width * 0.5 + 325,100,"🡠",50,function(){longDir = -1;},function(){longDir = 0;},function(){return longDir == -1;},true,false,false));
-
-buttons.push(new Button(theContext, theCanvas.width * 0.5 + 325,210,"Fast",40,function(){slew = 32.0},function(){},function(){return slew == 32.0;},false,false,false));
-buttons.push(new Button(theContext, theCanvas.width * 0.5 + 425,210,"Slow",40,function(){slew = 1.0},function(){},function(){return slew == 1.0;},false,false,false));
-
-buttons.push(new Button(theContext, theCanvas.width * 0.5 + 375,260,"Find Milky Way",40,findHome,function(){},function(){return this._isDown;},false,false,true));
-
-buttons.push(new Button(theContext, theCanvas.width * 0.5 + 375,355,"Take Image",40,takeImage,function(){},function(){return this._isDown;},false,false,false));
-buttons.push(new Button(theContext, theCanvas.width * 0.5 + 375,410,"Take Spectrum",40,takeSpectrum,function(){},function(){return this._isDown;},false,false,false));
-buttons.push(new Button(theContext, theCanvas.width * 0.5 + 375,465,"Download Measurements",30,downloadMeasurements,function(){},function(){return this._isDown;},false,false,false));
-buttons.push(new Button(theContext, 175,350,"Download Dist/Vel Data",30,downloadAnalysis,function(){},function(){return this._isDown;},false,false,false));
-buttons.push(new Button(theContext, 175,400,"Download Hubble Data",30,downloadHubbleAnalysis,function(){},function(){return this._isDown;},false,false,false));
-
-buttons.push(new Button(theContext, theCanvas.width * 0.5 - 105,775,"Return to the Milky Way",24,function(){moveHome(true);},function(){},function(){return this._isDown;},false,false,true));
-buttons.push(new Button(theContext, theCanvas.width * 0.5 + 105,775,"Move to a New Galaxy",24,function(){moveHome(false);},function(){},function(){return this._isDown;},false,false,false));
 
 
 function downloadMeasurements()
@@ -752,7 +791,9 @@ function checkUpdate()
 		if (viewLat < (-Math.PI * 0.5))
 			viewLat = (-Math.PI * 0.5);
 		var vL = viewLong % (2.0 * Math.PI);
-		if (vL < 0.0)
+		if (vL >= Math.PI)
+			vL -= 2.0 * Math.PI;
+		else if (vL < -Math.PI)
 			vL += 2.0 * Math.PI;
 		viewLong = vL;
 		update = true;

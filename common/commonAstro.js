@@ -115,5 +115,6 @@ function UBVRItoRGB(U,B,V,R,I,brightMag,dimMag)
 		cG *= bright;
 		cB *= bright;
 	}
-	return {r:Math.round(cR), g:Math.round(cG), b:Math.round(cB), bright:bright};
+	
+	return RGB(Math.round(cR), Math.round(cG), Math.round(cB));//, bright:bright};
 }

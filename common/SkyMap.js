@@ -35,7 +35,7 @@ class SkyMap
 				break;
 			}
 			stars[i].pidx = this.starsProjection.length;
-			this.starsProjection.push({x: projection.x, y:projection.y, style:rgbB.style, styleU:rgbB_U.style, styleB:rgbB_B.style, styleV:rgbB_V.style, styleR:rgbB_R.style, styleI:rgbB_I.style, idx:i, rgb:rgb});
+			this.starsProjection.push({ x: projection.x, y: projection.y, style: rgb.style, styleU:rgbB_U.style, styleB:rgbB_B.style, styleV:rgbB_V.style, styleR:rgbB_R.style, styleI:rgbB_I.style, idx:i});
 		}
 	}
 	constructor(context,x,y,width,height)

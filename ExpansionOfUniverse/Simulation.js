@@ -420,7 +420,7 @@ function createUniverse()
 	home._position.y = 0;
 	home._position.z = 0;
 	home._luminosity = 1.2e10;
-	home._sizeBasis = this._luminosity / 2.0e10 * 0.03;
+	home._sizeBasis = home._luminosity / 2.0e10 * 0.03;
 	home._galaxyType = 1;
 	home._bulgeSize = home._sizeBasis * (Math.random() * 0.25 + 0.05);
 	home._diskSize = home._sizeBasis;

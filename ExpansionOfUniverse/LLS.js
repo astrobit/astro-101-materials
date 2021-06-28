@@ -1,4 +1,4 @@
-// linear least squares fitting
+// 2-dimensional linear fitting using least squares
 
 class LLS
 {

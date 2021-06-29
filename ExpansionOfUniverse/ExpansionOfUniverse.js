@@ -326,8 +326,8 @@ function drawCurrentTargetInfo(cx,ty,size)
 	theContext.fillText("V",0,0);
 	theContext.fillText("z",150,0);
 	theContext.fillText("D (Mpc)",240,0);
-	theContext.fillStyle = "#1F1F1F";
-	theContext.strokeStyle = "#1F1F1F";
+	theContext.fillStyle = "#FFFFFF";
+	theContext.strokeStyle = "#7F7F7F";
 	theContext.beginPath();
 	theContext.moveTo(-180,size * 0.125);
 	theContext.lineTo(330,size * 0.125);
@@ -358,7 +358,7 @@ function drawCurrentTargetInfo(cx,ty,size)
 function drawCurrentHome(cx,ty,size)
 {
 	var state = theContext.save();
-	theContext.fillStyle = "#1F1F1F";
+	theContext.fillStyle = "#7F7F7F";
 	theContext.font = size + "px Arial";
 
 	theContext.translate(cx,ty);
@@ -374,7 +374,7 @@ function drawHubble(cx,ty,width,height)
 	theContext.translate(cx - width * 0.5 + 50,ty + height - 50 + 10);
 	var gh = height - 60;
 	var gw = width - 70;
-	theContext.strokeStyle = '#000000';
+	theContext.strokeStyle = '#FFFFFF';
 	theContext.beginPath();
 	theContext.moveTo(0,-gh);
 	theContext.lineTo(0,0);
@@ -387,7 +387,7 @@ function drawHubble(cx,ty,width,height)
 	for (idxLcl = 0; idxLcl < 6; idxLcl++)
 	{
 		var y = -gh / 5.0 * idxLcl;
-		theContext.strokeStyle = '#000000';
+		theContext.strokeStyle = '#FFFFFF';
 		theContext.fillStyle = '#FFFFFF';
 		theContext.beginPath();
 		theContext.moveTo(0,y);
@@ -408,7 +408,7 @@ function drawHubble(cx,ty,width,height)
 	for (idxLcl = 0; idxLcl < 16; idxLcl+=2)
 	{
 		var x = gw / 15.0 * idxLcl;
-		theContext.strokeStyle = '#000000';
+		theContext.strokeStyle = '#FFFFFF';
 		theContext.fillStyle = '#FFFFFF';
 		theContext.beginPath();
 		theContext.moveTo(x,0);
@@ -420,7 +420,7 @@ function drawHubble(cx,ty,width,height)
 	var text = "Distance (100 Mpc)"
 	theContext.fillText(text,0.5 * gw - theContext.measureText(text).width * 0.5,25);
 
-	theContext.fillStyle = '#0000FF';
+	theContext.fillStyle = '#FF0000';
 	for (idxLcl = 0; idxLcl < universe.length; idxLcl++)
 	{
 		if (universe[idxLcl]._dist_u != -1 && universe[idxLcl]._redshift_u != -1)
@@ -436,7 +436,7 @@ function drawHubble(cx,ty,width,height)
 
 	if (measH0u != -1)
 	{
-		theContext.strokeStyle = "#FF0000"
+		theContext.strokeStyle = "#0000FF"
 		theContext.beginPath();
 		theContext.moveTo(0,0);//measIntercept  / 125000.0 * gh );
 		theContext.lineTo(gw,-1500.0 * measH0 / 125000.0 * gh);

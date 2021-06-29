@@ -254,9 +254,9 @@ class RadioButton
 		else
 		{
 			if (this.disabled)
-				context.globalAlpha = this.insideTransparency;
-			else
 				context.globalAlpha = this.insideTransparencyDisabled;
+			else
+				context.globalAlpha = this.insideTransparency;
 			
 			if (this.selected)
 				context.fillStyle  = this.insideStyleSelected;

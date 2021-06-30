@@ -13,6 +13,16 @@ class Equirectangular
 
 		return {x: delLong, y: (latitude - this.centralLatitude) / 90.0 * Math.cos(cenLatRad)};
 	}
+	calculateReverse(x,y)
+	{
+		var lat = y * 90.0 / Math.cos(cenLatRad) + this.centralLatitude;
+		var long = x * 180.0 + this.centralLongitude;
+		long += 360.0;
+		long %= 360.0;
+		if (long > 180.0)
+			long -= 180.0;
+		return {lat: lat, long: long};
+	}
 	constructor(centralLongitude,centralLatitude)
 	{
 		if (centralLongitude != null)

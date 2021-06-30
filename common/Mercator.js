@@ -13,6 +13,17 @@ class Mercator
 
 		return {x: delLong, y: Math.log(Math.tan(Math.PI * 0.25 + latRad * 0.5)) / this.latScalar};
 	}
+	calculateReverse(x,y)
+	{
+		var lat = (Math.atan(Math.exp(y * this.latScalar)) * 2.0 + Math.PI * 0.5) * 180.0 / Math.PI;
+		var long = x * 180.0 + this.centralLongitude;
+		long += 360.0;
+		long %= 360.0;
+		if (long > 180.0)
+			long -= 180.0;
+//		long -= 180.0;
+		return {lat: lat, long: long};
+	}
 	constructor(centralLongitude,centralLatitude)
 	{
 		if (centralLongitude != null)

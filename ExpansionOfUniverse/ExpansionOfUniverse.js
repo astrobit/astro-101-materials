@@ -72,62 +72,73 @@ commonUIRegister(btnReturnMilkyWay);
 btnMoveHome = new Button("Move to a New Galaxy",theCanvas.width * 0.5 + 5,775,220,30,function(){moveHome(false);});
 commonUIRegister(btnMoveHome);
 
+var projection = new Mollweide(0,0);
 
 function drawMap(context,width,height)//cx,cy,width,height)
 {
 	context.save();
-	context.scale(width * 0.5,height * 0.5);
-	context.translate(1.0,1.0);
+//	context.scale(width * 0.5,height * 0.5);
+//	context.translate(1.0,1.0);
+	context.translate(width * 0.5,height * 0.5);
 	context.fillStyle = "#0F0F0F";
-	context.fillRect(-1,-1,2,2);
-
+//	context.fillRect(-1,-1,2,2);
+//	context.fillRect(-width*0.5,-height*0.5,width,height);
+	drawEllipseByCenterFill(context,0,0,width,height)
+	context.strokeStyle = "#FFFFFF";
+	drawEllipseByCenter(context,0,0,width,height)
+	
 	context.fillStyle = "#FFFFFF";
 	var idxLcl;
+	
 	for (idxLcl = 0; idxLcl < universe.length; idxLcl++)
 	{
 		if (idxLcl != currentHome)
 		{
+			
 			var relPos = universe[idxLcl]._position.subtract(universe[currentHome]._position)
 			var dist = relPos.radius;
-			var long = relPos.theta;//Math.atan2(universe[idxLcl]._position.y - universe[currentHome]._position.y,universe[idxLcl]._position.x - universe[currentHome]._position.x);
-			var lat = relPos.psi;//Math.asin(z / dist);
-			var mx = ((long / Math.PI * 0.5 + 0.5) % 1.0) * 2.0 - 1.0;
-			var my = -lat / Math.PI * 2.0;
+			var long = relPos.theta * 180.0 / Math.PI;//Math.atan2(universe[idxLcl]._position.y - universe[currentHome]._position.y,universe[idxLcl]._position.x - universe[currentHome]._position.x);
+			var lat = relPos.psi * 180.0 / Math.PI;//Math.asin(z / dist);
+			var proj = projection.calculate(lat,long);
+			
+//			var mx = (((long / Math.PI * 0.5 + 0.5) % 1.0) * 2.0 - 1.0) * width * 0.5;
+//			var my = (-lat / Math.PI * 2.0) * height * 0.5;
 
-			var flux = universe[idxLcl]._luminosity * Math.pow(dist * 2.06265e11,-2);
+/*			var flux = universe[idxLcl]._luminosity * Math.pow(dist * 2.06265e11,-2);
 			var Mv = -2.5 * Math.log10(flux) - 26.75;
 			var angSize = universe[idxLcl]._luminosity / 2.0e10 * 0.03 / dist
 			var size = angSize / (2.0 * Math.PI) * 100.0;
 
-			var bright = (22.0 - Mv) / 3.0;
-			context.fillStyle = scaleColor(bright,universe[idxLcl]._color).style;
+			var bright = (22.0 - Mv) / 3.0;*/
+			context.fillStyle = "#FFFFFF";//scaleColor(bright,universe[idxLcl]._color).style;
 
 
 //			console.log(mx + ' ' + my + ' ' + flux + ' ' + Mv);
 			context.beginPath();
-			context.arc(mx,my,size,0,2.0 * Math.PI);
+			context.arc(proj.x * width * 0.5,-proj.y * height * 0.5,1.0,0,2.0 * Math.PI);
 			context.closePath();
 			context.fill();
 
 
 		}
 	}
-	context.restore();
 	
 	context.strokeStyle = '#FFFF00';
-	var mx = ((viewLong / Math.PI) + 1.0) * width * 0.5;
-	var my = (1.0 - (viewLat / Math.PI * 2.0)) * height * 0.5;
+	var proj = projection.calculate(viewLat * 180.0 / Math.PI,viewLong * 180.0 / Math.PI);
 	var radius = Math.max(telescopes[0]._FOVdegrees * 0.5 / 360.0 * width,3);
 	context.beginPath();
-	context.arc(mx,my,radius,0,2.0 * Math.PI);
+	context.arc(proj.x * width  * 0.5,-proj.y * height  * 0.5,radius,0,2.0 * Math.PI);
 	context.stroke();
+
+	context.restore();
 }
 
 function clickMap(event,x,y)
 {
-	var lat = (0.5 - y) * Math.PI;
-	var long = (x - 0.5) * 2.0 * Math.PI;
-	setSlewTarget(lat,long);
+	var pos = projection.calculateReverse(x * 2.0 - 1.0,1.0 - y * 2.0);
+//	var lat = (0.5 - y) * Math.PI;
+//	var long = (x - 0.5) * 2.0 * Math.PI;
+	setSlewTarget(pos.lat / 180.0 * Math.PI,pos.long / 180.0 * Math.PI);
 }
 
 var viewMap = new Clickable("Sky Map",theCanvas.width * 0.5 - 250,40,500,250,clickMap,drawMap);
@@ -514,16 +525,11 @@ function draw()
 	theContext.fillText(text,theCanvas.width * 0.5 + 375 - theContext.measureText(text).width * 0.5,24);
 
 	commonUIdraw(theContext);
-/*	var idxLcl;
-	for (idxLcl = 0; idxLcl < buttons.length; idxLcl++)
-	{
-		buttons[idxLcl].draw();
-	}*/
-
-//	theContext.fillStyle = "#1F1F1F";
-//	theContext.font = "18px Arial";
-//	theContext.fillText(cX + ' ' + cY,0,680);
-
+	
+	
+	// debug: 
+/*	theContext.fillText(viewLat * 180.0 / Math.PI,theCanvas.width - 100, 30);
+	theContext.fillText(viewLong * 180.0 / Math.PI,theCanvas.width - 50, 30);*/
 }
 
 

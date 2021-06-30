@@ -415,6 +415,7 @@ function createUniverse()
 	home._sinOrientationFace = Math.sin(home._orientationFace);
 	home._id = 'Milky Way';
 	universe.push(home);
+	
 	if (debug) {
 		var tempX = new Galaxy();
 		tempX._position.x = 100;
@@ -530,7 +531,7 @@ function moveHome(toMW)
 
 	btnFindMilkyWay.disabled = false;
 	btnReturnMilkyWay.disabled = false;
-	btnMoveHome.disabled = true;
+	btnMoveHome.disabled = false;
 
 	measH0 = -1;
 	measH0u = -1;
@@ -553,8 +554,9 @@ function findHome()
 //		var dist = relPos.radius;
 		viewLong = relPos.theta;//Math.atan2(y,x);
 		viewLat = relPos.psi;//Math.asin(z / dist);
+		update = true;
 	}
-	draw();
+	//draw();
 }
 
 var targetLat = null;

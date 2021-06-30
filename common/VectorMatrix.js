@@ -95,7 +95,8 @@ class ThreeVector
 		this._x *= scalar;
 		this._y *= scalar;
 		this._z *= scalar;
-		this._r *= scalar;
+		this._r *= Math.abs(scalar);
+		this.calcPolar();
 	}
 	selfUnit()
 	{

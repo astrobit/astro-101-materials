@@ -2,6 +2,10 @@
 <html>
 <head>
     <meta charset="utf-8">
+    <meta name="description" content="A site geared toward astronmy education to explore the expansion of the Universe by measuring the brightness, distance, and redshift of galaxies in a simulated universe .">
+    <meta name="keywords" content="astronomy, education, galaxies, universe, Hubble, expansion, redshift, distance">
+    <meta name="author" content="Brian W. Mulligan">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Expansion of the Universe</title>
     <style>
         .slidecontainer {
@@ -35,8 +39,15 @@
                 background: #4CAF50;
                 cursor: pointer;
             }
-
     </style>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-RK4K0CMEJL"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-RK4K0CMEJL');
+    </script>
 </head>
 <body style="font-family:sans-serif;font-size:15px;width:1200px;margin-left:auto;margin-right:auto;background-color:#000000;">
     <div style="width:1200px; margin-left:auto; margin-right:auto;height:800px;">
@@ -46,7 +57,11 @@
     </div>
 
     <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
-        <p style="color: gray;font-size:75%">Copyright (c) 2020 - 2021, Brian W. Mulligan</p>
+        <p style="color: gray;font-size:75%">
+            Copyright (c) 2020 - 2021, Brian W. Mulligan
+            <a href="https://www.iubenda.com/privacy-policy/91469080" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe " title="Privacy Policy ">Privacy Policy</a>
+            <script type="text/javascript">(function (w, d) { var loader = function () { var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src = "https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s, tag); }; if (w.addEventListener) { w.addEventListener("load", loader, false); } else if (w.attachEvent) { w.attachEvent("onload", loader); } else { w.onload = loader; } })(window, document);</script>
+        </p>
     </div>
     <script type="text/javascript" src="common.js"></script>
     <script type="text/javascript" src="commonGP.js"></script>
@@ -57,5 +72,6 @@
     <script type="text/javascript" src="Mollweide.js"></script>
     <script type="text/javascript" src="Simulation.js"></script>
     <script type="text/javascript" src="ExpansionOfUniverse.js"></script>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
 </body>
 </html>

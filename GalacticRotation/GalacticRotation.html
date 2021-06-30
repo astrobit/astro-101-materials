@@ -2,12 +2,21 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="description" content="A site geared toward astronmy education to explore the rotation curve and surface brightness profiles from galaxies in the <a href="http://astroweb.cwru.edu/SPARC/">SPARC</a> sample, and see how the mass and shape of the disk, bulge, and dark matter halo of galaxies affect the velocity and surface brightness.">
+    <meta name="description" content="A site geared toward astronmy education to explore the rotation curve and surface brightness profiles from galaxies in the <a href=" http: //astroweb.cwru.edu/SPARC/">SPARC</a> sample, and see how the mass and shape of the disk, bulge, and dark matter halo of galaxies affect the velocity and surface brightness.">
     <meta name="keywords" content="astronomy, education, galaxies, rotation curve, dark matter">
     <meta name="author" content="Brian W. Mulligan">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galactic Rotation Curves</title>
     <link rel="stylesheet" href="GalacticRotation.css">
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-7LW388WPS8"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-7LW388WPS8');
+    </script>
 </head>
 <body>
     <h1>Galactic Rotation Curves</h1>
@@ -110,9 +119,15 @@
             </fieldset>
         </div>
     </div>
-        <div style="width:500px;">
-            <p style="color: gray;font-size:75%">Copyright (c) 2020,2021 Brian W. Mulligan</p>
+    <div style="width:500px;">
+        <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
+            <p style="color: gray;font-size:75%">
+                Copyright (c) 2020 - 2021, Brian W. Mulligan
+                <a href="https://www.iubenda.com/privacy-policy/91469080" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe " title="Privacy Policy ">Privacy Policy</a>
+                <script type="text/javascript">(function (w, d) { var loader = function () { var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src = "https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s, tag); }; if (w.addEventListener) { w.addEventListener("load", loader, false); } else if (w.attachEvent) { w.attachEvent("onload", loader); } else { w.onload = loader; } })(window, document);</script>
+            </p>
         </div>
+    </div>
         <script type="text/javascript" src="data/galaxyRotationData.js"></script>
         <script type="text/javascript" src="GalacticRotation.js"></script>
 </body>

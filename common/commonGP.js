@@ -76,5 +76,34 @@ function download(data, filename, type) {
         }, 0); 
     }
 }
+/////////////////////////////////////////////////////////////////////////
+//
+//  function sig_figs
+//
+// this function rounds a value and uncertainty to an 
+// appropriate number of significant figures, based on the uncertainty
+// the value and uncertainty are output as an object with keys
+// `value' and `uncertainty', respectively.
+// an additional key `rounding' is included that is for use with
+// the .toFixed method to ensure proper display of values
+/////////////////////////////////////////////////////////////////////////
+function sig_figs(value, uncertainty)
+{
+	var uncertainty_res = 0;
+	var value_res = 0;
+	var rounding = 0;
+	if (uncertainty > 0)
+	{
+		var uncertainty_log = Math.floor(Math.log10(uncertainty));
+		rounding = -uncertainty_log;
+		if (rounding < 0)
+			rounding = 0;
+		var mult = Math.pow(10,uncertainty_log);
+		uncertainty_res = Math.round(uncertainty / mult) * mult;
+		value_res = Math.round(value / mult) * mult;
+	}
+	
+	return {value:value_res, uncertainty: uncertainty_res, rounding: rounding};
+}
 
 

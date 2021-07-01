@@ -1,5 +1,6 @@
 common.js
 commonAstro.js
+commonConst.js
 commonGP.js
 constellation.js
 Equirectangular.js

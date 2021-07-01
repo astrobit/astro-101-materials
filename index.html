@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
@@ -17,62 +17,327 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-7W6FWKYRTE"></script>
     <script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-  gtag('config', 'G-7W6FWKYRTE');
+        gtag('config', 'G-7W6FWKYRTE');
     </script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Montserrat" rel="stylesheet" type="text/css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <style>
+        body {
+            line-height: 1.8;
+            color: #555;
+            font-weight: 400;
+            font-size: 15px;
+            font-family: 'Courier New', Courier, 'Lucida Sans Typewriter', 'Lucida Typewriter', monospace;
+        }
+
+        .btn-default {
+            color: #fff;
+            background-color: #4C5F76;
+            border-color: #4C5F76;
+        }
+
+        .btn-group-lg > .btn, .btn-lg {
+            padding: 10px 46px;
+        }
+
+        h2 {
+            font-size: 24px;
+            text-transform: uppercase;
+            color: #303030;
+            font-weight: 600;
+            margin-bottom: 30px;
+        }
+
+        h4 {
+            font-size: 18px;
+            line-height: 1.15em;
+            color: #303030;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        .jumbotron {
+            background-color: #4C5F76;
+            color: #fff;
+            padding: 100px 25px;
+            background: url(https://astronaos.com/images/sky-space-dark-galaxy_sm.jpg);
+        }
+
+        .container-fluid {
+            padding: 30px 40px;
+        }
+
+        .bg-grey {
+            background-color: #E8E9E9;
+        }
+
+        .logo-small {
+            color: #303030;
+            font-size: 50px;
+        }
+
+        .logo {
+            color: #f4511e;
+            font-size: 200px;
+        }
+
+        .thumbnail {
+            padding: 0 0 15px 0;
+            border: none;
+            border-radius: 0;
+        }
+
+            .thumbnail img {
+                width: 100%;
+                height: 100%;
+                margin-bottom: 10px;
+            }
+
+        .carousel-control.right, .carousel-control.left {
+            background-image: none;
+            color: #f4511e;
+        }
+
+        .carousel-indicators li {
+            border-color: #f4511e;
+        }
+
+            .carousel-indicators li.active {
+                background-color: #f4511e;
+            }
+
+        footer {
+            background: url(https://astronaos.com/images/sky-space-dark-galaxy_sm.jpg);
+        }
+
+            footer p {
+                color: #E8E9E9;
+            }
+
+        .item h4 {
+            font-size: 19px;
+            line-height: 1.375em;
+            font-weight: 400;
+            font-style: italic;
+            margin: 70px 0;
+        }
+
+        .item span {
+            font-style: normal;
+        }
+
+        .panel {
+            border: 1px solid #f4511e;
+            border-radius: 0 !important;
+            transition: box-shadow 0.5s;
+        }
+
+            .panel:hover {
+                box-shadow: 5px 0px 40px rgba(0,0,0, .2);
+            }
+
+        .panel-footer .btn:hover {
+            border: 1px solid #f4511e;
+            background-color: #fff !important;
+            color: #f4511e;
+        }
+
+        .panel-heading {
+            color: #fff !important;
+            background-color: #f4511e !important;
+            padding: 25px;
+            border-bottom: 1px solid transparent;
+            border-top-left-radius: 0px;
+            border-top-right-radius: 0px;
+            border-bottom-left-radius: 0px;
+            border-bottom-right-radius: 0px;
+        }
+
+        .panel-footer {
+            background-color: white !important;
+        }
+
+            .panel-footer h3 {
+                font-size: 32px;
+            }
+
+            .panel-footer h4 {
+                color: #aaa;
+                font-size: 14px;
+            }
+
+            .panel-footer .btn {
+                margin: 15px 0;
+                background-color: #f4511e;
+                color: #fff;
+            }
+
+        .navbar {
+            margin-bottom: 0;
+            background-color: #000;
+            z-index: 9999;
+            border: 0;
+            font-size: 15px !important;
+            line-height: 1.42857143 !important;
+            border-radius: 0;
+            text-transform: none;
+        }
+
+            .navbar li a, .navbar .navbar-brand {
+                color: #fff !important;
+            }
+
+        .navbar-nav li a:hover, .navbar-nav li.active a {
+            color: #4C5F76 !important;
+            background-color: #fff !important;
+        }
+
+        .navbar-default .navbar-toggle {
+            border-color: transparent;
+            color: #fff !important;
+        }
+
+        footer .fa {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #E8E9E9;
+        }
+
+        .slideanim {
+            visibility: hidden;
+        }
+
+        .slide {
+            animation-name: slide;
+            -webkit-animation-name: slide;
+            animation-duration: 1s;
+            -webkit-animation-duration: 1s;
+            visibility: visible;
+        }
+
+        @keyframes slide {
+            0% {
+                opacity: 0;
+                -webkit-transform: translateY(70%);
+            }
+
+            100% {
+                opacity: 1;
+                -webkit-transform: translateY(0%);
+            }
+        }
+
+        @-webkit-keyframes slide {
+            0% {
+                opacity: 0;
+                -webkit-transform: translateY(70%);
+            }
+
+            100% {
+                opacity: 1;
+                -webkit-transform: translateY(0%);
+            }
+        }
+
+        @media screen and (max-width: 768px) {
+            .col-md {
+                text-align: center;
+                margin: 25px 0;
+            }
+
+            .btn-lg {
+                width: 100%;
+                margin-bottom: 35px;
+            }
+        }
+
+        @media screen and (max-width: 480px) {
+            .logo {
+                font-size: 150px;
+            }
+        }
+    </style>
 </head>
-<body style="font-family:sans-serif;font-size:15px;width:1200px;margin-left:auto;margin-right:auto;background-color:#0F0F0F;">
-    <h1 style="font-size:24px;text-align:center;color:#FFFFFF;">Astronomy Apps</h1>
-    <div>
-    <div style="width: 1200px;
-        height:500px;
-        margin-left: auto;
-        margin-right: auto;
-        display: block;
-        text-align: justify;">
-        <div style="text-align: justify;width:400px;float:left">
-            <a href="elongation.html">
-                <img src="Elongation.png" alt="Elongation" style="width:400px;">
-            </a>
-            <a href="elongation.html">
-                <p>Elongation</p>
-            </a>
+<body id="myPage" data-spy="scroll" data-target=".navbar" data-offset="60">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-black fixed-top fixed-right">
+        <a class="navbar-brand" href="https://www.astronaos.com">Astronaos</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link active" href="https://www.astronaos.com">HOME</a>
+                <a class="nav-item nav-link active" href="#apps">APPS</a>
+                <a class="nav-item nav-link active" href="#contact">CONTACT</a>
+            </div>
         </div>
-        <div style="text-align: center;width:400px;float:left">
-            <a href="color-sky.html">
-                <img src="Color-Sky.png" alt="The Sky In Color" style="width:400px;">
-            </a>
-            <a href="color-sky.html">
-                <p>The Sky in Color</p>
-            </a>
+    </nav>
+
+    <div class="jumbotron text-center">
+        <h1>Astronomy Apps</h1>
+    </div>
+
+    <div id="apps" class="container-fluid text-center">
+        <div class="row">
+            <div class="col-md-3">
+                <h2><a href="elongation.html">Elongation</a></h2>
+                <a href="elongation.html">
+                    <img src="Elongation.png" alt="Elongation" style="width:225px;">
+                </a>
+                <p> Discover how the planets move relative to the Sun and stars</p>
+            </div>
+            <div class="col-md-3">
+                <h2><a href="color-sky.html">The Sky In Color</a></h2>
+                <a href="color-sky.html">
+                    <img src="Color-Sky.png" alt="The Sky In Color" style="        width: 225px;">
+                </a>
+                <p> View the sky through different astronomical filters</p>
+            </div>
+            <div class="col-md-3">
+                <h2><a href="ExpansionOfUniverse.html">Expansion of the Universe</a></h2>
+                <a href="ExpansionOfUniverse.html">
+                    <img src="ExpUniv.png" alt="Expansion of the Universe" style="        width: 225px;">
+                </a>
+                <p> Explore how the distances and motion of far away galaxies demonstrate the expansion of the Universe</p>
+            </div>
+            <div class="col-md-3">
+                <h2><a href="GalacticRotation.html">Rotation of Galaxies</a></h2>
+                <a href="GalacticRotation.html">
+                    <img src="GalRot.png" alt="Rotation of Galaxies" style="        width: 225px;">
+                </a>
+                <p> Explore how the rotation of galaxies demonstrates the existance of dark matter</p>
+            </div>
         </div>
-        <div style="text-align: center;width:400px;float:left">
-            <a href="ExpansionOfUniverse.html">
-                <img src="ExpUniv.png" alt="Expansion of the Universe" style="width:400px;">
-            </a>
-            <a href="ExpansionOfUniverse.html">
-                <p>Expansion of the Universe</p>
-            </a>
+        <div class="row">
+            <div class="col-xl-12">
+                <h2>Other Physics and Astronomy Related Simulations</h2>
+                <p style="font-size: 125%;font-family: verdana"><a href="https://foothill.edu/astronomy/astrosims.html">Foothill College AstroSims</a></p>
+                <p style="font-size: 125%;font-family: verdana"><a href="https://phet.colorado.edu/en/simulations/filter?subjects=physics,earth-science&type=html,cheerpj&sort=alpha&view=grid">PhET Simulations</a></p>
+                <p style="font-size: 125%;font-family: verdana"><a href="http://physics.bu.edu/~duffy/sims.html">Andrew Duffy's Physics Simulations</a></p>
+            </div>
         </div>
     </div>
-    <div style="        width: 1200px;
-        margin-left: auto;
-        margin-right: auto;
-        display: block;
-        text-align: justify;">
-        <div style="text-align: center;width:400px;float:left">
-            <a href="GalacticRotation.html">
-                <img src="GalRot.png" alt="Rotation of Galaxies" style="width:400px;">
-            </a>
-            <a href="GalacticRotation.html">
-                <p>Rotation of Galaxies</p>
-            </a>
+
+
+    <!-- Container (Contact Section) -->
+    <div id="contact" class="container-fluid text-center">
+        <div class="row">
+            <div class="col-md">
+                <a href="mailto:bwmulligan@stedwards.edu" target="_blank"><button class="btn btn-default btn-lg">Contact Brian<br><span style="font-size:80%;">bwmulligan@stedwards.edu</span></button></a>
+            </div>
         </div>
     </div>
-    </div>
+
     <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
         <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
             <p style="color: gray;font-size:75%">

@@ -382,9 +382,9 @@ function drawHubble(cx,ty,width,height)
 {
 	var state = theContext.save();
 
-	theContext.translate(cx - width * 0.5 + 50,ty + height - 50 + 10);
+	theContext.translate(cx - width * 0.5 + 60,ty + height - 50 + 10);
 	var gh = height - 60;
-	var gw = width - 70;
+	var gw = width - 80;
 	theContext.strokeStyle = '#FFFFFF';
 	theContext.beginPath();
 	theContext.moveTo(0,-gh);

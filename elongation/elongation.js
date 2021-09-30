@@ -34,7 +34,7 @@ var SSmapY = buttonsPlanetsY + 50 + SSmapHeight / 2;
 var tutorialControlsY0 = theCanvas.height - 30;
 var tutorialControlsY1 = theCanvas.height - 30;
 
-var speed = 4.0;//0.25;
+var g_speed = 4.0;//0.25;
 var pause = true;
 var zoom = 100.0;
 
@@ -51,11 +51,11 @@ const kDegrees = 180.0 / Math.PI;
 
 function speedup(event)
 {
-	speed *= 2.0;
+	g_speed *= 2.0;
 }
 function slowdown(event)
 {
-	speed *= 0.5;
+	g_speed *= 0.5;
 }
 
 function zoomin(event)
@@ -137,7 +137,15 @@ button.textFont = "30px Arial";
 button.insideStyle = "#000000"
 commonUIRegister(button);
 
+var g_basespeed = 2.0;
+
+
 var times = String.fromCharCode(0x00d7)
+var timesMTwoFiftySix = times + '-256'
+var timesMSixtyFour = times + '-64'
+var timesMSixteen = times + '-16'
+var timesMFour = times + '-4'
+var timesMOne = times + '-1'
 var timesOne = times + '1'
 var timesFour = times + '4'
 var timesSixteen = times + '16'
@@ -147,35 +155,50 @@ function selectSpeed(value)
 {
 	switch (value)
 	{
+	case timesMTwoFiftySix:
+		g_speed = -64.0 * g_basespeed;
+		break;
+	case timesMSixtyFour:
+		g_speed = -64.0 * g_basespeed;
+		break;
+	case timesMSixteen:
+		g_speed = -16.0 * g_basespeed;
+		break;
+	case timesMFour:
+		g_speed = -2.0 * g_basespeed;
+		break;
+	case timesMOne:
+		g_speed = -1.0 * g_basespeed;
+		break;
 	case timesOne:
 	default:
-		speed = 2.0;
+		g_speed = 1.0 * g_basespeed;
 		break;
 	case timesFour:
-		speed = 8.0;
+		g_speed = 4.0 * g_basespeed;
 		break;
 	case timesSixteen:
-		speed = 32.0;
+		g_speed = 16.0 * g_basespeed;
 		break;
 	case timesSixtyFour:
-		speed = 128.0;
-		break;
-	case timesSixtyFour:
-		speed = 128.0;
+		g_speed = 64.0 * g_basespeed;
 		break;
 	case timesTwoFiftySix:
-		speed = 512.0;
+		g_speed = 256.0 * g_basespeed;
 		break;
 	}
 }
 
 var speedButtons = new Array();
+speedButtons.push(new RadioButton(timesMSixteen,timesMSixteen,theCanvas.width / 2 - 150,buttonsTimeY,40,40));
+speedButtons.push(new RadioButton(timesMFour,timesMFour,theCanvas.width / 2 - 110,buttonsTimeY,40,40));
+speedButtons.push(new RadioButton(timesMOne,timesMOne,theCanvas.width / 2 - 70,buttonsTimeY,40,40));
 speedButtons.push(new RadioButton(timesOne,timesOne,theCanvas.width / 2 + 30,buttonsTimeY,40,40));
 speedButtons.push(new RadioButton(timesFour,timesFour,theCanvas.width / 2 +70,buttonsTimeY,40,40));
 speedButtons.push(new RadioButton(timesSixteen,timesSixteen,theCanvas.width / 2 +110,buttonsTimeY,40,40));
 speedButtons.push(new RadioButton(timesSixtyFour,timesSixtyFour,theCanvas.width / 2 +150,buttonsTimeY,40,40));
 speedButtons.push(new RadioButton(timesTwoFiftySix,timesTwoFiftySix,theCanvas.width / 2 +190,buttonsTimeY,40,40));
-commonUIRegister(new Radio("Speed",timesOne,selectSpeed,speedButtons));
+commonUIRegister(new Radio("speed",timesOne,selectSpeed,speedButtons));
 
 function tutorialDraw(context,state)
 {
@@ -772,7 +795,7 @@ function work(){
 
 // as long as it isn't paussed, advance the timer
 	if (!pause)
-		g_timer = g_timer + 1.0 / 30.0 * speed;
+		g_timer = g_timer + 1.0 / 30.0 * g_speed;
 
 // determine which planet is currently selected
 

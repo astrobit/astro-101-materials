@@ -160,7 +160,7 @@ function selectSpeed(value)
 	switch (value)
 	{
 	case timesMTwoFiftySix:
-		g_speed = -64.0 * g_basespeed;
+		g_speed = -256.0 * g_basespeed;
 		break;
 	case timesMSixtyFour:
 		g_speed = -64.0 * g_basespeed;

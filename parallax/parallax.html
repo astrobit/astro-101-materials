@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="A site geared toward astronomy education to explore the concept of parallax.">
+    <meta name="keywords" content="astronomy, education, stars, parallax, distance">
+    <meta name="author" content="Brian W. Mulligan">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parallax</title>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+<!--    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M15ZVRGK6"></script> -->
+<!--    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-0M15ZVRGK6');
+    </script>-->
+</head>
+<body style="font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#000000;">
+    <!--<h1 style="font-size:24px;text-align:center;color:#FFFFFF;">Elongation</h1>-->
+    <div style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center">
+        <canvas id="theCanvas" width="1000" height="900" onclick="commonUIOnClick(event);">
+            Canvas not supported; please update your browser.
+        </canvas>
+    </div>
+    <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
+        <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
+            <p style="color: gray;font-size:75%">
+                Copyright (c) 2020 - 2021, Brian W. Mulligan
+                <a href="https://www.iubenda.com/privacy-policy/91469080" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe " title="Privacy Policy ">Privacy Policy</a>
+                <script type="text/javascript">(function (w, d) { var loader = function () { var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src = "https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s, tag); }; if (w.addEventListener) { w.addEventListener("load", loader, false); } else if (w.attachEvent) { w.attachEvent("onload", loader); } else { w.onload = loader; } })(window, document);</script>
+            </p>
+        </div>
+    </div>
+<!--    <script type="text/javascript" src="stringsParallax.js"></script>-->
+    <script type="text/javascript" src="tutorial.js"></script>
+    <script type="text/javascript" src="ui.js"></script>
+    <script type="text/javascript" src="VectorMatrix.js"></script>
+    <script type="text/javascript" src="commonGP.js"></script>
+    <script type="text/javascript" src="commonAstro.js"></script>
+    <script type="text/javascript" src="common.js"></script>
+<!--    <script type="text/javascript" src="m6.js"></script>-->
+    <script type="text/javascript" src="stars.js"></script>
+    <script type="text/javascript" src="planets.js"></script>
+<!--    <script type="text/javascript" src="Mollweide.js"></script> -->
+    <script type="text/javascript" src="parallax.js"></script>
+</body>
+</html>

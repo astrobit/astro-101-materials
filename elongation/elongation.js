@@ -6,7 +6,7 @@ var theContext = theCanvas.getContext("2d");
 var minimumControlsHeightTop = 130;
 
 theCanvas.height = window.innerHeight - 60;
-theCanvas.width = theCanvas.height;
+//theCanvas.width = theCanvas.height;
 
 var elongationMapHeight = theCanvas.height / 2 - minimumControlsHeightTop;
 var elongationMapWidth = elongationMapHeight * 2;
@@ -34,7 +34,7 @@ var SSmapY = buttonsPlanetsY + 50 + SSmapHeight / 2;
 var tutorialControlsY0 = theCanvas.height - 30;
 var tutorialControlsY1 = theCanvas.height - 30;
 
-var g_speed = 4.0;//0.25;
+var g_speed = 1.0;//0.25;
 var pause = true;
 var zoom = 100.0;
 
@@ -137,20 +137,24 @@ button.textFont = "30px Arial";
 button.insideStyle = "#000000"
 commonUIRegister(button);
 
-var g_basespeed = 2.0;
+var g_basespeed = 1.0;
 
 
 var times = String.fromCharCode(0x00d7)
-var timesMTwoFiftySix = times + '-256'
-var timesMSixtyFour = times + '-64'
-var timesMSixteen = times + '-16'
-var timesMFour = times + '-4'
-var timesMOne = times + '-1'
-var timesOne = times + '1'
-var timesFour = times + '4'
-var timesSixteen = times + '16'
-var timesSixtyFour = times + '64'
-var timesTwoFiftySix = times + '256'
+var pauseButtonText = '| |'
+var playButtonText = String.fromCharCode(0x25b6);
+var reverseButtonText = String.fromCharCode(0x25c0);
+
+var timesMTwoFiftySix = reverseButtonText + '256'
+var timesMSixtyFour = reverseButtonText + '64'
+var timesMSixteen = reverseButtonText + '16'
+var timesMFour = reverseButtonText + '4'
+var timesMOne = reverseButtonText + '1'
+var timesOne = playButtonText + '1'
+var timesFour = playButtonText + '4'
+var timesSixteen = playButtonText + '16'
+var timesSixtyFour = playButtonText + '64'
+var timesTwoFiftySix = playButtonText + '256'
 function selectSpeed(value)
 {
 	switch (value)
@@ -189,7 +193,10 @@ function selectSpeed(value)
 	}
 }
 
+
 var speedButtons = new Array();
+speedButtons.push(new RadioButton(timesMTwoFiftySix,timesMTwoFiftySix,theCanvas.width / 2 - 230,buttonsTimeY,40,40));
+speedButtons.push(new RadioButton(timesMSixtyFour,timesMSixtyFour,theCanvas.width / 2 - 190,buttonsTimeY,40,40));
 speedButtons.push(new RadioButton(timesMSixteen,timesMSixteen,theCanvas.width / 2 - 150,buttonsTimeY,40,40));
 speedButtons.push(new RadioButton(timesMFour,timesMFour,theCanvas.width / 2 - 110,buttonsTimeY,40,40));
 speedButtons.push(new RadioButton(timesMOne,timesMOne,theCanvas.width / 2 - 70,buttonsTimeY,40,40));
@@ -197,8 +204,82 @@ speedButtons.push(new RadioButton(timesOne,timesOne,theCanvas.width / 2 + 30,but
 speedButtons.push(new RadioButton(timesFour,timesFour,theCanvas.width / 2 +70,buttonsTimeY,40,40));
 speedButtons.push(new RadioButton(timesSixteen,timesSixteen,theCanvas.width / 2 +110,buttonsTimeY,40,40));
 speedButtons.push(new RadioButton(timesSixtyFour,timesSixtyFour,theCanvas.width / 2 +150,buttonsTimeY,40,40));
-speedButtons.push(new RadioButton(timesTwoFiftySix,timesTwoFiftySix,theCanvas.width / 2 +190,buttonsTimeY,40,40));
+speedButtons.push(new RadioButton(timesTwoFiftySix,timesTwoFiftySix,theCanvas.width / 2 + 190,buttonsTimeY,40,40));
 commonUIRegister(new Radio("speed",timesOne,selectSpeed,speedButtons));
+
+function requestAdvanceDay(event)
+{
+	g_timer += 1.0;
+}
+function requestAdvanceWeek(event)
+{
+	g_timer += 7.0;
+}
+function requestAdvanceMonth(event)
+{
+	g_timer += 30.0;
+}
+function requestAdvanceYear(event)
+{
+	g_timer += 365.0;
+}
+
+var advanceDay = new Button("+1d",theCanvas.width / 2 + 250,buttonsTimeY,40,40,requestAdvanceDay);
+commonUIRegister(advanceDay);
+var advanceWeek = new Button("+7d",theCanvas.width / 2 + 290,buttonsTimeY,40,40,requestAdvanceWeek);
+commonUIRegister(advanceWeek);
+var advanceMonth = new Button("+30d",theCanvas.width / 2 + 330,buttonsTimeY,40,40,requestAdvanceMonth);
+commonUIRegister(advanceMonth);
+var advanceYear = new Button("+1y",theCanvas.width / 2 + 370,buttonsTimeY,40,40,requestAdvanceYear);
+commonUIRegister(advanceYear);
+
+function requestBackDay(event)
+{
+	g_timer -= 1.0;
+}
+function requestBackWeek(event)
+{
+	g_timer -= 7.0;
+}
+function requestBackMonth(event)
+{
+	g_timer -= 30.0;
+}
+function requestBackYear(event)
+{
+	g_timer -= 365.0;
+}
+
+var backDay = new Button("-1d",theCanvas.width / 2 - 290,buttonsTimeY,40,40,requestBackDay);
+commonUIRegister(backDay);
+var backWeek = new Button("-7d",theCanvas.width / 2 - 330,buttonsTimeY,40,40,requestBackWeek);
+commonUIRegister(backWeek);
+var backMonth = new Button("-30d",theCanvas.width / 2 - 370,buttonsTimeY,40,40,requestBackMonth);
+commonUIRegister(backMonth);
+var backYear = new Button("-1y",theCanvas.width / 2 - 410,buttonsTimeY,40,40,requestBackYear);
+commonUIRegister(backYear);
+
+function requestPause(event)
+{
+	pause = !pause;
+	if (!pause)
+	{
+		playButton.text = pauseButtonText;
+	}
+	else
+	{
+		playButton.text = playButtonText
+	}
+}
+
+var playButton = new Button("Pause",theCanvas.width / 2 - 20,buttonsTimeY,40,40,requestPause);
+if (pause)
+	playButton.text = playButtonText;
+else
+	playButton.text = pauseButtonText;
+playButton.textFont = "24px Arial";
+commonUIRegister(playButton);
+
 
 function tutorialDraw(context,state)
 {
@@ -418,30 +499,6 @@ if (!tutorialCompleted)
 
 commonUIRegister(g_tutorial);
 
-var pauseButtonText = '| |'
-var playButtonText = String.fromCharCode(0x25b6);
-
-function requestPause(event)
-{
-	pause = !pause;
-	if (!pause)
-	{
-		playButton.text = pauseButtonText;
-	}
-	else
-	{
-		playButton.text = playButtonText
-	}
-}
-
-var playButton = new Button("Pause",theCanvas.width / 2 - 20,buttonsTimeY,40,40,requestPause);
-if (pause)
-	playButton.text = playButtonText;
-else
-	playButton.text = pauseButtonText;
-playButton.textFont = "24px Arial";
-commonUIRegister(playButton);
-
 var replayTutorialButton = new Button("Tutorial",theCanvas.width - 210,modelButtonsY,100,25,tutorialStart);
 replayTutorialButton.textFont = "24px Arial";
 commonUIRegister(replayTutorialButton);
@@ -492,7 +549,7 @@ var g_SelectedPlanetData = {};
 var twoPi = Math.PI * 2.0;
 var degrees = 180.0 / Math.PI;
 var g_SunLongitude = 0;
-var g_timer = 2456084.50000; //2451545.0;
+var g_timer = 2456083.27000; //2451545.0;
 
 function drawSSmap()
 {
@@ -698,8 +755,15 @@ function drawElongationMap()
 		else
 			timerDisplay = timerDisplay + '.00'
 	}
-	var timerReadableDays = Math.round(g_timer)
+	var timerReadableDays = Math.round(g_timer * 100.0) / 100.0;
 	var timerDisplayDays = timerReadableDays.toString();
+	if (timerDisplayDays.charAt(timerDisplayDays.length - 3) != '.')
+	{
+		if (timerDisplayDays.charAt(timerDisplayDays.length - 2) == '.')
+			timerDisplayDays = timerDisplayDays + '0'
+		else
+			timerDisplayDays = timerDisplayDays + '.00'
+	}
 
 
 	theContext.fillText("Date: ",50,35);
@@ -710,7 +774,7 @@ function drawElongationMap()
 	var dayDisplay = Math.floor(calend.day).toString()
 	if (calend.day < 10)
 		dayDisplay = "0" + dayDisplay;
-	drawTextRight(theContext,calend.year + "/" + monthDisplay + '/' + dayDisplay,180,35);
+	drawTextRight(theContext,calend.year + "/" + monthDisplay + '/' + dayDisplay,160,35);
 	drawTextRight(theContext,"(JD "+ timerDisplayDays + ")",280,35);
 
 	theContext.restore();

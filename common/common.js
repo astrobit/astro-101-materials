@@ -183,5 +183,25 @@ class RGB
 			sB = "0" + sB;
 		return "#" + sR + sG + sB;
 	}
+	scale(value)
+	{
+		if (value >= 0.0)
+		{
+			var valueLcl = value;
+			if (this._r * valueLcl > 255)
+				valueLcl = 255 / this._r;
+			if (this._g * valueLcl > 255)
+				valueLcl = 255 / this._g;
+			if (this._g * valueLcl > 255)
+				valueLcl = 255 / this._g;
+			this._r *= valueLcl;
+			this._g *= valueLcl;
+			this._b *= valueLcl;
+		}
+	}
+	copy()
+	{
+		return new RGB(this._r,this._g,this._b);
+	}
 }
 

@@ -35,7 +35,7 @@ var displayCenterY = displayBottomY - displayHeight / 2;
 
 var g_simpleSolarSystem = true;
 var g_speed = 1.0;
-var g_zoom = 1.0 / 30.0; // 1/30 arcsec
+var g_zoom = 1.0 / 120.0; // 1/30 arcsec
 
 function speedup(event)
 {
@@ -303,9 +303,6 @@ var StarsV = new Array();
 var starPositionsCalculated = false;
 var selectedStar = null;
 
-
-var zoom = 1.0;
-
 var viewRA = 0.0;
 var viewDec = 0.0;
 var viewMatrix = new ThreeMatrix();
@@ -453,7 +450,7 @@ function work(){
 	var scaling = 648000.0 / Math.PI * 0.5;
 	var aperture = 1000.0;
 	var resolution = 1.22 * 5.5e-7 / aperture;// / scaling  * 0.5;
-	var seeing = 0.0625;
+	var seeing = 1.1;
 	var diff_patt_size = resolution;
 	if (diff_patt_size < seeing)
 		diff_patt_size = seeing;
@@ -468,10 +465,10 @@ function work(){
 		theContext.strokeStyle = "#1F1F1F";
 		for (idxLcl = -30; idxLcl < 30; idxLcl++)
 		{
-			var viewShiftX = viewRA % (1.0 / 3600.0) * scaling * zoom * halfSize;
-			var viewShiftY = viewDec % (1.0 / 3600.0) * scaling * zoom * halfSize;
+			var viewShiftX = viewRA % (1.0 / 3600.0) * scaling * g_zoom * halfSize;
+			var viewShiftY = viewDec % (1.0 / 3600.0) * scaling * g_zoom * halfSize;
 			
-			var x = (idxLcl * (1.0 / 3600.0) - viewRA % (1.0 / 3600.0)) * scaling * zoom * halfSize;
+			var x = (idxLcl * (1.0 / 3600.0) - viewRA % (1.0 / 3600.0)) * scaling * g_zoom * halfSize;
 			if (x > -halfSize && x < halfSize)
 			{
 				theContext.beginPath();
@@ -479,7 +476,7 @@ function work(){
 				theContext.lineTo(displayCenterX + x,displayCenterY + halfSize);
 				theContext.stroke();
 			}
-			var y = (idxLcl * (1.0 / 3600.0) - viewDec % (1.0 / 3600.0)) * scaling * zoom * halfSize;
+			var y = (idxLcl * (1.0 / 3600.0) - viewDec % (1.0 / 3600.0)) * scaling * g_zoom * halfSize;
 			if (y > -halfSize && y < halfSize)
 			{
 				theContext.beginPath();
@@ -515,9 +512,9 @@ function work(){
 				var viewPos = viewMatrix.dot(StarPDate.unit); // transform relative position into view coordinates
 				if (Math.abs(viewPos.theta < Math.PI * 0.5)) // needs to be in front of telescope
 				{
-					var x = viewPos.theta * scaling * zoom * halfSize;
-					var y = viewPos.psi * scaling * zoom * halfSize
-					var size = diff_patt_size * halfSize * zoom;
+					var x = viewPos.theta * scaling * g_zoom * halfSize;
+					var y = viewPos.psi * scaling * g_zoom * halfSize
+					var size = diff_patt_size * halfSize * g_zoom;
 					if ((x + size) >= -halfSize && (x - size) <= halfSize && (y + size) >= -halfSize && (y - size) < halfSize)
 					{
 						x += displayCenterX;

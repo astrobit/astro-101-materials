@@ -226,3 +226,100 @@ function JDtoGregorian(jd) {
 		*/
 	return { year: y, month: m, day: d };
 }
+
+function degrees(value)
+{
+	return value / Math.PI * 180.0;
+}
+function radians(value)
+{
+	return value * Math.PI / 180.0;
+}
+function degreestoDMS(value,rounding)
+{
+	var roundLcl = rounding;
+	if (rounding === undefined || rounding === null)
+		roundLcl = 2;
+	var round = Math.pow(10.0,roundLcl);
+
+	var valAbs = Math.abs(value);
+	var deg = Math.floor(valAbs);
+	var min = Math.floor((valAbs - deg) * 60.0);
+	var sec = Math.round(((valAbs - deg) * 60.0 - min) * 60.0 * round) / round;
+	if (value < 0)
+		deg *= -1;
+	return { deg: deg, min: min, sec: sec };
+}
+function degreestoHMS(value,rounding)
+{
+	var roundLcl = rounding;
+	if (rounding === undefined || rounding === null)
+		roundLcl = 2;
+	var round = Math.pow(10.0,roundLcl);
+	
+	var valH = Math.abs(value) / 15.0;
+	var hr = Math.floor(valH);
+	var min = Math.floor((valH - hr) * 60.0);
+	var sec = Math.round(((valH - hr) * 60.0 - min) * 60.0 * round) / round;
+	if (value < 0)
+		hr *= -1;
+	return { hr: hr, min: min, sec: sec };
+}
+
+function degreestoDMSDisplayable(value,rounding)
+{
+	var roundLcl = rounding;
+	if (rounding === undefined || rounding === null)
+		roundLcl = 2;
+
+	var dms = degreestoDMS(value,roundLcl);
+	var min;
+	if (dms.min < 10)
+		min = "0" + dms.min.toString();
+	else
+		min = dms.min.toString();
+	var sec;
+	if (dms.sec < 10)
+		sec = "0" + dms.sec.toString();
+	else
+		sec = dms.sec.toString();
+	if (roundLcl > 0 && sec.length < 3)
+	{
+		sec += ".";
+	}
+	var idx;
+	for (idx = sec.length; idx < (roundLcl + 3); idx++)
+	{
+		sec += "0";
+	}
+	return {deg: dms.deg, min: min, sec:sec};
+}
+
+function degreestoHMSDisplayable(value,rounding)
+{
+	var roundLcl = rounding;
+	if (rounding === undefined || rounding === null)
+		roundLcl = 2;
+
+	var dms = degreestoHMS(value,roundLcl);
+	var min;
+	if (dms.min < 10)
+		min = "0" + dms.min.toString();
+	else
+		min = dms.min.toString();
+	var sec;
+	if (dms.sec < 10)
+		sec = "0" + dms.sec.toString();
+	else
+		sec = dms.sec.toString();
+	if (roundLcl > 0 && sec.length < 3)
+	{
+		sec += ".";
+	}
+	var idx;
+	for (idx = sec.length; idx < (roundLcl + 3); idx++)
+	{
+		sec += "0";
+	}
+	return {hr: dms.hr, min: min, sec:sec};
+}

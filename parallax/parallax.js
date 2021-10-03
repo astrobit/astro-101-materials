@@ -14,6 +14,7 @@ var theContext = theCanvas.getContext("2d");
 var minimumControlsHeightTop = 130;
 
 theCanvas.height = window.innerHeight - 60;
+theCanvas.width = window.innerWidth;
 //theCanvas.width = theCanvas.height;
 
 var modelButtonsY = theCanvas.height - 30;

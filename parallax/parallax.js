@@ -51,18 +51,6 @@ function zoomout(event)
 }
 
 
-function selectComplexity(value)
-{
-	g_simpleSolarSystem = (value == "Simple Model");
-}
-var modelButtons = new Array();
-modelButtons.push(new RadioButton("Simple Model","Simple Model",theCanvas.width / 2 - 145,modelButtonsY,140,25));
-modelButtons.push(new RadioButton("Real Model","Real Model",theCanvas.width / 2 + 5,modelButtonsY,140,25));
-if (g_simpleSolarSystem)
-	commonUIRegister(new Radio("Model","Simple Model",selectComplexity,modelButtons));
-else
-	commonUIRegister(new Radio("Model","Real Model",selectComplexity,modelButtons));
-
 var g_basespeed = 1.0;
 var g_speed = 1.0;
 var g_pause = true;
@@ -237,10 +225,22 @@ function requestProperMotion(event)
 	}
 }
 
-var plxEnableButton = new Button("Parallax",theCanvas.width / 2 - 145,buttonsControlsY,140,25,requestParallax);
+var plxEnableButton = new Button("Parallax",theCanvas.width / 2 - 290,modelButtonsY,140,25,requestParallax);
 commonUIRegister(plxEnableButton);
-var pmEnableButton = new Button("Proper Motion",theCanvas.width / 2 + 5,buttonsControlsY,140,25,requestProperMotion);
+var pmEnableButton = new Button("Proper Motion",theCanvas.width / 2 - 145,modelButtonsY,140,25,requestProperMotion);
 commonUIRegister(pmEnableButton);
+
+function selectComplexity(value)
+{
+	g_simpleSolarSystem = (value == "Simple Model");
+}
+var modelButtons = new Array();
+modelButtons.push(new RadioButton("Simple Model","Simple Model",theCanvas.width / 2 + 5,modelButtonsY,140,25));
+modelButtons.push(new RadioButton("Real Model","Real Model",theCanvas.width / 2 + 150,modelButtonsY,140,25));
+if (g_simpleSolarSystem)
+	commonUIRegister(new Radio("Model","Simple Model",selectComplexity,modelButtons));
+else
+	commonUIRegister(new Radio("Model","Real Model",selectComplexity,modelButtons));
 
 
 var g_timer = 2451544.0;//2456083.27000; //2451545.0;
@@ -248,6 +248,8 @@ var g_timer = 2451544.0;//2456083.27000; //2451545.0;
 
 var StarsP0 = new Array();
 var StarsV = new Array();
+var starPositionsCalculated = false;
+var selectedStar = null;
 
 
 var zoom = 1.0;
@@ -256,34 +258,22 @@ var viewRA = 0.0;
 var viewDec = 0.0;
 var viewMatrix = new ThreeMatrix();
 var idxLcl = 0;
-	// stars with sirius
-for (idxLcl = 0; idxLcl < stars.length; idxLcl++)
+
+var highPM = new Array();
+var highPlx = new Array();
+	
+function selectStar(index)
 {
-	var raRad = stars[idxLcl].ra * Math.PI / 180.0;
-	var decRad = stars[idxLcl].dec * Math.PI / 180.0;
-	var cosRA = Math.cos(raRad);
-	var sinRA = Math.sin(raRad);
-	var cosDec = Math.cos(decRad);
-	var sinDec = Math.sin(decRad);
-	var distpc = 1000.0 / stars[idxLcl].plx_value;
-	var distcm = distpc * 180.0 * 3600.0 / Math.PI * 14959787070000.0;
-	var oneplusz = stars[idxLcl].rvz_redshift + 1.0;
-	var vrad = (oneplusz * oneplusz - 1.0) / (oneplusz * oneplusz + 1.0) * 29979245800.0;
-	var pmrarad = stars[idxLcl].pmra * Math.PI / 180.0 / 3600000.0 / (365.0 * 86400.0);
-	var pmdecrad = stars[idxLcl].pmdec * Math.PI / 180.0 / 3600000.0 / (365.0 * 86400.0);
-	var vra = pmrarad * distcm;
-	var vdec = pmdecrad * distcm;
-	var vx = -sinRA * cosDec * vra + cosRA * -sinDec * vdec + cosRA * cosDec * vrad
-	var vy = cosRA * cosDec * vra + cosRA * -sinDec * vdec + cosRA * sinDec * vrad
-	var vz = cosDec * vdec + sinDec * vrad
-
-
-	var pos = new ThreeVector(distcm * cosRA * cosDec,distcm * sinRA * cosDec,distcm * sinDec);
-	var vel = new ThreeVector(vx,vy,vz);
-	StarsP0.push(pos);
-	StarsV.push(vel);
-	if (stars[idxLcl].main_id == "* alf CMa")
+	if (index < stars.length)
 	{
+		selectedStar = index;
+		var raRad = stars[index].ra * Math.PI / 180.0;
+		var decRad = stars[index].dec * Math.PI / 180.0;
+		var cosRA = Math.cos(raRad);
+		var sinRA = Math.sin(raRad);
+		var cosDec = Math.cos(decRad);
+		var sinDec = Math.sin(decRad);
+
 		viewRA = raRad;
 		viewDec = decRad;
 		var cosRA = Math.cos(viewRA);
@@ -307,8 +297,50 @@ for (idxLcl = 0; idxLcl < stars.length; idxLcl++)
 		viewMatrix.setRowVector(2, viewZ);
 //		viewMatrix.selfTranspose();
 	}
-	
 }
+
+function preprocessStars()
+{
+	if (starsReady)
+	{
+		for (idxLcl = 0; idxLcl < stars.length; idxLcl++)
+		{
+			var raRad = stars[idxLcl].ra * Math.PI / 180.0;
+			var decRad = stars[idxLcl].dec * Math.PI / 180.0;
+			var cosRA = Math.cos(raRad);
+			var sinRA = Math.sin(raRad);
+			var cosDec = Math.cos(decRad);
+			var sinDec = Math.sin(decRad);
+			var distpc = 1000.0 / stars[idxLcl].plx_value;
+			var distcm = distpc * 180.0 * 3600.0 / Math.PI * 14959787070000.0;
+			var oneplusz = stars[idxLcl].rvz_redshift + 1.0;
+			var vrad = (oneplusz * oneplusz - 1.0) / (oneplusz * oneplusz + 1.0) * 29979245800.0;
+			var pmrarad = stars[idxLcl].pmra * Math.PI / 180.0 / 3600000.0 / (365.0 * 86400.0);
+			var pmdecrad = stars[idxLcl].pmdec * Math.PI / 180.0 / 3600000.0 / (365.0 * 86400.0);
+			var vra = pmrarad * distcm;
+			var vdec = pmdecrad * distcm;
+			var vx = -sinRA * cosDec * vra + cosRA * -sinDec * vdec + cosRA * cosDec * vrad;
+			var vy = cosRA * cosDec * vra + cosRA * -sinDec * vdec + cosRA * sinDec * vrad;
+			var vz = cosDec * vdec + sinDec * vrad;
+			if (Math.abs(stars[idxLcl].pmra) > 100 || Math.abs(stars[idxLcl].pmdec) > 100) // proper motion greater than 100 mas/yr
+				highPM.push(idxLcl);
+			if (Math.abs(stars[idxLcl].plx_value) > 100) // parallax > 100 mas
+				highPlx.push(idxLcl);
+
+			var pos = new ThreeVector(distcm * cosRA * cosDec,distcm * sinRA * cosDec,distcm * sinDec);
+			var vel = new ThreeVector(vx,vy,vz);
+			StarsP0.push(pos);
+			StarsV.push(vel);
+			if (stars[idxLcl].main_id == "* alf CMa")
+				selectStar(idxLcl);
+		}
+		starPositionsCalculated = true;	
+	}
+}
+
+preprocessStars();
+
+var standbyTimer = 0;
 
 function work(){
 	theContext.clearRect(0, 0, theCanvas.width, theCanvas.height);
@@ -316,8 +348,11 @@ function work(){
 	theContext.fillStyle = '#000000';
 	theContext.fillRect(0, 0, theCanvas.width, theCanvas.height);
 
-	if (!g_pause)
+	if (!g_pause && starsReady)
 		g_timer = g_timer + 1.0 / 30.0 * g_speed;
+	if (!starsReady)
+		standbyTimer += 1.0 / 30.0;
+		
 	var timeSeconds = (g_timer - 2451544.00000) * 86400.0;
 
 
@@ -342,7 +377,8 @@ function work(){
 	theContext.rect(displayCenterX - displayHeight / 2,displayCenterY - displayHeight / 2,displayHeight,displayHeight);
 	theContext.stroke();
 
-	
+	var arcSecRadians = Math.PI / 648000.0; // 1" in radians
+	var radiansArcSec = 648000.0 / Math.PI; // 1 radian in arc-sec
 	var scaling = 648000.0 / Math.PI * 0.5;
 	var aperture = 1000.0;
 	var resolution = 1.22 * 5.5e-7 / aperture;// / scaling  * 0.5;
@@ -352,55 +388,150 @@ function work(){
 		diff_patt_size = seeing;
 	
 	var halfSize = displayHeight * 0.5;
-	for (idxLcl = 0; idxLcl < stars.length; idxLcl++)
+	if (starsReady)
 	{
-//		if (inview[idxLcl])
+		if (!starPositionsCalculated)
 		{
-			var StarID = stars[idxLcl].main_id;
-//			StarPMRA = grp[idxLcl].pmra;
-//			StarPMDec = grp[idxLcl].pmdec;
-//			StarPlx = grp[idxLcl].plx_value;
-//			StarV = Math.round(grp[idxLcl].V * 100) / 100.0;
-//			StarB = Math.round(grp[idxLcl].B * 100) / 100.0;
-//			StarR = Math.round(grp[idxLcl].R * 100) / 100.0;
+			preprocessStars();
+		}
+		theContext.strokeStyle = "#1F1F1F";
+		for (idxLcl = -30; idxLcl < 30; idxLcl++)
+		{
+			var viewShiftX = viewRA % arcSecRadians * scaling * zoom * halfSize;
+			var viewShiftY = viewDec % arcSecRadians * scaling * zoom * halfSize;
 			
-//			StarVr = grp[idxLcl].rvz_radvel;
-			if (StarID == "* alf CMa")
-				console.log("here");
-
-			var StarPDate = StarsP0[idxLcl].copy();
-			var StarPDateUnit = StarPDate.unit;
-			var StarMDate = StarsV[idxLcl].scale(timeSeconds);
-			if (g_PMenable)
-				StarPDate.selfAdd(StarMDate);
-			if (g_PLXenable)
-				StarPDate.selfSubtract(Earth);
-			var viewPos = viewMatrix.dot(StarPDate.unit); // transform relative position into view coordinates
-			if (Math.abs(viewPos.theta < Math.PI * 0.5)) // needs to be in front of telescope
+			var x = (idxLcl * arcSecRadians - viewRA % arcSecRadians) * scaling * zoom * halfSize;
+			if (x > -halfSize && x < halfSize)
 			{
-				var x = viewPos.theta * scaling * zoom * halfSize;
-				var y = viewPos.psi * scaling * zoom * halfSize
-				var size = diff_patt_size * halfSize * zoom;
-				if ((x + size) >= -halfSize && (x - size) <= halfSize && (y + size) >= -halfSize && (y - size) < halfSize)
+				theContext.beginPath();
+				theContext.moveTo(displayCenterX + x,displayCenterY - halfSize);
+				theContext.lineTo(displayCenterX + x,displayCenterY + halfSize);
+				theContext.stroke();
+			}
+			var y = (idxLcl * arcSecRadians - viewDec % arcSecRadians) * scaling * zoom * halfSize;
+			if (y > -halfSize && y < halfSize)
+			{
+				theContext.beginPath();
+				theContext.moveTo(displayCenterX - halfSize,displayCenterY + y);
+				theContext.lineTo(displayCenterX + halfSize,displayCenterY + y);
+				theContext.stroke();
+			}
+		}
+		
+		for (idxLcl = 0; idxLcl < stars.length; idxLcl++)
+		{
+	//		if (inview[idxLcl])
+			{
+				var StarID = stars[idxLcl].main_id;
+	//			StarPMRA = grp[idxLcl].pmra;
+	//			StarPMDec = grp[idxLcl].pmdec;
+	//			StarPlx = grp[idxLcl].plx_value;
+	//			StarV = Math.round(grp[idxLcl].V * 100) / 100.0;
+	//			StarB = Math.round(grp[idxLcl].B * 100) / 100.0;
+	//			StarR = Math.round(grp[idxLcl].R * 100) / 100.0;
+				
+	//			StarVr = grp[idxLcl].rvz_radvel;
+	//			if (StarID == "* alf CMa")
+	//				console.log("here");
+
+				var StarPDate = StarsP0[idxLcl].copy();
+				var StarPDateUnit = StarPDate.unit;
+				var StarMDate = StarsV[idxLcl].scale(timeSeconds);
+				if (g_PMenable)
+					StarPDate.selfAdd(StarMDate);
+				if (g_PLXenable)
+					StarPDate.selfSubtract(Earth);
+				var viewPos = viewMatrix.dot(StarPDate.unit); // transform relative position into view coordinates
+				if (Math.abs(viewPos.theta < Math.PI * 0.5)) // needs to be in front of telescope
 				{
-					x += displayCenterX;
-					y += displayCenterY;
-					var starColor = UBVRItoRGB(null,stars[idxLcl].B,stars[idxLcl].V,stars[idxLcl].R,null,0.0,6.0);
-					if (size < 1)
-						size = 1;
-					var layer = 0;
-					for (layer = 0; layer < size; layer += 0.5)
+					var x = viewPos.theta * scaling * zoom * halfSize;
+					var y = viewPos.psi * scaling * zoom * halfSize
+					var size = diff_patt_size * halfSize * zoom;
+					if ((x + size) >= -halfSize && (x - size) <= halfSize && (y + size) >= -halfSize && (y - size) < halfSize)
 					{
-						var clrLcl = starColor.copy();
-						clrLcl.scale(layer / size);
-						theContext.fillStyle = clrLcl.style;
-						theContext.beginPath();
-						theContext.arc(x,y,size - layer,0,2.0*Math.PI);
-						theContext.fill(); // Draw it
+						x += displayCenterX;
+						y += displayCenterY;
+						var starColor = UBVRItoRGB(null,stars[idxLcl].B,stars[idxLcl].V,stars[idxLcl].R,null,0.0,6.0);
+						if (size < 1)
+							size = 1;
+						var layer = 0;
+						for (layer = 0; layer < size; layer += 0.5)
+						{
+							var clrLcl = starColor.copy();
+							clrLcl.scale(layer / size);
+							theContext.fillStyle = clrLcl.style;
+							theContext.beginPath();
+							theContext.arc(x,y,size - layer,0,2.0*Math.PI);
+							theContext.fill(); // Draw it
+						}
 					}
 				}
 			}
 		}
+		if (selectedStar !== null)
+		{
+			theContext.fillStyle = "#FFFFFF";
+			theContext.font = "20px Arial";
+			drawTextCenter(theContext,stars[selectedStar].main_id,displayCenterX - halfSize - 100,displayCenterY - 175);
+			var plxDisplayValue = Math.round(stars[selectedStar].plx_value * 10.0) / 10000.0;
+			var plxDisplay = plxDisplayValue.toString();
+			drawTextCenter(theContext,"Parallax: " + plxDisplay + "\"",displayCenterX - halfSize - 100,displayCenterY - 125);
+			var pmRADisplayValue = Math.round(stars[selectedStar].pmra * 10.0) / 10000.0;
+			var pmRADisplay = pmRADisplayValue.toString();
+			drawTextCenter(theContext,"PM (ra): " + pmRADisplay + "\"/yr",displayCenterX - halfSize - 100,displayCenterY - 75);
+			var pmDecDisplayValue = Math.round(stars[selectedStar].pmdec * 10.0) / 10000.0;
+			var pmDecDisplay = pmDecDisplayValue.toString();
+			drawTextCenter(theContext,"PM (dec): " + pmDecDisplay + "\"/yr",displayCenterX - halfSize - 100,displayCenterY - 50);
+
+			var raD = degreestoHMSDisplayable(stars[selectedStar].ra);
+			theContext.fillStyle = "#00FF00";
+			drawTextCenter(theContext,"RA (J2000)",displayCenterX - halfSize - 100,displayCenterY + 0);
+			theContext.fillStyle = "#FFFFFF";
+			drawTextCenter(theContext,raD.hr + "h " + raD.min + "m " + raD.sec + "s",displayCenterX - halfSize - 100,displayCenterY + 25);
+
+			var decD = degreestoDMSDisplayable(stars[selectedStar].dec);
+			theContext.fillStyle = "#00FF00";
+			drawTextCenter(theContext,"Dec (J2000)",displayCenterX - halfSize - 100,displayCenterY + 50);
+			theContext.fillStyle = "#FFFFFF";
+			drawTextCenter(theContext,decD.deg + String.fromCharCode(0x00b0) + " " + decD.min + "\' " + decD.sec + "\"",displayCenterX - halfSize - 100,displayCenterY + 75);
+
+			var StarPDate = StarsP0[selectedStar].copy();
+			var StarMDate = StarsV[selectedStar].scale(timeSeconds);
+			if (g_PMenable)
+				StarPDate.selfAdd(StarMDate);
+			if (g_PLXenable)
+				StarPDate.selfSubtract(Earth);
+			var raDate = degrees(StarPDate.theta);
+			if (raDate < 0)
+				raDate += 360.0;
+				
+			raD = degreestoHMSDisplayable(raDate);
+			theContext.fillStyle = "#00FF00";
+			drawTextCenter(theContext,"RA (date)",displayCenterX - halfSize - 100,displayCenterY + 125);
+			theContext.fillStyle = "#FFFFFF";
+			drawTextCenter(theContext,raD.hr + "h " + raD.min + "m " + raD.sec + "s",displayCenterX - halfSize - 100,displayCenterY + 150);
+
+			decD = degreestoDMSDisplayable(degrees(StarPDate.psi));
+			theContext.fillStyle = "#00FF00";
+			drawTextCenter(theContext,"Dec (date)",displayCenterX - halfSize - 100,displayCenterY + 175);
+			theContext.fillStyle = "#FFFFFF";
+			drawTextCenter(theContext,decD.deg + String.fromCharCode(0x00b0) + " " + decD.min + "\' " + decD.sec + "\"",displayCenterX - halfSize - 100,displayCenterY + 200);
+
+		}
+	}
+	else
+	{
+		var dots = standbyTimer % 2.0;
+		var dotsText = "";
+		if (dots > 0.50)
+			dotsText += ".";
+		if (dots > 1.00)
+			dotsText += ".";
+		if (dots > 1.50)
+			dotsText += ".";
+			
+		drawTextCenter(theContext,"Standby" + dotsText, displayCenterX,displayCenterY - 10);
+		drawTextCenter(theContext,"Scanning the Sky", displayCenterX,displayCenterY + 10);
 	}
 	var timerReadableDays = Math.round(g_timer * 100.0) / 100.0;
 	var timerDisplayDays = timerReadableDays.toString();

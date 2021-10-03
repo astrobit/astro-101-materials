@@ -1,7 +1,12 @@
 
 
 var theCanvas = document.getElementById("theCanvas");
-theCanvas.onselectstart = function () { return false; } // prevent selection of text below the canvas when you click on it
+theCanvas.onselectstart = function () { return false; }
+theCanvas.onmousedown = commonUIOnMouseDown;
+theCanvas.onmouseup = commonUIOnMouseUp;
+theCanvas.onclick = commonUIOnClick;
+theCanvas.onmousemove = commonUIOnMouseMove;
+theCanvas.onmouseleave = commonUIOnMouseLeave;
 
 var theContext = theCanvas.getContext("2d");
 
@@ -242,6 +247,53 @@ if (g_simpleSolarSystem)
 else
 	commonUIRegister(new Radio("Model","Real Model",selectComplexity,modelButtons));
 
+var slew = [0,0];
+function requestviewNorthStart(event)
+{
+	slew[1] = 1;
+}
+function requestviewNorthEnd(event)
+{
+	slew[1] = 0;
+}
+
+var viewNorth = new SpringButton(String.fromCharCode(0x25b2),displayCenterX + displayHeight * 0.5 + 70,displayCenterY - 155,40,40,requestviewNorthStart,requestviewNorthEnd);
+commonUIRegister(viewNorth);
+
+function requestviewSouthStart(event)
+{
+	slew[1] = -1;
+}
+function requestviewSouthEnd(event)
+{
+	slew[1] = 0;
+}
+
+var viewSouth = new SpringButton(String.fromCharCode(0x25bc),displayCenterX + displayHeight * 0.5 + 70,displayCenterY - 65,40,40, requestviewSouthStart, requestviewSouthEnd);
+commonUIRegister(viewSouth);
+function requestviewEastStart(event)
+{
+	slew[0] = 1;
+}
+function requestviewEastEnd(event)
+{
+	slew[0] = 0;
+}
+
+var viewEast = new SpringButton(String.fromCharCode(0x25c4),displayCenterX + displayHeight * 0.5 + 25,displayCenterY - 110,40,40, requestviewEastStart, requestviewEastEnd);
+commonUIRegister(viewEast);
+
+function requestviewWestStart(event)
+{
+	slew[0] = -1;
+}
+function requestviewWestEnd(event)
+{
+	slew[0] = 0;
+}
+var viewWest = new SpringButton(String.fromCharCode(0x25ba),displayCenterX + displayHeight * 0.5 + 115,displayCenterY - 110,40,40, requestviewWestStart, requestviewWestEnd);
+commonUIRegister(viewWest);
+
 
 var g_timer = 2451544.0;//2456083.27000; //2451545.0;
 
@@ -259,45 +311,47 @@ var viewDec = 0.0;
 var viewMatrix = new ThreeMatrix();
 var idxLcl = 0;
 
-var highPM = new Array();
-var highPlx = new Array();
-	
+function updateViewMatrix()
+{
+	var raRad = radians(viewRA);
+	var decRad = radians(viewDec);
+	var cosRA = Math.cos(raRad);
+	var sinRA = Math.sin(raRad);
+	var cosDec = Math.cos(decRad);
+	var sinDec = Math.sin(decRad);
+
+	var cosRAp90 = Math.cos(raRad + Math.PI * 0.5);
+	var sinRAp90 = Math.sin(raRad + Math.PI * 0.5);
+
+	var cosDecp90 = Math.cos(decRad + Math.PI * 0.5);
+	var sinDecp90 = Math.sin(decRad + Math.PI * 0.5);
+
+
+	var viewX = new ThreeVector(cosRA * cosDec, sinRA * cosDec, sinDec);
+	var viewY = new ThreeVector(cosRAp90, sinRAp90, 0.0);
+	var viewZ = new ThreeVector(cosRA * cosDecp90, sinRA * cosDecp90, sinDecp90);
+
+	viewMatrix.setRowVector(0, viewX);
+	viewMatrix.setRowVector(1, viewY);
+	viewMatrix.setRowVector(2, viewZ);
+//		viewMatrix.selfTranspose();
+}
+
 function selectStar(index)
 {
 	if (index < stars.length)
 	{
 		selectedStar = index;
-		var raRad = stars[index].ra * Math.PI / 180.0;
-		var decRad = stars[index].dec * Math.PI / 180.0;
-		var cosRA = Math.cos(raRad);
-		var sinRA = Math.sin(raRad);
-		var cosDec = Math.cos(decRad);
-		var sinDec = Math.sin(decRad);
-
-		viewRA = raRad;
-		viewDec = decRad;
-		var cosRA = Math.cos(viewRA);
-		var sinRA = Math.sin(viewRA);
-		var cosDec = Math.cos(viewDec);
-		var sinDec = Math.sin(viewDec);
-
-		var cosRAp90 = Math.cos(viewRA + Math.PI * 0.5);
-		var sinRAp90 = Math.sin(viewRA + Math.PI * 0.5);
-
-		var cosDecp90 = Math.cos(viewDec + Math.PI * 0.5);
-		var sinDecp90 = Math.sin(viewDec + Math.PI * 0.5);
-
-
-		var viewX = new ThreeVector(cosRA * cosDec, sinRA * cosDec, sinDec);
-		var viewY = new ThreeVector(cosRAp90, sinRAp90, 0.0);
-		var viewZ = new ThreeVector(cosRA * cosDecp90, sinRA * cosDecp90, sinDecp90);
-
-		viewMatrix.setRowVector(0, viewX);
-		viewMatrix.setRowVector(1, viewY);
-		viewMatrix.setRowVector(2, viewZ);
-//		viewMatrix.selfTranspose();
+		viewRA = stars[index].ra;
+		viewDec = stars[index].dec;
+		updateViewMatrix();
 	}
 }
+
+var highPM = new Array();
+var highPlx = new Array();
+	
+
 
 function preprocessStars()
 {
@@ -354,6 +408,21 @@ function work(){
 		standbyTimer += 1.0 / 30.0;
 		
 	var timeSeconds = (g_timer - 2451544.00000) * 86400.0;
+	
+	if (slew[0] != 0 || slew[1] != 0)
+	{
+		viewRA += slew[0] / 30.0 / 3600.0;
+		viewDec += slew[1] / 30.0 / 3600.0;
+		if (viewRA < 0.0)
+			viewRA += 360.0;
+		if (viewRA >= 360.0)
+			viewRA -= 360.0;
+		if (viewDec > 90.0)
+			viewDec = 90.0;
+		if (viewDec < -90.0)
+			viewDec = -90.0;
+		updateViewMatrix();
+	}
 
 
 	const kRadians = Math.PI / 180.0;
@@ -372,10 +441,12 @@ function work(){
 	var Earth = posEarth.planetHelio.copy();
 	Earth.selfScale(14959787070000.0); // convert from AU to cm
 
+	theContext.save();
 	theContext.strokeStyle = "#FFFFFF";
 	theContext.beginPath();
 	theContext.rect(displayCenterX - displayHeight / 2,displayCenterY - displayHeight / 2,displayHeight,displayHeight);
 	theContext.stroke();
+	theContext.clip();
 
 	var arcSecRadians = Math.PI / 648000.0; // 1" in radians
 	var radiansArcSec = 648000.0 / Math.PI; // 1 radian in arc-sec
@@ -397,10 +468,10 @@ function work(){
 		theContext.strokeStyle = "#1F1F1F";
 		for (idxLcl = -30; idxLcl < 30; idxLcl++)
 		{
-			var viewShiftX = viewRA % arcSecRadians * scaling * zoom * halfSize;
-			var viewShiftY = viewDec % arcSecRadians * scaling * zoom * halfSize;
+			var viewShiftX = viewRA % (1.0 / 3600.0) * scaling * zoom * halfSize;
+			var viewShiftY = viewDec % (1.0 / 3600.0) * scaling * zoom * halfSize;
 			
-			var x = (idxLcl * arcSecRadians - viewRA % arcSecRadians) * scaling * zoom * halfSize;
+			var x = (idxLcl * (1.0 / 3600.0) - viewRA % (1.0 / 3600.0)) * scaling * zoom * halfSize;
 			if (x > -halfSize && x < halfSize)
 			{
 				theContext.beginPath();
@@ -408,7 +479,7 @@ function work(){
 				theContext.lineTo(displayCenterX + x,displayCenterY + halfSize);
 				theContext.stroke();
 			}
-			var y = (idxLcl * arcSecRadians - viewDec % arcSecRadians) * scaling * zoom * halfSize;
+			var y = (idxLcl * (1.0 / 3600.0) - viewDec % (1.0 / 3600.0)) * scaling * zoom * halfSize;
 			if (y > -halfSize && y < halfSize)
 			{
 				theContext.beginPath();
@@ -468,56 +539,6 @@ function work(){
 				}
 			}
 		}
-		if (selectedStar !== null)
-		{
-			theContext.fillStyle = "#FFFFFF";
-			theContext.font = "20px Arial";
-			drawTextCenter(theContext,stars[selectedStar].main_id,displayCenterX - halfSize - 100,displayCenterY - 175);
-			var plxDisplayValue = Math.round(stars[selectedStar].plx_value * 10.0) / 10000.0;
-			var plxDisplay = plxDisplayValue.toString();
-			drawTextCenter(theContext,"Parallax: " + plxDisplay + "\"",displayCenterX - halfSize - 100,displayCenterY - 125);
-			var pmRADisplayValue = Math.round(stars[selectedStar].pmra * 10.0) / 10000.0;
-			var pmRADisplay = pmRADisplayValue.toString();
-			drawTextCenter(theContext,"PM (ra): " + pmRADisplay + "\"/yr",displayCenterX - halfSize - 100,displayCenterY - 75);
-			var pmDecDisplayValue = Math.round(stars[selectedStar].pmdec * 10.0) / 10000.0;
-			var pmDecDisplay = pmDecDisplayValue.toString();
-			drawTextCenter(theContext,"PM (dec): " + pmDecDisplay + "\"/yr",displayCenterX - halfSize - 100,displayCenterY - 50);
-
-			var raD = degreestoHMSDisplayable(stars[selectedStar].ra);
-			theContext.fillStyle = "#00FF00";
-			drawTextCenter(theContext,"RA (J2000)",displayCenterX - halfSize - 100,displayCenterY + 0);
-			theContext.fillStyle = "#FFFFFF";
-			drawTextCenter(theContext,raD.hr + "h " + raD.min + "m " + raD.sec + "s",displayCenterX - halfSize - 100,displayCenterY + 25);
-
-			var decD = degreestoDMSDisplayable(stars[selectedStar].dec);
-			theContext.fillStyle = "#00FF00";
-			drawTextCenter(theContext,"Dec (J2000)",displayCenterX - halfSize - 100,displayCenterY + 50);
-			theContext.fillStyle = "#FFFFFF";
-			drawTextCenter(theContext,decD.deg + String.fromCharCode(0x00b0) + " " + decD.min + "\' " + decD.sec + "\"",displayCenterX - halfSize - 100,displayCenterY + 75);
-
-			var StarPDate = StarsP0[selectedStar].copy();
-			var StarMDate = StarsV[selectedStar].scale(timeSeconds);
-			if (g_PMenable)
-				StarPDate.selfAdd(StarMDate);
-			if (g_PLXenable)
-				StarPDate.selfSubtract(Earth);
-			var raDate = degrees(StarPDate.theta);
-			if (raDate < 0)
-				raDate += 360.0;
-				
-			raD = degreestoHMSDisplayable(raDate);
-			theContext.fillStyle = "#00FF00";
-			drawTextCenter(theContext,"RA (date)",displayCenterX - halfSize - 100,displayCenterY + 125);
-			theContext.fillStyle = "#FFFFFF";
-			drawTextCenter(theContext,raD.hr + "h " + raD.min + "m " + raD.sec + "s",displayCenterX - halfSize - 100,displayCenterY + 150);
-
-			decD = degreestoDMSDisplayable(degrees(StarPDate.psi));
-			theContext.fillStyle = "#00FF00";
-			drawTextCenter(theContext,"Dec (date)",displayCenterX - halfSize - 100,displayCenterY + 175);
-			theContext.fillStyle = "#FFFFFF";
-			drawTextCenter(theContext,decD.deg + String.fromCharCode(0x00b0) + " " + decD.min + "\' " + decD.sec + "\"",displayCenterX - halfSize - 100,displayCenterY + 200);
-
-		}
 	}
 	else
 	{
@@ -533,6 +554,71 @@ function work(){
 		drawTextCenter(theContext,"Standby" + dotsText, displayCenterX,displayCenterY - 10);
 		drawTextCenter(theContext,"Scanning the Sky", displayCenterX,displayCenterY + 10);
 	}
+	theContext.restore();
+	
+	if (starsReady && selectedStar !== null)
+	{
+		theContext.fillStyle = "#FFFFFF";
+		theContext.font = "20px Arial";
+		drawTextCenter(theContext,stars[selectedStar].main_id,displayCenterX - halfSize - 100,displayCenterY - 175);
+		var plxDisplayValue = Math.round(stars[selectedStar].plx_value * 10.0) / 10000.0;
+		var plxDisplay = plxDisplayValue.toString();
+		drawTextCenter(theContext,"Parallax: " + plxDisplay + "\"",displayCenterX - halfSize - 100,displayCenterY - 125);
+		var pmRADisplayValue = Math.round(stars[selectedStar].pmra * 10.0) / 10000.0;
+		var pmRADisplay = pmRADisplayValue.toString();
+		drawTextCenter(theContext,"PM (ra): " + pmRADisplay + "\"/yr",displayCenterX - halfSize - 100,displayCenterY - 75);
+		var pmDecDisplayValue = Math.round(stars[selectedStar].pmdec * 10.0) / 10000.0;
+		var pmDecDisplay = pmDecDisplayValue.toString();
+		drawTextCenter(theContext,"PM (dec): " + pmDecDisplay + "\"/yr",displayCenterX - halfSize - 100,displayCenterY - 50);
+
+		var raD = degreestoHMSDisplayable(stars[selectedStar].ra);
+		theContext.fillStyle = "#00FF00";
+		drawTextCenter(theContext,"RA (J2000)",displayCenterX - halfSize - 100,displayCenterY + 0);
+		theContext.fillStyle = "#FFFFFF";
+		drawTextCenter(theContext,raD.hr + "h " + raD.min + "m " + raD.sec + "s",displayCenterX - halfSize - 100,displayCenterY + 25);
+
+		var decD = degreestoDMSDisplayable(stars[selectedStar].dec);
+		theContext.fillStyle = "#00FF00";
+		drawTextCenter(theContext,"Dec (J2000)",displayCenterX - halfSize - 100,displayCenterY + 50);
+		theContext.fillStyle = "#FFFFFF";
+		drawTextCenter(theContext,decD.deg + String.fromCharCode(0x00b0) + " " + decD.min + "\' " + decD.sec + "\"",displayCenterX - halfSize - 100,displayCenterY + 75);
+
+		var StarPDate = StarsP0[selectedStar].copy();
+		var StarMDate = StarsV[selectedStar].scale(timeSeconds);
+		if (g_PMenable)
+			StarPDate.selfAdd(StarMDate);
+		if (g_PLXenable)
+			StarPDate.selfSubtract(Earth);
+		var raDate = degrees(StarPDate.theta);
+		if (raDate < 0)
+			raDate += 360.0;
+			
+		raD = degreestoHMSDisplayable(raDate);
+		theContext.fillStyle = "#00FF00";
+		drawTextCenter(theContext,"RA (date)",displayCenterX - halfSize - 100,displayCenterY + 125);
+		theContext.fillStyle = "#FFFFFF";
+		drawTextCenter(theContext,raD.hr + "h " + raD.min + "m " + raD.sec + "s",displayCenterX - halfSize - 100,displayCenterY + 150);
+
+		decD = degreestoDMSDisplayable(degrees(StarPDate.psi));
+		theContext.fillStyle = "#00FF00";
+		drawTextCenter(theContext,"Dec (date)",displayCenterX - halfSize - 100,displayCenterY + 175);
+		theContext.fillStyle = "#FFFFFF";
+		drawTextCenter(theContext,decD.deg + String.fromCharCode(0x00b0) + " " + decD.min + "\' " + decD.sec + "\"",displayCenterX - halfSize - 100,displayCenterY + 200);
+
+	}
+
+	var raD = degreestoHMSDisplayable(viewRA);
+	theContext.fillStyle = "#00FF00";
+	drawTextCenter(theContext,"RA (J2000)",displayCenterX + halfSize + 90,displayCenterY + 0);
+	theContext.fillStyle = "#FFFFFF";
+	drawTextCenter(theContext,raD.hr + "h " + raD.min + "m " + raD.sec + "s",displayCenterX + halfSize + 90,displayCenterY + 25);
+
+	var decD = degreestoDMSDisplayable(viewDec);
+	theContext.fillStyle = "#00FF00";
+	drawTextCenter(theContext,"Dec (J2000)",displayCenterX + halfSize + 90,displayCenterY + 50);
+	theContext.fillStyle = "#FFFFFF";
+	drawTextCenter(theContext,decD.deg + String.fromCharCode(0x00b0) + " " + decD.min + "\' " + decD.sec + "\"",displayCenterX + halfSize + 90,displayCenterY + 75);
+
 	var timerReadableDays = Math.round(g_timer * 100.0) / 100.0;
 	var timerDisplayDays = timerReadableDays.toString();
 	if (timerDisplayDays.charAt(timerDisplayDays.length - 3) != '.')

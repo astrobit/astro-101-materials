@@ -560,7 +560,8 @@ function work(){
 		var arcsecPixels = scalingDeg * g_zoom * halfSize;
 		var arcsecDegrees = 1.0 / 3600.0;
 		var viewRAarcsec = viewRA * 3600.0
-		var offsetX = viewRAarcsec - Math.floor(viewRAarcsec);
+		var viewDecarcsec = viewDec * 3600.0
+
 		var angWidth = displayHeight / arcsecPixels;
 		var xstart = Math.floor(angWidth * 0.5);
 		var xend = Math.ceil(angWidth * 0.5);
@@ -584,6 +585,8 @@ function work(){
 		else if (angWidth > 30)
 			lineSpacing = 2.0;
 			
+		var offsetX = (viewRAarcsec - Math.floor(viewRAarcsec));
+
 		theContext.strokeStyle = "#1F1F1F";
 		var x;
 		for (x = -xstart; x < xend; x += lineSpacing)
@@ -593,6 +596,7 @@ function work(){
 			theContext.lineTo(displayCenterX + (x - offsetX) * arcsecPixels,displayCenterY + halfSize);
 			theContext.stroke();
 		}
+		offsetX = (viewDecarcsec - Math.floor(viewDecarcsec));
 		for (x = -xstart; x < xend; x += lineSpacing)
 		{
 			theContext.beginPath();
@@ -643,7 +647,7 @@ function work(){
 					{
 						x += displayCenterX;
 						y += displayCenterY;
-						var starColor = UBVRItoRGB(null,stars[idxLcl].B,stars[idxLcl].V,stars[idxLcl].R,null,0.0,6.0);
+						var starColor = UBVRItoRGB(null,stars[idxLcl].B,stars[idxLcl].V,stars[idxLcl].R,null,0.0,18.0);
 						if (size < 1)
 							size = 1;
 						var layer = 0;

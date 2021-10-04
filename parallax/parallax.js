@@ -36,7 +36,7 @@ var displayCenterY = displayBottomY - displayHeight / 2;
 
 var g_simpleSolarSystem = true;
 var g_speed = 1.0;
-var g_zoom = 1.0 / 120.0; // 1/30 arcsec
+var g_zoom = 1.0 / 20.0; // 1/30 arcsec
 
 function speedup(event)
 {
@@ -203,7 +203,7 @@ playButton.textFont = "24px Arial";
 commonUIRegister(playButton);
 
 
-var g_PLXenable = false;
+var g_PLXenable = true;
 function requestParallax(event)
 {
 	g_PLXenable = !g_PLXenable;
@@ -217,7 +217,7 @@ function requestParallax(event)
 	}
 }
 
-var g_PMenable = false;
+var g_PMenable = true;
 function requestProperMotion(event)
 {
 	g_PMenable = !g_PMenable;
@@ -232,8 +232,10 @@ function requestProperMotion(event)
 }
 
 var plxEnableButton = new Button("Parallax",theCanvas.width / 2 - 290,modelButtonsY,140,25,requestParallax);
+plxEnableButton.insideStyle = "#007F00";
 commonUIRegister(plxEnableButton);
 var pmEnableButton = new Button("Proper Motion",theCanvas.width / 2 - 145,modelButtonsY,140,25,requestProperMotion);
+pmEnableButton.insideStyle = "#007F00";
 commonUIRegister(pmEnableButton);
 
 function selectComplexity(value)
@@ -295,8 +297,84 @@ function requestviewWestEnd(event)
 var viewWest = new SpringButton(String.fromCharCode(0x25ba),displayCenterX + displayHeight * 0.5 + 115,displayCenterY - 110,40,40, requestviewWestStart, requestviewWestEnd);
 commonUIRegister(viewWest);
 
+var zoomAdjust = 0;
+function requestZoomInStart(event)
+{
+	zoomAdjust = 1;
+}
+
+function requestZoomInEnd(event)
+{
+	zoomAdjust = 0;
+}
+
+var zoomIn = new SpringButton("+",displayCenterX + displayHeight * 0.5 + 115,displayCenterY - 200,40,40, requestZoomInStart, requestZoomInEnd);
+commonUIRegister(zoomIn);
+
+function requestZoomOutStart(event)
+{
+	zoomAdjust = -1;
+}
+
+function requestZoomOutEnd(event)
+{
+	zoomAdjust = 0;
+}
+
+var zoomOut = new SpringButton("-",displayCenterX + displayHeight * 0.5 + 25,displayCenterY - 200,40,40, requestZoomOutStart, requestZoomOutEnd);
+commonUIRegister(zoomOut);
 
 var g_timer = 2451544.0;//2456083.27000; //2451545.0;
+
+function selectNextPlxStar(event)
+{
+	currList = 0;
+	currPlxidx++;
+
+	if (currPlxidx >= highPlx.length)
+		currPlxidx -= highPlx.length;
+	selectStar(highPlx[currPlxidx]);
+}
+
+	
+function selectPrevPlxStar(event)
+{
+	currList = 0;
+	currPlxidx--;
+
+	if (currPlxidx < 0)
+		currPlxidx += highPlx.length;
+	selectStar(highPlx[currPlxidx]);
+}
+
+var nextPlx = new Button(String.fromCharCode(0x25ba), displayCenterX - displayHeight * 0.5 - 45, displayCenterY - displayHeight * 0.5 + 25,40,20,selectNextPlxStar);
+commonUIRegister(nextPlx);
+var prevPlx = new Button(String.fromCharCode(0x25c4), displayCenterX - displayHeight * 0.5 - 195, displayCenterY - displayHeight * 0.5 + 25,40,20,selectPrevPlxStar);
+commonUIRegister(prevPlx);
+
+function selectNextPMStar(event)
+{
+	currList = 1;
+	currPMidx++;
+
+	if (currPMidx >= highPM.length)
+		currPMidx -= highPM.length;
+	selectStar(highPM[currPMidx]);
+}
+function selectPrevPMStar(event)
+{
+	currList = 0;
+	currPMidx--;
+
+	if (currPMidx < 0)
+		currPMidx += highPM.length;
+	selectStar(highPM[currPMidx]);
+}
+
+var nextPM = new Button(String.fromCharCode(0x25ba), displayCenterX - displayHeight * 0.5 - 45, displayCenterY - displayHeight * 0.5,40,20,selectNextPMStar);
+commonUIRegister(nextPM);
+var prevPM = new Button(String.fromCharCode(0x25c4), displayCenterX - displayHeight * 0.5 - 195, displayCenterY - displayHeight * 0.5,40,20,selectPrevPMStar);
+commonUIRegister(prevPM);
 
 
 var StarsP0 = new Array();
@@ -349,7 +427,9 @@ function selectStar(index)
 var highPM = new Array();
 var highPlx = new Array();
 	
-
+var currList = 0;
+var currPMidx = 0;
+var currPlxidx = 0;
 
 function preprocessStars()
 {
@@ -383,10 +463,12 @@ function preprocessStars()
 			var vel = new ThreeVector(vx,vy,vz);
 			StarsP0.push(pos);
 			StarsV.push(vel);
-			if (stars[idxLcl].main_id == "* alf CMa")
-				selectStar(idxLcl);
 		}
 		starPositionsCalculated = true;	
+		currList = 0;
+		currPMidx = 0;
+		currPlxidx = 0;
+		selectStar(highPlx[currPlxidx]);
 	}
 }
 
@@ -421,6 +503,13 @@ function work(){
 			viewDec = -90.0;
 		updateViewMatrix();
 	}
+	if (zoomAdjust != 0)
+	{
+		if (zoomAdjust > 0)
+			g_zoom *= 1.05;
+		else
+			g_zoom *= 0.95;
+	}
 
 
 	const kRadians = Math.PI / 180.0;
@@ -449,6 +538,7 @@ function work(){
 	var arcSecRadians = Math.PI / 648000.0; // 1" in radians
 	var radiansArcSec = 648000.0 / Math.PI; // 1 radian in arc-sec
 	var scaling = 648000.0 / Math.PI * 0.5;
+	var scalingDeg = 1.0 * 0.5;
 	var aperture = 1000.0;
 	var resolution = 1.22 * 5.5e-7 / aperture;// / scaling  * 0.5;
 	var seeing = 1.1;
@@ -463,35 +553,68 @@ function work(){
 		{
 			preprocessStars();
 		}
-		theContext.strokeStyle = "#1F1F1F";
-		for (idxLcl = -30; idxLcl < 30; idxLcl++)
-		{
-			var viewShiftX = viewRA % (1.0 / 3600.0) * scaling * g_zoom * halfSize;
-			var viewShiftY = viewDec % (1.0 / 3600.0) * scaling * g_zoom * halfSize;
+		var arcsecPixels = arcSecRadians * scaling * g_zoom * halfSize;
+		
+				
+		
+		var arcsecPixels = scalingDeg * g_zoom * halfSize;
+		var arcsecDegrees = 1.0 / 3600.0;
+		var viewRAarcsec = viewRA * 3600.0
+		var offsetX = viewRAarcsec - Math.floor(viewRAarcsec);
+		var angWidth = displayHeight / arcsecPixels;
+		var xstart = Math.floor(angWidth * 0.5);
+		var xend = Math.ceil(angWidth * 0.5);
+		var lineSpacing = 1.0;
+		if (angWidth > 7200.0)
+			lineSpacing = 3600.0;
+		else if (angWidth > 3600)
+			lineSpacing = 120.0;
+		else if (angWidth > 1800)
+			lineSpacing = 60.0;
+		else if (angWidth > 900)
+			lineSpacing = 30.0;
+		else if (angWidth > 480)
+			lineSpacing = 15.0;
+		else if (angWidth > 240)
+			lineSpacing = 10.0;
+		else if (angWidth > 120)
+			lineSpacing = 5.0;
+		else if (angWidth > 60)
+			lineSpacing = 3.0;
+		else if (angWidth > 30)
+			lineSpacing = 2.0;
 			
-			var x = (idxLcl * (1.0 / 3600.0) - viewRA % (1.0 / 3600.0)) * scaling * g_zoom * halfSize;
-			if (x > -halfSize && x < halfSize)
-			{
-				theContext.beginPath();
-				theContext.moveTo(displayCenterX + x,displayCenterY - halfSize);
-				theContext.lineTo(displayCenterX + x,displayCenterY + halfSize);
-				theContext.stroke();
-			}
-			var y = (idxLcl * (1.0 / 3600.0) - viewDec % (1.0 / 3600.0)) * scaling * g_zoom * halfSize;
-			if (y > -halfSize && y < halfSize)
-			{
-				theContext.beginPath();
-				theContext.moveTo(displayCenterX - halfSize,displayCenterY + y);
-				theContext.lineTo(displayCenterX + halfSize,displayCenterY + y);
-				theContext.stroke();
-			}
+		theContext.strokeStyle = "#1F1F1F";
+		var x;
+		for (x = -xstart; x < xend; x += lineSpacing)
+		{
+			theContext.beginPath();
+			theContext.moveTo(displayCenterX + (x - offsetX) * arcsecPixels,displayCenterY - halfSize);
+			theContext.lineTo(displayCenterX + (x - offsetX) * arcsecPixels,displayCenterY + halfSize);
+			theContext.stroke();
 		}
+		for (x = -xstart; x < xend; x += lineSpacing)
+		{
+			theContext.beginPath();
+			theContext.moveTo(displayCenterX - halfSize, displayCenterY + (x - offsetX) * arcsecPixels);
+			theContext.lineTo(displayCenterX + halfSize, displayCenterY + (x - offsetX) * arcsecPixels);
+			theContext.stroke();
+		}
+	
+
+		theContext.fillStyle = "#FF0000";
+		theContext.strokeStyle = "#FF0000";
+		drawTextCenter(theContext,"1\"",displayCenterX,displayCenterY + 0.85 * halfSize);
+		theContext.beginPath();
+		theContext.moveTo(displayCenterX - 0.5 * arcSecRadians * scaling * g_zoom * halfSize,displayCenterY + 0.9 * halfSize);
+		theContext.lineTo(displayCenterX + 0.5 * arcSecRadians * scaling * g_zoom * halfSize,displayCenterY + 0.9 * halfSize);
+		theContext.stroke();
 		
 		for (idxLcl = 0; idxLcl < stars.length; idxLcl++)
 		{
 	//		if (inview[idxLcl])
 			{
-				var StarID = stars[idxLcl].main_id;
+//				var StarID = stars[idxLcl].main_id;
 	//			StarPMRA = grp[idxLcl].pmra;
 	//			StarPMDec = grp[idxLcl].pmdec;
 	//			StarPlx = grp[idxLcl].plx_value;
@@ -515,7 +638,7 @@ function work(){
 				{
 					var x = viewPos.theta * scaling * g_zoom * halfSize;
 					var y = viewPos.psi * scaling * g_zoom * halfSize
-					var size = diff_patt_size * halfSize * g_zoom;
+					var size = diff_patt_size * halfSize * g_zoom * 0.5;
 					if ((x + size) >= -halfSize && (x - size) <= halfSize && (y + size) >= -halfSize && (y - size) < halfSize)
 					{
 						x += displayCenterX;
@@ -557,29 +680,34 @@ function work(){
 	if (starsReady && selectedStar !== null)
 	{
 		theContext.fillStyle = "#FFFFFF";
+		theContext.font = "14px Arial";
+		drawTextCenter(theContext,"Hi Plx",displayCenterX - displayHeight * 0.5 - 100, displayCenterY - displayHeight * 0.5 + 25 + 17);
+		drawTextCenter(theContext,"Hi PM",displayCenterX - displayHeight * 0.5 - 100, displayCenterY - displayHeight * 0.5 + 17);
+
+
 		theContext.font = "20px Arial";
-		drawTextCenter(theContext,stars[selectedStar].main_id,displayCenterX - halfSize - 100,displayCenterY - 175);
+		drawTextCenter(theContext,stars[selectedStar].main_id,displayCenterX - halfSize - 100,displayCenterY - 145);
 		var plxDisplayValue = Math.round(stars[selectedStar].plx_value * 10.0) / 10000.0;
 		var plxDisplay = plxDisplayValue.toString();
-		drawTextCenter(theContext,"Parallax: " + plxDisplay + "\"",displayCenterX - halfSize - 100,displayCenterY - 125);
+		drawTextCenter(theContext,"Parallax: " + plxDisplay + "\"",displayCenterX - halfSize - 100,displayCenterY - 115);
 		var pmRADisplayValue = Math.round(stars[selectedStar].pmra * 10.0) / 10000.0;
 		var pmRADisplay = pmRADisplayValue.toString();
-		drawTextCenter(theContext,"PM (ra): " + pmRADisplay + "\"/yr",displayCenterX - halfSize - 100,displayCenterY - 75);
+		drawTextCenter(theContext,"PM (ra): " + pmRADisplay + "\"/yr",displayCenterX - halfSize - 100,displayCenterY - 65);
 		var pmDecDisplayValue = Math.round(stars[selectedStar].pmdec * 10.0) / 10000.0;
 		var pmDecDisplay = pmDecDisplayValue.toString();
-		drawTextCenter(theContext,"PM (dec): " + pmDecDisplay + "\"/yr",displayCenterX - halfSize - 100,displayCenterY - 50);
+		drawTextCenter(theContext,"PM (dec): " + pmDecDisplay + "\"/yr",displayCenterX - halfSize - 100,displayCenterY - 40);
 
 		var raD = degreestoHMSDisplayable(stars[selectedStar].ra);
 		theContext.fillStyle = "#00FF00";
-		drawTextCenter(theContext,"RA (J2000)",displayCenterX - halfSize - 100,displayCenterY + 0);
+		drawTextCenter(theContext,"RA (J2000)",displayCenterX - halfSize - 100,displayCenterY + 10);
 		theContext.fillStyle = "#FFFFFF";
-		drawTextCenter(theContext,raD.hr + "h " + raD.min + "m " + raD.sec + "s",displayCenterX - halfSize - 100,displayCenterY + 25);
+		drawTextCenter(theContext,raD.hr + "h " + raD.min + "m " + raD.sec + "s",displayCenterX - halfSize - 100,displayCenterY + 35);
 
 		var decD = degreestoDMSDisplayable(stars[selectedStar].dec);
 		theContext.fillStyle = "#00FF00";
-		drawTextCenter(theContext,"Dec (J2000)",displayCenterX - halfSize - 100,displayCenterY + 50);
+		drawTextCenter(theContext,"Dec (J2000)",displayCenterX - halfSize - 100,displayCenterY + 60);
 		theContext.fillStyle = "#FFFFFF";
-		drawTextCenter(theContext,decD.deg + String.fromCharCode(0x00b0) + " " + decD.min + "\' " + decD.sec + "\"",displayCenterX - halfSize - 100,displayCenterY + 75);
+		drawTextCenter(theContext,decD.deg + String.fromCharCode(0x00b0) + " " + decD.min + "\' " + decD.sec + "\"",displayCenterX - halfSize - 100,displayCenterY + 85);
 
 		var StarPDate = StarsP0[selectedStar].copy();
 		var StarMDate = StarsV[selectedStar].scale(timeSeconds);
@@ -593,15 +721,15 @@ function work(){
 			
 		raD = degreestoHMSDisplayable(raDate);
 		theContext.fillStyle = "#00FF00";
-		drawTextCenter(theContext,"RA (date)",displayCenterX - halfSize - 100,displayCenterY + 125);
+		drawTextCenter(theContext,"RA (date)",displayCenterX - halfSize - 100,displayCenterY + 135);
 		theContext.fillStyle = "#FFFFFF";
-		drawTextCenter(theContext,raD.hr + "h " + raD.min + "m " + raD.sec + "s",displayCenterX - halfSize - 100,displayCenterY + 150);
+		drawTextCenter(theContext,raD.hr + "h " + raD.min + "m " + raD.sec + "s",displayCenterX - halfSize - 100,displayCenterY + 160);
 
 		decD = degreestoDMSDisplayable(degrees(StarPDate.psi));
 		theContext.fillStyle = "#00FF00";
-		drawTextCenter(theContext,"Dec (date)",displayCenterX - halfSize - 100,displayCenterY + 175);
+		drawTextCenter(theContext,"Dec (date)",displayCenterX - halfSize - 100,displayCenterY + 185);
 		theContext.fillStyle = "#FFFFFF";
-		drawTextCenter(theContext,decD.deg + String.fromCharCode(0x00b0) + " " + decD.min + "\' " + decD.sec + "\"",displayCenterX - halfSize - 100,displayCenterY + 200);
+		drawTextCenter(theContext,decD.deg + String.fromCharCode(0x00b0) + " " + decD.min + "\' " + decD.sec + "\"",displayCenterX - halfSize - 100,displayCenterY + 210);
 
 	}
 

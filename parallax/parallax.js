@@ -638,7 +638,7 @@ function work(){
 				if (g_PLXenable)
 					StarPDate.selfSubtract(Earth);
 				var viewPos = viewMatrix.dot(StarPDate.unit); // transform relative position into view coordinates
-				if (Math.abs(viewPos.theta < Math.PI * 0.5)) // needs to be in front of telescope
+				if (Math.abs(viewPos.theta) < Math.PI * 0.5 || Math.abs(viewPos.theta) > 1.5 * Math.PI) // needs to be in front of telescope
 				{
 					var x = viewPos.theta * scaling * g_zoom * halfSize;
 					var y = viewPos.psi * scaling * g_zoom * halfSize

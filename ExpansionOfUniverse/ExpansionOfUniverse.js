@@ -18,26 +18,26 @@ theCanvas.onmouseleave = commonUIOnMouseLeave;
 var theContext = theCanvas.getContext("2d");
 
 
-var btnCurr = new SpringButton("SlewNorth",theCanvas.width * 0.5 + 375,50,50,50,function(){latDir = 1;},function(){latDir = 0;});
+var btnCurr = new SpringButton("SlewNorth",theCanvas.width * 0.5 + 375,70,50,50,function(){latDir = 1;},function(){latDir = 0;});
 btnCurr.text = "🡡";
 commonUIRegister(btnCurr);
 
-btnCurr = new SpringButton("SlewSouth",theCanvas.width * 0.5 + 375,150,50,50,function(){latDir = -1;},function(){latDir = 0;});
+btnCurr = new SpringButton("SlewSouth",theCanvas.width * 0.5 + 375,170,50,50,function(){latDir = -1;},function(){latDir = 0;});
 btnCurr.text = "🡣";
 commonUIRegister(btnCurr);
 
-var btnCurr = new SpringButton("SlewEast",theCanvas.width * 0.5 + 425,100,50,50,function(){longDir = 1;},function(){longDir = 0;});
+var btnCurr = new SpringButton("SlewEast",theCanvas.width * 0.5 + 425,120,50,50,function(){longDir = 1;},function(){longDir = 0;});
 btnCurr.text = "🡢";
 commonUIRegister(btnCurr);
 
-btnCurr = new SpringButton("SlewWest",theCanvas.width * 0.5 + 325,100,50,50,function(){longDir = -1;},function(){longDir = 0;});
+btnCurr = new SpringButton("SlewWest",theCanvas.width * 0.5 + 325,120,50,50,function(){longDir = -1;},function(){longDir = 0;});
 btnCurr.text = "🡠";
 commonUIRegister(btnCurr);
 
 var slewButtonArray = new Array();
 
-var slewFast = new RadioButton("Fast","Fast",theCanvas.width * 0.5 + 335,210,60,40);
-var slewSlow = new RadioButton("Slow","Slow",theCanvas.width * 0.5 + 405,210,60,40);
+var slewFast = new RadioButton("Fast","Fast",theCanvas.width * 0.5 + 335,230,60,40);
+var slewSlow = new RadioButton("Slow","Slow",theCanvas.width * 0.5 + 405,230,60,40);
 
 slewButtonArray.push(slewFast);
 slewButtonArray.push(slewSlow);
@@ -46,7 +46,7 @@ var radioSlew = new Radio("Slew","Fast",slewSelect,slewButtonArray);
 
 commonUIRegister(radioSlew);
 
-btnFindMilkyWay = new Button("Find Milky Way",theCanvas.width * 0.5 + 330,260,140,30,findHome);
+btnFindMilkyWay = new Button("Find Milky Way",theCanvas.width * 0.5 + 330,280,140,30,findHome);
 btnFindMilkyWay.disabled = true;
 commonUIRegister(btnFindMilkyWay);
 
@@ -101,19 +101,9 @@ function drawMap(context,width,height)//cx,cy,width,height)
 			var lat = relPos.psi * 180.0 / Math.PI;//Math.asin(z / dist);
 			var proj = projection.calculate(lat,long);
 			
-//			var mx = (((long / Math.PI * 0.5 + 0.5) % 1.0) * 2.0 - 1.0) * width * 0.5;
-//			var my = (-lat / Math.PI * 2.0) * height * 0.5;
-
-/*			var flux = universe[idxLcl]._luminosity * Math.pow(dist * 2.06265e11,-2);
-			var Mv = -2.5 * Math.log10(flux) - 26.75;
-			var angSize = universe[idxLcl]._luminosity / 2.0e10 * 0.03 / dist
-			var size = angSize / (2.0 * Math.PI) * 100.0;
-
-			var bright = (22.0 - Mv) / 3.0;*/
-			context.fillStyle = "#FFFFFF";//scaleColor(bright,universe[idxLcl]._color).style;
+			context.fillStyle = "#FFFFFF";
 
 
-//			console.log(mx + ' ' + my + ' ' + flux + ' ' + Mv);
 			context.beginPath();
 			context.arc(proj.x * width * 0.5,-proj.y * height * 0.5,1.0,0,2.0 * Math.PI);
 			context.closePath();
@@ -125,7 +115,7 @@ function drawMap(context,width,height)//cx,cy,width,height)
 	
 	context.strokeStyle = '#FFFF00';
 	var proj = projection.calculate(viewLat * 180.0 / Math.PI,viewLong * 180.0 / Math.PI);
-	var radius = Math.max(telescopes[0]._FOVdegrees * 0.5 / 360.0 * width,3);
+	var radius = 3;//telescopes[0]._FOVdegrees * 0.5 / 360.0 * width;//Math.max(telescopes[0]._FOVdegrees * 0.5 / 360.0 * width,3);
 	context.beginPath();
 	context.arc(proj.x * width  * 0.5,-proj.y * height  * 0.5,radius,0,2.0 * Math.PI);
 	context.stroke();
@@ -136,28 +126,14 @@ function drawMap(context,width,height)//cx,cy,width,height)
 function clickMap(event,x,y)
 {
 	var pos = projection.calculateReverse(x * 2.0 - 1.0,1.0 - y * 2.0);
-//	var lat = (0.5 - y) * Math.PI;
-//	var long = (x - 0.5) * 2.0 * Math.PI;
-	setSlewTarget(pos.lat / 180.0 * Math.PI,pos.long / 180.0 * Math.PI);
+	var nearest = findNearestGalaxy(radians(pos.lat),radians(pos.long));
+	setSlewTarget(nearest.lat,nearest.long);
 }
 
 var viewMap = new Clickable("Sky Map",theCanvas.width * 0.5 - 250,40,500,250,clickMap,drawMap);
 commonUIRegister(viewMap);
 
 
-/*
-
-buttons.push(new Button(theContext, theCanvas.width * 0.5 + 375,260,"Find Milky Way",40,findHome,function(){},function(){return this._isDown;},false,false,true));
-
-buttons.push(new Button(theContext, theCanvas.width * 0.5 + 375,355,"Take Image",40,takeImage,function(){},function(){return this._isDown;},false,false,false));
-buttons.push(new Button(theContext, theCanvas.width * 0.5 + 375,410,"Take Spectrum",40,takeSpectrum,function(){},function(){return this._isDown;},false,false,false));
-buttons.push(new Button(theContext, theCanvas.width * 0.5 + 375,465,"Download Measurements",30,downloadMeasurements,function(){},function(){return this._isDown;},false,false,false));
-buttons.push(new Button(theContext, 175,350,"Download Dist/Vel Data",30,downloadAnalysis,function(){},function(){return this._isDown;},false,false,false));
-buttons.push(new Button(theContext, 175,400,"Download Hubble Data",30,downloadHubbleAnalysis,function(){},function(){return this._isDown;},false,false,false));
-
-buttons.push(new Button(theContext, theCanvas.width * 0.5 - 105,775,"Return to the Milky Way",24,function(){moveHome(true);},function(){},function(){return this._isDown;},false,false,true));
-buttons.push(new Button(theContext, theCanvas.width * 0.5 + 105,775,"Move to a New Galaxy",24,function(){moveHome(false);},function(){},function(){return this._isDown;},false,false,false));
-*/
 
 
 function scaleColor(x,color)
@@ -219,6 +195,8 @@ function drawTelescopeField(cx,cy,radius)
 {
 	inView = new Array();
 	inViewDist = new Array();
+	
+	var telescopePixelToViewPixel = radius / telescopes[currentTelescope]._CCDresolution;
 
 	var state = theContext.save();
 
@@ -246,21 +224,21 @@ function drawTelescopeField(cx,cy,radius)
 		currLcl.colorDisk = null;
 		if (curr._galaxyType == 0) // elliptical
 		{
-			currLcl.eqSize = curr._radiusEquatorial * inViewList[idxLcl].pixelScale;
-			currLcl.polSize = curr._radiusPolar * inViewList[idxLcl].pixelScale;
+			currLcl.eqSize = Math.max(curr._radiusEquatorial * inViewList[idxLcl].pixelScale * telescopePixelToViewPixel,1);
+			currLcl.polSize = Math.max(curr._radiusPolar * inViewList[idxLcl].pixelScale * telescopePixelToViewPixel,1);
 			currLcl.color = scaleColorElliptical(inViewList[idxLcl].bright,curr._color)
 		}
 		else
 		{
-			currLcl.eqSize = curr._bulgeSize * inViewList[idxLcl].pixelScale;
-			currLcl.polSize = curr._bulgeSize * inViewList[idxLcl].pixelScale;
-			currLcl.eqDiskSize = curr._diskSize * inViewList[idxLcl].pixelScale;
-			currLcl.polDiskSize = curr._diskSize * inViewList[idxLcl].pixelScale * curr._cosOrientationFace;
+			currLcl.eqSize = Math.max(curr._bulgeSize * inViewList[idxLcl].pixelScale * telescopePixelToViewPixel,1);
+			currLcl.polSize = Math.max(curr._bulgeSize * inViewList[idxLcl].pixelScale * telescopePixelToViewPixel,1);
+			currLcl.eqDiskSize = Math.max(curr._diskSize * inViewList[idxLcl].pixelScale * telescopePixelToViewPixel,1);
+			currLcl.polDiskSize = Math.max(curr._diskSize * inViewList[idxLcl].pixelScale * curr._cosOrientationFace * telescopePixelToViewPixel,1);
 			currLcl.color = scaleColorElliptical(inViewList[idxLcl].bright,curr._color)
 			currLcl.colorDisk = scaleColorSpiral(inViewList[idxLcl].bright,curr._color)
 		}
-		currLcl.x = inViewList[idxLcl].x;
-		currLcl.y = inViewList[idxLcl].y;
+		currLcl.x = inViewList[idxLcl].x * telescopePixelToViewPixel;
+		currLcl.y = inViewList[idxLcl].y * telescopePixelToViewPixel;
 		currLcl.bright = inViewList[idxLcl].bright;
 		currLcl._cosOrientation = curr._cosOrientation;
 		currLcl._sinOrientation = curr._sinOrientation;
@@ -303,25 +281,10 @@ function drawTelescopeField(cx,cy,radius)
 					imgData.data[imgIdx + 2] = Math.floor((1.0 - alpha) * imgData.data[imgIdx + 2] + alpha * curr.color.b);
 //					imgData.data[imgIdx + 3] = imgData.data[imgIdx + 3]; // don't adjust alpha'
 				}
-
-/*				if (eqDiskSize !== null)
-				{
-					if (reDisk <= 1.0 && coordDisk.ye > 0) // point is in the ellipse
-					{
-						var alpha = Math.exp(-reDisk * 9); // std. dev = 1/3
-						var imgIdx = (y * 2 * radius + x) * 4;
-						imgData.data[imgIdx + 0] = Math.floor((1.0 - alpha) * imgData.data[imgIdx + 0] + alpha * colorDisk.r);
-						imgData.data[imgIdx + 1] = Math.floor((1.0 - alpha) * imgData.data[imgIdx + 1] + alpha * colorDisk.g);
-						imgData.data[imgIdx + 2] = Math.floor((1.0 - alpha) * imgData.data[imgIdx + 2] + alpha * colorDisk.b);
-	//					imgData.data[imgIdx + 3] = imgData.data[imgIdx + 3]; // don't adjust alpha'
-					}
-				}*/
 			}
 		}
 	}
 		
-//		theContext.restore(lclSave);
-
 	theContext.putImageData(imgData,cx - radius, cy - radius);
 	theContext.restore(state);
 }
@@ -347,22 +310,27 @@ function drawCurrentTargetInfo(cx,ty,size)
 	for (idxLcl = 0; idxLcl < inViewList.length; idxLcl++)
 	{
 		var curr = universe[inViewList[idxLcl].idx]
+		var relPos = curr._position.subtract(universe[currentHome]._position);
 		var id = curr._id;
-		var x = curr._position.x - universe[currentHome]._position.x;
-		var y = curr._position.y - universe[currentHome]._position.y;
-		var z = curr._position.z - universe[currentHome]._position.z;
-		var dist = Math.sqrt(x * x + y * y + z * z);
+//		var x = curr._position.x - universe[currentHome]._position.x;
+//		var y = curr._position.y - universe[currentHome]._position.y;
+//		var z = curr._position.z - universe[currentHome]._position.z;
+		var dist = relPos.r;
 		theContext.fillText(id,-180,(idxLcl + 1.25) * size);
 		if (curr._Mv_u != -1)
 		{
-			theContext.fillText(curr._Mv.toFixed(3) + '±' + curr._Mv_u.toFixed(3),0,(idxLcl + 1.25) * size);
+			var Mv = sig_figs(curr._Mv,curr._Mv_u);
+			theContext.fillText(Mv.value.toFixed(Mv.rounding) + '±' + Mv.uncertainty.toFixed(Mv.rounding),0,(idxLcl + 1.25) * size);
 		}
 		if (curr._redshift_u != -1)
 		{
 			theContext.fillText(curr._redshift.toFixed(3),150,(idxLcl + 1.25) * size);
 		}
 		if (curr._dist_u != -1)
-			theContext.fillText(curr._dist.toFixed(0) + '±' + curr._dist_u.toFixed(0),240,(idxLcl + 1.25) * size);
+		{
+			var dist = sig_figs(curr._dist,curr._dist_u);
+			theContext.fillText(dist.value.toFixed(dist.rounding) + '±' + dist.uncertainty.toFixed(dist.rounding),240,(idxLcl + 1.25) * size);
+		}
 	}
 	theContext.restore(state);
 }
@@ -472,7 +440,7 @@ function draw()
 	var text = "Map of the Sky"
 	theContext.fillText(text,(theCanvas.width - theContext.measureText(text).width) * 0.5,24);
 	theContext.font = "14px Arial";
-	var text = "Yellow circle shows where the telescope is pointing."
+	text = "Yellow circle shows where the telescope is pointing."
 	theContext.fillText(text,(theCanvas.width - theContext.measureText(text).width) * 0.5,38);
 
 //	drawMap(theCanvas.width * 0.5,170,500,250);
@@ -482,8 +450,7 @@ function draw()
 	theContext.fillStyle = "#FFFFFF";
 	theContext.textBaseline = "bottom";
 	theContext.font = "24px Arial";
-	var text = "Telescope View";
-	theContext.fillText(text,(theCanvas.width - theContext.measureText(text).width) * 0.5,324);
+	drawTextCenter(theContext,"Telescope View",theCanvas.width * 0.5,324);
 
 	drawTelescopeField(theCanvas.width * 0.5,454,125);
 	drawCurrentTargetInfo(theCanvas.width * 0.5,579,18);
@@ -494,9 +461,10 @@ function draw()
 	{
 		var x = 0;
 		var width = 0;
-		var text = ' = ' + measH0.toFixed(1) + '±';
+		var H0sf = sig_figs(measH0,measH0u);
+		var text = ' = ' + H0sf.value.toFixed(H0sf.rounding) + '±';
 		if (measH0u != -2) 
-			text += measH0u.toFixed(1) + ' km/s/Mpc';
+			text += H0sf.uncertainty.toFixed(H0sf.rounding) + ' km/s/Mpc';
 		else
 			text += '∞ km/s/Mpc';
 
@@ -521,8 +489,18 @@ function draw()
 	theContext.fillStyle = "#7F7F7F";
 	theContext.textBaseline = "bottom";
 	theContext.font = "24px Arial";
-	var text = "Telescope Controls";
-	theContext.fillText(text,theCanvas.width * 0.5 + 375 - theContext.measureText(text).width * 0.5,24);
+	drawTextCenter(theContext,"Telescope Controls",theCanvas.width * 0.5 + 375 + 25,24);
+
+	var decD = degreestoDMSDisplayable(degrees(viewLat));
+	var raD = degreestoDMSDisplayable(degrees(viewLong));
+	theContext.fillStyle = "#FFFFFF";
+	theContext.font = "14px Arial";
+	text = decD.deg + String.fromCharCode(0x00b0) + " " + decD.min + "\' " + decD.sec + "\"";
+	drawTextCenter(theContext,"Dec",theCanvas.width * 0.5 + 375 + 25 + 50,40);
+	drawTextCenter(theContext,text,theCanvas.width * 0.5 + 375 + 25 + 50,56);
+	text = raD.deg + String.fromCharCode(0x00b0) + " " + raD.min + "\' " + raD.sec + "\"";
+	drawTextCenter(theContext,"RA",theCanvas.width * 0.5 + 375 + 25 - 50,40);
+	drawTextCenter(theContext,text,theCanvas.width * 0.5 + 375 + 25 - 50,56);
 
 	commonUIdraw(theContext);
 	

@@ -278,7 +278,9 @@ class Galaxy
 		}
 		if (flux_u != -1)
 		{
-			this._Mv = -2.5 * Math.log10(flux / kLuminositySolar) - 26.75;
+			// solar flux
+			var fluxSun = kLuminositySolar / (1.49597870700e13 * 1.49597870700e13 * 4.0 * Math.PI);
+			this._Mv = -2.5 * Math.log10(flux / fluxSun) - 26.75;
 			this._Mv_u = 2.5 * flux_u / flux / Math.log(10.0);
 		}
 		if (dist_u != -1)
@@ -301,22 +303,22 @@ class Galaxy
 		var dist = relPos.radius;
 		var collectingArea = Math.PI * aperture * aperture * 0.25;
 		const greenPhotonEnergy = kPlanck * kSpeedLight / (550.0e-7);
-		var flux = this._luminosity * kLuminositySolar * Math.pow(dist * 1.0e6 * kParsec_cm,-2.0) * 0.25 / Math.PI;
-		var intFlux = flux * collectingArea;
-		var photonFlux = intFlux / greenPhotonEnergy;
-		var exposure = SN * SN / photonFlux;
-		var photoxFluxExpsoure = exposure * photonFlux;
-		var measPhotonFlux = random_gaussian(photoxFluxExpsoure,Math.sqrt(photoxFluxExpsoure));
-		var measPhotonFlux_err = Math.sqrt(measPhotonFlux);
-		var measFlux = measPhotonFlux * greenPhotonEnergy / exposure / collectingArea;
-		var measFlux_err = measPhotonFlux_err * greenPhotonEnergy / exposure / collectingArea;
+		var flux = this._luminosity * kLuminositySolar * Math.pow(dist * 1.0e6 * kParsec_cm,-2.0) * 0.25 / Math.PI; // erg/s/cm^2
+		var intFlux = flux * collectingArea; // erg/s
+		var photonFlux = intFlux / greenPhotonEnergy; // photons / s
+		var exposure = SN * SN / photonFlux; // s
+		var photoxFluxExpsoure = exposure * photonFlux; // photons
+		var measPhotonFlux = random_gaussian(photoxFluxExpsoure,Math.sqrt(photoxFluxExpsoure)); // photons
+		var measPhotonFlux_err = Math.sqrt(measPhotonFlux); // photons
+		var measFlux = measPhotonFlux * greenPhotonEnergy / exposure / collectingArea; // erg/s/cm^2
+		var measFlux_err = measPhotonFlux_err * greenPhotonEnergy / exposure / collectingArea; // erg / s / cm^2
 		
 		var measDist = 0;
 		var measDist_err = -1;
 		if (dist < 35.0)
 		{
-			measDist = dist * (1.0 + random_gaussian(0,1.0 / SN));
-			measDist_err = measDist / SN;
+			measDist = dist * (1.0 + random_gaussian(0,1.0 / SN)); // Mpc
+			measDist_err = measDist / SN; // Mpc
 		}
 		this._measurements.push(new Measurement(measPhotonFlux, measPhotonFlux_err, measFlux,measFlux_err,measDist,measDist_err,0,-1,0,-1));
 		this.computeValues();
@@ -350,7 +352,7 @@ class Galaxy
 		var vrot = Math.pow(this._luminosity / 4.0e10,0.25) * 200.0;
 		var measVrot = random_gaussian(vrot,resolution);
 
-		this._measurements.push(new Measurement(0,-1,0,-1,measRv,resolution,measVrot,resolution));
+		this._measurements.push(new Measurement(0,-1,0,-1,0,-1,measRv,resolution,measVrot,resolution));
 		this.computeValues();
 	}
 }

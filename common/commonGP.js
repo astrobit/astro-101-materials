@@ -102,6 +102,16 @@ function sig_figs(value, uncertainty)
 		uncertainty_res = Math.round(uncertainty / mult) * mult;
 		value_res = Math.round(value / mult) * mult;
 	}
+	else
+	{
+		var value_log = Math.floor(Math.log10(value));
+		rounding = -value_log;
+		if (rounding < 0)
+			rounding = 0;
+		var mult = Math.pow(10,value_log);
+		uncertainty_res = uncertainty;
+		value_res = Math.round(value / mult) * mult;
+	}
 	
 	return {value:value_res, uncertainty: uncertainty_res, rounding: rounding};
 }

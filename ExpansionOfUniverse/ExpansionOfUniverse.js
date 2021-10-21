@@ -399,6 +399,19 @@ function drawHubble(cx,ty,width,height)
 	var text = "Distance (100 Mpc)"
 	theContext.fillText(text,0.5 * gw - theContext.measureText(text).width * 0.5,25);
 
+
+	if (measH0u != -1)
+	{
+		theContext.strokeStyle = "#0000FF"
+		theContext.beginPath();
+		if (measIntercept >= 0)
+			theContext.moveTo(0,-measIntercept  / 125000.0 * gh );
+		else
+			theContext.moveTo(-measIntercept / measH0 / 1500.0 * gw,0 );
+		theContext.lineTo(gw,-(1500.0 * measH0 + measIntercept) / 125000.0 * gh);
+		theContext.stroke();
+	}
+
 	theContext.fillStyle = '#FF0000';
 	for (idxLcl = 0; idxLcl < universe.length; idxLcl++)
 	{
@@ -411,15 +424,6 @@ function drawHubble(cx,ty,width,height)
 			theContext.arc(x,y,2,0,2.0 * Math.PI);
 			theContext.fill();
 		}
-	}
-
-	if (measH0u != -1)
-	{
-		theContext.strokeStyle = "#0000FF"
-		theContext.beginPath();
-		theContext.moveTo(0,0);//measIntercept  / 125000.0 * gh );
-		theContext.lineTo(gw,-1500.0 * measH0 / 125000.0 * gh);
-		theContext.stroke();
 	}
 
 	theContext.restore(state);

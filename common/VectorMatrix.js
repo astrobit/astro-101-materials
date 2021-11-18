@@ -7,7 +7,10 @@ class ThreeVector
 		{
 			this._r = Math.sqrt(this._x * this._x + this._y * this._y + this._z * this._z);
 			this._theta = Math.atan2(this._y,this._x);
-			this._psi = Math.asin(this._z / this._r);
+			if (this._r == 0.0)
+				this._psi = 0.0;
+			else
+				this._psi = Math.asin(this._z / this._r);
 		}
 	}
 	calcRectangular()
@@ -58,7 +61,9 @@ class ThreeVector
 	}
 	scale(scalar)
 	{
-		return new ThreeVector(this._x * scalar, this._y * scalar, this._z * scalar)
+		var ret = new ThreeVector(this);
+		ret.selfScale(scalar);
+		return ret;
 	}
 	get magnitude()
 	{
@@ -66,28 +71,27 @@ class ThreeVector
 	}
 	get unit()
 	{
-		var ret = new ThreeVector();
-		ret.selfCopy(this);
-		ret.selfUnit();
+		var ret = new ThreeVector(this);
+		ret.selfScale(1.0 / ret._r);
 		return ret;
 	}
 
-	get selfDot()
+	selfDot()
 	{
 		return this._r * this._r;
 	}
 	selfAdd(vector)
 	{
-		this.x += vector.x;
-		this.y += vector.y;
-		this.z += vector.z;
+		this._x += vector._x;
+		this._y += vector._y;
+		this._z += vector._z;
 		this.calcPolar();
 	}
 	selfSubtract(vector)
 	{
-		this.x -= vector.x;
-		this.y -= vector.y;
-		this.z -= vector.z;
+		this._x -= vector._x;
+		this._y -= vector._y;
+		this._z -= vector._z;
 		this.calcPolar();
 	}
 	selfScale(scalar)
@@ -96,12 +100,11 @@ class ThreeVector
 		this._y *= scalar;
 		this._z *= scalar;
 		this._r *= Math.abs(scalar);
-		this.calcPolar();
+		//this.calcPolar();
 	}
 	selfUnit()
 	{
-		if (this._r != 0.0)
-			this.selfScale(1.0 / this._r);
+		this.selfScale(1.0 / this._r);
 	}
 	selfCopy(vector)
 	{
@@ -115,9 +118,21 @@ class ThreeVector
 
 	copy()
 	{
-		var ret = new ThreeVector(this.x,this.y,this.z);
-		ret.selfCopy(this);
-		return ret;
+		return new ThreeVector(this);
+	}
+	updateXYZ(x,y,z)
+	{
+		this._x = x;
+		this._y = y;
+		this._z = z;
+		this.calcPolar();
+	}
+	updatePolar(r,theta,psi)
+	{
+		this._r = r;
+		this._theta = theta;
+		this._psi = psi;
+		this.calcRectangular();
 	}
 	set x(val)
 	{
@@ -272,12 +287,15 @@ class ThreeMatrix
 	{
 		if (rho instanceof ThreeVector)
 		{
-			var rowVectX = this.getRowVector(0);
-			var rowVectY = this.getRowVector(1);
-			var rowVectZ = this.getRowVector(2);
-			return new ThreeVector(rowVectX.dot(rho),
-									rowVectY.dot(rho),
-									rowVectZ.dot(rho));
+//			var rowVectX = this.getRowVector(0);
+//			var rowVectY = this.getRowVector(1);
+//			var rowVectZ = this.getRowVector(2);
+			return new ThreeVector(this.data[0]._x * rho._x + this.data[1]._x * rho._y + this.data[2]._x * rho._z,
+									this.data[0]._y * rho._x + this.data[1]._y * rho._y + this.data[2]._y * rho._z,
+									this.data[0]._z * rho._x + this.data[1]._z * rho._y + this.data[2]._z * rho._z);
+//									rowVectX.dot(rho),
+//									rowVectY.dot(rho),
+//									rowVectZ.dot(rho));
 
 		}
 		else if (rho instanceof ThreeMatrix)
@@ -307,21 +325,17 @@ class ThreeMatrix
 	}
 	selfDot(matrix)
 	{
-		var rowVectX = this.getRowVector(0);
-		var rowVectY = this.getRowVector(1);
-		var rowVectZ = this.getRowVector(2);
+//		var rowVectX = this.getRowVector(0);
+//		var rowVectY = this.getRowVector(1);
+//		var rowVectZ = this.getRowVector(2);
 
-		this.data[0].x = rowVectX.dot(matrix.data[0]),
-		this.data[0].y = rowVectY.dot(matrix.data[0]),
-		this.data[0].z = rowVectZ.dot(matrix.data[0]),
-
-		this.data[1].x = rowVectX.dot(matrix.data[1]),
-		this.data[1].y = rowVectY.dot(matrix.data[1]),
-		this.data[1].z = rowVectZ.dot(matrix.data[1]),
-
-		this.data[2].x = rowVectX.dot(matrix.data[2]),
-		this.data[2].y = rowVectY.dot(matrix.data[2]),
-		this.data[2].z = rowVectZ.dot(matrix.data[2])
+		this.data[0].updateXYZ(this._data[0]._x * matrix.data[0]._x,this._data[1]._x * matrix.data[0]._y,this._data[2]._x * matrix.data[0]._z);
+		this.data[1].updateXYZ(this._data[0]._y * matrix.data[1]._x,this._data[1]._y * matrix.data[1]._y,this._data[2]._y * matrix.data[1]._z);
+		this.data[2].updateXYZ(this._data[0]._z * matrix.data[2]._x,this._data[1]._z * matrix.data[2]._y,this._data[2]._z * matrix.data[2]._z);
+		
+//		this.data[0].updateXYZ(rowVectX.dot(matrix.data[0]),rowVectY.dot(matrix.data[0]),rowVectZ.dot(matrix.data[0]));
+//		this.data[1].updateXYZ(rowVectX.dot(matrix.data[1]),rowVectY.dot(matrix.data[1]),rowVectZ.dot(matrix.data[1]));
+//		this.data[2].updateXYZ(rowVectX.dot(matrix.data[2]),rowVectY.dot(matrix.data[2]),rowVectZ.dot(matrix.data[2]));
 	}
 	selfCopy(matrix)
 	{
@@ -331,7 +345,7 @@ class ThreeMatrix
 	}
 	copy()
 	{
-		return new ThreeMatrix(this.data[0],this.data[1],this.data[2]);
+		return new ThreeMatrix(this);
 	}
 	transpose()
 	{
@@ -341,12 +355,13 @@ class ThreeMatrix
 	}
 	selfTranspose()
 	{
-		var rowVectX = this.getRowVector(0);
-		var rowVectY = this.getRowVector(1);
-		var rowVectZ = this.getRowVector(2);
-		this.setColumnVector(0,rowVectX);
-		this.setColumnVector(1,rowVectY);
-		this.setColumnVector(2,rowVectZ);
+		var colVectA = new ThreeVector(this.data[0]);
+		var colVectB = new ThreeVector(this.data[1]);
+		var colVectC = new ThreeVector(this.data[2]);
+		
+		this.data[0].updateXYZ(colVectA._x,colVectB._x,colVectC._x);
+		this.data[1].updateXYZ(colVectA._y,colVectB._y,colVectC._y);
+		this.data[2].updateXYZ(colVectA._z,colVectB._z,colVectC._z);
 	}
 
 	loadBasis(vectX,vectY,vectZ)

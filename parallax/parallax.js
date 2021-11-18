@@ -377,8 +377,7 @@ var prevPM = new Button(String.fromCharCode(0x25c4), displayCenterX - displayHei
 commonUIRegister(prevPM);
 
 
-var StarsP0 = new Array();
-var StarsV = new Array();
+var starData = new Array();
 var starPositionsCalculated = false;
 var selectedStar = null;
 
@@ -431,64 +430,22 @@ var currList = 0;
 var currPMidx = 0;
 var currPlxidx = 0;
 
+
+
 function preprocessStars()
 {
-	if (starsReady)
+	if (starsReady && !starPositionsCalculated)
 	{
-		// 29979245800 is the CODATA 2017 value for the speed of light in cm/s
-		var kSpeedOfLight = 29979245800.0;
-		// 14959787070000 is the length of an astronomical unit in cm, per IAU 2009 Resolution B2
-		var kAstronomicalUnit = 14959787070000.0;
-		// degrees to radians
-		var kDegreesRadians = Math.PI / 180.0;
-		// arc-seconds to radians
-		var kArcSecRadians = kDegreesRadians / 3600.0;
-		// milli-arc-seconds (mas) to radians
-		var kMasRadians = kArcSecRadians / 1000.0;
-		// parsecs in cm
-		var kParsec = 3600.0 / kDegreesRadians * kAstronomicalUnit;
-		// seconds per year. A year is taken to be exactly 365.0 days
-		var kYearSeconds = 365.0 * 86400.0;
-
 		for (idxLcl = 0; idxLcl < stars.length; idxLcl++)
 		{
-			// convert RA and Dec from degrees to radians
-			var raRad = stars[idxLcl].ra * kDegreesRadians;
-			var decRad = stars[idxLcl].dec * kDegreesRadians;
-			// precalculate the cosine and sine of ra and dec.
-			var cosRA = Math.cos(raRad);
-			var sinRA = Math.sin(raRad);
-			var cosDec = Math.cos(decRad);
-			var sinDec = Math.sin(decRad);
-			// calcualte the distance to the star in parsecs and cm; parallax is taken to be in milli-arcsec (mas).
-			// 14959787070000 is the length of an astronomical unit in cm, per IAU 2009 Resolution B2
-			var distpc = 1000.0 / stars[idxLcl].plx_value;
-			var distcm = distpc * kParsec;
-			// calculate the radial velocity (in cm/s) from the determined shift in wavelength (z = Δλ/λ)
-			// This uses the relativistic method to allow for large redshifts
-			var oneplusz = stars[idxLcl].rvz_redshift + 1.0;
-			var vrad = (oneplusz * oneplusz - 1.0) / (oneplusz * oneplusz + 1.0) * kSpeedOfLight;
-			// calculate the proper motion in radians per second. pmra and pmdec are assumed to be in milli-arcsec (mas) per year
-			// A year is taken to be exactly 365.0 days
-			var pmrarad = stars[idxLcl].pmra * kMasRadians / kYearSeconds;
-			var pmdecrad = stars[idxLcl].pmdec * kMasRadians / kYearSeconds;
-			// calculate the spatial tangential velocity, in cm/s, in RA and dec from the proper motion and distance. 
-			var vra = pmrarad * distcm;
-			var vdec = pmdecrad * distcm;
-			// calculate the three dimensional spatial velocity, in cm/s
+			var dataCurrent = new SpatialStarData();
+			dataCurrent.calculate(stars[idxLcl].ra, stars[idxLcl].dec, stars[idxLcl].plx_value, stars[idxLcl].rvz_redshift, stars[idxLcl].pmra, stars[idxLcl].pmdec);
+			starData.push(dataCurrent);
 
-			var vx = -sinRA * cosDec * vra + cosRA * -sinDec * vdec + cosRA * cosDec * vrad;
-			var vy = cosRA * cosDec * vra + cosRA * -sinDec * vdec + cosRA * sinDec * vrad;
-			var vz = cosDec * vdec + sinDec * vrad;
 			if (Math.abs(stars[idxLcl].pmra) > 100 || Math.abs(stars[idxLcl].pmdec) > 100) // proper motion greater than 100 mas/yr
 				highPM.push(idxLcl);
 			if (Math.abs(stars[idxLcl].plx_value) > 100) // parallax > 100 mas
 				highPlx.push(idxLcl);
-
-			var pos = new ThreeVector(distcm * cosRA * cosDec,distcm * sinRA * cosDec,distcm * sinDec);
-			var vel = new ThreeVector(vx,vy,vz);
-			StarsP0.push(pos);
-			StarsV.push(vel);
 		}
 		starPositionsCalculated = true;	
 		currList = 0;
@@ -656,9 +613,9 @@ function work(){
 	//			if (StarID == "* alf CMa")
 	//				console.log("here");
 
-				var StarPDate = StarsP0[idxLcl].copy();
+				var StarPDate = starData[idxLcl].positionApparent.copy();
 				var StarPDateUnit = StarPDate.unit;
-				var StarMDate = StarsV[idxLcl].scale(timeSeconds);
+				var StarMDate = starData[idxLcl].velocity.scale(timeSeconds);
 				if (g_PMenable)
 					StarPDate.selfAdd(StarMDate);
 				if (g_PLXenable)
@@ -739,8 +696,8 @@ function work(){
 		theContext.fillStyle = "#FFFFFF";
 		drawTextCenter(theContext,decD.deg + String.fromCharCode(0x00b0) + " " + decD.min + "\' " + decD.sec + "\"",displayCenterX - halfSize - 100,displayCenterY + 85);
 
-		var StarPDate = StarsP0[selectedStar].copy();
-		var StarMDate = StarsV[selectedStar].scale(timeSeconds);
+		var StarPDate = starData[selectedStar].positionApparent.copy();
+		var StarMDate = starData[selectedStar].velocity.scale(timeSeconds);
 		if (g_PMenable)
 			StarPDate.selfAdd(StarMDate);
 		if (g_PLXenable)

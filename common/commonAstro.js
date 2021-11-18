@@ -1,6 +1,74 @@
 
 var commonAstroLogRegister = 0;
 
+class PhysicalConstants
+{
+	constructor()
+	{
+		// 29979245800 is the CODATA 2017 value for the speed of light in cm/s
+		this._kSpeedOfLight = 29979245800.0;
+		// 14959787070000 is the length of an astronomical unit in cm, per IAU 2009 Resolution B2
+		this._kAstronomicalUnit = 14959787070000.0;
+		// seconds per year. A year is taken to be exactly 365.0 days
+		this._kYearSeconds = 365.0 * 86400.0;
+		// degrees to radians
+		this._kDegreesRadians = Math.PI / 180.0;
+		// arc-seconds to radians
+		this._kArcSecRadians = this.kDegreesRadians / 3600.0;
+		// milli-arc-seconds (mas) to radians
+		this._kMasRadians = this.kArcSecRadians / 1000.0;
+		// parsecs in cm
+		this._kParsec = 3600.0 / this.kDegreesRadians * this.kAstronomicalUnit;
+	}
+	get kSpeedOfLight()
+	{
+		// 29979245800 is the CODATA 2017 value for the speed of light in cm/s
+		return 29979245800.0;
+	}
+	set kSpeedOfLight(value)
+	{}
+	get kAstronomicalUnit()
+	{
+		// 14959787070000 is the length of an astronomical unit in cm, per IAU 2009 Resolution B2
+		return 14959787070000.0;
+	}
+	set kAstronomicalUnit(value)
+	{}
+	get kDegreesRadians()
+	{
+		return this._kDegreesRadians;
+	}
+	set kDegreesRadians(value)
+	{}
+	get kArcSecRadians()
+	{
+		return this._kArcSecRadians;
+	}
+	set kArcSecRadians(value)
+	{}
+	get kMasRadians()
+	{
+		return this._kMasRadians;
+	}
+	set kMasRadians(value)
+	{}
+	get kParsec()
+	{
+		return this._kParsec;
+	}
+	set kParsec(value)
+	{}
+	get kYearSeconds()
+	{
+		// seconds per year. A year is taken to be exactly 365.0 days
+		return 365.0 * 86400.0;
+	}
+	set kYearSeconds(value)
+	{}
+}
+
+var Phys = new PhysicalConstants();
+
 function UBVRItoRGB(U,B,V,R,I,brightMag,dimMag)
 {
 	var brightMagInternal = brightMag;
@@ -322,4 +390,58 @@ function degreestoHMSDisplayable(value,rounding)
 		sec += "0";
 	}
 	return {hr: dms.hr, min: min, sec:sec};
+}
+
+
+class SpatialStarData
+{
+	constructor()
+	{
+		this.positionApparent = new ThreeVector();
+		this.positionTrue = new ThreeVector();
+		this.velocity = new ThreeVector();
+	}
+	
+
+	calculate(ra_degrees,dec_degrees,parallax_mas,redshift_z,PM_ra_mas_yr,PM_dec_mas_yr)
+	{
+		// convert RA and Dec from degrees to radians
+		var raRad = ra_degrees * Phys.kDegreesRadians;
+		var decRad = dec_degrees * Phys.kDegreesRadians;
+		// precalculate the cosine and sine of ra and dec.
+		var cosRA = Math.cos(raRad);
+		var sinRA = Math.sin(raRad);
+		var cosDec = Math.cos(decRad);
+		var sinDec = Math.sin(decRad);
+		// calcualte the distance to the star in parsecs and cm; parallax is taken to be in milli-arcsec (mas).
+		var distpc = 1000.0 / parallax_mas;
+		var distcm = distpc * Phys.kParsec;
+
+		// calculate the three dimensional spatial velocity, in cm/s
+		this.positionApparent.x = distcm * cosRA * cosDec;
+		this.positionApparent.y = distcm * sinRA * cosDec;
+		this.positionApparent.z = distcm * sinDec;
+
+		// calculate the radial velocity (in cm/s) from the determined shift in wavelength (z = Δλ/λ)
+		// This uses the relativistic method to allow for large redshifts
+		var oneplusz = redshift_z + 1.0;
+		var vrad = (oneplusz * oneplusz - 1.0) / (oneplusz * oneplusz + 1.0) * Phys.kSpeedOfLight;
+		// calculate the proper motion in radians per second. pmra and pmdec are assumed to be in milli-arcsec (mas) per year
+		// A year is taken to be exactly 365.0 days
+		var pmrarad = PM_ra_mas_yr * Phys.kMasRadians / Phys.kYearSeconds;
+		var pmdecrad = PM_dec_mas_yr * Phys.kMasRadians / Phys.kYearSeconds;
+		// calculate the spatial tangential velocity, in cm/s, in RA and dec from the proper motion and distance. 
+		var vra = pmrarad * distcm;
+		var vdec = pmdecrad * distcm;
+		// calculate the three dimensional spatial velocity, in cm/s
+		this.velocity.x = -sinRA * cosDec * vra + cosRA * -sinDec * vdec + cosRA * cosDec * vrad;
+		this.velocity.y = cosRA * cosDec * vra + cosRA * -sinDec * vdec + cosRA * sinDec * vrad;
+		this.velocity.z = cosDec * vdec + sinDec * vrad;
+		
+		var lightTravelTime = distcm / Phys.kSpeedOfLight;
+		
+		// calculate the three dimensional spatial velocity, in cm/s
+		this.positionTrue = this.positionApparent.add(this.velocity.scale(lightTravelTime));
+		
+	}
 }

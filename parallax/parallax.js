@@ -435,22 +435,48 @@ function preprocessStars()
 {
 	if (starsReady)
 	{
+		// 29979245800 is the CODATA 2017 value for the speed of light in cm/s
+		var kSpeedOfLight = 29979245800.0;
+		// 14959787070000 is the length of an astronomical unit in cm, per IAU 2009 Resolution B2
+		var kAstronomicalUnit = 14959787070000.0;
+		// degrees to radians
+		var kDegreesRadians = Math.PI / 180.0;
+		// arc-seconds to radians
+		var kArcSecRadians = kDegreesRadians / 3600.0;
+		// milli-arc-seconds (mas) to radians
+		var kMasRadians = kArcSecRadians / 1000.0;
+		// parsecs in cm
+		var kParsec = 3600.0 / kDegreesRadians * kAstronomicalUnit;
+		// seconds per year. A year is taken to be exactly 365.0 days
+		var kYearSeconds = 365.0 * 86400.0;
+
 		for (idxLcl = 0; idxLcl < stars.length; idxLcl++)
 		{
-			var raRad = stars[idxLcl].ra * Math.PI / 180.0;
-			var decRad = stars[idxLcl].dec * Math.PI / 180.0;
+			// convert RA and Dec from degrees to radians
+			var raRad = stars[idxLcl].ra * kDegreesRadians;
+			var decRad = stars[idxLcl].dec * kDegreesRadians;
+			// precalculate the cosine and sine of ra and dec.
 			var cosRA = Math.cos(raRad);
 			var sinRA = Math.sin(raRad);
 			var cosDec = Math.cos(decRad);
 			var sinDec = Math.sin(decRad);
+			// calcualte the distance to the star in parsecs and cm; parallax is taken to be in milli-arcsec (mas).
+			// 14959787070000 is the length of an astronomical unit in cm, per IAU 2009 Resolution B2
 			var distpc = 1000.0 / stars[idxLcl].plx_value;
-			var distcm = distpc * 180.0 * 3600.0 / Math.PI * 14959787070000.0;
+			var distcm = distpc * kParsec;
+			// calculate the radial velocity (in cm/s) from the determined shift in wavelength (z = Δλ/λ)
+			// This uses the relativistic method to allow for large redshifts
 			var oneplusz = stars[idxLcl].rvz_redshift + 1.0;
-			var vrad = (oneplusz * oneplusz - 1.0) / (oneplusz * oneplusz + 1.0) * 29979245800.0;
-			var pmrarad = stars[idxLcl].pmra * Math.PI / 180.0 / 3600000.0 / (365.0 * 86400.0);
-			var pmdecrad = stars[idxLcl].pmdec * Math.PI / 180.0 / 3600000.0 / (365.0 * 86400.0);
+			var vrad = (oneplusz * oneplusz - 1.0) / (oneplusz * oneplusz + 1.0) * kSpeedOfLight;
+			// calculate the proper motion in radians per second. pmra and pmdec are assumed to be in milli-arcsec (mas) per year
+			// A year is taken to be exactly 365.0 days
+			var pmrarad = stars[idxLcl].pmra * kMasRadians / kYearSeconds;
+			var pmdecrad = stars[idxLcl].pmdec * kMasRadians / kYearSeconds;
+			// calculate the spatial tangential velocity, in cm/s, in RA and dec from the proper motion and distance. 
 			var vra = pmrarad * distcm;
 			var vdec = pmdecrad * distcm;
+			// calculate the three dimensional spatial velocity, in cm/s
+
 			var vx = -sinRA * cosDec * vra + cosRA * -sinDec * vdec + cosRA * cosDec * vrad;
 			var vy = cosRA * cosDec * vra + cosRA * -sinDec * vdec + cosRA * sinDec * vrad;
 			var vz = cosDec * vdec + sinDec * vrad;

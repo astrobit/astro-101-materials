@@ -430,8 +430,6 @@ var currList = 0;
 var currPMidx = 0;
 var currPlxidx = 0;
 
-
-
 function preprocessStars()
 {
 	if (starsReady && !starPositionsCalculated)

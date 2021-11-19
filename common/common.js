@@ -228,3 +228,106 @@ class RGB
 	}
 }
 
+class ImgData
+{
+	load(context,x,y,width,height)
+	{
+		if (typeof context !== 'undefined' && context !== null &&
+			typeof width !== 'undefined' && width !== null &&
+			typeof height !== 'undefined' && height !== null &&
+			typeof x !== 'undefined' && x !== null &&
+			typeof y !== 'undefined' && y !== null &&
+			width > 0 && height > 0)
+		{
+			this._context = context;
+			this._x = Math.floor(x);
+			this._y = Math.floor(y);
+			this._width = Math.ceil(width);
+			this._height = Math.ceil(height);
+			this._imgData = context.getImageData(this._x, this._y, this._width, this._height);
+		}
+		else
+		{
+			this._context = null;
+			this._x = 0;
+			this._y = 0;
+			this._width = 0;
+			this._height = 0;
+			this._imgData = null;
+        }
+	}
+	draw(context, x, y)
+	{
+		if (typeof this._imgData !== 'undefined' && this._imgData !== null)
+		{
+			var ctxLcl = this._context;
+			if (typeof context !== 'undefined' && context !== null)
+				ctxLcl = context;
+			var xl = this._x;
+			if (typeof x !== 'undefined' && x !== null)
+				xl = x;
+			var yl = this._y;
+			if (typeof y !== 'undefined' && y !== null)
+				yl = y;
+			ctxLcl.putImageData(this._imgData, xl, yl);
+		}
+	}
+	constructor(context, x, y, width, height)
+	{
+		this.load(context,x,y,width,height)
+    }
+
+	getAtRelative(x, y)
+	{
+		if (typeof this._imgData !== 'undefined' && this._imgData !== null && x < this._width && y < this._height)
+		{
+			var xl = Math.floor(x);
+			var yl = Math.floor(y);
+			var idx = (yl * this._width + xl) *4;
+			var r = this._imgData.data[idx + 0];
+			var g = this._imgData.data[idx + 1];
+			var b = this._imgData.data[idx + 2];
+
+			return new RGB(r, g, b);
+		}
+		else
+			return new RGB();
+	}
+	getAtAbsolute(x, y)
+	{
+		var xr = x - this._x;
+		var yr = y - this._y;
+		return this.getAtRelative(xr, yr);
+	}
+	setAtRelative(x, y, rgb)
+	{
+		if (typeof this._imgData !== 'undefined' && this._imgData !== null && x < this._width && y < this._height)
+		{
+			var xl = Math.floor(x);
+			var yl = Math.floor(y);
+			var idx = (yl * this._width + xl) * 4;
+
+			this._imgData.data[idx] = rgb.r;
+			this._imgData.data[idx + 1] = rgb.b;
+			this._imgData.data[idx + 2] = rgb.g;
+		}
+	}
+	setAtAbsolute(x, y,rgb)
+	{
+		var xr = x - this._x;
+		var yr = y - this._y;
+		this.setAtRelative(xr, yr,rgb);
+	}
+	addAtRelative(x, y, rgb)
+	{
+		var clr = this.getAtRelative(x, y);
+		clr.add(rgb);
+		this.setAtRelative(x, y, clr);
+	}
+	addAtAbsolute(x, y, rgb)
+	{
+		var xr = x - this._x;
+		var yr = y - this._y;
+		this.addAtRelative(xr, yr, rgb);
+	}
+}

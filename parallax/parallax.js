@@ -594,7 +594,7 @@ function work(){
 		theContext.moveTo(displayCenterX - 0.5 * arcSecRadians * scaling * g_zoom * halfSize,displayCenterY + 0.9 * halfSize);
 		theContext.lineTo(displayCenterX + 0.5 * arcSecRadians * scaling * g_zoom * halfSize,displayCenterY + 0.9 * halfSize);
 		theContext.stroke();
-		
+		var map = new ImgData(theContext, displayCenterX - displayHeight / 2, displayCenterY - displayHeight / 2, displayHeight, displayHeight);
 		for (idxLcl = 0; idxLcl < stars.length; idxLcl++)
 		{
 	//		if (inview[idxLcl])
@@ -626,10 +626,8 @@ function work(){
 					var size = diff_patt_size * halfSize * g_zoom * 0.5;
 					if ((x + size) >= -halfSize && (x - size) <= halfSize && (y + size) >= -halfSize && (y - size) < halfSize)
 					{
-						x += displayCenterX;
-						y += displayCenterY;
 						var starColor = UBVRItoRGB(null, stars[idxLcl].B, stars[idxLcl].V, stars[idxLcl].R, null, 0.0, 18.0);
-						drawStar(theContext, x, y, size, starColor);
+						drawStar(map, x + halfSize, y + halfSize, size, starColor);
 /*
 						if (size < 1)
 							size = 1;
@@ -647,6 +645,7 @@ function work(){
 				}
 			}
 		}
+		map.draw();
 	}
 	else
 	{

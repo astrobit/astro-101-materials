@@ -159,6 +159,7 @@ class SkyMap
 		this.context.lineTo(mapCenterX + mapWidth * 0.5,mapCenterY);
 		this.context.stroke();
 
+		var mapImage = new ImgData(this.context, mapCenterX - mapWidth * 0.5, mapCenterY - mapHeight * 0.5, mapWidth, mapHeight);
 	// draw the stars on the map
 		var i;
 		for (i = 0; i < this.starsProjection.length; i++)
@@ -179,7 +180,7 @@ class SkyMap
 			var size = 3.0 - stars[this.starsProjection[i].idx].V / 6.0;
 			if (size < 1.0)
 				size = 1.0;
-			drawStar(this.context, mapCenterX - this.starsProjection[i].x * mapWidth * 0.5, mapCenterY - this.starsProjection[i].y * mapHeight * 0.5, size, color)
+			drawStar(mapImage, (-this.starsProjection[i].x + 1.0) * mapWidth * 0.5, (-this.starsProjection[i].y + 1.0) * mapHeight * 0.5, size, color);
 /*			if (rad < 1.0)
 				rad = 1.0;
 			if (rad > 3.0)
@@ -189,6 +190,7 @@ class SkyMap
 			this.context.closePath();
 			this.context.fill();*/
 		}
+		mapImage.draw();
 	// draw the constallations on the map
 		if (this.displayConstellationLevel != "none")
 		{

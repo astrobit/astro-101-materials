@@ -628,7 +628,9 @@ function work(){
 					{
 						x += displayCenterX;
 						y += displayCenterY;
-						var starColor = UBVRItoRGB(null,stars[idxLcl].B,stars[idxLcl].V,stars[idxLcl].R,null,0.0,18.0);
+						var starColor = UBVRItoRGB(null, stars[idxLcl].B, stars[idxLcl].V, stars[idxLcl].R, null, 0.0, 18.0);
+						drawStar(theContext, x, y, size, starColor);
+/*
 						if (size < 1)
 							size = 1;
 						var layer = 0;
@@ -640,7 +642,7 @@ function work(){
 							theContext.beginPath();
 							theContext.arc(x,y,size - layer,0,2.0*Math.PI);
 							theContext.fill(); // Draw it
-						}
+						}*/
 					}
 				}
 			}

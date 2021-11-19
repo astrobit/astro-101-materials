@@ -445,3 +445,41 @@ class SpatialStarData
 		
 	}
 }
+
+function drawStar(context, x, y, size, color)
+{
+
+	var sizeLcl = Math.ceil(size) * 2.0; // allow for first order diffraction ring
+	if (size == 0)
+		sizeLcl = 2;
+	var xmin = x - sizeLcl;
+	var ymin = y - sizeLcl;
+	var twoSizeLcl = 2.0 * sizeLcl;
+	var imgData = context.getImageData(xmin, ymin, twoSizeLcl, twoSizeLcl);
+	for (xl = 0; xl < twoSizeLcl; xl++)
+	{
+		for (yl = 0; yl < twoSizeLcl; yl++)
+		{
+			var imgIdx = (yl * twoSizeLcl + xl) * 4;
+			var xr = (xl - sizeLcl);
+			var yr = (yl - sizeLcl);
+			var r = Math.sqrt(xr * xr + yr * yr);
+			var b = 1.0;
+			if (r != 0)
+			{
+				var s = r / sizeLcl * Math.PI * 2.0;
+				var bl = Math.sin(s) / s;
+				var b = bl * bl;
+			}
+			var starClrLcl = color.copy();
+			starClrLcl.scale(b);
+			var clrLcl = new RGB(imgData.data[imgIdx + 0], imgData.data[imgIdx + 1], imgData.data[imgIdx + 2]);
+			clrLcl.add(starClrLcl);
+			imgData.data[imgIdx + 0] = clrLcl.r;
+			imgData.data[imgIdx + 1] = clrLcl.g;
+			imgData.data[imgIdx + 2] = clrLcl.b;
+		}
+	}
+	theContext.putImageData(imgData, xmin, ymin);
+
+}

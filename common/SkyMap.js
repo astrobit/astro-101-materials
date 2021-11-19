@@ -35,7 +35,7 @@ class SkyMap
 				break;
 			}
 			stars[i].pidx = this.starsProjection.length;
-			this.starsProjection.push({ x: projection.x, y: projection.y, style: rgb.style, styleU:rgbB_U.style, styleB:rgbB_B.style, styleV:rgbB_V.style, styleR:rgbB_R.style, styleI:rgbB_I.style, idx:i});
+			this.starsProjection.push({ x: projection.x, y: projection.y, style: rgb, styleU:rgbB_U, styleB:rgbB_B, styleV:rgbB_V, styleR:rgbB_R, styleI:rgbB_I, idx:i});
 		}
 	}
 	constructor(context,x,y,width,height)
@@ -163,27 +163,31 @@ class SkyMap
 		var i;
 		for (i = 0; i < this.starsProjection.length; i++)
 		{
+			var color;
 			if (this.filterInternal == "none")
-				this.context.fillStyle  = this.starsProjection[i].style;
+				color = this.starsProjection[i].style;
 			else if (this.filterInternal == "U")
-				this.context.fillStyle  = this.starsProjection[i].styleU;
+				color = this.starsProjection[i].styleU;
 			else if (this.filterInternal == "B")
-				this.context.fillStyle  = this.starsProjection[i].styleB;
+				color = this.starsProjection[i].styleB;
 			else if (this.filterInternal == "V")
-				this.context.fillStyle  = this.starsProjection[i].styleV;
+				color = this.starsProjection[i].styleV;
 			else if (this.filterInternal == "R")
-				this.context.fillStyle  = this.starsProjection[i].styleR;
+				color = this.starsProjection[i].styleR;
 			else if (this.filterInternal == "I")
-				this.context.fillStyle  = this.starsProjection[i].styleI;
-			var rad = 2.0 - stars[this.starsProjection[i].idx].V / 6.0 * 1.0;
-			if (rad < 1.0)
+				color = this.starsProjection[i].styleI;
+			var size = 3.0 - stars[this.starsProjection[i].idx].V / 6.0;
+			if (size < 1.0)
+				size = 1.0;
+			drawStar(this.context, mapCenterX - this.starsProjection[i].x * mapWidth * 0.5, mapCenterY - this.starsProjection[i].y * mapHeight * 0.5, size, color)
+/*			if (rad < 1.0)
 				rad = 1.0;
 			if (rad > 3.0)
 				rad = 3.0;
 			this.context.beginPath();
 			this.context.arc(mapCenterX - this.starsProjection[i].x * mapWidth * 0.5,mapCenterY - this.starsProjection[i].y * mapHeight * 0.5,rad,0,2.0*Math.PI,true);
 			this.context.closePath();
-			this.context.fill();
+			this.context.fill();*/
 		}
 	// draw the constallations on the map
 		if (this.displayConstellationLevel != "none")

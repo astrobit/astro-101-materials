@@ -199,6 +199,29 @@ class RGB
 			this._b *= valueLcl;
 		}
 	}
+	add(rgbValue)
+	{
+		this._r += rgbValue._r;
+		if (this._r > 255)
+			this._r = 255;
+		this._g += rgbValue._g;
+		if (this._g > 255)
+			this._g = 255;
+		this._b += rgbValue._b;
+		if (this._b > 255)
+			this._b = 255;
+    }
+	subtract(rgbValue) {
+		this._r -= rgbValue._r;
+		if (this._r > 0)
+			this._r = 0;
+		this._g -= rgbValue._g;
+		if (this._g < 0)
+			this._g = 0;
+		this._b -= rgbValue._b;
+		if (this._b < 0)
+			this._b = 0;
+	}
 	copy()
 	{
 		return new RGB(this._r,this._g,this._b);

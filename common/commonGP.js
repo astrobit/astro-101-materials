@@ -61,7 +61,7 @@ function random_gaussian(mean, stdev) {
 // Author(s): Kanchu (https://stackoverflow.com/users/1458751/kanchu), Awesomeness01 (https://stackoverflow.com/users/4181717/awesomeness01), trueimage(https://stackoverflow.com/users/2430498/trueimage)
 function download(data, filename, type) {
     var file = new Blob([data], {type: type});
-    if (window.navigator.msSaveOrOpenBlob) // IE10+
+    if (window.navigator && window.navigator.msSaveOrOpenBlob) // IE10+
         window.navigator.msSaveOrOpenBlob(file, filename);
     else { // Others
         var a = document.createElement("a"),

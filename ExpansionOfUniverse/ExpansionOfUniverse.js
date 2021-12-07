@@ -309,27 +309,28 @@ function drawCurrentTargetInfo(cx,ty,size)
 	var idxLcl;
 	for (idxLcl = 0; idxLcl < inViewList.length; idxLcl++)
 	{
-		var curr = universe[inViewList[idxLcl].idx]
+		var curr = universe[inViewList[idxLcl].idx];
 		var relPos = curr._position.subtract(universe[currentHome]._position);
 		var id = curr._id;
-//		var x = curr._position.x - universe[currentHome]._position.x;
-//		var y = curr._position.y - universe[currentHome]._position.y;
-//		var z = curr._position.z - universe[currentHome]._position.z;
 		var dist = relPos.r;
 		theContext.fillText(id,-180,(idxLcl + 1.25) * size);
-		if (curr._Mv_u != -1)
+		var measData = curr.getMeasurementSet(currentHome);
+		if (typeof measData !== 'undefined')
 		{
-			var Mv = sig_figs(curr._Mv,curr._Mv_u);
-			theContext.fillText(Mv.value.toFixed(Mv.rounding) + '±' + Mv.uncertainty.toFixed(Mv.rounding),0,(idxLcl + 1.25) * size);
-		}
-		if (curr._redshift_u != -1)
-		{
-			theContext.fillText(curr._redshift.toFixed(3),150,(idxLcl + 1.25) * size);
-		}
-		if (curr._dist_u != -1)
-		{
-			var dist = sig_figs(curr._dist,curr._dist_u);
-			theContext.fillText(dist.value.toFixed(dist.rounding) + '±' + dist.uncertainty.toFixed(dist.rounding),240,(idxLcl + 1.25) * size);
+			if (measData._Mv_u > 0)
+			{
+				var Mv = sig_figs(measData._Mv,measData._Mv_u);
+				theContext.fillText(Mv.value.toFixed(Mv.rounding) + '±' + Mv.uncertainty.toFixed(Mv.rounding),0,(idxLcl + 1.25) * size);
+			}
+			if (measData._redshift_u > 0)
+			{
+				theContext.fillText(measData._redshift.toFixed(3),150,(idxLcl + 1.25) * size);
+			}
+			if (measData._dist_u > 0)
+			{
+				var dist = sig_figs(measData._dist,measData._dist_u);
+				theContext.fillText(dist.value.toFixed(dist.rounding) + '±' + dist.uncertainty.toFixed(dist.rounding),240,(idxLcl + 1.25) * size);
+			}
 		}
 	}
 	theContext.restore(state);
@@ -400,25 +401,25 @@ function drawHubble(cx,ty,width,height)
 	theContext.fillText(text,0.5 * gw - theContext.measureText(text).width * 0.5,25);
 
 
-	if (measH0u != -1)
+	if (hubbleLaw.measH0u > 0)
 	{
 		theContext.strokeStyle = "#0000FF"
 		theContext.beginPath();
-		if (measIntercept >= 0)
-			theContext.moveTo(0,-measIntercept  / 125000.0 * gh );
+		if (hubbleLaw.measIntercept >= 0)
+			theContext.moveTo(0,-hubbleLaw.measIntercept  / 125000.0 * gh );
 		else
-			theContext.moveTo(-measIntercept / measH0 / 1500.0 * gw,0 );
-		theContext.lineTo(gw,-(1500.0 * measH0 + measIntercept) / 125000.0 * gh);
+			theContext.moveTo(-hubbleLaw.measIntercept / hubbleLaw.measH0 / 1500.0 * gw,0 );
+		theContext.lineTo(gw,-(1500.0 * hubbleLaw.measH0 + hubbleLaw.measIntercept) / 125000.0 * gh);
 		theContext.stroke();
 	}
 
 	theContext.fillStyle = '#FF0000';
-	for (idxLcl = 0; idxLcl < universe.length; idxLcl++)
+	for (idxLcl = 0; idxLcl < listMeasurements.length; idxLcl++)
 	{
-		if (universe[idxLcl]._dist_u != -1 && universe[idxLcl]._redshift_u != -1)
+		if (listMeasurements[idxLcl]._fromGalaxy == currentHome && listMeasurements[idxLcl]._dist_u > 0 && listMeasurements[idxLcl]._redshift_u > 0)
 		{
-			var v = universe[idxLcl]._redshift * 299792.458;
-			var x = universe[idxLcl]._dist / 1500.0 * gw;
+			var v = listMeasurements[idxLcl]._redshift * 299792.458;
+			var x = listMeasurements[idxLcl]._dist / 1500.0 * gw;
 			var y = -v / 125000.0 * gh;
 			theContext.beginPath();
 			theContext.arc(x,y,2,0,2.0 * Math.PI);
@@ -461,13 +462,13 @@ function draw()
 	drawCurrentHome(theCanvas.width * 0.5,770,18);
 	drawHubble(175,0,350,250);
 	theContext.fillStyle = "#FF0000";
-	if (measH0u != -1)
+	if (hubbleLaw.measH0u > 0)
 	{
 		var x = 0;
 		var width = 0;
-		var H0sf = sig_figs(measH0,measH0u);
+		var H0sf = sig_figs(hubbleLaw.measH0,hubbleLaw.measH0u);
 		var text = ' = ' + H0sf.value.toFixed(H0sf.rounding) + '±';
-		if (measH0u != -2) 
+		if (hubbleLaw.measH0u > 0) 
 			text += H0sf.uncertainty.toFixed(H0sf.rounding) + ' km/s/Mpc';
 		else
 			text += '∞ km/s/Mpc';

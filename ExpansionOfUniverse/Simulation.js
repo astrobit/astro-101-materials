@@ -52,11 +52,37 @@ function randL()
 }
 
 
+
+var listHomesMeasurements = new Array();
+function addHomeToList(idxToAdd)
+{
+	var found = false;
+	for (idx = 0; idx < listHomesMeasurements.length && !found; idx++)
+	{
+		found = listHomesMeasurements[idx] == idxToAdd;
+	}
+	if (!found)
+		listHomesMeasurements.push(idxToAdd);
+}
+
+var listMeasurements = new Array();
+function addMeasurementSetToList(measurementSet)
+{
+	var found = false;
+	for (idx = 0; idx < listMeasurements.length && !found; idx++)
+	{
+		found = listMeasurements[idx]._thisGalaxy == measurementSet._thisGalaxy && listMeasurements[idx]._fromGalaxy == measurementSet._fromGalaxy;
+	}
+	if (!found)
+		listMeasurements.push(measurementSet);
+}
+
+
 class Measurement
 {
-	constructor(pFlux, pFlux_u,flux, flux_u, dist, dist_u, rv, rv_u,vrot,vrot_u)
+	constructor(fromGalaxy,pFlux, pFlux_u,flux, flux_u, dist, dist_u, rv, rv_u,vrot,vrot_u)
 	{
-		this._fromGalaxy = currentHome;
+		this._fromGalaxy = fromGalaxy;
 		this.pFlux = pFlux;
 		this.pFlux_u = pFlux_u;
 		this._flux = flux;
@@ -69,44 +95,7 @@ class Measurement
 		this._vrot_u = vrot_u;
 	}
 }
-
-var measH0 = -1;
-var measH0u = -1;
-var measIntercept = -1;
-var measInterceptu = -1;
-
-function updateHubbleLaw()
-{
-	var v = new Array();
-	var d = new Array();
-	var idxLcl;
-	for (idxLcl = 0; idxLcl < universe.length; idxLcl++)
-	{
-		if (universe[idxLcl]._dist_u != -1 && universe[idxLcl]._redshift_u != -1)
-		{
-			v.push(universe[idxLcl]._redshift * 299792.458);
-			d.push(universe[idxLcl]._dist);
-		}
-	}
-	if (v.length > 2)
-	{
-		var lls = new LLS(d,v);
-		measH0 = lls.slope;
-		measH0u = lls.slope_uncertainty;
-		measIntercept = lls.intercept;
-		measInterceptu = lls.intercept_uncertainty;
-	}
-	else if (v.length == 2)
-	{
-		measH0 = (v[1] - v[0]) / (d[1] - d[0]);
-		measH0u = -2;
-		measIntercept = v[1] - measH0 * d[1];
-		measInterceptu = -2;
-	}
-	draw();
-}
-
-class Galaxy
+class MeasurementSet
 {
 	clearMeasurements()
 	{
@@ -117,9 +106,153 @@ class Galaxy
 		this._redshift = 0;
 		this._redshift_u = -1;
 	}
-
-	constructor()
+	constructor(thisGalaxy,fromGalaxy,dist_True)
 	{
+		this._measurements = new Array();
+		this._thisGalaxy = thisGalaxy;
+		this._fromGalaxy = fromGalaxy;
+		this._dist_True = dist_True;
+		this.clearMeasurements();
+	}
+	
+	computeValues()
+	{
+		this.clearMeasurements();
+//		var relPos = this._position.subtract(universe[currentHome]._position)
+//		var dist_True = relPos.radius;
+
+		var dist = 0;
+		var rv = 0;
+		var vrot = 0;
+		var flux = 0;
+
+		var distSum = 0;
+		var rvSum = 0;
+		var vrotSum = 0;
+		var fluxSum = 0;
+
+		var distSq = 0;
+		var rvSq = 0;
+		var vrotSq = 0;
+		var fluxSq = 0;
+
+		var dist_u = -1;
+		var rv_u = -1;
+		var vrot_u = -1;
+		var flux_u = -1;
+
+		var distVar = 0;
+		var rvVar = 0;
+		var vrotVar = 0;
+		var fluxVar = 0;
+
+		var Ndist =0;
+		var Nrv = 0;
+		var Nvrot = 0;
+		var Nflux = 0;
+		var idxLcl;
+
+		for (idxLcl = 0; idxLcl < this._measurements.length; idxLcl++)
+		{
+			if (this._measurements[idxLcl]._dist_u != -1)
+			{
+				distSum += this._measurements[idxLcl]._dist;
+				distSq += this._measurements[idxLcl]._dist * this._measurements[idxLcl]._dist;
+				dist_u = this._measurements[idxLcl]._dist_u;
+				Ndist++;
+			}
+			if (this._measurements[idxLcl]._rv_u != -1)
+			{
+				rvSum += this._measurements[idxLcl]._rv;
+				rvSq += this._measurements[idxLcl]._rv * this._measurements[idxLcl]._rv;
+				rv_u = this._measurements[idxLcl]._rv_u;
+				Nrv++;
+			}
+			if (this._measurements[idxLcl]._vrot_u != -1)
+			{
+				vrotSum += this._measurements[idxLcl]._vrot;
+				vrotSq += this._measurements[idxLcl]._vrot * this._measurements[idxLcl]._vrot;
+				vrot_u = this._measurements[idxLcl]._vrot_u;
+				Nvrot++;
+			}
+			if (this._measurements[idxLcl]._flux_u != -1)
+			{
+				fluxSum += this._measurements[idxLcl]._flux;
+				fluxSq += this._measurements[idxLcl]._flux * this._measurements[idxLcl]._flux;
+				flux_u = this._measurements[idxLcl]._flux_u;
+				Nflux++;
+			}
+		}
+		if (Ndist != 0)
+			dist = distSum / Ndist;
+		if (Nrv != 0)
+			rv  = rvSum / Nrv;
+		if (Nvrot != 0)
+			vrot  = vrotSum / Nvrot;
+		if (Nflux != 0)
+			flux  = fluxSum / Nflux;
+		distVar = distSq + Ndist * dist * dist - 2.0 * distSum * dist;
+		rvVar = rvSq + Nrv * rv * rv - 2.0 * rvSum * rv;
+		vrotVar = vrotSq + Nvrot * vrot * vrot - 2.0 * vrotSum * vrot;
+		fluxVar = fluxSq + Nflux * flux * flux - 2.0 * fluxSum * flux;
+		
+		if (Ndist > 1)
+			dist_u = Math.sqrt(distVar / ((Ndist - 1.0) * Ndist));
+		if (Nrv > 1)
+			rv_u = Math.sqrt(rvVar / ((Nrv - 1.0) * Nrv));
+		if (Nvrot > 1)
+			vrot_u = Math.sqrt(vrotVar / ((Nvrot - 1.0) * Nvrot));
+		if (Nflux > 1)
+			flux_u = Math.sqrt(fluxVar / ((Nflux - 1.0) * Nflux));
+
+// Tully-Fisher Distance
+//L = 4e10 * Math.pow(v / 200.0,4.0); // solar luminosities, v in km/s
+		var dist_tf = 0;
+		var dist_tf_u = -1;
+		if (Nflux != 0 && Nvrot != 0 && this._dist_True >= 35.0)
+		{
+			var lum_tf =  4.0e10 * Math.pow(vrot / 200.0,4.0);
+			var lum_tf_u = 4.0 * lum_tf * vrot_u / vrot;
+			dist = Math.sqrt(lum_tf / (flux / kLuminositySolar) * 0.25 / Math.PI) / (1.0e6 * kParsec_cm);
+			var ul = 0.5 * lum_tf_u / lum_tf;
+			var uf = 0.5 * flux_u / flux;
+			dist_u = dist * Math.sqrt(ul * ul + uf * uf);
+		}
+		if (flux_u != -1)
+		{
+			// solar flux
+			var fluxSun = kLuminositySolar / (1.49597870700e13 * 1.49597870700e13 * 4.0 * Math.PI);
+			this._Mv = -2.5 * Math.log10(flux / fluxSun) - 26.75;
+			this._Mv_u = 2.5 * flux_u / flux / Math.log(10.0);
+		}
+		if (dist_u != -1)
+		{
+			this._dist = dist;
+			this._dist_u = dist_u;
+		}
+		if (rv_u != -1)
+		{
+			this._redshift = rv / kSpeedLight_kms;
+			this._redshift_u = rv_u / kSpeedLight_kms;
+		}
+//		console.log(this._id + ' ' + this._dist + ' ' + this._redshift + ' ' + this._redshift_u + ' ' + this._Mv);
+
+	}
+	
+	addMeasurement(measurement)
+	{
+		this._measurements.push(measurement);
+		this.computeValues();
+	}
+
+}
+
+class Galaxy
+{
+
+	constructor(idx)
+	{
+		this._myIdx = idx;
 		this._position = new ThreeVector((Math.random() - 0.5) * 2.0 * 1000.0, // Mpc
 										(Math.random() - 0.5) * 2.0 * 1000.0, // Mpc
 										(Math.random() - 0.5) * 2.0 * 1000.0); // Mpc
@@ -157,144 +290,31 @@ class Galaxy
 		this._color = Math.random();
 
 		this._id = 'NSiGC ' + Math.round(Math.random() * 1000000);
-		this.clearMeasurements();
-		this._measurements = new Array();
+		this._measurements = new Object();
 
 	}
-
-	computeValues()
+	getMeasurementSet(homeIdx)
 	{
-		this.clearMeasurements();
-		var relPos = this._position.subtract(universe[currentHome]._position)
-		var dist_True = relPos.radius;
-
-		var dist = 0;
-		var rv = 0;
-		var vrot = 0;
-		var flux = 0;
-
-		var dist_u = -1;
-		var rv_u = -1;
-		var vrot_u = -1;
-		var flux_u = -1;
-
-		var distVar = 0;
-		var rvVar = 0;
-		var vrotVar = 0;
-		var fluxVar = 0;
-
-		var Ndist =0;
-		var Nrv = 0;
-		var Nvrot = 0;
-		var Nflux = 0;
-		var idxLcl;
-
-		for (idxLcl = 0; idxLcl < this._measurements.length; idxLcl++)
+		var homeStr = homeIdx.toString();
+		var ret = undefined;
+		if (homeStr in this._measurements)
+			ret = this._measurements[homeStr];
+		return ret;
+	}
+	addGetMeasurementSet(homeIdx)
+	{
+		var homeStr = homeIdx.toString();
+		var ret = undefined;
+		if (homeStr in this._measurements)
+			ret = this._measurements[homeStr];
+		else
 		{
-			if (this._measurements[idxLcl]._fromGalaxy == currentHome)
-			{
-				if (this._measurements[idxLcl]._dist_u != -1)
-				{
-					dist += this._measurements[idxLcl]._dist;
-					dist_u = this._measurements[idxLcl]._dist_u;
-					Ndist++;
-				}
-				if (this._measurements[idxLcl]._rv_u != -1)
-				{
-					rv += this._measurements[idxLcl]._rv;
-					rv_u = this._measurements[idxLcl]._rv_u;
-					Nrv++;
-				}
-				if (this._measurements[idxLcl]._vrot_u != -1)
-				{
-					vrot += this._measurements[idxLcl]._vrot;
-					vrot_u = this._measurements[idxLcl]._vrot_u;
-					Nvrot++;
-				}
-				if (this._measurements[idxLcl]._flux_u != -1)
-				{
-					flux += this._measurements[idxLcl]._flux;
-					flux_u = this._measurements[idxLcl]._flux_u;
-					Nflux++;
-				}
-			}
-		}
-		if (Ndist != 0)
-			dist /= Ndist;
-		if (Nrv != 0)
-			rv /= Nrv;
-		if (Nvrot != 0)
-			vrot /= Nvrot;
-		if (Nflux != 0)
-			flux /= Nflux;
-		for (idxLcl = 0; idxLcl < this._measurements.length; idxLcl++)
-		{
-			if (this._measurements[idxLcl]._fromGalaxy == currentHome)
-			{
-				if (this._measurements[idxLcl]._dist_u != -1)
-				{
-					var err = this._measurements[idxLcl]._dist - dist;
-					distVar += err * err;
-				}
-				if (this._measurements[idxLcl]._rv_u != -1)
-				{
-					var err = this._measurements[idxLcl]._rv - rv;
-					rvVar += err * err;
-				}
-				if (this._measurements[idxLcl]._vrot_u != -1)
-				{
-					var err = this._measurements[idxLcl]._vrot - vrot;
-					vrotVar += err * err;
-				}
-				if (this._measurements[idxLcl]._flux_u != -1)
-				{
-					var err = this._measurements[idxLcl]._flux - flux;
-					fluxVar += err * err;
-				}
-			}
-		}
-
-		if (Ndist > 1)
-			dist_u = Math.sqrt(distVar / (Ndist - 1.0)) / Math.sqrt(Ndist);
-		if (Nrv > 1)
-			rv_u = Math.sqrt(rvVar / (Nrv - 1.0)) / Math.sqrt(Nrv);
-		if (Nvrot > 1)
-			vrot_u = Math.sqrt(vrotVar / (Nvrot - 1.0)) / Math.sqrt(Nvrot);
-		if (Nflux > 1)
-			flux_u = Math.sqrt(fluxVar / (Nflux - 1.0)) / Math.sqrt(Nflux);
-
-// Tully-Fisher Distance
-//L = 4e10 * Math.pow(v / 200.0,4.0); // solar luminosities, v in km/s
-		var dist_tf = 0;
-		var dist_tf_u = -1;
-		if (Nflux != 0 && Nvrot != 0 && dist_True >= 35.0)
-		{
-			var lum_tf =  4.0e10 * Math.pow(vrot / 200.0,4.0);
-			var lum_tf_u = 4.0 * lum_tf * vrot_u / vrot;
-			dist = Math.sqrt(lum_tf / (flux / kLuminositySolar) * 0.25 / Math.PI) / (1.0e6 * kParsec_cm);
-			var ul = 0.5 * lum_tf_u / lum_tf;
-			var uf = 0.5 * flux_u / flux;
-			dist_u = dist * Math.sqrt(ul * ul + uf * uf);
-		}
-		if (flux_u != -1)
-		{
-			// solar flux
-			var fluxSun = kLuminositySolar / (1.49597870700e13 * 1.49597870700e13 * 4.0 * Math.PI);
-			this._Mv = -2.5 * Math.log10(flux / fluxSun) - 26.75;
-			this._Mv_u = 2.5 * flux_u / flux / Math.log(10.0);
-		}
-		if (dist_u != -1)
-		{
-			this._dist = dist;
-			this._dist_u = dist_u;
-		}
-		if (rv_u != -1)
-		{
-			this._redshift = rv / kSpeedLight_kms;
-			this._redshift_u = rv_u / kSpeedLight_kms;
-		}
-//		console.log(this._id + ' ' + this._dist + ' ' + this._redshift + ' ' + this._redshift_u + ' ' + this._Mv);
-
+			var relPos = this._position.subtract(universe[homeIdx]._position)
+			ret = new MeasurementSet(this._myIdx,homeIdx,relPos.radius);
+			addMeasurementSetToList(ret);
+			this._measurements[homeStr] = ret;
+		}	
+		return ret;
 	}
 
 	takeImage(SN,aperture)
@@ -320,8 +340,9 @@ class Galaxy
 			measDist = dist * (1.0 + random_gaussian(0,1.0 / SN)); // Mpc
 			measDist_err = measDist / SN; // Mpc
 		}
-		this._measurements.push(new Measurement(measPhotonFlux, measPhotonFlux_err, measFlux,measFlux_err,measDist,measDist_err,0,-1,0,-1));
-		this.computeValues();
+		var measurementSet = this.addGetMeasurementSet(currentHome);
+		measurementSet.addMeasurement(new Measurement(currentHome,measPhotonFlux, measPhotonFlux_err, measFlux,measFlux_err,measDist,measDist_err,0,-1,0,-1));
+		addHomeToList(currentHome);
 	}
 
 	takeSpectrum(resolution)
@@ -352,8 +373,9 @@ class Galaxy
 		var vrot = Math.pow(this._luminosity / 4.0e10,0.25) * 200.0;
 		var measVrot = random_gaussian(vrot,resolution);
 
-		this._measurements.push(new Measurement(0,-1,0,-1,0,-1,measRv,resolution,measVrot,resolution));
-		this.computeValues();
+		var measurementSet = this.addGetMeasurementSet(currentHome);
+		measurementSet.addMeasurement(new Measurement(currentHome,0,-1,0,-1,0,-1,measRv,resolution,measVrot,resolution));
+		addHomeToList(currentHome);
 	}
 }
 
@@ -415,7 +437,7 @@ var universe = new Array();
 function createUniverse()
 {
 	var debug = false;
-	var home = new Galaxy();
+	var home = new Galaxy(0);
 	home._position.x = 0;
 	home._position.y = 0;
 	home._position.z = 0;
@@ -431,42 +453,42 @@ function createUniverse()
 	universe.push(home);
 	
 	if (debug) {
-		var tempX = new Galaxy();
+		var tempX = new Galaxy(1);
 		tempX._position.x = 100;
 		tempX._position.y = 0;
 		tempX._position.z = 0;
 		tempX._id = 'Test x';
 		universe.push(tempX);
 
-		var tempMX = new Galaxy();
+		var tempMX = new Galaxy(2);
 		tempMX._position.x = -100;
 		tempMX._position.y = 0;
 		tempMX._position.z = 0;
 		tempMX._id = 'Test -x';
 		universe.push(tempMX);
 
-		var tempZ = new Galaxy();
+		var tempZ = new Galaxy(3);
 		tempZ._position.x = 0;
 		tempZ._position.y = 0;
 		tempZ._position.z = 100;
 		tempZ._id = 'Test Z';
 		universe.push(tempZ);
 
-		var tempMZ = new Galaxy();
+		var tempMZ = new Galaxy(4);
 		tempMZ._position.x = 0;
 		tempMZ._position.y = 0;
 		tempMZ._position.z = -100;
 		tempMZ._id = 'Test -Z';
 		universe.push(tempMZ);
 
-		var tempY = new Galaxy();
+		var tempY = new Galaxy(5);
 		tempY._position.x = 0;
 		tempY._position.y = 100;
 		tempY._position.z = 0;
 		tempY._id = 'Test Y';
 		universe.push(tempY);
 
-		var tempMY = new Galaxy();
+		var tempMY = new Galaxy(6);
 		tempMY._position.x = 0;
 		tempMY._position.y = -100;
 		tempMY._position.z = 0;
@@ -478,7 +500,7 @@ function createUniverse()
 		var idxLcl;
 		for (idxLcl = 0; idxLcl < 999; idxLcl++)
 		{
-			universe.push(new Galaxy());
+			universe.push(new Galaxy(idxLcl + 1));
 		}
 	}
 }
@@ -533,7 +555,6 @@ function moveHome(toMW)
 			if (idxLcl != currentHome)
 				nearestList.push(new GalData(idxLcl,relPos.radius));
 
-			universe[idxLcl].clearMeasurements();
 		}
 		nearestList.sort(function(a, b){return a._d - b._d});
 
@@ -546,12 +567,6 @@ function moveHome(toMW)
 	btnReturnMilkyWay.disabled = false;
 	btnMoveHome.disabled = false;
 
-	measH0 = -1;
-	measH0u = -1;
-	for (idxLcl = 0; idxLcl < universe.length; idxLcl++)
-	{
-		universe[idxLcl].computeValues();
-	}
 	updateHubbleLaw();
 	draw();
 }
@@ -559,12 +574,12 @@ function findHome()
 {
 	if (currentHome != 0)
 	{
-		var relPos = new ThreeVector(universe[currentHome]._position);
-		relPos.selfScale(-1.0);
-		setView(relPos.psi,relPos.theta);
-		update = true;
+		var relPos = universe[0]._position.subtract(universe[currentHome]._position);
+		setSlewTarget(relPos.psi,relPos.theta);
+//		setView(relPos.psi,relPos.theta);
+//		update = true;
 	}
-	//draw();
+//	draw();
 }
 
 var targetLat = null;
@@ -640,17 +655,20 @@ function downloadMeasurements()
 {
 	var idxLcl;
 	var data = 'Galaxy, From Galaxy, Flux (erg/s/au^2), Flux Uncertainty (erg/s/au^2), Cepheid Distance (Mpc), Cepheid Distance Uncertainty (Mpc), Radial Velocity (km/s), Radial Velocity Uncertainty (km/s), Rotational Velocity (km/s), Rotational Velocity Uncertainty (km/s)\n';
-	for (idxLcl = 0; idxLcl < universe.length; idxLcl++)
+	for (idxLcl = 0; idxLcl < listMeasurements.length; idxLcl++)
 	{
 		var jLcl;
-		for (jLcl = 0; jLcl < universe[idxLcl]._measurements.length; jLcl++)
-		{
-			var flux = sig_figs(universe[idxLcl]._measurements[jLcl]._flux,universe[idxLcl]._measurements[jLcl]._flux_u);
-			var dist = sig_figs(universe[idxLcl]._measurements[jLcl]._dist,universe[idxLcl]._measurements[jLcl]._dist_u);
-			var radVel = sig_figs(universe[idxLcl]._measurements[jLcl]._rv,universe[idxLcl]._measurements[jLcl]._rv_u);
-			var rotVel = sig_figs(universe[idxLcl]._measurements[jLcl]._vrot,universe[idxLcl]._measurements[jLcl]._vrot_u);
+		var gIdx  = listMeasurements[idxLcl]._thisGalaxy;
+		var hIdx  = listMeasurements[idxLcl]._fromGalaxy;
 
-			data += universe[idxLcl]._id + ', ' + universe[universe[idxLcl]._measurements[jLcl]._fromGalaxy]._id
+		for (jLcl = 0; jLcl < listMeasurements[idxLcl]._measurements.length; jLcl++)
+		{
+			var flux = sig_figs(listMeasurements[idxLcl]._measurements[jLcl]._flux,listMeasurements[idxLcl]._measurements[jLcl]._flux_u);
+			var dist = sig_figs(listMeasurements[idxLcl]._measurements[jLcl]._dist,listMeasurements[idxLcl]._measurements[jLcl]._dist_u);
+			var radVel = sig_figs(listMeasurements[idxLcl]._measurements[jLcl]._rv,listMeasurements[idxLcl]._measurements[jLcl]._rv_u);
+			var rotVel = sig_figs(listMeasurements[idxLcl]._measurements[jLcl]._vrot,listMeasurements[idxLcl]._measurements[jLcl]._vrot_u);
+
+			data += universe[gIdx]._id + ', ' + universe[hIdx]._id
 			+ ', ' + flux.value.toFixed(flux.rounding)
 			+ ', ' + flux.uncertainty.toFixed(flux.rounding)
 			+ ', ' + dist.value.toFixed(dist.rounding)
@@ -668,120 +686,121 @@ function downloadAnalysis()
 {
 	var idxLcl;
 	var data = 'Galaxy, From Galaxy, Distance (Mpc), Distance Uncertainty (Mpc), Radial Velocity (km/s), Radial Velocity Uncertainty (km/s), V Magnitude, V Magnitude Uncertainty, Redshift, Redshift Uncertainty\n';
-	var listHomes = new Array();
-	for (idxLcl = 0; idxLcl < universe.length; idxLcl++)
+	for (kLcl = 0; kLcl < listHomesMeasurements.length; kLcl++)
 	{
-		var jLcl;
-		for (jLcl = 0; jLcl < universe[idxLcl]._measurements.length; jLcl++)
+		for (idxLcl = 0; idxLcl < listMeasurements.length; idxLcl++)
 		{
-			var found = false;
-			for (kLcl = 0; kLcl < listHomes.length && !found; kLcl++)
+			var gIdx  = listMeasurements[idxLcl]._thisGalaxy;
+			var hIdx  = listMeasurements[idxLcl]._fromGalaxy;
+			if (hIdx == listHomesMeasurements[kLcl])
 			{
-				found = universe[idxLcl]._measurements[jLcl]._fromGalaxy == listHomes[kLcl];
-			}
-			if (!found)
-			{
-				listHomes.push(universe[idxLcl]._measurements[jLcl]._fromGalaxy);
-			}
-		}
-	}
-	var saveCurrentHome = currentHome;
+				if (listMeasurements[idxLcl]._measurements.length > 0)
+				{
+					var dist = sig_figs(listMeasurements[idxLcl]._dist,listMeasurements[idxLcl]._dist_u);
+					var radVel = sig_figs(listMeasurements[idxLcl]._redshift * 299792.458,listMeasurements[idxLcl]._redshift_u * 299792.458);
+					var Mv = sig_figs(listMeasurements[idxLcl]._Mv,listMeasurements[idxLcl]._Mv_u);
+					var redshift = sig_figs(listMeasurements[idxLcl]._redshift,listMeasurements[idxLcl]._redshift_u);
 
-	for (kLcl = 0; kLcl < listHomes.length; kLcl++)
-	{
-		currentHome = listHomes[kLcl];
-		for (idxLcl = 0; idxLcl < universe.length; idxLcl++)
-		{
-			universe[idxLcl].computeValues();
-			if (universe[idxLcl]._dist_u != -1 || universe[idxLcl]._redshift_u != -1 || universe[idxLcl]._Mv_u != -1)
-			{
-				var dist = sig_figs(universe[idxLcl]._dist,universe[idxLcl]._dist_u);
-				var radVel = sig_figs(universe[idxLcl]._redshift * 299792.458,universe[idxLcl]._redshift_u * 299792.458);
-				var Mv = sig_figs(universe[idxLcl]._Mv,universe[idxLcl]._Mv_u);
-				var redshift = sig_figs(universe[idxLcl]._redshift,universe[idxLcl]._redshift_u);
-
-				data += universe[idxLcl]._id
-				+ ', ' + universe[currentHome]._id
-				+ ', ' + dist.value.toFixed(dist.rounding)
-				+ ', ' + dist.uncertainty.toFixed(dist.rounding)
-				+ ', ' + radVel.value.toFixed(radVel.rounding)
-				+ ', ' + radVel.uncertainty.toFixed(radVel.rounding)
-				+ ', ' + Mv.value.toFixed(Mv.rounding)
-				+ ', ' + Mv.uncertainty.toFixed(Mv.rounding)
-				+ ', ' + redshift.value.toFixed(redshift.rounding)
-				+ ', ' + redshift.uncertainty.toFixed(redshift.rounding)
-				+ '\n';
+					data += universe[gIdx]._id
+					+ ', ' + universe[hIdx]._id
+					+ ', ' + dist.value.toFixed(dist.rounding)
+					+ ', ' + dist.uncertainty.toFixed(dist.rounding)
+					+ ', ' + radVel.value.toFixed(radVel.rounding)
+					+ ', ' + radVel.uncertainty.toFixed(radVel.rounding)
+					+ ', ' + Mv.value.toFixed(Mv.rounding)
+					+ ', ' + Mv.uncertainty.toFixed(Mv.rounding)
+					+ ', ' + redshift.value.toFixed(redshift.rounding)
+					+ ', ' + redshift.uncertainty.toFixed(redshift.rounding)
+					+ '\n';
+				}
 			}
 		}
 	}
 	download(data,"ExpansionOfUniverseAnalysis.csv","csv");
 }
 
+class HubbleData
+{
+	constructor(fromGalaxy, H0, H0_u, H0int, H0int_u)
+	{
+		this._fromGalaxy = fromGalaxy;
+
+		
+	}
+}
+
+
+function determineHubbleLaw(idx)
+{
+	var v = new Array();
+	var vu = new Array();
+	var d = new Array();
+	var du = new Array();
+	var ret = new Object;
+	var idxLcl;
+	for (idxLcl = 0; idxLcl < listMeasurements.length; idxLcl++)
+	{
+		if (listMeasurements[idxLcl]._fromGalaxy == idx && listMeasurements[idxLcl]._dist_u != -1 && listMeasurements[idxLcl]._redshift_u != -1)
+		{
+			v.push(listMeasurements[idxLcl]._redshift * 299792.458);
+			vu.push(listMeasurements[idxLcl]._redshift_u * 299792.458);
+			d.push(listMeasurements[idxLcl]._dist);
+			du.push(listMeasurements[idxLcl]._dist_u);
+		}
+	}
+	if (v.length > 2)
+	{
+		var lls = new LLS(d,v);
+		ret.measH0 = lls.slope;
+		ret.measH0u = lls.slope_uncertainty;
+		ret.measIntercept = lls.intercept;
+		ret.measInterceptu = lls.intercept_uncertainty;
+	}
+	else if (v.length == 2)
+	{
+		var recip = 1.0 / (d[1] - d[0]);
+		ret.measH0 = (v[1] - v[0]) * recip;
+				
+		ret.measH0u = recip * Math.sqrt((vu[1] * vu[1] + vu[0] * vu[0]) + (du[1] * du[1] + du[0] * du[0]) * ret.measH0 * ret.measH0);
+		ret.measIntercept = v[1] - ret.measH0 * d[1];
+		ret.measInterceptu = Math.sqrt(vu[1] * vu[1] + d[1] * d[1] * ret.measH0u * ret.measH0u + ret.measH0 * ret.measH0 * du[1] * du[1]);
+	}
+	else
+	{
+		ret.measH0 = 0;
+		ret.measH0u = -1;
+		ret.measIntercept = 0;
+		ret.measInterceptu = -1;
+	}
+	return ret;
+}
+var hubbleLaw = {measH0:0,measH0u:-2,measIntercept:0,measInterceptu:-2};
+function updateHubbleLaw()
+{
+	hubbleLaw = determineHubbleLaw(currentHome);
+	draw();
+}
+	
 function downloadHubbleAnalysis()
 {
 	var idxLcl;
 	var data = 'From Galaxy, H0 (km/s/Mpc), H0 Uncertainty (km/s/Mpc)\n';
 
-	var listHomes = new Array();
-	for (idxLcl = 0; idxLcl < universe.length; idxLcl++)
-	{
-		var jLcl;
-		for (jLcl = 0; jLcl < universe[idxLcl]._measurements.length; jLcl++)
-		{
-			var found = false;
-			for (kLcl = 0; kLcl < listHomes.length && !found; kLcl++)
-			{
-				found = universe[idxLcl]._measurements[jLcl]._fromGalaxy == listHomes[kLcl];
-			}
-			if (!found)
-			{
-				listHomes.push(universe[idxLcl]._measurements[jLcl]._fromGalaxy);
-			}
-		}
-	}
-	var saveCurrentHome = currentHome;
-	class HubbleData
-	{
-		constructor(fromGalaxy, H0, H0_u)
-		{
-			this._fromGalaxy = fromGalaxy;
 
-			var H0sf = sig_figs(H0,H0_u);
 
-			this._H0 = H0sf.value;
-			this._H0_u = H0sf.uncertainty;
-			this._H0_r = H0sf.rounding;
-		}
-	}
-	var hubbleData = new Array();
-
-	for (kLcl = 0; kLcl < listHomes.length; kLcl++)
+	for (kLcl = 0; kLcl < listHomesMeasurements.length; kLcl++)
 	{
-		currentHome = listHomes[kLcl];
-		for (idxLcl = 0; idxLcl < universe.length; idxLcl++)
-		{
-			universe[idxLcl].computeValues();
-		}
-		updateHubbleLaw();
-		hubbleData.push(new HubbleData(universe[currentHome]._id,measH0,measH0u));
-	}
+		var law = determineHubbleLaw(listHomesMeasurements[kLcl]);
+		var H0sf = sig_figs(law.measH0,law.measH0u);
+		var H0intsf = sig_figs(law.measIntercept,law.measInterceptu);
 
-	for (idxLcl = 0; idxLcl < hubbleData.length; idxLcl++)
-	{
 		data +=
-			hubbleData[idxLcl]._fromGalaxy
-			+ ', ' + hubbleData[idxLcl]._H0.toFixed(hubbleData[idxLcl]._H0_r)
-			+ ', ' + hubbleData[idxLcl]._H0_u.toFixed(hubbleData[idxLcl]._H0_r)
+			universe[listHomesMeasurements[kLcl]]._id
+			+ ', ' + H0sf.value.toFixed(H0sf.rounding)
+			+ ', ' + H0sf.uncertainty.toFixed(H0sf.rounding)
 			+ '\n';
 	}
 	download(data,"ExpansionOfUniverseH0.csv","csv");
-
-	currentHome = saveCurrentHome;
-	for (idxLcl = 0; idxLcl < universe.length; idxLcl++)
-	{
-		universe[idxLcl].computeValues();
-		updateHubbleLaw();
-	}
 }
 
 var inViewList = new Array();

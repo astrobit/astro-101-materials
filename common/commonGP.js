@@ -89,7 +89,7 @@ function download(data, filename, type) {
 /////////////////////////////////////////////////////////////////////////
 function sig_figs(value, uncertainty)
 {
-	var uncertainty_res = 0;
+	var uncertainty_res = -1;
 	var value_res = 0;
 	var rounding = 0;
 	if (uncertainty > 0)
@@ -102,7 +102,7 @@ function sig_figs(value, uncertainty)
 		uncertainty_res = Math.round(uncertainty / mult) * mult;
 		value_res = Math.round(value / mult) * mult;
 	}
-	else
+	else if (value > 0)
 	{
 		var value_log = Math.floor(Math.log10(value));
 		rounding = -value_log;

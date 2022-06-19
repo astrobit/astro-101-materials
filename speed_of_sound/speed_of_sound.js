@@ -107,7 +107,7 @@ var g_slew = 0;
 
 function onRightSelect()
 {
-	g_slew = -1;
+	g_slew = 1;
 }
 function onRightRelease()
 {
@@ -116,19 +116,19 @@ function onRightRelease()
 
 var controlButtonsY = theCanvas.height / 2 - 110;
 var lengthDisplayY = theCanvas.height / 2 - 130;
-var buttonRight = new SpringButton("Right",theCanvas.width / 2 - 65,controlButtonsY,60,30,onRightSelect,onRightRelease)
+var buttonRight = new SpringButton("Right",theCanvas.width / 2 + 5,controlButtonsY,60,30,onRightSelect,onRightRelease)
 commonUIRegister(buttonRight);
 
 function onLeftSelect()
 {
-	g_slew = 1;
+	g_slew = -1;
 }
 function onLeftRelease()
 {
 	g_slew = 0;
 }
 
-var buttonLeft = new SpringButton("Left",theCanvas.width / 2 + 5,controlButtonsY,60,30,onLeftSelect,onLeftRelease)
+var buttonLeft = new SpringButton("Left",theCanvas.width / 2 - 65,controlButtonsY,60,30,onLeftSelect,onLeftRelease)
 commonUIRegister(buttonLeft);
 
 g_curr_Sound = g_sounds["1024 Hz"];

@@ -445,67 +445,107 @@ class Slider
 		this.max = max;
 		this.roundCursor = false;
 		this.vertical = false;
+		this.cursorRadius = this.height / 2 + 2;
 	}
 
 	draw(context)
 	{
 		context.save();
 		context.translate(this.x,this.y);
-		context.scale(this.width,this.height)
-		if (this.drawer !== null && typeof this.drawer !== 'undefined')
+		if (typeof this.drawer !== 'undefined' && this.drawer !== null)
 			this.drawer();
 		else
 		{
-			if (this.baseColor !== null)
+			if (typeof this.baseColor != 'undefined' && this.baseColor !== null)
 			{
-				context.fillColor = baseColor;
+				context.fillColor = this.baseColor;
 			}
 			else
 			{
-				context.fillColor = "#bfbfbf";
+				context.fillStyle = "#bfbfbf";
 			}
+			context.beginPath();
+			context.moveTo(-this.width * 0.5,-this.height * 0.5);
+			if (this.vertical)
+			{
+				if (this.roundCursor)
+					context.arc(0,-this.height * 0.5,this.width * 0.5,Math.PI,0);
+				else
+					context.lineTo(this.width * 0.5,-this.height * 0.5);
+				context.lineTo(this.width * 0.5, this.height * 0.5);
+				if (this.roundCursor)
+					context.arc(0,this.height * 0.5,this.width * 0.5,0,-Math.PI);
+				else
+					context.lineTo(-this.width * 0.5,this.height * 0.5);
+			}
+			else
+			{
+				context.lineTo(this.width * 0.5,-this.height * 0.5);
+				if (this.roundCursor)
+					context.arc(this.width * 0.5,0,this.height * 0.5,-0.5 * Math.PI,0.5 * Math.PI);
+				else
+					context.lineTo(this.width * 0.5,this.height * 0.5);
+				context.lineTo(-this.width * 0.5,this.height * 0.5);
+				if (this.roundCursor)
+					context.arc(-this.width * 0.5,0,this.height * 0.5,0.5 * Math.PI,1.5 * Math.PI);
+				else
+					context.lineTo(-this.width * 0.5,-this.height * 0.5);
+			}
+			context.closePath();
+			context.fill();
+			
+			var cursorX;
+			var cursorY;
+			if (this.vertical)
+			{
+				cursorX = 0;
+				cursorY = this.height * ((this.value - this.min) / (this.max - this.min) - 0.5);
+			}
+			else
+			{
+				cursorY = 0;
+				cursorX = this.width * ((this.value - this.min) / (this.max - this.min) - 0.5);
+			}
+			
+			if (typeof this.cursorColor != 'undefined' && this.cursorColor !== null)
+			{
+				context.fillColor = this.cursorColor;
+			}
+			else
+			{
+				context.fillStyle = "#0000bf";
+			}
+			context.beginPath();
 			if (this.roundCursor)
 			{
-				context.beginPath();
-				if (this.vertical)
-				{
-					context.moveTo(this.x,this.y + this.cursorRadius);
-					context.lineTo(this.x,this.y+ this.height- this.cursorRadius);
-					context.arc(this.x + this.width / 2,this.y + this.height - this.cursorRadius ,Math.PI,Math.PI * 2.0)
-					context.lineTo(this.x + this.width,this.y + this.cursorRadius);
-					context.arc(this.x + this.width/2,this.y + this.cursorRadius,0,Math.PI)
-				}
-				else
-				{
-					context.moveTo(this.x + this.cursorRadius,this.y);
-					context.lineTo(this.x + this.width - this.cursorRadius,this.y);
-					context.arc(this.x + this.width - this.cursorRadius,this.y + this.height / 2,Math.PI * 0.5,-Math.PI * 0.5)
-					context.lineTo(this.x + this.cursorRadius,this.y + this.height);
-					context.arc(this.x + this.cursorRadius,this.y + this.height / 2,Math.PI * 1.5,Math.PI * 0.5)
-				}
-				context.closePath();
-				context.stroke();
+				context.moveTo(cursorX + this.cursorRadius,cursorY);
+				context.arc(cursorX,cursorY,this.cursorRadius,0,2.8 * Math.PI);
 			}
 			else
 			{
-			
+				context.moveTo(cursorX + this.cursorRadius,cursorY + this.cursorRadius);
+				context.lineTo(cursorX + this.cursorRadius,cursorY - this.cursorRadius);
+				context.lineTo(cursorX - this.cursorRadius,cursorY - this.cursorRadius);
+				context.lineTo(cursorX - this.cursorRadius,cursorY + this.cursorRadius);
 			}
+			context.closePath();
+			context.fill();
 		}
 		context.restore();
 	}
 	onClick(event)
 	{
 		var acted = false;
-		if (test(event) && !this.disabled)
+		if (this.test(event) && !this.disabled)
 		{
 			var rel;
 			if (this.vertical)
 				rel = (event.offsetY - this.y) / this.height;
 			else
 				rel = (event.offsetX - this.x) / this.width;
-			if (rel >= 0.0 && rel <= 1.0)
+			if (rel <= 0.5 && rel <= 0.5)
 			{
-				this.value = (this.max - this.min) * rel  + this.min;
+				this.value = (this.max - this.min) * (rel + 0.5)  + this.min;
 				acted = true;
 			}
 		}
@@ -513,7 +553,12 @@ class Slider
 	}
 	test(event)
 	{
-		return (this.visible && this.x <= event.offsetX && (this.x + this.width) >= event.offsetX && this.y <= event.offsetY && (this.y + this.height) >= event.offsetY)
+		var relX;
+		var relY;
+		relX = (event.offsetY - this.y) / this.height;
+		relY = (event.offsetX - this.x) / this.width;
+		
+		return (this.visible && (-0.5 <= relX && relX <= 0.5 && -0.5 <= relY && relY <= 0.5));
 	}
 }
 

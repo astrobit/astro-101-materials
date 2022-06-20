@@ -459,6 +459,10 @@ class Slider
 		this.drawer = null;
 		this.hasMouse = false;
 		this.calculateSlope();
+		this.label = null;
+		this.labelStyle = "#000000";
+		this.labelFont = "16px Ariel"
+		this.labelPosition = "center-above";
 	}
 	calculateSlope()
 	{
@@ -500,6 +504,69 @@ class Slider
 			this.drawer();
 		else
 		{
+			if (typeof this.label !== 'undefined' && this.label !== null)
+			{
+				context.fillStyle = this.labelStyle;
+				var fontSize = this.labelFont.search("px");
+				var size;
+				if (this.labelFont.charAt(fontSize - 2) < '0' ||  this.labelFont.charAt(fontSize - 2) > '9')
+				{
+					size = parseInt(this.labelFont.substring(fontSize - 1,fontSize));
+				}
+				else
+				{
+					if (this.labelFont.charAt(fontSize - 3) < '0' ||  this.labelFont.charAt(fontSize - 3) > '9')
+						size = parseInt(this.labelFont.substring(fontSize - 2,fontSize));
+					else
+						size = parseInt(this.labelFont.substring(fontSize - 3,fontSize));
+				}
+				var x = 0;
+				var y = 0;
+				var positionDash = this.labelPosition.search("-");
+				var positionHorizontal = this.labelPosition.substring(0,positionDash);
+				var positionVertical = this.labelPosition.substring(positionDash + 1);
+				
+				
+				if (positionVertical == "middle")
+					y = 0;
+				else if (positionVertical == "above")
+				{
+					if (this.vertical)
+						y = -this.cursorSize - 2;
+					else
+						y = -this.height * 0.5 - this.cursorSize - 2;
+				}
+				else // below
+				{
+					if (this.vertical)
+						y = this.cursorSize + 2 + size;
+					else
+						y = this.height * 0.5 + this.cursorSize + size;
+				}
+				if (positionHorizontal == "center")
+				{
+					x = 0;
+					context.font = this.labelFont
+					drawTextCenter(context,this.label,x,y);
+				}
+				else if (positionHorizontal == "left")
+				{
+					if (this.vertical)
+						x = -this.cursorSize - 2;
+					else
+						x = -this.width * 0.5 - this.cursorSize - 2;
+					drawTextRight(context,this.label,x,y);
+				}
+				else // right
+				{
+					if (this.vertical)
+						x = this.cursorSize + 2;
+					else
+						x = this.width * 0.5 + this.cursorSize + 2;
+					context.fillText(this.label,x,y);
+				}
+				
+			}
 			context.fillStyle = this.sliderStyle;
 			context.beginPath();
 			context.moveTo(-this.width * 0.5,-this.height * 0.5);

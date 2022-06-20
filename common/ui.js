@@ -430,40 +430,77 @@ class Clickable
 
 class Slider
 {
-	constructor(x,y,width,height,depth,visible,disabled,value,min,max,drawer,vertical)
+	constructor(x,y,min,max,value)
 	{
 		this.x = x;
 		this.y = y;
-		this.width = width;
-		this.height = height;
-		this.depth = depth;
-		this.drawer = drawer;
-		this.visible = visible;
-		this.disabled = disabled;
-		this.value = value;
-		this.min = min;
-		this.max = max;
-		this.roundCursor = false;
-		this.vertical = false;
-		this.cursorRadius = this.height / 2 + 2;
+		if (typeof vertical !== 'undefined' && vertical !== null && vertical)
+		{
+			this.width = 25;
+			this.height = 200;
+			this.cursorSize = this.width / 2 + 2;
+		}
+		else
+		{
+			this.width = 200;
+			this.height = 25;
+			this.cursorSize = this.height / 2 + 2;
+		}
+		this.depth = 0;
+		this.visible = true;
+		this.disabled = false;
+		this._value = value;
+		this._min = min;
+		this._max = max;
+		this.roundCursor = true;
+		this.sliderStyle = "#7F7F7F";
+		this.cursorStyle = "#00007F";
+		this.onChange = null;
+		this.drawer = null;
+		this.hasMouse = false;
+		this.calculateSlope();
+	}
+	calculateSlope()
+	{
+		this._slope = 1.0 / (this._max - this._min);
+		this._offset = -this._min * this._slope - 0.5;
+	}
+	get value()
+	{
+		return this._value;
+	}
+	get min()
+	{
+		return this._min;
+	}
+	get max()
+	{
+		return this._max;
+	}
+	set value(val)
+	{
+		this._value = val;
+	}
+	set min(value)
+	{
+		this._min = value;
+		this.calculateSlope();
+	}
+	set max(value)
+	{
+		this._max = value;
+		this.calculateSlope();
 	}
 
 	draw(context)
 	{
 		context.save();
 		context.translate(this.x,this.y);
-		if (typeof this.drawer !== 'undefined' && this.drawer !== null)
+		if (this.drawer !== null)
 			this.drawer();
 		else
 		{
-			if (typeof this.baseColor != 'undefined' && this.baseColor !== null)
-			{
-				context.fillColor = this.baseColor;
-			}
-			else
-			{
-				context.fillStyle = "#bfbfbf";
-			}
+			context.fillStyle = this.sliderStyle;
 			context.beginPath();
 			context.moveTo(-this.width * 0.5,-this.height * 0.5);
 			if (this.vertical)
@@ -499,44 +536,115 @@ class Slider
 			if (this.vertical)
 			{
 				cursorX = 0;
-				cursorY = this.height * ((this.value - this.min) / (this.max - this.min) - 0.5);
+				cursorY = this.height * (this._value * this._slope + this._offset);
 			}
 			else
 			{
+				cursorX = this.width * (this._value * this._slope + this._offset);
 				cursorY = 0;
-				cursorX = this.width * ((this.value - this.min) / (this.max - this.min) - 0.5);
 			}
 			
-			if (typeof this.cursorColor != 'undefined' && this.cursorColor !== null)
-			{
-				context.fillColor = this.cursorColor;
-			}
-			else
-			{
-				context.fillStyle = "#0000bf";
-			}
+			context.fillStyle = this.cursorStyle;
 			context.beginPath();
 			if (this.roundCursor)
 			{
-				context.moveTo(cursorX + this.cursorRadius,cursorY);
-				context.arc(cursorX,cursorY,this.cursorRadius,0,2.8 * Math.PI);
+				context.moveTo(cursorX + this.cursorSize,cursorY);
+				context.arc(cursorX,cursorY,this.cursorSize,0,2.0 * Math.PI);
 			}
 			else
 			{
-				context.moveTo(cursorX + this.cursorRadius,cursorY + this.cursorRadius);
-				context.lineTo(cursorX + this.cursorRadius,cursorY - this.cursorRadius);
-				context.lineTo(cursorX - this.cursorRadius,cursorY - this.cursorRadius);
-				context.lineTo(cursorX - this.cursorRadius,cursorY + this.cursorRadius);
+				context.moveTo(cursorX + this.cursorSize,cursorY + this.cursorRadius);
+				context.lineTo(cursorX + this.cursorSize,cursorY - this.cursorRadius);
+				context.lineTo(cursorX - this.cursorSize,cursorY - this.cursorRadius);
+				context.lineTo(cursorX - this.cursorSize,cursorY + this.cursorRadius);
 			}
 			context.closePath();
 			context.fill();
 		}
 		context.restore();
 	}
+	onMouseDown(event)
+	{
+		var acted = false;
+		if (!this.disabled && this.visible && this.test(event))
+		{
+			var cursorPos = this._value * this._slope + this._offset;
+			var relX;
+			var relY;
+			if (this.vertical)
+			{
+				cursorPos *= this.height;
+				relX = this.x - event.offsetX;
+				relY = this.y + cursorPos - event.offsetY;
+			}
+			else
+			{
+				cursorPos *= this.width;
+				relX = this.x + cursorPos - event.offsetX;
+				relY = this.y - event.offsetY;
+			}
+			if (this.roundCursor)
+			{
+				var r = relX * relX + relY * relY - this.cursorSize * this.cursorSize;
+				if (r < 0)
+					this.hasMouse = true;				
+			}
+			else
+			{
+				if (Math.abs(relX) < this.cursorSize &&
+					Math.abs(relY) < this.cursorSize)
+					this.hasMouse = true;				
+			}
+			if (this.hasMouse)
+				acted = true;
+		}
+		return acted;
+	}
+	onMouseUp(event)
+	{
+		var acted = false;
+		if (this.hasMouse)
+		{
+			this.hasMouse = false;
+			acted = true;
+		}
+		return acted;
+	}
+	onMouseMove(event)
+	{
+		var acted = false;
+		if (this.hasMouse)
+		{
+			var relPos;
+			if (this.vertical)
+			{
+				relPos = (event.offsetY - this.y) / this.height + 0.5;
+			}
+			else
+			{
+				relPos = (event.offsetX - this.x) / this.width + 0.5;
+			}
+			if (relPos < 0.0)
+				relPos = 0.0;
+			if (relPos > 1.0)
+				relPos = 1.0;
+			this._value = relPos / this._slope + this._min;
+			if (this.onChange !== null)
+				this.onChange(this._value);
+			acted = true;
+		}
+		return acted;
+	}
+	onPageHide(event)
+	{
+		if (this.hasMouse)
+			this.hasMouse = false;
+	}
+	
 	onClick(event)
 	{
 		var acted = false;
-		if (this.test(event) && !this.disabled)
+		if (!this.disabled && this.visible && this.test(event))
 		{
 			var rel;
 			if (this.vertical)
@@ -548,6 +656,8 @@ class Slider
 				this.value = (this.max - this.min) * (rel + 0.5)  + this.min;
 				acted = true;
 			}
+			if (this.onChange !== null)
+				this.onChange(this._value);
 		}
 		return acted;
 	}
@@ -577,6 +687,7 @@ class CommonUIContainer
 
 var commonUIContainer = new CommonUIContainer()
 var commonUITutorialContainer = new CommonUIContainer()
+var commonUIhasMouse = null;
 
 function commonUIRegister(uiObject)
 {
@@ -656,6 +767,8 @@ function commonUIOnMouseDown(event)
 		{
 			tutorialActive = commonUITutorialContainer.registry[i].standardUIDisable;
 			commonUITutorialContainer.registry[i].onMouseDown(event);
+			if (commonUITutorialContainer.registry[i].hasMouse)
+					commonUIhasMouse = commonUITutorialContainer.registry[i]; 
 		}
 	}
 	if (!tutorialActive)
@@ -665,6 +778,8 @@ function commonUIOnMouseDown(event)
 			if ("onMouseDown" in commonUIContainer.registry[i] && commonUIContainer.registry[i].test(event))
 			{
 				commonUIContainer.registry[i].onMouseDown(event);
+				if (commonUIContainer.registry[i].hasMouse)
+						commonUIhasMouse = commonUIContainer.registry[i]; 
 			}
 		}
 		if (commonUIContainer.userOnMouseDown !== null)
@@ -697,10 +812,17 @@ function commonUIOnMouseUp(event)
 		if (commonUIContainer.userOnMouseUp !== null)
 			commonUIContainer.userOnMouseUp(event);
 	}
+	if (commonUIhasMouse !== null && !commonUIhasMouse.hasMouse)
+		commonUIhasMouse = null;
+	
 }
 
 function commonUIOnMouseMove(event)
 {
+	if (commonUIhasMouse !== null && commonUIhasMouse.hasMouse && "onMouseMove" in commonUIhasMouse)
+	{
+		commonUIhasMouse.onMouseMove(event);
+	}
 }
 
 function commonUIOnMouseLeave(event)

@@ -3,17 +3,17 @@
 
 function drawTextCenter(context,text,x,y)
 {
-	context.save();
+	var align = context.textAlign;
 	context.textAlign = "center";
 	context.fillText(text,x,y);
-	context.restore();
+	context.textAlign = align;
 }
 function drawTextRight(context,text,x,y)
 {
-	context.save();
+	var align = context.textAlign;
 	context.textAlign = "right";
 	context.fillText(text,x,y);
-	context.restore();
+	context.textAlign = align;
 }
 
 function drawArrow(context,x0,y0,x1,y1,style,linewidth,tipsizelength,tipsizewidth,open)

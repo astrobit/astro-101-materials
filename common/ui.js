@@ -498,137 +498,140 @@ class Slider
 
 	draw(context)
 	{
-		context.save();
-		context.translate(this.x,this.y);
-		if (this.drawer !== null)
-			this.drawer();
-		else
+		if (this.visible)
 		{
-			if (typeof this.label !== 'undefined' && this.label !== null)
+			context.save();
+			context.translate(this.x,this.y);
+			if (this.drawer !== null)
+				this.drawer();
+			else
 			{
-				context.fillStyle = this.labelStyle;
-				var fontSize = this.labelFont.search("px");
-				var size;
-				if (this.labelFont.charAt(fontSize - 2) < '0' ||  this.labelFont.charAt(fontSize - 2) > '9')
+				if (typeof this.label !== 'undefined' && this.label !== null)
 				{
-					size = parseInt(this.labelFont.substring(fontSize - 1,fontSize));
+					context.fillStyle = this.labelStyle;
+					var fontSize = this.labelFont.search("px");
+					var size;
+					if (this.labelFont.charAt(fontSize - 2) < '0' ||  this.labelFont.charAt(fontSize - 2) > '9')
+					{
+						size = parseInt(this.labelFont.substring(fontSize - 1,fontSize));
+					}
+					else
+					{
+						if (this.labelFont.charAt(fontSize - 3) < '0' ||  this.labelFont.charAt(fontSize - 3) > '9')
+							size = parseInt(this.labelFont.substring(fontSize - 2,fontSize));
+						else
+							size = parseInt(this.labelFont.substring(fontSize - 3,fontSize));
+					}
+					var x = 0;
+					var y = 0;
+					var positionDash = this.labelPosition.search("-");
+					var positionHorizontal = this.labelPosition.substring(0,positionDash);
+					var positionVertical = this.labelPosition.substring(positionDash + 1);
+					
+					
+					if (positionVertical == "middle")
+						y = 0;
+					else if (positionVertical == "above")
+					{
+						if (this.vertical)
+							y = -this.cursorSize - 2;
+						else
+							y = -this.height * 0.5 - this.cursorSize - 2;
+					}
+					else // below
+					{
+						if (this.vertical)
+							y = this.cursorSize + 2 + size;
+						else
+							y = this.height * 0.5 + this.cursorSize + size;
+					}
+					if (positionHorizontal == "center")
+					{
+						x = 0;
+						context.font = this.labelFont
+						drawTextCenter(context,this.label,x,y);
+					}
+					else if (positionHorizontal == "left")
+					{
+						if (this.vertical)
+							x = -this.cursorSize - 2;
+						else
+							x = -this.width * 0.5 - this.cursorSize - 2;
+						drawTextRight(context,this.label,x,y);
+					}
+					else // right
+					{
+						if (this.vertical)
+							x = this.cursorSize + 2;
+						else
+							x = this.width * 0.5 + this.cursorSize + 2;
+						context.fillText(this.label,x,y);
+					}
+					
+				}
+				context.fillStyle = this.sliderStyle;
+				context.beginPath();
+				context.moveTo(-this.width * 0.5,-this.height * 0.5);
+				if (this.vertical)
+				{
+					if (this.roundCursor)
+						context.arc(0,-this.height * 0.5,this.width * 0.5,Math.PI,0);
+					else
+						context.lineTo(this.width * 0.5,-this.height * 0.5);
+					context.lineTo(this.width * 0.5, this.height * 0.5);
+					if (this.roundCursor)
+						context.arc(0,this.height * 0.5,this.width * 0.5,0,-Math.PI);
+					else
+						context.lineTo(-this.width * 0.5,this.height * 0.5);
 				}
 				else
 				{
-					if (this.labelFont.charAt(fontSize - 3) < '0' ||  this.labelFont.charAt(fontSize - 3) > '9')
-						size = parseInt(this.labelFont.substring(fontSize - 2,fontSize));
-					else
-						size = parseInt(this.labelFont.substring(fontSize - 3,fontSize));
-				}
-				var x = 0;
-				var y = 0;
-				var positionDash = this.labelPosition.search("-");
-				var positionHorizontal = this.labelPosition.substring(0,positionDash);
-				var positionVertical = this.labelPosition.substring(positionDash + 1);
-				
-				
-				if (positionVertical == "middle")
-					y = 0;
-				else if (positionVertical == "above")
-				{
-					if (this.vertical)
-						y = -this.cursorSize - 2;
-					else
-						y = -this.height * 0.5 - this.cursorSize - 2;
-				}
-				else // below
-				{
-					if (this.vertical)
-						y = this.cursorSize + 2 + size;
-					else
-						y = this.height * 0.5 + this.cursorSize + size;
-				}
-				if (positionHorizontal == "center")
-				{
-					x = 0;
-					context.font = this.labelFont
-					drawTextCenter(context,this.label,x,y);
-				}
-				else if (positionHorizontal == "left")
-				{
-					if (this.vertical)
-						x = -this.cursorSize - 2;
-					else
-						x = -this.width * 0.5 - this.cursorSize - 2;
-					drawTextRight(context,this.label,x,y);
-				}
-				else // right
-				{
-					if (this.vertical)
-						x = this.cursorSize + 2;
-					else
-						x = this.width * 0.5 + this.cursorSize + 2;
-					context.fillText(this.label,x,y);
-				}
-				
-			}
-			context.fillStyle = this.sliderStyle;
-			context.beginPath();
-			context.moveTo(-this.width * 0.5,-this.height * 0.5);
-			if (this.vertical)
-			{
-				if (this.roundCursor)
-					context.arc(0,-this.height * 0.5,this.width * 0.5,Math.PI,0);
-				else
 					context.lineTo(this.width * 0.5,-this.height * 0.5);
-				context.lineTo(this.width * 0.5, this.height * 0.5);
-				if (this.roundCursor)
-					context.arc(0,this.height * 0.5,this.width * 0.5,0,-Math.PI);
-				else
+					if (this.roundCursor)
+						context.arc(this.width * 0.5,0,this.height * 0.5,-0.5 * Math.PI,0.5 * Math.PI);
+					else
+						context.lineTo(this.width * 0.5,this.height * 0.5);
 					context.lineTo(-this.width * 0.5,this.height * 0.5);
-			}
-			else
-			{
-				context.lineTo(this.width * 0.5,-this.height * 0.5);
-				if (this.roundCursor)
-					context.arc(this.width * 0.5,0,this.height * 0.5,-0.5 * Math.PI,0.5 * Math.PI);
+					if (this.roundCursor)
+						context.arc(-this.width * 0.5,0,this.height * 0.5,0.5 * Math.PI,1.5 * Math.PI);
+					else
+						context.lineTo(-this.width * 0.5,-this.height * 0.5);
+				}
+				context.closePath();
+				context.fill();
+				
+				var cursorX;
+				var cursorY;
+				if (this.vertical)
+				{
+					cursorX = 0;
+					cursorY = this.height * (this._value * this._slope + this._offset);
+				}
 				else
-					context.lineTo(this.width * 0.5,this.height * 0.5);
-				context.lineTo(-this.width * 0.5,this.height * 0.5);
+				{
+					cursorX = this.width * (this._value * this._slope + this._offset);
+					cursorY = 0;
+				}
+				
+				context.fillStyle = this.cursorStyle;
+				context.beginPath();
 				if (this.roundCursor)
-					context.arc(-this.width * 0.5,0,this.height * 0.5,0.5 * Math.PI,1.5 * Math.PI);
+				{
+					context.moveTo(cursorX + this.cursorSize,cursorY);
+					context.arc(cursorX,cursorY,this.cursorSize,0,2.0 * Math.PI);
+				}
 				else
-					context.lineTo(-this.width * 0.5,-this.height * 0.5);
+				{
+					context.moveTo(cursorX + this.cursorSize,cursorY + this.cursorRadius);
+					context.lineTo(cursorX + this.cursorSize,cursorY - this.cursorRadius);
+					context.lineTo(cursorX - this.cursorSize,cursorY - this.cursorRadius);
+					context.lineTo(cursorX - this.cursorSize,cursorY + this.cursorRadius);
+				}
+				context.closePath();
+				context.fill();
 			}
-			context.closePath();
-			context.fill();
-			
-			var cursorX;
-			var cursorY;
-			if (this.vertical)
-			{
-				cursorX = 0;
-				cursorY = this.height * (this._value * this._slope + this._offset);
-			}
-			else
-			{
-				cursorX = this.width * (this._value * this._slope + this._offset);
-				cursorY = 0;
-			}
-			
-			context.fillStyle = this.cursorStyle;
-			context.beginPath();
-			if (this.roundCursor)
-			{
-				context.moveTo(cursorX + this.cursorSize,cursorY);
-				context.arc(cursorX,cursorY,this.cursorSize,0,2.0 * Math.PI);
-			}
-			else
-			{
-				context.moveTo(cursorX + this.cursorSize,cursorY + this.cursorRadius);
-				context.lineTo(cursorX + this.cursorSize,cursorY - this.cursorRadius);
-				context.lineTo(cursorX - this.cursorSize,cursorY - this.cursorRadius);
-				context.lineTo(cursorX - this.cursorSize,cursorY + this.cursorRadius);
-			}
-			context.closePath();
-			context.fill();
+			context.restore();
 		}
-		context.restore();
 	}
 	onMouseDown(event)
 	{

@@ -454,13 +454,16 @@ class Slider
 		this._max = max;
 		this.roundCursor = true;
 		this.sliderStyle = "#7F7F7F";
+		this.disableSliderStyle = "#3F3F3F";
 		this.cursorStyle = "#00007F";
+		this.disableCursorStyle = "#1F1F3F"
 		this.onChange = null;
 		this.drawer = null;
 		this.hasMouse = false;
 		this.calculateSlope();
 		this.label = null;
 		this.labelStyle = "#000000";
+		this.disablelabelStyle = "#7F7F7F";
 		this.labelFont = "16px Ariel"
 		this.labelPosition = "center-above";
 	}
@@ -508,7 +511,11 @@ class Slider
 			{
 				if (typeof this.label !== 'undefined' && this.label !== null)
 				{
-					context.fillStyle = this.labelStyle;
+					if (this.disabled)
+						context.fillStyle = this.disableLabelStyle;
+					else
+						context.fillStyle = this.labelStyle;
+					
 					var fontSize = this.labelFont.search("px");
 					var size;
 					if (this.labelFont.charAt(fontSize - 2) < '0' ||  this.labelFont.charAt(fontSize - 2) > '9')
@@ -569,7 +576,10 @@ class Slider
 					}
 					
 				}
-				context.fillStyle = this.sliderStyle;
+				if (this.disabled)
+					context.fillStyle = this.disableSliderStyle;
+				else
+					context.fillStyle = this.sliderStyle;
 				context.beginPath();
 				context.moveTo(-this.width * 0.5,-this.height * 0.5);
 				if (this.vertical)
@@ -613,7 +623,10 @@ class Slider
 					cursorY = 0;
 				}
 				
-				context.fillStyle = this.cursorStyle;
+				if (this.disabled)
+					context.fillStyle = this.disableCursorStyle;
+				else
+					context.fillStyle = this.cursorStyle;
 				context.beginPath();
 				if (this.roundCursor)
 				{

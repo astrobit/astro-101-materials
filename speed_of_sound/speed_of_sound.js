@@ -60,7 +60,18 @@ function onMuteSelect()
 var freqButtonsY = theCanvas.height - 150;
 var volumeControlY = theCanvas.height - 100;
 
-var buttonMute = new Button ("Mute",theCanvas.width / 2 - 30.0,volumeControlY,60,30,onMuteSelect)
+function volumeControl(value)
+{
+	g_curr_Sound.volume = g_volume * value;
+}
+var sliderVolume = new Slider(theCanvas.width / 2,volumeControlY + 50,0.0,1.0,0.1);
+sliderVolume.width = 400;
+sliderVolume.label = "Volume";
+sliderVolume.labelStyle = "#FFFFFF";
+sliderVolume.onChange = volumeControl;
+commonUIRegister(sliderVolume);
+
+var buttonMute = new Button ("Mute",theCanvas.width / 2 + 40.0,volumeControlY,60,30,onMuteSelect)
 buttonMute.insideStyle = "#FF7F00";
 commonUIRegister(buttonMute);
 
@@ -73,7 +84,7 @@ function selectFrequency(frequency)
 	{
 		if (!g_muted)
 		{
-			g_curr_Sound.volume = g_volume;
+			g_curr_Sound.volume = g_volume * sliderVolume.value;
 			g_curr_Sound.muted = false;
 			g_curr_Sound.play();
 		}
@@ -131,8 +142,16 @@ function onLeftRelease()
 var buttonLeft = new SpringButton("Left",theCanvas.width / 2 - 65,controlButtonsY,60,30,onLeftSelect,onLeftRelease)
 commonUIRegister(buttonLeft);
 
+function onResetSelect()
+{
+	g_length = 0;
+}
+
+var buttonLeft = new Button("Reset",theCanvas.width / 2 - 135,controlButtonsY,60,30,onResetSelect)
+commonUIRegister(buttonLeft);
+
 g_curr_Sound = g_sounds["1024 Hz"];
-g_curr_Sound.volume = g_volume;
+g_curr_Sound.volume = g_volume * sliderVolume.value;
 
 var halfHeight = theCanvas.height / 2;
 
@@ -152,7 +171,7 @@ function work(){
 	var amplitude = (fracWavelength % 0.5 - 0.25) / 0.25;
 	var intensity = 1.0 - amplitude * amplitude;
 	var eff_Volume = (intensity * 0.9 + 0.1);
-	g_curr_Sound.volume = eff_Volume * g_volume;
+	g_curr_Sound.volume = eff_Volume * g_volume * sliderVolume.value;
 
 	theContext.clearRect(0, 0, theCanvas.width, theCanvas.height);
 	theContext.fillStyle = '#000000';

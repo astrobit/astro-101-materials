@@ -64,7 +64,7 @@ function volumeControl(value)
 {
 	g_curr_Sound.volume = g_volume * value;
 }
-var sliderVolume = new Slider(theCanvas.width / 2,volumeControlY + 50,0.0,1.0,0.1);
+var sliderVolume = new Slider(theCanvas.width / 2,volumeControlY + 50,0.0,0.5,0.1);
 sliderVolume.width = 400;
 sliderVolume.label = "Volume";
 sliderVolume.labelStyle = "#FFFFFF";

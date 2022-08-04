@@ -247,23 +247,48 @@ class MeasurementSet
 
 }
 
+const kUniverseSize = 1000.0; // Mpc
+const kMaxPeculiarVelocity = 1400.0; // km/s
+function randPos()
+{
+		var position;
+		position = new ThreeVector((Math.random() - 0.5) * 2.0 * kUniverseSize, // Mpc
+									(Math.random() - 0.5) * 2.0 * kUniverseSize, // Mpc
+									(Math.random() - 0.5) * 2.0 * kUniverseSize); // Mpc
+	   return position;
+}
+function getRelPos(myPos,otherPos)
+{
+		var relPos = otherPos.subtract(myPos);
+		if (relPos.x > kUniverseSize)
+			relPos.x -= (2.0 * kUniverseSize);
+		if (relPos.x < -kUniverseSize)
+			relPos.x += (2.0 * kUniverseSize);
+		if (relPos.y > kUniverseSize)
+			relPos.y -= (2.0 * kUniverseSize);
+		if (relPos.y < -kUniverseSize)
+			relPos.y += (2.0 * kUniverseSize);
+		if (relPos.z > kUniverseSize)
+			relPos.z -= (2.0 * kUniverseSize);
+		if (relPos.z < -kUniverseSize)
+			relPos.z += (2.0 * kUniverseSize);
+		return relPos;
+}
 class Galaxy
 {
 
 	constructor(idx)
 	{
 		this._myIdx = idx;
-		this._position = new ThreeVector((Math.random() - 0.5) * 2.0 * 1000.0, // Mpc
-										(Math.random() - 0.5) * 2.0 * 1000.0, // Mpc
-										(Math.random() - 0.5) * 2.0 * 1000.0); // Mpc
+		this._position = randPos();
 		this._luminosity = randL();
 
-		this._velocityPeculiar = new ThreeVector(
-										(Math.random() - 0.5) * 2.0 * 700.0, // km/s
-										(Math.random() - 0.5) * 2.0 * 700.0, // km/s
-										(Math.random() - 0.5) * 2.0 * 700.0); // km/s
-		this._velocityPeculiarUnit = new ThreeVector(this._velocityPeculiar);
+		this._velocityPeculiarUnit = new ThreeVector(
+										(Math.random() - 0.5),
+										(Math.random() - 0.5),
+										(Math.random() - 0.5));
 		this._velocityPeculiarUnit.selfUnit();
+		this._velocityPeculiar = this._velocityPeculiarUnit.scale(kMaxPeculiarVelocity);
 
 
 		this._orientation = Math.random() * 2.0 * Math.PI;
@@ -309,7 +334,7 @@ class Galaxy
 			ret = this._measurements[homeStr];
 		else
 		{
-			var relPos = this._position.subtract(universe[homeIdx]._position)
+			var relPos = getRelPos(this._position,universe[homeIdx]._position);
 			ret = new MeasurementSet(this._myIdx,homeIdx,relPos.radius);
 			addMeasurementSetToList(ret);
 			this._measurements[homeStr] = ret;
@@ -319,8 +344,8 @@ class Galaxy
 
 	takeImage(SN,aperture)
 	{
-		var relPos = this._position.subtract(universe[currentHome]._position)
-		var dist = relPos.radius;
+		var relPos = getRelPos(this._position,universe[currentHome]._position);
+		var dist = relPos.magnitude;
 		var collectingArea = Math.PI * aperture * aperture * 0.25;
 		const greenPhotonEnergy = kPlanck * kSpeedLight / (550.0e-7);
 		var flux = this._luminosity * kLuminositySolar * Math.pow(dist * 1.0e6 * kParsec_cm,-2.0) * 0.25 / Math.PI; // erg/s/cm^2
@@ -347,7 +372,7 @@ class Galaxy
 
 	takeSpectrum(resolution)
 	{
-		var relPos = this._position.subtract(universe[currentHome]._position)
+		var relPos = getRelPos(this._position,universe[currentHome]._position);
 		var dist = relPos.radius;
 		relPos.selfUnit();
 
@@ -355,7 +380,7 @@ class Galaxy
 		var uy = relPos.y;
 		var uz = relPos.z;
 
-		var vPec = this._velocityPeculiar.radius;
+		var vPec = this._velocityPeculiar.r;
 
 		var vx = this._velocityPeculiarUnit.x;
 		var vy = this._velocityPeculiarUnit.y;
@@ -366,8 +391,9 @@ class Galaxy
 		var rv = rv_Hubble + rv_pec;
 		var measRv = random_gaussian(rv,resolution);
 
-		var redshift = measRv / kSpeedLight_kms;
-
+		var beta = measRv / kSpeedLight_kms; 
+		var redshift = Math.sqrt((1 + beta) / (1 - beta)) - 1;
+		
 // Tully-Fisher
 //L = 4e10 * Math.pow(v / 200.0,4.0); // solar luminosities, v in km/s
 		var vrot = Math.pow(this._luminosity / 4.0e10,0.25) * 200.0;
@@ -434,6 +460,8 @@ function takeSpectrum()
 
 var universe = new Array();
 
+const kNumGalaxies = 1000;
+
 function createUniverse()
 {
 	var debug = false;
@@ -498,9 +526,10 @@ function createUniverse()
 	else
 	{
 		var idxLcl;
-		for (idxLcl = 0; idxLcl < 999; idxLcl++)
+		// start at 1 since the Milky way is the first in the list.
+		for (idxLcl = 1; idxLcl < kNumGalaxies; idxLcl++)
 		{
-			universe.push(new Galaxy(idxLcl + 1));
+			universe.push(new Galaxy(idxLcl));
 		}
 	}
 }
@@ -536,30 +565,31 @@ function moveHome(toMW)
 	}
 	else
 	{
-		class GalData
-		{
-			constructor (i,d)
-			{
-				this._i = i;
-				this._d = d;
-			}
-		};
-		var nearestList = new Array();
+		currentHome = Math.floor(Math.random() * kNumGalaxies);
+//		class GalData
+//		{
+//			constructor (i,d)
+//			{
+//				this._i = i;
+//				this._d = d;
+//			}
+//		};
+//		var nearestList = new Array();
 
-		var u = Math.random();
-		while (u == 0) Math.random();
+//		var u = Math.random();
+//		while (u == 0) Math.random();
 
-		for (idxLcl = 0; idxLcl < universe.length; idxLcl++)
-		{
-			var relPos = universe[idxLcl]._position.subtract(universe[currentHome]._position);
-			if (idxLcl != currentHome)
-				nearestList.push(new GalData(idxLcl,relPos.radius));
+//		for (idxLcl = 0; idxLcl < universe.length; idxLcl++)
+//		{
+//		var relPos = getRelPos(universe[idxLcl]._position,universe[homeIdx]._position);
+//			if (idxLcl != currentHome)
+//				nearestList.push(new GalData(idxLcl,relPos.radius));
+//
+//		}
+//		nearestList.sort(function(a, b){return a._d - b._d});
 
-		}
-		nearestList.sort(function(a, b){return a._d - b._d});
-
-		var nearIdx = Math.round(u * 15);
-		currentHome = nearestList[nearIdx]._i;
+//		var nearIdx = Math.round(u * 15);
+//		currentHome = nearestList[nearIdx]._i;
 	}
 	setView(0.0,0.0);
 
@@ -574,7 +604,8 @@ function findHome()
 {
 	if (currentHome != 0)
 	{
-		var relPos = universe[0]._position.subtract(universe[currentHome]._position);
+		var relPos = getRelPos(universe[currentHome]._position,universe[0]._position);
+//		var relPos = universe[0]._position.subtract(universe[currentHome]._position);
 		setSlewTarget(relPos.psi,relPos.theta);
 //		setView(relPos.psi,relPos.theta);
 //		update = true;
@@ -907,7 +938,7 @@ function checkUpdate()
 		{
 			if (idxLcl != currentHome)
 			{
-				var relPos = universe[idxLcl]._position.subtract(universe[currentHome]._position);
+				var relPos = getRelPos(universe[currentHome]._position,universe[idxLcl]._position);
 
 				var viewPos = viewMatrix.dot(relPos.unit); // transform relative position into view coordinates
 				var angSize = universe[idxLcl]._sizeBasis / relPos.r; // radians
@@ -990,7 +1021,7 @@ function findNearestGalaxy(lat,long)
 	{
 		if (idxLcl != currentHome)
 		{
-			var relPos = universe[idxLcl]._position.subtract(universe[currentHome]._position);
+			var relPos = getRelPos(universe[currentHome]._position,universe[idxLcl]._position);
 			var relPosUnit = relPos.unit;
 			var dot = relPosUnit.dot(lookPos);
 			if (dot > 0 && dot > bestDist)

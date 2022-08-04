@@ -95,7 +95,7 @@ function drawMap(context,width,height)//cx,cy,width,height)
 		if (idxLcl != currentHome)
 		{
 			
-			var relPos = universe[idxLcl]._position.subtract(universe[currentHome]._position)
+			var relPos = getRelPos(universe[currentHome]._position,universe[idxLcl]._position);
 			var dist = relPos.radius;
 			var long = relPos.theta * 180.0 / Math.PI;//Math.atan2(universe[idxLcl]._position.y - universe[currentHome]._position.y,universe[idxLcl]._position.x - universe[currentHome]._position.x);
 			var lat = relPos.psi * 180.0 / Math.PI;//Math.asin(z / dist);
@@ -310,7 +310,7 @@ function drawCurrentTargetInfo(cx,ty,size)
 	for (idxLcl = 0; idxLcl < inViewList.length; idxLcl++)
 	{
 		var curr = universe[inViewList[idxLcl].idx];
-		var relPos = curr._position.subtract(universe[currentHome]._position);
+		var relPos = getRelPos(universe[currentHome]._position,curr._position);
 		var id = curr._id;
 		var dist = relPos.r;
 		theContext.fillText(id,-180,(idxLcl + 1.25) * size);

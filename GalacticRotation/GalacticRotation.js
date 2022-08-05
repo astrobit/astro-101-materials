@@ -6,6 +6,8 @@
 
 var theCanvas = document.getElementById("theCanvas");
 theCanvas.onselectstart = function () { return false; } // prevent selection of text below the canvas when you click on it
+theCanvas.width = window.innerWidth - 10;
+var canvasCenterX = theCanvas.width / 2.0; 
 
 var theContext = theCanvas.getContext("2d");
 
@@ -48,7 +50,7 @@ var RdBulge;// @@TODO: consider making this a user controlled parameter
 var RdDisk;// @@TODO: consider making this a user controlled parameter
 var RdDM;// @@TODO: consider making this a user controlled parameter
 var hDisk = 0.5; // 0.5 kpc scale height for disk - @@TODO consider parameterizing this
-var massToLight = 10.0; // assume a mass-to-light ratio //@@TODO consider making this a user controlled parameter
+var massToLight = 4.0; // assume a mass-to-light ratio //@@TODO consider making this a user controlled parameter
 
 
 function getIntegral(x,a)
@@ -159,8 +161,139 @@ function plot()
 	//
 
 	var r;
+	
 	theContext.save();
-	theContext.translate(50,20 + graphHeight);
+	theContext.translate(canvasCenterX - 3* graphWidth / 2 - 100,20 + graphHeight);
+	
+	theContext.fillStyle = "#7F7F7F";
+
+	theContext.textAlign = "center";
+	theContext.font = "18px Arial";
+	theContext.fillText("Distance from center (kpc)", graphWidth * 0.5, 40);
+	theContext.save();
+	theContext.translate(-35,-graphHeight*0.5);
+	theContext.rotate(-0.5 * Math.PI);
+	theContext.fillText("Interior Mass (Solar Masses)", 0, 0);
+	theContext.restore();
+
+	
+	theContext.lineWidth = 2;
+	theContext.strokeStyle = "#FFFFFF";
+	theContext.fillStyle = "#FFFFFF";
+	theContext.beginPath();
+	theContext.moveTo(0,-graphHeight);
+	theContext.lineTo(0,0);
+	theContext.lineTo(graphWidth,0);
+	theContext.stroke();
+
+	theContext.textAlign = "center";
+	theContext.font = "10px Arial";
+	for (i = 0; i < 6; i++)
+	{
+		var x = i * graphWidth / 5;
+		var y = 0;
+		theContext.beginPath();
+		theContext.moveTo(x,y);
+		theContext.lineTo(x,y+10);
+		theContext.stroke();
+		var radLabel = Math.round(radiusMax / 4 * i * 10.0) / 10.0;
+		theContext.fillText(radLabel, x,y+20);
+	}
+	theContext.textAlign = "right";
+	var massRel;
+	for (massRel = 0; massRel <= 1.25; massRel += 0.25)
+	{
+		var x = 0;
+		var y = -massRel / 1.25 * graphHeight;
+		theContext.beginPath();
+		theContext.moveTo(x,y);
+		theContext.lineTo(x - 5,y);
+		theContext.stroke();
+		theContext.fillText(massRel, x - 6,y + 3);
+	}
+
+	
+	theContext.rect(0,-graphHeight,graphWidth,graphHeight);
+	theContext.clip();
+	
+	//
+	// Model
+	//
+	
+
+	theContext.strokeStyle = "#FF0000";
+	theContext.beginPath();
+	var first = true;
+	for (r = 0.01 * radiusMax; r <= radiusMax; r += (radiusMax * 0.02))
+	{
+		var Mdisk = M0disk * getMassFactor(r / RdDisk, diskIndex);
+
+		var x = r / radiusMax * graphWidth;
+		var y = -Mdisk / mass * graphHeight / 1.25;
+		if (first)
+			theContext.moveTo(x, y);
+		else
+			theContext.lineTo(x, y);
+		first = false;
+	}
+	theContext.stroke();
+	theContext.strokeStyle = "#00FF00";
+	first = true;
+	theContext.beginPath();
+	for (r = 0.01 * radiusMax; r <= radiusMax; r += (radiusMax * 0.02))
+	{
+		var Mbulge = M0bulge * getMassFactor(r / RdBulge, bulgeIndex);
+
+		var x = r / radiusMax * graphWidth;
+		var y = -Mbulge / mass * graphHeight / 1.25;
+		if (first)
+			theContext.moveTo(x, y);
+		else
+			theContext.lineTo(x, y);
+		first = false;
+	}
+	theContext.stroke();
+	theContext.strokeStyle = "#0000FF";
+	first = true;
+	theContext.beginPath();
+	for (r = 0.01 * radiusMax; r <= radiusMax; r += (radiusMax * 0.02))
+	{
+		var Mdm = M0dm * getMassFactor(r / RdDM, dmIndex);
+
+		var x = r / radiusMax * graphWidth;
+		var y = -Mdm / mass * graphHeight / 1.25;
+		if (first)
+			theContext.moveTo(x, y);
+		else
+			theContext.lineTo(x, y);
+		first = false;
+	}
+	theContext.stroke();
+	theContext.strokeStyle = "#7F7F7F";
+	first = true;
+	theContext.beginPath();
+	for (r = 0.01 * radiusMax; r <= radiusMax; r += (radiusMax * 0.02))
+	{
+		var Mbulge = M0bulge * getMassFactor(r / RdBulge, bulgeIndex);
+		var Mdm = M0dm * getMassFactor(r / RdDM, dmIndex);
+		var Mdisk = M0disk * getMassFactor(r / RdDisk, diskIndex);
+
+		var x = r / radiusMax * graphWidth;
+		var y = -(Mdm + Mbulge + Mdisk) / mass * graphHeight / 1.25;
+		if (first)
+			theContext.moveTo(x, y);
+		else
+			theContext.lineTo(x, y);
+		first = false;
+	}
+	theContext.stroke();
+
+
+	theContext.restore();
+	
+		
+	theContext.save();
+	theContext.translate(canvasCenterX + -graphWidth / 2,20 + graphHeight);
 	
 	theContext.fillStyle = "#7F7F7F";
 
@@ -205,8 +338,6 @@ function plot()
 		VelRound = 200;
 	var VelScale = (Math.floor(VelMax / VelRound) + 1.0) * VelRound;
 
-	var LumMinPlot = Math.floor(LumMin);
-	var LumMaxPlot = Math.ceil(LumMax);
 
 
 	theContext.textAlign = "center";
@@ -310,8 +441,11 @@ function plot()
 	//
 	
 	theContext.save();
-	theContext.translate(525,graphHeight + 20);
+	theContext.translate(canvasCenterX + graphWidth / 2 + 100,20 + graphHeight);
 	
+	var LumMinPlot = Math.floor(LumMin);
+	var LumMaxPlot = Math.ceil(LumMax);
+
 	theContext.fillStyle = "#7F7F7F";
 	theContext.textAlign = "center";
 	theContext.font = "18px Arial";
@@ -447,7 +581,8 @@ function update()
 {
 	var elemBulge = document.getElementById('bulgeDiskRatio');
 	var elemMassLightRatio = document.getElementById('MassLightRatio');
-	var InvLightMassRatio = 1.0 / Number(elemMassLightRatio.value);
+	massToLight = Number(elemMassLightRatio.value);
+	var InvLightMassRatio = 1.0 / massToLight;
 	dmMassFrac = 1.0 - InvLightMassRatio;
 	var diskMassFracLcl = Number(elemBulge.value) / Number(elemBulge.max);
 	bulgeMassFrac = (1.0 - diskMassFracLcl) * InvLightMassRatio;

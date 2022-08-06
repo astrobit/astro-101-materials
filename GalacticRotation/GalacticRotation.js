@@ -148,6 +148,91 @@ function getUserFitParameters()
 
 }
 
+var modelA = 1;
+
+function JaffeMassFrac(r,a)
+{
+	var x = r/a;
+	return (x / (1.0 + x));
+}
+function HerquistMassFrac(r,a)
+{
+	var x = r/a;
+	return 0.5 * (x / (1.0 + x)) ** 2;
+}
+function NFWMassFrac(r,a)
+{
+	var x = r/a;
+	return Math.log(1.0 + x) - (x / (1.0 + x));
+}
+var bulgeModel = "Jaffe";
+
+function getBulgeMass(r)
+{
+	var a = bulgeIndex;
+	var ret = 0;
+	if (bulgeModel == "Jaffe")
+	{
+		ret = bulgeMassFrac * mass * JaffeMassFrac(r,a);
+	}
+	else // model = Hernquist
+	{
+		ret = bulgeMassFrac * mass * HerquistMassFrac(r,a);
+	}
+	return ret;
+}
+
+var diskModel = "exponential";
+
+function ExponentialDiskMassFrac(r,a)
+{
+	var x = r/a;
+	return 1.0 - Math.exp(-x) * (1 + x);
+}
+
+function MestelDiskMassFrac(r,a)
+{
+	return Math.min(r/a,1);
+}
+function getDiskMass(r)
+{
+	var a = diskIndex;
+	var ret = 0;
+	if (diskModel == "exponential")
+	{
+		ret = diskMassFrac * mass * ExponentialDiskMassFrac(r,a);
+	}
+	else // model = Mestel
+	{
+		ret = diskMassFrac * mass * MestelDiskMassFrac(r,a);
+	}
+	return ret;
+}
+
+function getHaloMass(r)
+{
+	var a = dmIndex;
+	var ret = 0;
+	ret = dmMassFrac * mass * NFWMassFrac(r,a);
+	return ret;
+}
+
+
+function getMass(r)
+{
+	return getBulgeMass(r) + getDiskMass(r) + getHaloMass(r);
+}
+
+
+
+function getVelocity(r)
+{
+	var massGcgs = getMass(r) * 1.98847e33 * 6.67430e-8;
+	var radiuscgs = r *  3.0856775814913673e21; // kpc to cm
+	var velocity = Math.sqrt(massGcgs / radiuscgs);
+	return velocity * 1e-5; // cm/s -> km/s
+}
+
 
 function plot()
 {
@@ -226,10 +311,10 @@ function plot()
 	var first = true;
 	for (r = 0.01 * radiusMax; r <= radiusMax; r += (radiusMax * 0.02))
 	{
-		var Mdisk = M0disk * getMassFactor(r / RdDisk, diskIndex);
+		var Mdisk = getDiskMass(r) / mass;
 
 		var x = r / radiusMax * graphWidth;
-		var y = -Mdisk / mass * graphHeight / 1.25;
+		var y = -Mdisk * graphHeight / 1.25;
 		if (first)
 			theContext.moveTo(x, y);
 		else
@@ -242,10 +327,10 @@ function plot()
 	theContext.beginPath();
 	for (r = 0.01 * radiusMax; r <= radiusMax; r += (radiusMax * 0.02))
 	{
-		var Mbulge = M0bulge * getMassFactor(r / RdBulge, bulgeIndex);
+		var Mbulge = getBulgeMass(r) / mass;
 
 		var x = r / radiusMax * graphWidth;
-		var y = -Mbulge / mass * graphHeight / 1.25;
+		var y = -Mbulge * graphHeight / 1.25;
 		if (first)
 			theContext.moveTo(x, y);
 		else
@@ -258,10 +343,10 @@ function plot()
 	theContext.beginPath();
 	for (r = 0.01 * radiusMax; r <= radiusMax; r += (radiusMax * 0.02))
 	{
-		var Mdm = M0dm * getMassFactor(r / RdDM, dmIndex);
+		var Mdm = getHaloMass(r) / mass;
 
 		var x = r / radiusMax * graphWidth;
-		var y = -Mdm / mass * graphHeight / 1.25;
+		var y = -Mdm * graphHeight / 1.25;
 		if (first)
 			theContext.moveTo(x, y);
 		else
@@ -274,12 +359,10 @@ function plot()
 	theContext.beginPath();
 	for (r = 0.01 * radiusMax; r <= radiusMax; r += (radiusMax * 0.02))
 	{
-		var Mbulge = M0bulge * getMassFactor(r / RdBulge, bulgeIndex);
-		var Mdm = M0dm * getMassFactor(r / RdDM, dmIndex);
-		var Mdisk = M0disk * getMassFactor(r / RdDisk, diskIndex);
+		var mtot = getMass(r) / mass;
 
 		var x = r / radiusMax * graphWidth;
-		var y = -(Mdm + Mbulge + Mdisk) / mass * graphHeight / 1.25;
+		var y = -mtot * graphHeight / 1.25;
 		if (first)
 			theContext.moveTo(x, y);
 		else
@@ -378,14 +461,9 @@ function plot()
 	var first = true;
 	for (r = 0.01 * radiusMax; r <= radiusMax; r += (radiusMax * 0.02))
 	{
-		var Mdisk = M0disk * getMassFactor(r / RdDisk, diskIndex);
-		var Mbulge = M0bulge * getMassFactor(r / RdBulge, bulgeIndex);
-		var Mdm = M0dm * getMassFactor(r / RdDM, dmIndex);
-
-		var v = Math.sqrt(6.67e-8 * 2e33 * (Mdisk + Mbulge + Mdm) / (r * 3.086e21)  ) * 1.0e-5;
 	
 		var x = r / radiusMax * graphWidth;
-		var y = -v / VelScale * graphHeight;
+		var y = -getVelocity(r) / VelScale * graphHeight;
 		if (first)
 			theContext.moveTo(x, y);
 		else
@@ -592,12 +670,12 @@ function update()
 	var elemDiskIndex = document.getElementById('diskIndex');
 	var elemDMIndex = document.getElementById('DMIndex');
 
-	diskIndex = Number(elemDiskIndex.value) / 100.0 * 3.0 + 1.0;
-	bulgeIndex = Number(elemBulgeIndex.value) / 100.0 * 3.0 + 1.0;
-	dmIndex = Number(elemDMIndex.value) / 100.0 * 3.0 + 1.0;
+	diskIndex = Number(elemDiskIndex.value);// / 100.0 * 3.0 + 1.0;
+	bulgeIndex = Number(elemBulgeIndex.value);// / 100.0 * 3.0 + 1.0;
+	dmIndex = Number(elemDMIndex.value);// / 100.0 * 3.0 + 1.0;
 
 	var elemMass = document.getElementById('totalMass');
-	mass = Math.pow(10,Number(elemMass.value) / 100.0 * 5.0 + 10.0);
+	mass = Math.pow(10,Number(elemMass.value));
 
 
 	var elemOutput = document.getElementById('tdTotalMass');

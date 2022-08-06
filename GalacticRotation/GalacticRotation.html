@@ -45,7 +45,7 @@
         <div style="width:400px;float:left">
             <fieldset>
                 <legend>Total Galaxy Mass</legend>
-                <input type="range" min="0" max="100" value="50" step="0.1" class="slider" id="totalMass">
+                <input type="range" min="9" max="15" value="12" step="0.01" class="slider" id="totalMass">
                 <table style="width: 350px;">
                     <tbody>
                         <tr>
@@ -58,17 +58,17 @@
         <div style="width: 400px;float:right;">
             <fieldset>
                 <legend>Component Shapes</legend>
-                <label>
+                <label style="color:#ffffff">
                     Bulge
-                    <input type="range" min="0" max="100" value="50" class="slider" id="bulgeIndex">
+                    <input type="range" min="0" max="100" value="50" step="0.1" class="slider" id="bulgeIndex">
                 </label>
-                <label>
+                <label style="color:#ffffff">
                     Disk
-                    <input type="range" min="0" max="100" value="50" class="slider" id="diskIndex">
+                    <input type="range" min="0" max="100" value="50" step="0.1" class="slider" id="diskIndex">
                 </label>
-                <label>
+                <label style="color:#ffffff">
                     Dark Matter
-                    <input type="range" min="0" max="100" value="50" class="slider" id="DMIndex">
+                    <input type="range" min="0" max="100" value="50" step="0.1" class="slider" id="DMIndex">
                 </label>
                 <table style="width: 350px;">
                     <tbody>
@@ -118,13 +118,13 @@
     <div style="width:500px;">
         <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
             <p style="color: gray;font-size:75%">
-                Copyright (c) 2020 - 2021, Brian W. Mulligan
+                Copyright (c) 2020 - 2022, Brian W. Mulligan
                 <a href="https://www.iubenda.com/privacy-policy/91469080" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe " title="Privacy Policy ">Privacy Policy</a>
                 <script type="text/javascript">(function (w, d) { var loader = function () { var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src = "https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s, tag); }; if (w.addEventListener) { w.addEventListener("load", loader, false); } else if (w.attachEvent) { w.attachEvent("onload", loader); } else { w.onload = loader; } })(window, document);</script>
             </p>
         </div>
     </div>
-        <script type="text/javascript" src="data/galaxyRotationData.js"></script>
-        <script type="text/javascript" src="GalacticRotation.js"></script>
+    <script type="text/javascript" src="data/galaxyRotationData.js"></script>
+    <script type="text/javascript" src="GalacticRotation.js"></script>
 </body>
 </html>

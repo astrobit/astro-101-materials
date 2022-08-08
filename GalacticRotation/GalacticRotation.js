@@ -41,114 +41,7 @@ var bulgeIndex = 1.0; // Bulge
 var dmIndex = 1.0; // DM
 var mass = 3.16e12;
 
-var M0bulge;
-var M0disk;
-var M0dm;
-var I0bulge;
-var I0disk;
-var RdBulge;// @@TODO: consider making this a user controlled parameter
-var RdDisk;// @@TODO: consider making this a user controlled parameter
-var RdDM;// @@TODO: consider making this a user controlled parameter
-var hDisk = 0.5; // 0.5 kpc scale height for disk - @@TODO consider parameterizing this
-var massToLight = 4.0; // assume a mass-to-light ratio //@@TODO consider making this a user controlled parameter
-
-
-function getIntegral(x,a)
-{
-	var i = 0;
-	var sum = 0.0;
-	var factorial = 1;
-	var delta = 0;
-	do {
-		var even = (i % 2);
-		var sign = 1;
-		if (even == 1)
-			sign = -1;
-
-		if (i != 0)
-			factorial *= i;
-		var constTerm = 1.0 / (a + i + 1);
-		var xTerm = Math.pow(x, a + 1 + i);
-		delta = xTerm * constTerm / factorial * sign;
-		sum += delta;
-		i++;
-	} while (Math.abs(delta / sum) > 0.1);
-	return sum;
-}
-
-function getMassFactor(x,n)
-{
-	return getIntegral(x,2.0 * n);
-}
-
-function gammaFunction(a)
-{
-	var ret = 1;
-	var i;
-	for (i = 2; i < (a - 1); i++)
-		ret *= i;
-	return ret;
-}
-
-function getUserFitParameters()
-{
-	// find scale length of galaxy
-	// use solar absolute magnitude (K) of 3.24 (Oh et al. 2008), matching value used for Lelli, McGaugh, & Schombert 2016
-
-	var minMu = 0;
-	var minMuRad = 100000;
-	var maxMu = 0;
-	var maxMuRad = 0;
-
-	for (i = 0; i < galaxyData[selectedGalaxy].SFB.length; i++)
-	{
-		if (galaxyData[selectedGalaxy].SFB[i][0].radius < minMuRad)
-		{
-			minMuRad = galaxyData[selectedGalaxy].SFB[i][0].radius;
-			minMu = galaxyData[selectedGalaxy].SFB[i][0].surfaceBrightness;
-		}
-		var j;
-		for (j = 0; j < galaxyData[selectedGalaxy].SFB[i].length; j++)
-		{
-			if (galaxyData[selectedGalaxy].SFB[i][j].radius > maxMuRad) {
-				maxMuRad = galaxyData[selectedGalaxy].SFB[i][j].radius;
-				maxMu = galaxyData[selectedGalaxy].SFB[i][j].surfaceBrightness;
-			}
-		}
-	}
-
-	var Imin = Math.pow(10.0, (21.572 + 3.24 - minMu)*0.4);
-	var Imax = Math.pow(10.0, (21.572 + 3.24 - maxMu)*0.4);
-	var invNbulge = 1.0 / bulgeIndex;
-	var invNdisk = 1.0 / diskIndex;
-	var invNdm = 1.0 / dmIndex;
-	var logI = Math.log10(Imax / Imin);
-	// calculate the scale length for the disk and bulge based on the surface brightness profile
-	RdBulge = Math.pow((Math.pow(minMuRad, invNbulge) - Math.pow(maxMuRad, invNbulge)) / logI, bulgeIndex);
-	RdDisk = Math.pow((Math.pow(minMuRad, invNdisk) - Math.pow(maxMuRad, invNdisk)) / logI, diskIndex);
-	// calculate a scale length for the dark matter halo. For now, just use the disk brightness and the dm index
-	RdDM = Math.pow((Math.pow(minMuRad, invNdm) - Math.pow(maxMuRad, invNdm)) / logI, dmIndex);
-	var MFactorbulge = getMassFactor(6, bulgeIndex); // use a distance of 6 Rd - @@TODO find a more appropriate value
-	var MFactordisk = getMassFactor(6, diskIndex);
-	var MFactorDM = getMassFactor(6, dmIndex);
-
-	// calculate total mass of components
-	var bulgeMass = bulgeMassFrac * mass;
-	var diskMass = diskMassFrac * mass;
-	var dmMass = mass - diskMass - bulgeMass;
-
-	// find the mass constant based on the user selected mass components
-	M0bulge = bulgeMass / MFactorbulge;
-	M0disk = diskMass / MFactordisk;
-	M0dm = dmMass / MFactorDM;
-
-	// find the surface luminosity constants from the mass constants
-	I0bulge = M0bulge / (4.0 * Math.PI * RdBulge * RdBulge * massToLight);
-	I0disk = M0disk / (4.0 * Math.PI * RdBulge * hDisk * massToLight);
-
-}
-
-var modelA = 1;
+var massToLight = 4.0; // mass-to-light ratio
 
 function JaffeMassFrac(r,a)
 {
@@ -194,6 +87,8 @@ function MestelDiskMassFrac(r,a)
 {
 	return Math.min(r/a,1);
 }
+
+
 function getDiskMass(r)
 {
 	var a = diskIndex;
@@ -225,12 +120,99 @@ function getMass(r)
 
 
 
+
 function getVelocity(r)
 {
 	var massGcgs = getMass(r) * 1.98847e33 * 6.67430e-8;
 	var radiuscgs = r *  3.0856775814913673e21; // kpc to cm
 	var velocity = Math.sqrt(massGcgs / radiuscgs);
 	return velocity * 1e-5; // cm/s -> km/s
+}
+
+
+function JaffeSurfaceLuminosityFrac(r,a)
+{
+//@@TODO
+	var x = r/a;
+	return 0;//(x / (1.0 + x));
+}
+function HerquistSurfaceLuminosityFrac(r,a)
+{
+//@@TODO
+	var x = r/a;
+	return 0;//0.5 * (x / (1.0 + x)) ** 2;
+}
+function getBulgeLuminosity(r)
+{
+	var a = bulgeIndex;
+	var ret = 0;
+	if (bulgeModel == "Jaffe")
+	{
+		ret = bulgeMassFrac * mass / massToLight * JaffeSurfaceLuminosityFrac(r,a);
+	}
+	else // model = Hernquist
+	{
+		ret = bulgeMassFrac * mass  / massToLight* HerquistSurfaceLuminosityFrac(r,a);
+	}
+	return ret;
+}
+
+
+function ExponentialDiskSurfaceLuminosityFrac(r,a) // (kpc^-2)
+{
+	var x = r/a;
+	if (x == 0)
+		x = 0.0001;
+	return 1.0 / (Math.PI * (a**2) * x) * Math.exp(-x);
+}
+
+function MestelDiskSurfaceLuminosityFrac(r,a) // (kpc^-2)
+{
+	var x = r/a;
+	if (x == 0)
+		x = 0.0001;
+	return 1.0 / (2.0 * Math.PI * (a**2) * x);
+}
+
+
+function getDiskLuminosity(r)
+{
+	var a = diskIndex;
+	var ret = 0;
+	if (diskModel == "exponential")
+	{
+		ret = diskMassFrac * mass / massToLight * ExponentialDiskSurfaceLuminosityFrac(r,a);
+	}
+	else // model = Mestel
+	{
+		ret = diskMassFrac * mass / massToLight * MestelDiskSurfaceLuminosityFrac(r,a);
+	}
+	return ret;
+}
+
+function getHaloMass(r)
+{
+	var a = dmIndex;
+	var ret = 0;
+	ret = dmMassFrac * mass * NFWMassFrac(r,a);
+	return ret;
+}
+
+function getLuminosity(r)
+{
+	return getBulgeLuminosity(r) + getDiskLuminosity(r); // halo is dark, so only bulge and disk matter
+}
+
+function getSurfaceBrightness(r)
+{
+	var fluxSolar = getLuminosity(r); // Solar luminosities / kpc^2
+	var d = galaxyData[selectedGalaxy].DAT[0].distance; // Mpc
+	var arcsec = 1.0 / 3600.0 * Math.PI / 180.0; // 1"
+	var x = d * arcsec * 1000.0; // kpc
+	var L = fluxSolar * (x**2); // Solar luminosities
+	var Mv = Math.log10(L) * -2.5 + 4.83 ;
+	var DM = 5 * Math.log10(d) + 25
+	return Mv + DM;
 }
 
 
@@ -595,20 +577,18 @@ function plot()
 	//
 	// User model
 	//
-	
+	theContext.strokeStyle = "#7F7F7F";
 	theContext.beginPath();
 	first = true;
-	for (r = 0.01 * radiusMax; r <= radiusMax; r += (radiusMax * 0.02))
+	for (r = 0; r <= radiusMax; r += (radiusMax * 0.02))
 	{
-		var Idisk = I0disk * Math.exp(-Math.pow(r / RdDisk, 1.0 / diskIndex));
-		var Ibulge = I0bulge * Math.exp(-Math.pow(r / RdBulge, 1.0 / bulgeIndex));
-		var mv = 21.572 + 3.24 - 2.5 * Math.log10(Idisk + Ibulge);
+		var s = getSurfaceBrightness(r);
 	
 		var x = r / radiusMax * graphWidth;
-		var y = (mv - LumMaxPlot) / (LumMaxPlot - LumMinPlot) * graphHeight;
+		var y = (s - LumMaxPlot) / (LumMaxPlot - LumMinPlot) * graphHeight;
 		if (first)
 			theContext.moveTo(x, y);
-		else if (y < -graphHeight)
+		else
 			theContext.lineTo(x, y);
 		first = false;
 	}
@@ -703,7 +683,7 @@ function update()
 	elemOutput = document.getElementById('tdGalID');
 	elemOutput.innerHTML = selectedGalaxy;
 
-	getUserFitParameters();
+//	getUserFitParameters();
 	plot();
 	window.setTimeout(update, 30.0);
 

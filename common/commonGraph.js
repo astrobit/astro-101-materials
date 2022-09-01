@@ -1261,7 +1261,11 @@ class Graph
 		var graphWidth = this.width - axisHorizontalSpace - 4;
 		var graphHeight = this.height - axisVerticalSpace - 4;
 		context.save();
-			context.translate(xOffsetGraph + x,y + this.height - yOffsetGraph);
+			context.translate(x,y);
+			context.rect(0, 0, this.width, this.height);
+			context.stroke();
+			context.clip();
+			context.translate(xOffsetGraph,this.height - yOffsetGraph);
 			context.strokeStyle = this.color;
 			if (this._axisHorizontal.length > 0)
 			{
@@ -1289,6 +1293,11 @@ class Graph
 					this._axisVertical[1].drawLabels(context,1,graphHeight,1);
 				context.restore();
 			}
+		context.restore();
+			
+		context.save();
+			context.translate(x + xOffsetGraph,y + this.height - yOffsetGraph);
+			context.strokeStyle = this.color;
 			context.beginPath();
 			context.rect(0, -graphHeight, graphWidth, graphHeight);
 			context.stroke();

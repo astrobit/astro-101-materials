@@ -921,7 +921,52 @@ class GraphDataSet
 			this._data.push(datum);
 		}
 	}
-	
+	// 2-dimensional linear fitting using least squares
+
+	LinearLeastSquare()
+	{
+		if (this._data.length > 1)
+		{
+			var sY = 0;
+			var sX = 0;
+			var sX2 = 0;
+			var sXY = 0;
+			var sOy = 0;
+			var invN = 1.0 / this._data.length;
+			var idxLcl;
+			for (idxLcl = 0; idxLcl < this._data.length; idxLcl++)
+			{
+				sY += this._data[idxLcl].y;
+				sX += this._data[idxLcl].x;
+				sX2 += this._data[idxLcl].x * this._data[idxLcl].x;
+				sXY += this._data[idxLcl].x * this._data[idxLcl].y;
+			}
+			var invDelta = 1.0 / (this._data.length * sX2 - sX * sX);
+			var _m = (this._data.length * sXY - sX * sY) * invDelta;
+			var _b = (sX2 * sY - sX * sXY) * invDelta;
+			var _om;
+			var _ob;
+			var _oy;
+			if (this._data.length > 2)
+			{
+				for (idxLcl = 0; idxLcl < this._data.length; idxLcl++)
+				{
+					var err = this._data[idxLcl].y - _b - _m * this._data[idxLcl].x;
+					sOy += err * err;
+				}
+				_oy = Math.sqrt(sOy / (this._data.length - 2.0));
+				_ob = Math.sqrt(sX2 * invDelta) * _oy;
+				_om = Math.sqrt(this._data.length * invDelta) * _oy;
+			}
+			else
+			{
+				_oy = 0;
+				_ob = 0;
+				_om = 0;
+			}
+		}
+		return {slope: _m, slope_uncertainty: _om, intercept: _b, intercept_uncertainty: _ob, S: _oy};
+	}
 }
 class Graph
 {
@@ -1266,6 +1311,7 @@ class Graph
 		var graphHeight = this.height - axisVerticalSpace - 4;
 		context.save();
 			context.translate(x,y);
+			context.strokeStyle = "#000000";
 			context.rect(0, 0, this.width, this.height);
 			context.stroke();
 			context.clip();
@@ -1302,9 +1348,6 @@ class Graph
 		context.save();
 			context.translate(x + xOffsetGraph,y + this.height - yOffsetGraph);
 			context.strokeStyle = this.color;
-			context.beginPath();
-			context.rect(0, -graphHeight, graphWidth, graphHeight);
-			context.stroke();
 			context.rect(0, -graphHeight, graphWidth, graphHeight);
 			context.stroke();
 			context.clip();

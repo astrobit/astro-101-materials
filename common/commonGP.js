@@ -1,3 +1,18 @@
+/////////////////////////////////////////////////////////////////////////
+//
+//  function binarySearch
+//
+// performs a binary search on a sorted array of objects that contain
+// a number in the specified key.
+// inputs: sortedArray (Array) - an array of Objects that contain
+//                               numeric data in the specified key
+//         findValue (Number) - the number to find within the array
+//         key (String)       - the key within the Objects in the array
+//                              that contains the numeric value to search
+// output: (Number) - the index within the array at which findValue is 
+//                    found. If the findValue is not found, null is returned
+//
+/////////////////////////////////////////////////////////////////////////
 
 function binarySearch(sortedArray,findValue,key)
 {
@@ -45,10 +60,21 @@ function binarySearch(sortedArray,findValue,key)
 	return ret;
 }
 
-
+/////////////////////////////////////////////////////////////////////////
+//
+// function random_gaussian
+//
 // random Gaussian disribution
 //Source: https://stackoverflow.com/questions/25582882/javascript-math-random-normal-distribution-gaussian-bell-curve/36481059#36481059
 // modified to allow a mean and standard deviation
+// input: mean (Number) - the value around which the distribution should vary
+//        stdev (Number) - the standard deviation of the distribution
+// output: (Number) a random number that is distributed in a normal
+//                  distribution about the mean with the given standard 
+//					deviation
+//
+/////////////////////////////////////////////////////////////////////////
+
 function random_gaussian(mean, stdev) { 
     var u = 0, v = 0;
     while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
@@ -56,9 +82,24 @@ function random_gaussian(mean, stdev) {
     return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v ) * stdev / Math.PI * 0.5 + mean;
 }
 
+/////////////////////////////////////////////////////////////////////////
+//
+// function download
+//
 // Function to download data to a file
 // Source: https://stackoverflow.com/questions/13405129/javascript-create-and-save-file/30832210#30832210
-// Author(s): Kanchu (https://stackoverflow.com/users/1458751/kanchu), Awesomeness01 (https://stackoverflow.com/users/4181717/awesomeness01), trueimage(https://stackoverflow.com/users/2430498/trueimage)
+// Author(s): Kanchu (https://stackoverflow.com/users/1458751/kanchu), 
+//			Awesomeness01 (https://stackoverflow.com/users/4181717/awesomeness01), 
+//			trueimage(https://stackoverflow.com/users/2430498/trueimage)
+//
+// input: data (String) - a string containing the data to be downloaded
+//        filename (String) - the name of the file that the downloading user recieves
+//        type (String) - the MIME type of information that the file contains
+// outputs: none 
+//     (note: output is a file download for the client)
+//
+/////////////////////////////////////////////////////////////////////////
+
 function download(data, filename, type) {
     var file = new Blob([data], {type: type});
     if (window.navigator && window.navigator.msSaveOrOpenBlob) // IE10+
@@ -115,5 +156,197 @@ function sig_figs(value, uncertainty)
 	
 	return {value:value_res, uncertainty: uncertainty_res, rounding: rounding};
 }
+/////////////////////////////////////////////////////////////////////////
+//
+//  function toSubscript
+//
+// convert the numbers in a string to unicode subscript numbers
+// input: value (String) - the string containing the numbers to convert
+// output: (String) - the same string with all numbers converted to 
+//                    unicode subscript
+//
+/////////////////////////////////////////////////////////////////////////
 
+function toSubscript(value)
+{
+	var vstring = value.toString();
+	var ret = new String();
+	var i;
+	for (i = 0; i < vstring.length; i++)
+	{
+		switch(vstring.charAt(i))
+		{
+		case '0':
+			ret += String.fromCharCode(0x2080)
+			break;
+		case '1':
+			ret += String.fromCharCode(0x2081)
+			break;
+		case '2':
+			ret += String.fromCharCode(0x2082)
+			break;
+		case '3':
+			ret += String.fromCharCode(0x2083)
+			break;
+		case '4':
+			ret += String.fromCharCode(0x2084)
+			break;
+		case '5':
+			ret += String.fromCharCode(0x2085)
+			break;
+		case '6':
+			ret += String.fromCharCode(0x2086)
+			break;
+		case '7':
+			ret += String.fromCharCode(0x2087)
+			break;
+		case '8':
+			ret += String.fromCharCode(0x2088)
+			break;
+		case '9':
+			ret += String.fromCharCode(0x2089)
+			break;
+		case '-':
+			ret += String.fromCharCode(0x208b)
+			break;
+		case '+':
+			ret += String.fromCharCode(0x208a)
+			break;
+		default:
+			ret += vstring.charAt(i);
+			break;
+		}
+	}
+	return ret;
+}
+
+/////////////////////////////////////////////////////////////////////////
+//
+//  function toSubscript
+//
+// convert the numbers in a string to unicode superscript numbers
+// input: value (String) - the string containing the numbers to convert
+// output: (String) - the same string with all numbers converted to 
+//                    unicode superscript
+//
+/////////////////////////////////////////////////////////////////////////
+
+function toSuperscript(value)
+{
+	var vstring = value.toString();
+	var ret = new String();
+	var i;
+	for (i = 0; i < vstring.length; i++)
+	{
+		switch(vstring.charAt(i))
+		{
+		case '0':
+			ret += String.fromCharCode(0x2070)
+			break;
+		case '1':
+			ret += String.fromCharCode(0x20b9)
+			break;
+		case '2':
+			ret += String.fromCharCode(0x00b2)
+			break;
+		case '3':
+			ret += String.fromCharCode(0x00b3)
+			break;
+		case '4':
+			ret += String.fromCharCode(0x2074)
+			break;
+		case '5':
+			ret += String.fromCharCode(0x2075)
+			break;
+		case '6':
+			ret += String.fromCharCode(0x2076)
+			break;
+		case '7':
+			ret += String.fromCharCode(0x2077)
+			break;
+		case '8':
+			ret += String.fromCharCode(0x2078)
+			break;
+		case '9':
+			ret += String.fromCharCode(0x2079)
+			break;
+		case '-':
+			ret += String.fromCharCode(0x207b)
+			break;
+		case '+':
+			ret += String.fromCharCode(0x207a)
+			break;
+		default:
+			ret += vstring.charAt(i);
+			break;
+		}
+	}
+	return ret;
+}
+
+/////////////////////////////////////////////////////////////////////////
+//
+//  function getFontSize
+//
+// interpret the font size specified in a CSS style object or a context font specification
+// input: font (String) - the string to interpret; for a CSS style the entire style string may be provided
+// output: (Object) - an object containing the size of the specified font
+//				key: units (String) - the specified units; may be "%", "px", "em", or "vw"
+//				key: value (Number) - the numeric font size
+//
+/////////////////////////////////////////////////////////////////////////
+
+function getFontSize(font)
+{
+	var ret = new Object();
+	// if font is a style, look for font-size
+	var style = font.search("font-size:");
+	var value = new String();
+	var units = new String();
+	var charCode0 = String('0').charCodeAt(0);
+	var charCode9 = String('9').charCodeAt(0);
+	
+	if (style >= 0)
+	{
+		var i = style + 10;
+		while (i < font.length && (font.charAt(i) == ' ' || font.charAt(i) == '\t'))
+			i++;
+		while (i < font.length && ((font.charCodeAt(i) >= charCode0 && font.charCodeAt(i) <= charCode9) || font.charAt(i) == '.'))
+		{
+			value += font.charAt(i);
+			i++;
+		}
+		while (i < font.length && (font.charAt(i) == ' ' || font.charAt(i) == '\t'))
+			i++;
+		while (i < font.length && (font.charAt(i) != ';' && font.charAt(i) != ' ' && font.charAt(i) != '\t'))
+		{
+			units += font.charAt(i);
+			i++;
+		}
+	}
+	else
+	{	
+		var i = 0;
+		// find the number
+		while (i < font.length && (font.charCodeAt(i) < charCode0 || font.charCodeAt(i) > charCode9))
+		{
+			i++;
+		}
+		while (i < font.length && ((font.charCodeAt(i) >= charCode0 && font.charCodeAt(i) <= charCode9) || font.charAt(i) == '.'))
+		{
+			value += font.charAt(i);
+			i++;
+		}
+		while (i < font.length && (font.charAt(i) == ' ' || font.charAt(i) == '\t'))
+			i++;
+		while (i < font.length && (font.charAt(i) != ';' && font.charAt(i) != ' ' && font.charAt(i) != '\t'))
+		{
+			units += font.charAt(i);
+			i++;
+		}
+	}
+	ret.units = units;
+	ret.value = Number(value);
+	return ret;
+}
 

@@ -901,12 +901,16 @@ class GraphDataSet
 			this._data = new Array();
 		}
 	}
+	get length()
+	{
+		return this._data.length;
+	}
 	at(index)
 	{
 		var ret;
 		if (index < this._data.length)
 		{
-			ret = this._data[ret];
+			ret = this._data[index];
 		}
 		return ret;
 	}
@@ -1205,26 +1209,26 @@ class Graph
 				break;
 			case 1:
 				context.arc(0,0,symbolSize*0.5,0,Math.PI * 2.0);
-				context.cycle();
+				context.closePath();
 				break;
 			case 2:
 				context.moveTo(-symbolSize * 0.5,-symbolSize * 0.5);
 				context.lineTo(symbolSize * 0.5,-symbolSize * 0.5);
 				context.lineTo(0,symbolSize * 0.5);
-				context.cycle();
+				context.closePath();
 				break;
 			case 3:
 				context.moveTo(0,-symbolSize * 0.5);
 				context.lineTo(symbolSize * 0.5,0);
 				context.lineTo(0,symbolSize * 0.5);
 				context.lineTo(-symbolSize * 0.5,0);
-				context.lineTo(0,-symbolSize * 0.5);
+				context.closePath()
 				break;
 			case 4:
 				context.moveTo(-symbolSize * 0.5,symbolSize * 0.5);
 				context.lineTo(symbolSize * 0.5,symbolSize * 0.5);
 				context.lineTo(0,-symbolSize * 0.5);
-				context.cycle();
+				context.closePath();
 				break;
 			}
 			if (symbolFilled)
@@ -1242,7 +1246,7 @@ class Graph
 		var xOffsetGraph = 0;
 		var yOffsetGraph = 0;
 		// first find out how big the axis titles and labels are
-		for (i = 0; i < 2; i++)
+		for (i = 0; i < 2 && i < this._axisHorizontal.length; i++)
 		{
 			var neededSpace = this._axisHorizontal[i].requiredSpace();
 			axisVerticalSpace += neededSpace;
@@ -1251,7 +1255,7 @@ class Graph
 			
 		}
 
-		for (i = 0; i < 2; i++)
+		for (i = 0; i < 2 && i < this._axisVertical.length; i++)
 		{
 			var neededSpace = this._axisVertical[i].requiredSpace();
 			axisHorizontalSpace += neededSpace;

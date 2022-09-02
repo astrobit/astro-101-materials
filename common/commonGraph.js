@@ -923,7 +923,7 @@ class GraphDataSet
 	}
 	// 2-dimensional linear fitting using least squares
 
-	LinearLeastSquare()
+	LinearLeastSquare(loglog)
 	{
 		if (this._data.length > 1)
 		{
@@ -932,31 +932,63 @@ class GraphDataSet
 			var sX2 = 0;
 			var sXY = 0;
 			var sOy = 0;
-			var invN = 1.0 / this._data.length;
 			var idxLcl;
+			var count = 0;
 			for (idxLcl = 0; idxLcl < this._data.length; idxLcl++)
 			{
-				sY += this._data[idxLcl].y;
-				sX += this._data[idxLcl].x;
-				sX2 += this._data[idxLcl].x * this._data[idxLcl].x;
-				sXY += this._data[idxLcl].x * this._data[idxLcl].y;
+				if (this._data[idxLcl].x !== null && this._data[idxLcl].y !== null)
+				{
+					var xl = this._data[idxLcl].x;
+					var yl = this._data[idxLcl].y;
+					var process = true;
+					if (loglog !== undefined && loglog)
+					{
+						process = (this._data[idxLcl].x > 0 && this._data[idxLcl].y > 0);
+						xl = Math.log2(this._data[idxLcl].x);
+						yl = Math.log2(this._data[idxLcl].y);
+					}
+					if (process)
+					{
+						sY += yl;
+						sX += xl;
+						sX2 += xl * xl;
+						sXY += xl * yl;
+						count++;
+					}
+				}
 			}
-			var invDelta = 1.0 / (this._data.length * sX2 - sX * sX);
-			var _m = (this._data.length * sXY - sX * sY) * invDelta;
+			var invN = 1.0 / count;
+			var invDelta = 1.0 / (count * sX2 - sX * sX);
+			var _m = (count * sXY - sX * sY) * invDelta;
 			var _b = (sX2 * sY - sX * sXY) * invDelta;
 			var _om;
 			var _ob;
 			var _oy;
-			if (this._data.length > 2)
+			if (count > 2)
 			{
-				for (idxLcl = 0; idxLcl < this._data.length; idxLcl++)
+				for (idxLcl = 0; idxLcl < count; idxLcl++)
 				{
-					var err = this._data[idxLcl].y - _b - _m * this._data[idxLcl].x;
-					sOy += err * err;
+					if (this._data[idxLcl].x !== null && this._data[idxLcl].y !== null)
+					{
+						var xl = this._data[idxLcl].x;
+						var yl = this._data[idxLcl].y;
+						var process = true;
+						if (loglog !== undefined && loglog)
+						{
+							process = (this._data[idxLcl].x > 0 && this._data[idxLcl].y > 0);
+							xl = Math.log2(this._data[idxLcl].x);
+							yl = Math.log2(this._data[idxLcl].y);
+						}
+						if (process)
+						{
+							var err = yl - _b - _m * xl;
+							sOy += err * err;
+						}
+					}
 				}
-				_oy = Math.sqrt(sOy / (this._data.length - 2.0));
+				_oy = Math.sqrt(sOy / (count - 2.0));
 				_ob = Math.sqrt(sX2 * invDelta) * _oy;
-				_om = Math.sqrt(this._data.length * invDelta) * _oy;
+				_om = Math.sqrt(count * invDelta) * _oy;
 			}
 			else
 			{
@@ -965,8 +997,64 @@ class GraphDataSet
 				_om = 0;
 			}
 		}
-		return {slope: _m, slope_uncertainty: _om, intercept: _b, intercept_uncertainty: _ob, S: _oy};
+		var type = "Linear LLS";
+		if (loglog)
+			type = "Log-Log LLS";
+		return {type: type, slope: _m, slope_uncertainty: _om, intercept: _b, intercept_uncertainty: _ob, S: _oy, DOF: count - 2};
 	}
+	LogLogLinearLeastSquare()
+	{
+		return this.LinearLeastSquare(true);
+	}	
+}
+class GraphTrend
+{
+
+	constructor(id,horizontalAxisID, verticalAxisID, type, m,b, color )
+	{
+		this.id = id;
+		this._horizontalAxisID = horizontalAxisID;
+		this._verticalAxisID = verticalAxisID;
+		if (type == "linear")
+		{
+			this._m = m;
+			this._b = b;
+		}
+		else
+		{
+			this._exponent = m;
+			this._coefficent = b;
+		}
+		this._color = color;
+		this._type = type;
+	}
+	y(x)
+	{
+		var ret = null;
+		if (this._type == "linear")
+		{
+			ret = this._m * x + this._b;
+		}
+		else
+		{
+			ret = this._coefficent * Math.pow(x,this._exponent);
+		}
+		return ret;
+	}
+	x(y)
+	{
+		var ret = null;
+		if (this._type == "linear")
+		{
+			ret = (y - this._b) / this._m;
+		}
+		else
+		{
+			ret = Math.pow(y / this._coefficent, 1.0 / this._exponent);
+		}
+		return ret;
+	}
+	
 }
 class Graph
 {
@@ -979,6 +1067,7 @@ class Graph
 		this._axisHorizontal = new Array();
 		this._axisVertical = new Array();
 		this._data = new Array();
+		this._trends = new Array();
 		this._colorMax = 6;
 		this._paletteSelect = 0;
 		this._paletteMax = 6;
@@ -1062,6 +1151,19 @@ class Graph
 			}
 			else
 				this._data.push(data);
+		}
+	}
+	addTrend(trend)
+	{
+		if (trend instanceof GraphTrend)
+		{
+//			var currAxis = this.findDataByID(data.id);
+//			if (currAxis !== null)
+//			{
+//				console.log("new GraphDataSet " + data.id + " added to Graph " + this._id + ", but data with that ID already exists.");
+//			}
+//			else
+				this._trends.push(trend);
 		}
 	}
 	_colorSelect(color)
@@ -1403,6 +1505,79 @@ class Graph
 						symbolFilled = !symbolFilled;
 					}
 					symbolSize = 6;
+				}
+				colorSelect = 0;
+				for (i = 0; i < this._trends.length; i++)
+				{
+					var currData = this._trends[i];
+					var currHorizontalAxis = this.findAxisByID(currData._horizontalAxisID);
+					var currVerticalAxis = this.findAxisByID(currData._verticalAxisID);
+					if (currData._type == "exponential" && currHorizontalAxis.log && currVerticalAxis.log ||
+						currData._type == "linear" && !currHorizontalAxis.log && !currVerticalAxis.log)
+					{
+						var y_minx = currData.y(currHorizontalAxis._min);
+						var y_maxx = currData.y(currHorizontalAxis._max);
+						var x_miny = currData.x(currVerticalAxis._min);
+						var x_maxy = currData.x(currVerticalAxis._max);
+						var x0;
+						var x1;
+						var y0;
+						var y1;
+						if (y_minx >= currVerticalAxis._min && y_minx <= currVerticalAxis._max)
+						{
+							x0 = currHorizontalAxis._min;
+							y0 = y_minx;
+						}
+						else
+						{
+							if (x_miny < x_maxy)
+							{
+								x0 = x_miny;
+								y0 = currVerticalAxis._min;
+							}
+							else
+							{
+								x0 = x_maxy;
+								y0 = currVerticalAxis._max;
+							}
+						}
+						
+						if (y_maxx >= currVerticalAxis._min && y_maxx <= currVerticalAxis._max)
+						{
+							x1 = currHorizontalAxis._max;
+							y1 = y_maxx;
+						}
+						else
+						{
+							if (x_miny > x_maxy)
+							{
+								x1 = x_miny;
+								y1 = currVerticalAxis._min;
+							}
+							else
+							{
+								x1 = x_maxy;
+								y1 = currVerticalAxis._max;
+							}
+						}
+						if (currData._color !== undefined && currData._color !== null)
+						{
+							context.strokeStyle = currData._color;
+						}
+						else
+						{
+							context.strokeStyle = this._colorSelect(colorSelect);
+							colorSelect++;
+						}
+						var gx0 = currHorizontalAxis.calculate(x0) * graphWidth;
+						var gx1 = currHorizontalAxis.calculate(x1) * graphWidth;
+						var gy0 = currVerticalAxis.calculate(y0) * graphHeight;
+						var gy1 = currVerticalAxis.calculate(y1) * graphHeight;
+						context.beginPath();
+						context.moveTo(gx0,-gy0);
+						context.lineTo(gx1,-gy1);
+						context.stroke();
+					}
 				}
 			}
 			

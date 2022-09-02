@@ -1,32 +1,34 @@
 
-class Activity
-{
-	constructor (title, functionMeasure, functionAverage, functionLinearRegression, functionGraph)
-	{
-	}
-}
-
 
 class StarPositionActvity
 {
 	constructor()
 	{
+		this._title = "Measure Position of a Star";
+		this._loglogAllowed = false;
+		
 		this._RA_Center = 132.92;
 		this._Dec_Center = 37.060;
+		this._scatter = 0.000555556;
 		
-		this._axisRA = new GraphAxis("RA","Right Ascension",this._RA_Center - 0.06,this._RA_Center + 0.06);
-		this._axisRA._labelFormatter._isAngle = true;
-		this._axisRA._labelFormatter._showUnitsAngle = true;
-		this._axisRA._labelFormatter._angleFormat = "0D 0M 0S.ss";
+		this._min_x = this._RA_Center - 5.0 * this._scatter;
+		this._max_x = this._RA_Center + 5.0 * this._scatter;
+		this._min_y = this._Dec_Center - 5.0 * this._scatter;
+		this._max_y = this._Dec_Center + 5.0 * this._scatter;
+
+		this._axisHorizontal = new GraphAxis("RA","Right Ascension",this._min_x,this._max_x);
+		this._axisHorizontal._labelFormatter._isAngle = true;
+		this._axisHorizontal._labelFormatter._showUnitsAngle = true;
+		this._axisHorizontal._labelFormatter._angleFormat = "0D 0M 0S.ss";
 		
-		this._axisDec = new GraphAxis("Dec","Declination",this._Dec_Center - 0.06,this._Dec_Center + 0.06);
-		this._axisDec._labelFormatter._isAngle = true;
-		this._axisDec._labelFormatter._showUnitsAngle = true;
-		this._axisDec._labelFormatter._angleFormat = "0D 0M 0S.ss";
+		this._axisVertical = new GraphAxis("Dec","Declination",this._min_y,this._max_y);
+		this._axisVertical._labelFormatter._isAngle = true;
+		this._axisVertical._labelFormatter._showUnitsAngle = true;
+		this._axisVertical._labelFormatter._angleFormat = "0D 0M 0S.ss";
 
 		this._graph = new Graph("position",500,500,"#ffffff");
-		this._graph.addHorizontalAxis(this._axisRA);
-		this._graph.addVerticalAxis(this._axisDec);
+		this._graph.addHorizontalAxis(this._axisHorizontal);
+		this._graph.addVerticalAxis(this._axisVertical);
 		this._measurements = new GraphDataSet("positions","RA", "Dec", null,1,3,"#7f7f7f",true);
 		this._graph.addDataSet(this._measurements);
 		
@@ -43,7 +45,7 @@ class StarPositionActvity
 		var i;
 		for (i = 0; i < number; i++)
 		{
-			var curr = new GraphDatum(random_gaussian(this._RA_Center,0.02),random_gaussian(this._Dec_Center,0.02));
+			var curr = new GraphDatum(random_gaussian(this._RA_Center,this._scatter),random_gaussian(this._Dec_Center,this._scatter));
 			this._measurements.add(curr);
 		}
 //		if (this._averageRA !== null && this._averageDec !== null)
@@ -158,7 +160,224 @@ class StarPositionActvity
 
 }
 
+
+
+class AsteroidNearJupiter
+{
+	constructor()
+	{
+		this._title = "Measure Position of an Asteroid Near Jupiter";
+
+		var jd = 2459800.5;
+		var jupiter = Planets.Jupiter.orbitalParameters.getOrbitalPosition(jd); 
+		this._asteroidData = new Array();
+		var max_y = 1;
+		var min_y = 1000;
+					
+		var twoPi = Math.PI * 2.0;
+		var i;
+		for (i = 0; i < minorPlanetsTrojans.length; i++)
+		{
+			var curr = minorPlanetsTrojans[i].orbitalParameters.getOrbitalPosition(jd);
+			var relPosition = curr.helioLongitude - jupiter.helioLongitude;
+			var fPi = Math.floor(relPosition / twoPi);
+			relPosition -= fPi * twoPi;
+			if (relPosition > Math.PI)
+				relPosition -= twoPi;
+			
+			var data = new GraphDatum(relPosition * 180.0 / Math.PI,minorPlanetsTrojans[i].orbitalParameters.semiMajorAxis);
+			this._asteroidData.push(data);
+			if (minorPlanetsTrojans[i].orbitalParameters.semiMajorAxis < min_y)
+				min_y = minorPlanetsTrojans[i].orbitalParameters.semiMajorAxis;
+			if (minorPlanetsTrojans[i].orbitalParameters.semiMajorAxis > max_y)
+				max_y = minorPlanetsTrojans[i].orbitalParameters.semiMajorAxis;
+		}
+		this._min_x = -180.0;
+		this._max_x = 180.0;
+		this._min_y = Math.floor(min_y * 10.0) / 10.0;
+		this._max_y = Math.ceil(max_y * 10.0) / 10.0;
+	
+		this._loglogAllowed = false;
+
+		this._axisHorizontal = new GraphAxis("Relative Angle","Position Relative to Jupiter",-180.0,180.0);
+		this._axisHorizontal._labelFormatter._isAngle = true;
+		this._axisHorizontal._labelFormatter._showUnitsAngle = true;
+		this._axisHorizontal._labelFormatter._angleFormat = "D.dd";
+		
+		this._axisVertical = new GraphAxis("Distance","Distance From the Sun (au)",min_y,max_y);
+
+		this._graph = new Graph("position",500,500,"#ffffff");
+		this._graph.addHorizontalAxis(this._axisHorizontal);
+		this._graph.addVerticalAxis(this._axisVertical);
+		this._measurements = new GraphDataSet("positions","Relative Angle", "Distance", null,1,3,"#7f7f7f",true);
+		this._graph.addDataSet(this._measurements);
+		
+	}
+	
+	measure(number)
+	{
+		var i;
+		for (i = 0; i < number; i++)
+		{
+			var idx = this._measurements.length;
+			if (idx < this._asteroidData.length)
+				this._measurements.add(this._asteroidData[idx]);
+		}
+	}
+	average()
+	{
+		// nothing to do for this case
+	}		
+	linearRegression()
+	{
+		// nothing to do for this case
+	}
+	graph(context)
+	{
+		this._graph.draw(context,0,0);
+		context.strokeStyle = "#ffffff";
+		context.fillStyle = "#ffffff";
+		context.font = "20px Arial";
+		context.textBaseline = "middle";
+		context.textAlign = "center";
+		context.save();
+		context.translate(0,510);
+		context.fillText("Number of Measurements: " + this._measurements.length.toString(), 250,0);
+		context.restore();
+	}
+
+}
+
+
+class AsteroidDiameterBrightnessActivity
+{
+	constructor()
+	{
+		this._title = "Measure Brightness and Diameter of Asteroids";
+
+		this._asteroidData = new Array();
+		var max_x = 0.00001;
+		var min_x = 1000000;
+		var max_y = 0;
+		var min_y = 1000;
+					
+		var twoPi = Math.PI * 2.0;
+		var i;
+		for (i = 0; i < minorPlanetsTrojans.length; i++)
+		{
+			var curr = minorPlanetsTrojans[i]
+			if (curr.H !== null && curr.diameter !== null)
+			{
+				var data = new GraphDatum(curr.H,curr.diameter);
+				this._asteroidData.push(data);
+				if (data.x < min_x)
+					min_x = data.x;
+				if (data.x > max_x)
+					max_x = data.x;
+				if (data.y < min_y)
+					min_y = data.y;
+				if (data.y > max_y)
+					max_y = data.y;
+			}			
+		}
+		this._min_x = Math.floor(min_x * 10.0) / 10.0;
+		this._max_x = Math.ceil(max_x * 10.0) / 10.0;
+		this._min_y = Math.floor(min_y * 10.0) / 10.0;
+		this._max_y = Math.ceil(max_y * 10.0) / 10.0;
+	
+		this._loglogAllowed = true;
+
+		this._axisHorizontal = new GraphAxis("Absolute Magnitude","Absolute Magnitude",this._min_x,this._max_x);
+		this._axisVertical = new GraphAxis("Diameter","Diameter (km)",this._min_y,this._max_y);
+
+		this._graph = new Graph("position",500,500,"#ffffff");
+		this._graph.addHorizontalAxis(this._axisHorizontal);
+		this._graph.addVerticalAxis(this._axisVertical);
+		this._measurements = new GraphDataSet("positions","Absolute Magnitude", "Diameter", null,1,3,"#7f7f7f",true);
+		this._graph.addDataSet(this._measurements);
+		this._graphTrend = new GraphTrend("positions","Absolute Magnitude", "Diameter", "linear", 0,0,"#ff0000");
+		this._graph.addTrend(this._graphTrend);
+		
+	}
+	
+	measure(number)
+	{
+		var i;
+		for (i = 0; i < number; i++)
+		{
+			var idx = this._measurements.length;
+			if (idx < this._asteroidData.length)
+				this._measurements.add(this._asteroidData[idx]);
+		}
+	}
+	average()
+	{
+		// nothing to do for this case
+	}		
+	linearRegression(loglog)
+	{
+		if (loglog)
+		{
+			this._lls = this._measurements.LinearLeastSquare(true);
+			this._graphTrend._type = "exponential";
+			this._graphTrend._exponent = this._lls.slope;
+			this._graphTrend._coefficent = Math.pow(2.0,this._lls.intercept);
+		}
+		else
+		{
+			this._lls = this._measurements.LinearLeastSquare();
+			this._graphTrend._type = "linear";
+			this._graphTrend._m = this._lls.slope;
+			this._graphTrend._b = this._lls.intercept;
+		}
+	}
+	graph(context)
+	{
+		this._graph.draw(context,0,0);
+		context.strokeStyle = "#ffffff";
+		context.fillStyle = "#ffffff";
+		context.font = "20px Arial";
+		context.textBaseline = "middle";
+		context.textAlign = "center";
+		context.save();
+		context.translate(0,510);
+		context.fillText("Number of Measurements: " + this._measurements.length.toString(), 250,0);
+		context.translate(0,35);
+		if (this._lls !== undefined && this._lls !== null)
+		{
+			if (this._lls.type == "Log-Log LLS")
+			{
+				var vD_1 = Math.pow(2.0,this._lls.intercept);
+				var sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
+				var D_1 = sig_figs(vD_1,sD_1);
+				var Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
+				var eqnString = "D = ((" + D_1.value.toString() + "±" + D_1.uncertainty.toString() + ") km) M";
+				var expString = "(" + Exp.value.toString() + "±" + Exp.uncertainty.toString() + ")";
+				
+				context.fillText(eqnString, 250,0);
+				var offset = context.measureText(eqnString).width;
+				context.textAlign = "left";
+				context.font = "12px Arial";
+				context.fillText(expString, 250 + offset * 0.5,-8);
+			
+			}
+			else
+			{
+				var b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
+				var m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
+				var eqnString = "D = (" + m.value.toString() + "±" + m.uncertainty.toString() + ") M + (" + b.value.toString() + "±" + b.uncertainty.toString() + ") km";
+				context.fillText(eqnString, 250,0);
+			}
+			context.translate(0,35);
+		}
+		context.restore();
+	}
+
+}
+
 var starPostionActivity = new StarPositionActvity();
+var asteroidNearJupiterActivity = new AsteroidNearJupiter();
+var asteroidDiameterBrightnessActivity = new AsteroidDiameterBrightnessActivity();
 
 var currentActivity = starPostionActivity;
 
@@ -174,12 +393,17 @@ var theContext = theCanvas.getContext("2d");
 
 var select = document.getElementById("selectActivity");
 var option = document.createElement("option");
-option.text = "Measure Position of a Star";
+option.text = starPostionActivity._title;
 
 select.add(option)
 
 option = document.createElement("option");
-option.text = "Measure Position of an Asteroid Near Jupiter";
+option.text = asteroidNearJupiterActivity._title;
+
+select.add(option)
+
+option = document.createElement("option");
+option.text = asteroidDiameterBrightnessActivity._title;
 
 select.add(option)
 
@@ -187,7 +411,32 @@ var g_bLogLogDisplay = false;
 
 function OnActivitySelect()
 {
+	if (select.value == asteroidNearJupiterActivity._title)
+		currentActivity = asteroidNearJupiterActivity;
+	else if (select.value == asteroidDiameterBrightnessActivity._title)
+		currentActivity = asteroidDiameterBrightnessActivity;
+	else
+		currentActivity = starPostionActivity;
+	if (!currentActivity._loglogAllowed)
+	{
+		g_bLogLogDisplay = false;
+		var btn = document.getElementById("buttonLogPlot");
+		btn.innerText = "Display Log-Log Plot";
+		btn.disabled = true;
+	}
+	else
+	{
+		g_bLogLogDisplay = false;
+		var btn = document.getElementById("buttonLogPlot");
+		btn.innerText = "Display Log-Log Plot";
+		btn.disabled = false;
+	}
+	
+	
 }
+
+OnActivitySelect(); // call it right away to make sure everything set up correctly
+
 function OnMeasureSelect()
 {
 	currentActivity.measure(g_currentNumMeasure);
@@ -198,22 +447,22 @@ function OnAverageSelect()
 }
 function OnLinearRegressionSelect()
 {
-	currentActivity.linearRegression();
+	currentActivity.linearRegression(g_bLogLogDisplay);
 }
 function OnLogPlotSelect()
 {
-	if (g_bLogLogDisplay)
-		g_bLogLogDisplay = false;
-	else
-		g_bLogLogDisplay = true;
+	if (currentActivity._loglogAllowed)
+	{
+		g_bLogLogDisplay = !g_bLogLogDisplay;
+	}
 	var btn = document.getElementById("buttonLogPlot");
 	if (g_bLogLogDisplay)
 	{
-		btn.style.backgroundColor = '#4CFF50;';
+		btn.innerText = "Display Linear Plot";
 	}
 	else
 	{
-		btn.style.backgroundColor = '#7F7F7F';
+		btn.innerText = "Display Log-Log Plot";
 	}
 		
 }
@@ -248,6 +497,16 @@ function work(){
 
 	theContext.save();
 		theContext.translate(theCanvas.width * 0.5 - 250,0);
+		if (currentActivity._loglogAllowed)
+		{
+			currentActivity._axisHorizontal.log = g_bLogLogDisplay;
+			currentActivity._axisVertical.log = g_bLogLogDisplay;
+		}
+		else
+		{
+			currentActivity._axisHorizontal.log = false;
+			currentActivity._axisVertical.log = false;
+		}
 		currentActivity.graph(theContext);
 	theContext.restore();
 

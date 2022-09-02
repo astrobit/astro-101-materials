@@ -1,25 +1,132 @@
+class OrbitalParameters
+{
+	constructor(epoch, semiMajorAxis,periodYears,orbitalEccentricity,meanLongitude,longitudeAscendingNode,longitudePerihelion,orbitalInclination)
+	{
+		this._degrees = 180.0 / Math.PI;
+		this._radians = Math.PI / 180.0;
+
+		this.semiMajorAxis = semiMajorAxis;
+		this.orbitalEccentricity = orbitalEccentricity;
+		this.periodYears = periodYears;
+		this.epoch = epoch;
+
+		this._meanLongitude = meanLongitude;
+		this._longitudePerihelion = longitudePerihelion;
+		this._longitudeAscendingNode = longitudeAscendingNode;
+		this._orbitalInclination = orbitalInclination;
+
+		this._meanLongitudeDegrees = this._meanLongitude * this._degrees;
+		this._longitudePerihelionDegrees = this._longitudePerihelion * this._degrees;
+		this._longitudeAscendingNodeDegrees = this._longitudeAscendingNode * this._degrees;
+		this._orbitalInclinationDegrees = this._orbitalInclination * this._degrees;
+
+	}
+	get meanLongitude()
+	{
+		return this._meanLongitude;
+	}
+	set meanLongitude(value)
+	{
+		this._meanLongitude = value;
+		this._meanLongitudeDegrees = this._meanLongitude * this._degrees;
+	}
+	get meanLongitudeDegrees()
+	{
+		return this._meanLongitudeDegrees;
+	}
+	set meanLongitudeDegrees(value)
+	{
+		this._meanLongitudeDegrees = value;
+		this._meanLongitudeDegrees = this._meanLongitudeDegrees * this._radians;
+	}
+	get longitudePerihelion()
+	{
+		return this._longitudePerihelion;
+	}
+	set longitudePerihelion(value)
+	{
+		this._longitudePerihelion = value;
+		this._longitudePerihelionDegrees = this._longitudePerihelion * this._degrees;
+	}
+	get longitudePerihelionDegrees()
+	{
+		return this._longitudePerihelionDegrees;
+	}
+	set longitudePerihelionDegrees(value)
+	{
+		this._longitudePerihelionDegrees = value;
+		this._longitudePerihelion = this._longitudePerihelionDegrees * this._radians;
+	}
+	get longitudeAscendingNode()
+	{
+		return this._longitudeAscendingNode;
+	}
+	set longitudeAscendingNode(value)
+	{
+		this._longitudeAscendingNode = value;
+		this._longitudeAscendingNodeDegrees = this._longitudeAscendingNode * this._degrees;
+	}
+	get longitudeAscendingNodeDegrees()
+	{
+		return this._longitudeAscendingNodeDegrees;
+	}
+	set longitudeAscendingNodeDegrees(value)
+	{
+		this._longitudeAscendingNodeDegrees = value;
+		this._longitudeAscendingNode = this._longitudeAscendingNodeDegrees * this._radians;
+	}
+	get orbitalInclination()
+	{
+		return this._orbitalInclination;
+	}
+	set orbitalInclination(value)
+	{
+		this._orbitalInclination = value;
+		this._orbitalInclinationDegrees = this._orbitalInclination * this._degrees;
+	}
+	get orbitalInclinationDegrees()
+	{
+		return this._orbitalInclinationDegrees;
+	}
+	set orbitalInclinationDegrees(value)
+	{
+		this._orbitalInclinationDegrees = value;
+		this._orbitalInclination = this._orbitalInclinationDegrees * this._radians;
+	}
+}
+
 // data source:
 // https://nssdc.gsfc.nasa.gov/planetary/factsheet/
 // https://nssdc.gsfc.nasa.gov/planetary/factsheet/fact_notes.html
 function interpretVSOP2013Parameters(params)
 {
-	var degrees = 180.0 / Math.PI;
+	var longitudePerihelion = Math.atan2(params.h0,params.k0);
+	var longitudeAscendingNode = Math.atan2(params.q0,params.p0);
+	var orbitalEccentricity = params.k0 / Math.cos(longitudePerihelion);
+	var orbitalInclination = Math.asin(2.0 * params.q0 * Math.cos(longitudeAscendingNode));
 
-	var ret = {};
-	ret.semiMajorAxis = params.a0;
-	ret.meanLongitude = params.lambda0;
-	ret.longitudePerihelion = Math.atan2(params.h0,params.k0);
-	ret.longitudeAscendingNode = Math.atan2(params.q0,params.p0);
-	ret.orbitalEccentricity = params.k0 / Math.cos(ret.longitudePerihelion);
-	ret.orbitalInclination = Math.asin(2.0 * params.q0 * Math.cos(ret.longitudeAscendingNode));
-	ret.periodYears = 2.0 * Math.PI / params.n * 1000.0;
+	var ret = new OrbitalParameters(params.epoch,
+									params.a0, // semi-Major axis
+									2.0 * Math.PI / params.n * 1000.0, // period
+									orbitalEccentricity,
+									params.lambda0, // mean longitude
+									longitudeAscendingNode,
+									longitudePerihelion,
+									orbitalInclination);
+//	ret.semiMajorAxis = params.a0;
+//	ret.meanLongitude = params.lambda0;
+//	ret.longitudePerihelion = Math.atan2(params.h0,params.k0);
+//	ret.longitudeAscendingNode = Math.atan2(params.q0,params.p0);
+//	ret.orbitalEccentricity = params.k0 / Math.cos(ret.longitudePerihelion);
+//	ret.orbitalInclination = Math.asin(2.0 * params.q0 * Math.cos(ret.longitudeAscendingNode));
+//	ret.periodYears = 
 
-	ret.meanLongitudeDegrees = ret.meanLongitude * degrees;
-	ret.longitudePerihelionDegrees = ret.longitudePerihelion * degrees;
-	ret.longitudeAscendingNodeDegrees = ret.longitudeAscendingNode * degrees;
-	ret.orbitalInclinationDegrees = ret.orbitalInclination * degrees;
+//	ret.meanLongitudeDegrees = ret.meanLongitude * degrees;
+//	ret.longitudePerihelionDegrees = ret.longitudePerihelion * degrees;
+//	ret.longitudeAscendingNodeDegrees = ret.longitudeAscendingNode * degrees;
+//	ret.orbitalInclinationDegrees = ret.orbitalInclination * degrees;
 
-	ret.epoch = params.epoch;
+//	ret.epoch = params.epoch;
 	return ret;
 }
 

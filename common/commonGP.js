@@ -350,3 +350,33 @@ function getFontSize(font)
 	return ret;
 }
 
+/////////////////////////////////////////////////////////////////////////
+//
+//  function shuffle
+// Source: https://bost.ocks.org/mike/shuffle/
+// Author(s): Mike Bostock
+//
+// randomly shuffle the elements of an array using a Fisher–Yates shuffle.
+// input: arrray (Array) - the array to shuffle
+// output: (Array) - the array with the data randomly shuffled.
+//
+/////////////////////////////////////////////////////////////////////////
+
+function shuffle(array) {
+  var m = array.length, t, i;
+
+  // While there remain elements to shuffle…
+  while (m) {
+
+    // Pick a remaining element…
+    i = Math.floor(Math.random() * m--);
+
+    // And swap it with the current element.
+    t = array[m];
+    array[m] = array[i];
+    array[i] = t;
+  }
+
+  return array;
+}
+

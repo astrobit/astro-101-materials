@@ -1512,71 +1512,81 @@ class Graph
 					var currData = this._trends[i];
 					var currHorizontalAxis = this.findAxisByID(currData._horizontalAxisID);
 					var currVerticalAxis = this.findAxisByID(currData._verticalAxisID);
-					if (currData._type == "exponential" && currHorizontalAxis.log && currVerticalAxis.log ||
-						currData._type == "linear" && !currHorizontalAxis.log && !currVerticalAxis.log)
+					if (currHorizontalAxis !== null && currVerticalAxis !== null)
 					{
-						var y_minx = currData.y(currHorizontalAxis._min);
-						var y_maxx = currData.y(currHorizontalAxis._max);
-						var x_miny = currData.x(currVerticalAxis._min);
-						var x_maxy = currData.x(currVerticalAxis._max);
-						var x0;
-						var x1;
-						var y0;
-						var y1;
-						if (y_minx >= currVerticalAxis._min && y_minx <= currVerticalAxis._max)
+						if (currData._type == "exponential" && currHorizontalAxis.log && currVerticalAxis.log ||
+							currData._type == "linear" && !currHorizontalAxis.log && !currVerticalAxis.log)
 						{
-							x0 = currHorizontalAxis._min;
-							y0 = y_minx;
-						}
-						else
-						{
-							if (x_miny < x_maxy)
+							var y_minx = currData.y(currHorizontalAxis._min);
+							var y_maxx = currData.y(currHorizontalAxis._max);
+							var x_miny = currData.x(currVerticalAxis._min);
+							var x_maxy = currData.x(currVerticalAxis._max);
+							var x0;
+							var x1;
+							var y0;
+							var y1;
+							if (y_minx >= currVerticalAxis._min && y_minx <= currVerticalAxis._max)
 							{
-								x0 = x_miny;
-								y0 = currVerticalAxis._min;
+								x0 = currHorizontalAxis._min;
+								y0 = y_minx;
 							}
 							else
 							{
-								x0 = x_maxy;
-								y0 = currVerticalAxis._max;
+								if (x_miny < x_maxy)
+								{
+									x0 = x_miny;
+									y0 = currVerticalAxis._min;
+								}
+								else
+								{
+									x0 = x_maxy;
+									y0 = currVerticalAxis._max;
+								}
 							}
-						}
-						
-						if (y_maxx >= currVerticalAxis._min && y_maxx <= currVerticalAxis._max)
-						{
-							x1 = currHorizontalAxis._max;
-							y1 = y_maxx;
-						}
-						else
-						{
-							if (x_miny > x_maxy)
+							
+							if (y_maxx >= currVerticalAxis._min && y_maxx <= currVerticalAxis._max)
 							{
-								x1 = x_miny;
-								y1 = currVerticalAxis._min;
+								x1 = currHorizontalAxis._max;
+								y1 = y_maxx;
 							}
 							else
 							{
-								x1 = x_maxy;
-								y1 = currVerticalAxis._max;
+								if (x_miny > x_maxy)
+								{
+									x1 = x_miny;
+									y1 = currVerticalAxis._min;
+								}
+								else
+								{
+									x1 = x_maxy;
+									y1 = currVerticalAxis._max;
+								}
 							}
+							if (currData._color !== undefined && currData._color !== null)
+							{
+								context.strokeStyle = currData._color;
+							}
+							else
+							{
+								context.strokeStyle = this._colorSelect(colorSelect);
+								colorSelect++;
+							}
+							var gx0 = currHorizontalAxis.calculate(x0) * graphWidth;
+							var gx1 = currHorizontalAxis.calculate(x1) * graphWidth;
+							var gy0 = currVerticalAxis.calculate(y0) * graphHeight;
+							var gy1 = currVerticalAxis.calculate(y1) * graphHeight;
+							context.beginPath();
+							context.moveTo(gx0,-gy0);
+							context.lineTo(gx1,-gy1);
+							context.stroke();
 						}
-						if (currData._color !== undefined && currData._color !== null)
-						{
-							context.strokeStyle = currData._color;
-						}
-						else
-						{
-							context.strokeStyle = this._colorSelect(colorSelect);
-							colorSelect++;
-						}
-						var gx0 = currHorizontalAxis.calculate(x0) * graphWidth;
-						var gx1 = currHorizontalAxis.calculate(x1) * graphWidth;
-						var gy0 = currVerticalAxis.calculate(y0) * graphHeight;
-						var gy1 = currVerticalAxis.calculate(y1) * graphHeight;
-						context.beginPath();
-						context.moveTo(gx0,-gy0);
-						context.lineTo(gx1,-gy1);
-						context.stroke();
+					}
+					else
+					{
+						if (currHorizontalAxis === null)
+							console.log("Unable to identify axis " + currData._horizontalAxisID);
+						if (currVerticalAxis === null)
+							console.log("Unable to identify axis " + currData._verticalAxisID);
 					}
 				}
 			}

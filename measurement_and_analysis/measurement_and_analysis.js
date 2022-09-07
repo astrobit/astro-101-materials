@@ -6,6 +6,7 @@ class StarPositionActvity
 	{
 		this._title = "Measure Position of a Star";
 		this._loglogAllowed = false;
+		this._linearAnalysisAllowed = false;
 		
 		this._RA_Center = 132.92;
 		this._Dec_Center = 37.060;
@@ -48,10 +49,7 @@ class StarPositionActvity
 			var curr = new GraphDatum(random_gaussian(this._RA_Center,this._scatter),random_gaussian(this._Dec_Center,this._scatter));
 			this._measurements.add(curr);
 		}
-//		if (this._averageRA !== null && this._averageDec !== null)
-		{
-			this.average();
-		}
+		this.average();
 	}
 	average()
 	{
@@ -161,12 +159,23 @@ class StarPositionActvity
 }
 
 
+var randomizedAsteroidList = new Array();
+
+var g_irand;
+
+for (g_irand = 0; g_irand < minorPlanetsTrojans.length; g_irand++)
+{
+	randomizedAsteroidList.push(minorPlanetsTrojans[g_irand]);
+}
+randomizedAsteroidList = shuffle(randomizedAsteroidList);
 
 class AsteroidNearJupiter
 {
 	constructor()
 	{
 		this._title = "Measure Position of an Asteroid Near Jupiter";
+		this._loglogAllowed = false;
+		this._linearAnalysisAllowed = true;
 
 		var jd = 2459800.5;
 		var jupiter = Planets.Jupiter.orbitalParameters.getOrbitalPosition(jd); 
@@ -176,28 +185,27 @@ class AsteroidNearJupiter
 					
 		var twoPi = Math.PI * 2.0;
 		var i;
-		for (i = 0; i < minorPlanetsTrojans.length; i++)
+		for (i = 0; i < randomizedAsteroidList.length; i++)
 		{
-			var curr = minorPlanetsTrojans[i].orbitalParameters.getOrbitalPosition(jd);
+			var curr = randomizedAsteroidList[i].orbitalParameters.getOrbitalPosition(jd);
 			var relPosition = curr.helioLongitude - jupiter.helioLongitude;
 			var fPi = Math.floor(relPosition / twoPi);
 			relPosition -= fPi * twoPi;
 			if (relPosition > Math.PI)
 				relPosition -= twoPi;
 			
-			var data = new GraphDatum(relPosition * 180.0 / Math.PI,minorPlanetsTrojans[i].orbitalParameters.semiMajorAxis);
+			var data = new GraphDatum(relPosition * 180.0 / Math.PI,randomizedAsteroidList[i].orbitalParameters.semiMajorAxis);
 			this._asteroidData.push(data);
-			if (minorPlanetsTrojans[i].orbitalParameters.semiMajorAxis < min_y)
-				min_y = minorPlanetsTrojans[i].orbitalParameters.semiMajorAxis;
-			if (minorPlanetsTrojans[i].orbitalParameters.semiMajorAxis > max_y)
-				max_y = minorPlanetsTrojans[i].orbitalParameters.semiMajorAxis;
+			if (data.y < min_y)
+				min_y = data.y;
+			if (data.y > max_y)
+				max_y = data.y;
 		}
 		this._min_x = -180.0;
 		this._max_x = 180.0;
 		this._min_y = Math.floor(min_y * 10.0) / 10.0;
 		this._max_y = Math.ceil(max_y * 10.0) / 10.0;
 	
-		this._loglogAllowed = false;
 
 		this._axisHorizontal = new GraphAxis("Relative Angle","Position Relative to Jupiter",-180.0,180.0);
 		this._axisHorizontal._labelFormatter._isAngle = true;
@@ -211,6 +219,10 @@ class AsteroidNearJupiter
 		this._graph.addVerticalAxis(this._axisVertical);
 		this._measurements = new GraphDataSet("positions","Relative Angle", "Distance", null,1,3,"#7f7f7f",true);
 		this._graph.addDataSet(this._measurements);
+		this._graphTrend = new GraphTrend("positions","Relative Angle", "Distance", "linear", 0,0,"#ff0000");
+		this._graph.addTrend(this._graphTrend);
+		this._linearTrendComputed = false;
+		this._loglogTrendComputed = false;
 		
 	}
 	
@@ -223,14 +235,34 @@ class AsteroidNearJupiter
 			if (idx < this._asteroidData.length)
 				this._measurements.add(this._asteroidData[idx]);
 		}
+		this.average();
+//		if (this._linearTrendComputed && this._graphTrend._type == "linear")
+//			this.linearRegression(false);
+//		if (this._loglogTrendComputed && this._graphTrend._type == "exponential")
+//			this.linearRegression(true);
 	}
 	average()
 	{
 		// nothing to do for this case
 	}		
-	linearRegression()
+	linearRegression(loglog)
 	{
-		// nothing to do for this case
+		if (loglog)
+		{
+			this._lls = this._measurements.LinearLeastSquare(true);
+			this._graphTrend._type = "exponential";
+			this._graphTrend._exponent = this._lls.slope;
+			this._graphTrend._coefficent = Math.pow(2.0,this._lls.intercept);
+			this._loglogTrendComputed = true;
+		}
+		else
+		{
+			this._lls = this._measurements.LinearLeastSquare();
+			this._graphTrend._type = "linear";
+			this._graphTrend._m = this._lls.slope;
+			this._graphTrend._b = this._lls.intercept;
+			this._linearTrendComputed = true;
+		}
 	}
 	graph(context)
 	{
@@ -254,6 +286,8 @@ class AsteroidDiameterBrightnessActivity
 	constructor()
 	{
 		this._title = "Measure Brightness and Diameter of Asteroids";
+		this._loglogAllowed = true;
+		this._linearAnalysisAllowed = true;
 
 		this._asteroidData = new Array();
 		var max_x = 0.00001;
@@ -263,9 +297,9 @@ class AsteroidDiameterBrightnessActivity
 					
 		var twoPi = Math.PI * 2.0;
 		var i;
-		for (i = 0; i < minorPlanetsTrojans.length; i++)
+		for (i = 0; i < randomizedAsteroidList.length; i++)
 		{
-			var curr = minorPlanetsTrojans[i]
+			var curr = randomizedAsteroidList[i]
 			if (curr.H !== null && curr.diameter !== null)
 			{
 				var data = new GraphDatum(curr.H,curr.diameter);
@@ -285,8 +319,6 @@ class AsteroidDiameterBrightnessActivity
 		this._min_y = Math.floor(min_y * 10.0) / 10.0;
 		this._max_y = Math.ceil(max_y * 10.0) / 10.0;
 	
-		this._loglogAllowed = true;
-
 		this._axisHorizontal = new GraphAxis("Absolute Magnitude","Absolute Magnitude",this._min_x,this._max_x);
 		this._axisVertical = new GraphAxis("Diameter","Diameter (km)",this._min_y,this._max_y);
 
@@ -297,6 +329,8 @@ class AsteroidDiameterBrightnessActivity
 		this._graph.addDataSet(this._measurements);
 		this._graphTrend = new GraphTrend("positions","Absolute Magnitude", "Diameter", "linear", 0,0,"#ff0000");
 		this._graph.addTrend(this._graphTrend);
+		this._linearTrendComputed = false;
+		this._loglogTrendComputed = false;
 		
 	}
 	
@@ -309,6 +343,11 @@ class AsteroidDiameterBrightnessActivity
 			if (idx < this._asteroidData.length)
 				this._measurements.add(this._asteroidData[idx]);
 		}
+		this.average();
+		if (this._linearTrendComputed && this._graphTrend._type == "linear")
+			this.linearRegression(false);
+		if (this._loglogTrendComputed && this._graphTrend._type == "exponential")
+			this.linearRegression(true);
 	}
 	average()
 	{
@@ -322,6 +361,7 @@ class AsteroidDiameterBrightnessActivity
 			this._graphTrend._type = "exponential";
 			this._graphTrend._exponent = this._lls.slope;
 			this._graphTrend._coefficent = Math.pow(2.0,this._lls.intercept);
+			this._loglogTrendComputed = true;
 		}
 		else
 		{
@@ -329,6 +369,7 @@ class AsteroidDiameterBrightnessActivity
 			this._graphTrend._type = "linear";
 			this._graphTrend._m = this._lls.slope;
 			this._graphTrend._b = this._lls.intercept;
+			this._linearTrendComputed = true;
 		}
 	}
 	graph(context)
@@ -375,9 +416,144 @@ class AsteroidDiameterBrightnessActivity
 
 }
 
+class AsteroidDiameterDistanceActivity
+{
+	constructor()
+	{
+		this._title = "Measure Distance and Diameter of Asteroids";
+		this._loglogAllowed = true;
+		this._linearAnalysisAllowed = true;
+
+		this._asteroidData = new Array();
+		var max_x = 0.00001;
+		var min_x = 1000000;
+		var max_y = 0;
+		var min_y = 1000;
+					
+		var twoPi = Math.PI * 2.0;
+		var i;
+		for (i = 0; i < randomizedAsteroidList.length; i++)
+		{
+			var curr = randomizedAsteroidList[i]
+			if (curr.a !== null && curr.diameter !== null)
+			{
+				var data = new GraphDatum(curr.a,curr.diameter);
+				this._asteroidData.push(data);
+				if (data.x < min_x)
+					min_x = data.x;
+				if (data.x > max_x)
+					max_x = data.x;
+				if (data.y < min_y)
+					min_y = data.y;
+				if (data.y > max_y)
+					max_y = data.y;
+			}			
+		}
+		this._min_x = Math.floor(min_x * 10.0) / 10.0;
+		this._max_x = Math.ceil(max_x * 10.0) / 10.0;
+		this._min_y = Math.floor(min_y * 10.0) / 10.0;
+		this._max_y = Math.ceil(max_y * 10.0) / 10.0;
+	
+		this._axisHorizontal = new GraphAxis("Distance","Distance (au)",this._min_x,this._max_x);
+		this._axisVertical = new GraphAxis("Diameter","Diameter (km)",this._min_y,this._max_y);
+
+		this._graph = new Graph("position",500,500,"#ffffff");
+		this._graph.addHorizontalAxis(this._axisHorizontal);
+		this._graph.addVerticalAxis(this._axisVertical);
+		this._measurements = new GraphDataSet("data","Distance", "Diameter", null,1,3,"#7f7f7f",true);
+		this._graph.addDataSet(this._measurements);
+		this._graphTrend = new GraphTrend("data","Distance", "Diameter", "linear", 0,0,"#ff0000");
+		this._graph.addTrend(this._graphTrend);
+		this._linearTrendComputed = false;
+		this._loglogTrendComputed = false;
+		
+	}
+	
+	measure(number)
+	{
+		var i;
+		for (i = 0; i < number; i++)
+		{
+			var idx = this._measurements.length;
+			if (idx < this._asteroidData.length)
+				this._measurements.add(this._asteroidData[idx]);
+		}
+		this.average();
+		if (this._linearTrendComputed && this._graphTrend._type == "linear")
+			this.linearRegression(false);
+		if (this._loglogTrendComputed && this._graphTrend._type == "exponential")
+			this.linearRegression(true);
+	}
+	average()
+	{
+		// nothing to do for this case
+	}		
+	linearRegression(loglog)
+	{
+		if (loglog)
+		{
+			this._lls = this._measurements.LinearLeastSquare(true);
+			this._graphTrend._type = "exponential";
+			this._graphTrend._exponent = this._lls.slope;
+			this._graphTrend._coefficent = Math.pow(2.0,this._lls.intercept);
+			this._loglogTrendComputed = true;
+		}
+		else
+		{
+			this._lls = this._measurements.LinearLeastSquare();
+			this._graphTrend._type = "linear";
+			this._graphTrend._m = this._lls.slope;
+			this._graphTrend._b = this._lls.intercept;
+			this._linearTrendComputed = true;
+		}
+	}
+	graph(context)
+	{
+		this._graph.draw(context,0,0);
+		context.strokeStyle = "#ffffff";
+		context.fillStyle = "#ffffff";
+		context.font = "20px Arial";
+		context.textBaseline = "middle";
+		context.textAlign = "center";
+		context.save();
+		context.translate(0,510);
+		context.fillText("Number of Measurements: " + this._measurements.length.toString(), 250,0);
+		context.translate(0,35);
+		if (this._lls !== undefined && this._lls !== null)
+		{
+			if (this._lls.type == "Log-Log LLS")
+			{
+				var vD_1 = Math.pow(2.0,this._lls.intercept);
+				var sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
+				var D_1 = sig_figs(vD_1,sD_1);
+				var Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
+				var eqnString = "D = ((" + D_1.value.toString() + "±" + D_1.uncertainty.toString() + ") km) M";
+				var expString = "(" + Exp.value.toString() + "±" + Exp.uncertainty.toString() + ")";
+				
+				context.fillText(eqnString, 250,0);
+				var offset = context.measureText(eqnString).width;
+				context.textAlign = "left";
+				context.font = "12px Arial";
+				context.fillText(expString, 250 + offset * 0.5,-8);
+			
+			}
+			else
+			{
+				var b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
+				var m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
+				var eqnString = "D = (" + m.value.toString() + "±" + m.uncertainty.toString() + ") M + (" + b.value.toString() + "±" + b.uncertainty.toString() + ") km";
+				context.fillText(eqnString, 250,0);
+			}
+			context.translate(0,35);
+		}
+		context.restore();
+	}
+
+}
 var starPostionActivity = new StarPositionActvity();
 var asteroidNearJupiterActivity = new AsteroidNearJupiter();
 var asteroidDiameterBrightnessActivity = new AsteroidDiameterBrightnessActivity();
+var asteroidDiameterDistanceActivity = new AsteroidDiameterDistanceActivity();
 
 var currentActivity = starPostionActivity;
 
@@ -407,6 +583,13 @@ option.text = asteroidDiameterBrightnessActivity._title;
 
 select.add(option)
 
+option = document.createElement("option");
+option.text = asteroidDiameterDistanceActivity._title;
+
+select.add(option)
+
+
+
 var g_bLogLogDisplay = false;
 
 function OnActivitySelect()
@@ -415,6 +598,8 @@ function OnActivitySelect()
 		currentActivity = asteroidNearJupiterActivity;
 	else if (select.value == asteroidDiameterBrightnessActivity._title)
 		currentActivity = asteroidDiameterBrightnessActivity;
+	else if (select.value == asteroidDiameterDistanceActivity._title)
+		currentActivity = asteroidDiameterDistanceActivity;
 	else
 		currentActivity = starPostionActivity;
 	if (!currentActivity._loglogAllowed)
@@ -429,6 +614,16 @@ function OnActivitySelect()
 		g_bLogLogDisplay = false;
 		var btn = document.getElementById("buttonLogPlot");
 		btn.innerText = "Display Log-Log Plot";
+		btn.disabled = false;
+	}
+	if (!currentActivity._linearAnalysisAllowed)
+	{
+		var btn = document.getElementById("buttonLinearRegression");
+		btn.disabled = true;
+	}
+	else
+	{
+		var btn = document.getElementById("buttonLinearRegression");
 		btn.disabled = false;
 	}
 	

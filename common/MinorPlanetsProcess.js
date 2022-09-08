@@ -17,7 +17,7 @@
 // e: orbital eccentricity
 // a: semi-major axis (au)
 // i: orbital inclination (deg., relative to ecliptic)
-// om: longitude of ascentding node (deg.)
+// om: longitude of ascending node (deg.)
 // sigma_om: uncertainty in long. of ascending node
 // w: argument of perihelion (deg.)
 // sigma_w: uncertainty in agrumnet of perihelion (deg).

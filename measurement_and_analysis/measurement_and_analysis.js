@@ -221,6 +221,7 @@ class AsteroidNearJupiter
 		this._graph.addDataSet(this._measurements);
 		this._graphTrend = new GraphTrend("positions","xaxis", "yaxis", "linear", 0,0,"#ff0000");
 		this._graph.addTrend(this._graphTrend);
+		this._graphTrend.disable = true;
 		this._linearTrendComputed = false;
 		this._loglogTrendComputed = false;
 		
@@ -254,6 +255,7 @@ class AsteroidNearJupiter
 			this._graphTrend._exponent = this._lls.slope;
 			this._graphTrend._coefficent = Math.pow(2.0,this._lls.intercept);
 			this._loglogTrendComputed = true;
+			this._graphTrend.disable = false;
 		}
 		else
 		{
@@ -262,6 +264,7 @@ class AsteroidNearJupiter
 			this._graphTrend._m = this._lls.slope;
 			this._graphTrend._b = this._lls.intercept;
 			this._linearTrendComputed = true;
+			this._graphTrend.disable = false;
 		}
 	}
 	graph(context)
@@ -328,6 +331,7 @@ class AsteroidDiameterBrightnessActivity
 		this._measurements = new GraphDataSet("positions","xaxis", "yaxis", null,1,3,"#7f7f7f",true);
 		this._graph.addDataSet(this._measurements);
 		this._graphTrend = new GraphTrend("positions","xaxis", "yaxis", "linear", 0,0,"#ff0000");
+		this._graphTrend.disable = true;
 		this._graph.addTrend(this._graphTrend);
 		this._linearTrendComputed = false;
 		this._loglogTrendComputed = false;
@@ -362,6 +366,7 @@ class AsteroidDiameterBrightnessActivity
 			this._graphTrend._exponent = this._lls.slope;
 			this._graphTrend._coefficent = Math.pow(2.0,this._lls.intercept);
 			this._loglogTrendComputed = true;
+			this._graphTrend.disable = false;
 		}
 		else
 		{
@@ -370,6 +375,7 @@ class AsteroidDiameterBrightnessActivity
 			this._graphTrend._m = this._lls.slope;
 			this._graphTrend._b = this._lls.intercept;
 			this._linearTrendComputed = true;
+			this._graphTrend.disable = false;
 		}
 	}
 	graph(context)
@@ -463,6 +469,7 @@ class AsteroidDiameterDistanceActivity
 		this._measurements = new GraphDataSet("data","xaxis", "yaxis", null,1,3,"#7f7f7f",true);
 		this._graph.addDataSet(this._measurements);
 		this._graphTrend = new GraphTrend("data","xaxis", "yaxis", "linear", 0,0,"#ff0000");
+		this._graphTrend.disable = true;
 		this._graph.addTrend(this._graphTrend);
 		this._linearTrendComputed = false;
 		this._loglogTrendComputed = false;
@@ -497,6 +504,7 @@ class AsteroidDiameterDistanceActivity
 			this._graphTrend._exponent = this._lls.slope;
 			this._graphTrend._coefficent = Math.pow(2.0,this._lls.intercept);
 			this._loglogTrendComputed = true;
+			this._graphTrend.disable = false;
 		}
 		else
 		{
@@ -505,6 +513,7 @@ class AsteroidDiameterDistanceActivity
 			this._graphTrend._m = this._lls.slope;
 			this._graphTrend._b = this._lls.intercept;
 			this._linearTrendComputed = true;
+			this._graphTrend.disable = false;
 		}
 	}
 	graph(context)
@@ -527,7 +536,7 @@ class AsteroidDiameterDistanceActivity
 				var sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
 				var D_1 = sig_figs(vD_1,sD_1);
 				var Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "D = ((" + D_1.value.toString() + "±" + D_1.uncertainty.toString() + ") km) M";
+				var eqnString = "D = ((" + D_1.value.toString() + "±" + D_1.uncertainty.toString() + ")) a";
 				var expString = "(" + Exp.value.toString() + "±" + Exp.uncertainty.toString() + ")";
 				
 				context.fillText(eqnString, 250,0);
@@ -541,7 +550,7 @@ class AsteroidDiameterDistanceActivity
 			{
 				var b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
 				var m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "D = (" + m.value.toString() + "±" + m.uncertainty.toString() + ") M + (" + b.value.toString() + "±" + b.uncertainty.toString() + ") km";
+				var eqnString = "D = (" + m.value.toString() + "±" + m.uncertainty.toString() + ") km/au a + (" + b.value.toString() + "±" + b.uncertainty.toString() + ") km";
 				context.fillText(eqnString, 250,0);
 			}
 			context.translate(0,35);
@@ -602,6 +611,7 @@ class AsteroidOrbitalParametersctivity
 		this._measurements = new GraphDataSet("data","xaxis", "yaxis", null,1,3,"#7f7f7f",true);
 		this._graph.addDataSet(this._measurements);
 		this._graphTrend = new GraphTrend("data","xaxis", "yaxis", "linear", 0,0,"#ff0000");
+		this._graphTrend.disable = true;
 		this._graph.addTrend(this._graphTrend);
 		this._linearTrendComputed = false;
 		this._loglogTrendComputed = false;
@@ -636,6 +646,7 @@ class AsteroidOrbitalParametersctivity
 			this._graphTrend._exponent = this._lls.slope;
 			this._graphTrend._coefficent = Math.pow(2.0,this._lls.intercept);
 			this._loglogTrendComputed = true;
+			this._graphTrend.disable = false;
 		}
 		else
 		{
@@ -644,6 +655,7 @@ class AsteroidOrbitalParametersctivity
 			this._graphTrend._m = this._lls.slope;
 			this._graphTrend._b = this._lls.intercept;
 			this._linearTrendComputed = true;
+			this._graphTrend.disable = false;
 		}
 	}
 	graph(context)
@@ -666,7 +678,7 @@ class AsteroidOrbitalParametersctivity
 				var sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
 				var D_1 = sig_figs(vD_1,sD_1);
 				var Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "D = ((" + D_1.value.toString() + "±" + D_1.uncertainty.toString() + ") km) M";
+				var eqnString = "i = ((" + D_1.value.toString() + "±" + D_1.uncertainty.toString() + ")) Ω";
 				var expString = "(" + Exp.value.toString() + "±" + Exp.uncertainty.toString() + ")";
 				
 				context.fillText(eqnString, 250,0);
@@ -680,7 +692,7 @@ class AsteroidOrbitalParametersctivity
 			{
 				var b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
 				var m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "D = (" + m.value.toString() + "±" + m.uncertainty.toString() + ") M + (" + b.value.toString() + "±" + b.uncertainty.toString() + ") km";
+				var eqnString = "i = (" + m.value.toString() + "±" + m.uncertainty.toString() + ") Ω + (" + b.value.toString() + "±" + b.uncertainty.toString() + ")°";
 				context.fillText(eqnString, 250,0);
 			}
 			context.translate(0,35);
@@ -745,6 +757,7 @@ class StarSpTypeColorActivity
 		this._measurements = new GraphDataSet("data","xaxis", "yaxis", null,1,3,"#7f7f7f",true);
 		this._graph.addDataSet(this._measurements);
 		this._graphTrend = new GraphTrend("data","xaxis", "yaxis", "linear", 0,0,"#ff0000");
+		this._graphTrend.disable = true;
 		this._graph.addTrend(this._graphTrend);
 		this._linearTrendComputed = false;
 		this._loglogTrendComputed = false;
@@ -779,6 +792,7 @@ class StarSpTypeColorActivity
 			this._graphTrend._exponent = this._lls.slope;
 			this._graphTrend._coefficent = Math.pow(2.0,this._lls.intercept);
 			this._loglogTrendComputed = true;
+			this._graphTrend.disable = false;
 		}
 		else
 		{
@@ -787,6 +801,7 @@ class StarSpTypeColorActivity
 			this._graphTrend._m = this._lls.slope;
 			this._graphTrend._b = this._lls.intercept;
 			this._linearTrendComputed = true;
+			this._graphTrend.disable = false;
 		}
 	}
 	graph(context)
@@ -809,7 +824,7 @@ class StarSpTypeColorActivity
 				var sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
 				var D_1 = sig_figs(vD_1,sD_1);
 				var Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "D = ((" + D_1.value.toString() + "±" + D_1.uncertainty.toString() + ") km) M";
+				var eqnString = "B - V = ((" + D_1.value.toString() + "±" + D_1.uncertainty.toString() + ")) n";
 				var expString = "(" + Exp.value.toString() + "±" + Exp.uncertainty.toString() + ")";
 				
 				context.fillText(eqnString, 250,0);
@@ -823,7 +838,7 @@ class StarSpTypeColorActivity
 			{
 				var b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
 				var m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "D = (" + m.value.toString() + "±" + m.uncertainty.toString() + ") M + (" + b.value.toString() + "±" + b.uncertainty.toString() + ") km";
+				var eqnString = "B - V = (" + m.value.toString() + "±" + m.uncertainty.toString() + ") n + (" + b.value.toString() + "±" + b.uncertainty.toString() + ")";
 				context.fillText(eqnString, 250,0);
 			}
 			context.translate(0,35);
@@ -884,6 +899,7 @@ class StarRedshiftGalLongActivity
 		this._measurements = new GraphDataSet("data","xaxis", "yaxis", null,1,3,"#7f7f7f",true);
 		this._graph.addDataSet(this._measurements);
 		this._graphTrend = new GraphTrend("data","xaxis", "yaxis", "linear", 0,0,"#ff0000");
+		this._graphTrend.disable = true;
 		this._graph.addTrend(this._graphTrend);
 		this._linearTrendComputed = false;
 		this._loglogTrendComputed = false;
@@ -918,6 +934,7 @@ class StarRedshiftGalLongActivity
 			this._graphTrend._exponent = this._lls.slope;
 			this._graphTrend._coefficent = Math.pow(2.0,this._lls.intercept);
 			this._loglogTrendComputed = true;
+			this._graphTrend.disable = false;
 		}
 		else
 		{
@@ -926,6 +943,7 @@ class StarRedshiftGalLongActivity
 			this._graphTrend._m = this._lls.slope;
 			this._graphTrend._b = this._lls.intercept;
 			this._linearTrendComputed = true;
+			this._graphTrend.disable = false;
 		}
 	}
 	graph(context)
@@ -948,7 +966,7 @@ class StarRedshiftGalLongActivity
 				var sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
 				var D_1 = sig_figs(vD_1,sD_1);
 				var Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "D = ((" + D_1.value.toString() + "±" + D_1.uncertainty.toString() + ") km) M";
+				var eqnString = "z = ((" + D_1.value.toString() + "±" + D_1.uncertainty.toString() + ")) ℓ";
 				var expString = "(" + Exp.value.toString() + "±" + Exp.uncertainty.toString() + ")";
 				
 				context.fillText(eqnString, 250,0);
@@ -962,7 +980,7 @@ class StarRedshiftGalLongActivity
 			{
 				var b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
 				var m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "D = (" + m.value.toString() + "±" + m.uncertainty.toString() + ") M + (" + b.value.toString() + "±" + b.uncertainty.toString() + ") km";
+				var eqnString = "z = (" + m.value.toString() + "±" + m.uncertainty.toString() + ") deg.⁻¹ ℓ + (" + b.value.toString() + "±" + b.uncertainty.toString() + ")";
 				context.fillText(eqnString, 250,0);
 			}
 			context.translate(0,35);

@@ -110,6 +110,65 @@ function starsProcess()
 		var sinBeta = sinDec * cosTilt - cosDec * sinTilt * sinRA;
 		star.eclat = Math.asin(sinBeta) * degrees;
 		star.eclong = (Math.atan2(sinRA * cosTilt + Math.tan(decRad) * sinTilt,cosRA)* degrees + 363) % 360.0;
+		
+		star.num_sp_type = null;
+		star.num_sp_type_subtype = null;
+		if (star.sp_type !== null)
+		{
+			switch (star.sp_type.charAt(0))
+			{
+			case 'O':
+				star.num_sp_type = 100;
+				break;
+			case 'B':
+				star.num_sp_type = 200;
+				break;
+			case 'A':
+				star.num_sp_type = 300;
+				break;
+			case 'F':
+				star.num_sp_type = 400;
+				break;
+			case 'G':
+				star.num_sp_type = 500;
+				break;
+			case 'K':
+				star.num_sp_type = 600;
+				break;
+			case 'M':
+				star.num_sp_type = 700;
+				break;
+//			case 'R':
+//				star.num_sp_type = 800;
+//				break;
+//			case 'N':
+//				star.num_sp_type = 900;
+//				break;
+//			case 'S':
+//				star.num_sp_type = 1000;
+//				break;
+//			case 'C':
+//				star.num_sp_type = 1100;
+//				break;
+			default:
+				break;
+			}
+			if (star.num_sp_type != null)
+			{
+				var sp_type_subtype_str = star.sp_type.substring(1,3);
+				var sp_type_subtype = Number(sp_type_subtype_str);
+				if (star.num_sp_type > 0 && !isNaN(sp_type_subtype))
+				{
+					star.num_sp_type_subtype = sp_type_subtype;
+					star.num_sp_type += Math.floor(sp_type_subtype * 10.0);
+				}
+				else
+				{
+					star.num_sp_type += 50;
+				}
+			}
+				
+		}
 		stars.push(star);
 	}
 	stars.sort(function (a,b){if (a.main_id < b.main_id) return -1; else if (a.main_id > b.main_id) return 1; else return 0;});

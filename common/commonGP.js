@@ -380,3 +380,17 @@ function shuffle(array) {
   return array;
 }
 
+/////////////////////////////////////////////////////////////////////////
+//
+//  function ValidateValue
+//
+// confirm that a variable is identified, non-null, and numeric
+// input: value - the variable to test
+// output: (boolean) - true if the variable is identified, non-null, and a number, false otherwise
+//
+/////////////////////////////////////////////////////////////////////////
+function ValidateValue(value)
+{
+	return (value !== undefined && value !== null && typeof(value) == "number");
+}
+

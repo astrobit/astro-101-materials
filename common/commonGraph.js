@@ -50,6 +50,7 @@ class LabelFormatter
 		var log10 = Math.log10(absValue);
 		var log10Step = Math.log10(step);
 		var exponentStep = Math.floor(log10Step);
+		var isZero = value == 0.0;
 		
 		var exponent = Math.floor(log10);
 		var mantissa = Math.pow(10,log10 - exponent);
@@ -331,7 +332,11 @@ class LabelFormatter
 		{
 			if (step < 1)
 			{
-				if (absValue > 0.001)
+				if (isZero)
+				{
+					ret += +"0";
+				}
+				else if (absValue > 0.001)
 				{
 					var m10 = Math.pow(10,-exponentStep);
 					ret += (Math.round(value * m10)/m10).toString();
@@ -352,7 +357,11 @@ class LabelFormatter
 			}
 			else
 			{
-				if (absValue < 1000)
+				if (isZero)
+				{
+					ret += +"0";
+				}
+				else if (absValue < 1000)
 				{
 					ret = Math.floor(value).toString();
 				}

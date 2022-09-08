@@ -994,6 +994,7 @@ class GraphDataSet
 	constructor(id,horizontalAxisID, verticalAxisID, data, symbol, symbolSize, color, filled)
 	{
 		this.id = id;
+		this.disable = false;
 		this._horizontalAxisID = horizontalAxisID;
 		this._verticalAxisID = verticalAxisID;
 		this._data = data;
@@ -1118,6 +1119,7 @@ class GraphTrend
 	constructor(id,horizontalAxisID, verticalAxisID, type, m,b, color )
 	{
 		this.id = id;
+		this.disable = false;
 		this._horizontalAxisID = horizontalAxisID;
 		this._verticalAxisID = verticalAxisID;
 		if (type == "linear")
@@ -1565,133 +1567,139 @@ class Graph
 			for (i = 0; i < this._data.length; i++)
 			{
 				var currData = this._data[i];
-				var currHorizontalAxis = this.findAxisByID(currData._horizontalAxisID);
-				var currVerticalAxis = this.findAxisByID(currData._verticalAxisID);
-				if (currHorizontalAxis !== null && currVerticalAxis !== null)
+				if (!currData.disable)
 				{
-					var j;
-					if (currData._color !== undefined && currData._color !== null)
+					var currHorizontalAxis = this.findAxisByID(currData._horizontalAxisID);
+					var currVerticalAxis = this.findAxisByID(currData._verticalAxisID);
+					if (currHorizontalAxis !== null && currVerticalAxis !== null)
 					{
-						context.strokeStyle = currData._color;
-						context.fillStyle = currData._color;
-					}
-					else
-					{
-						context.strokeStyle = this._colorSelect(colorSelect);
-						context.fillStyle = this._colorSelect(colorSelect);
-					}
-					
-					if (currData._symbol !== undefined && currData._symbol !== null)
-					{
-						symbol = currData._symbol;
-					}
-					if (currData._symbol !== undefined && currData._symbol !== null)
-					{
-						symbolFilled = currData._filled;
-					}
-					if (currData._symbolSize !== undefined && currData._symbolSize !== null)
-						symbolSize = currData._symbolSize;
-					for (j = 0; j < currData._data.length; j++)
-					{
-						if (currData._data[j].x !== undefined && currData._data[j].x !== null && currData._data[j].y !== undefined && currData._data[j].y !== null)
+						var j;
+						if (currData._color !== undefined && currData._color !== null)
 						{
-							var x = currHorizontalAxis.calculate(currData._data[j].x) * graphWidth;
-							var y = -currVerticalAxis.calculate(currData._data[j].y) * graphHeight;
-							this._drawSymbol(context,x,y,symbol,symbolFilled,symbolSize);
-							//@@TODO: error bars
+							context.strokeStyle = currData._color;
+							context.fillStyle = currData._color;
 						}
+						else
+						{
+							context.strokeStyle = this._colorSelect(colorSelect);
+							context.fillStyle = this._colorSelect(colorSelect);
+						}
+						
+						if (currData._symbol !== undefined && currData._symbol !== null)
+						{
+							symbol = currData._symbol;
+						}
+						if (currData._symbol !== undefined && currData._symbol !== null)
+						{
+							symbolFilled = currData._filled;
+						}
+						if (currData._symbolSize !== undefined && currData._symbolSize !== null)
+							symbolSize = currData._symbolSize;
+						for (j = 0; j < currData._data.length; j++)
+						{
+							if (currData._data[j].x !== undefined && currData._data[j].x !== null && currData._data[j].y !== undefined && currData._data[j].y !== null)
+							{
+								var x = currHorizontalAxis.calculate(currData._data[j].x) * graphWidth;
+								var y = -currVerticalAxis.calculate(currData._data[j].y) * graphHeight;
+								this._drawSymbol(context,x,y,symbol,symbolFilled,symbolSize);
+								//@@TODO: error bars
+							}
+						}
+						symbol++;
+						colorSelect = symbol;
+						if (symbol >= this._symbolMax)
+						{
+							symbol = 0;
+							colorSelect = 0;
+							symbolFilled = !symbolFilled;
+						}
+						symbolSize = 6;
 					}
-					symbol++;
-					colorSelect = symbol;
-					if (symbol >= this._symbolMax)
-					{
-						symbol = 0;
-						colorSelect = 0;
-						symbolFilled = !symbolFilled;
-					}
-					symbolSize = 6;
 				}
 				colorSelect = 0;
 				for (i = 0; i < this._trends.length; i++)
 				{
 					var currData = this._trends[i];
-					var currHorizontalAxis = this.findAxisByID(currData._horizontalAxisID);
-					var currVerticalAxis = this.findAxisByID(currData._verticalAxisID);
-					if (currHorizontalAxis !== null && currVerticalAxis !== null)
+					if (!currData.disable)
 					{
-						if (currData._type == "exponential" && currHorizontalAxis.log && currVerticalAxis.log ||
-							currData._type == "linear" && !currHorizontalAxis.log && !currVerticalAxis.log)
+						var currHorizontalAxis = this.findAxisByID(currData._horizontalAxisID);
+						var currVerticalAxis = this.findAxisByID(currData._verticalAxisID);
+						if (currHorizontalAxis !== null && currVerticalAxis !== null)
 						{
-							var y_minx = currData.y(currHorizontalAxis._min);
-							var y_maxx = currData.y(currHorizontalAxis._max);
-							var x_miny = currData.x(currVerticalAxis._min);
-							var x_maxy = currData.x(currVerticalAxis._max);
-							var x0;
-							var x1;
-							var y0;
-							var y1;
-							if (y_minx >= currVerticalAxis._min && y_minx <= currVerticalAxis._max)
+							if (currData._type == "exponential" && currHorizontalAxis.log && currVerticalAxis.log ||
+								currData._type == "linear" && !currHorizontalAxis.log && !currVerticalAxis.log)
 							{
-								x0 = currHorizontalAxis._min;
-								y0 = y_minx;
-							}
-							else
-							{
-								if (x_miny < x_maxy)
+								var y_minx = currData.y(currHorizontalAxis._min);
+								var y_maxx = currData.y(currHorizontalAxis._max);
+								var x_miny = currData.x(currVerticalAxis._min);
+								var x_maxy = currData.x(currVerticalAxis._max);
+								var x0;
+								var x1;
+								var y0;
+								var y1;
+								if (y_minx >= currVerticalAxis._min && y_minx <= currVerticalAxis._max)
 								{
-									x0 = x_miny;
-									y0 = currVerticalAxis._min;
+									x0 = currHorizontalAxis._min;
+									y0 = y_minx;
 								}
 								else
 								{
-									x0 = x_maxy;
-									y0 = currVerticalAxis._max;
+									if (x_miny < x_maxy)
+									{
+										x0 = x_miny;
+										y0 = currVerticalAxis._min;
+									}
+									else
+									{
+										x0 = x_maxy;
+										y0 = currVerticalAxis._max;
+									}
 								}
-							}
-							
-							if (y_maxx >= currVerticalAxis._min && y_maxx <= currVerticalAxis._max)
-							{
-								x1 = currHorizontalAxis._max;
-								y1 = y_maxx;
-							}
-							else
-							{
-								if (x_miny > x_maxy)
+								
+								if (y_maxx >= currVerticalAxis._min && y_maxx <= currVerticalAxis._max)
 								{
-									x1 = x_miny;
-									y1 = currVerticalAxis._min;
+									x1 = currHorizontalAxis._max;
+									y1 = y_maxx;
 								}
 								else
 								{
-									x1 = x_maxy;
-									y1 = currVerticalAxis._max;
+									if (x_miny > x_maxy)
+									{
+										x1 = x_miny;
+										y1 = currVerticalAxis._min;
+									}
+									else
+									{
+										x1 = x_maxy;
+										y1 = currVerticalAxis._max;
+									}
 								}
+								if (currData._color !== undefined && currData._color !== null)
+								{
+									context.strokeStyle = currData._color;
+								}
+								else
+								{
+									context.strokeStyle = this._colorSelect(colorSelect);
+									colorSelect++;
+								}
+								var gx0 = currHorizontalAxis.calculate(x0) * graphWidth;
+								var gx1 = currHorizontalAxis.calculate(x1) * graphWidth;
+								var gy0 = currVerticalAxis.calculate(y0) * graphHeight;
+								var gy1 = currVerticalAxis.calculate(y1) * graphHeight;
+								context.beginPath();
+								context.moveTo(gx0,-gy0);
+								context.lineTo(gx1,-gy1);
+								context.stroke();
 							}
-							if (currData._color !== undefined && currData._color !== null)
-							{
-								context.strokeStyle = currData._color;
-							}
-							else
-							{
-								context.strokeStyle = this._colorSelect(colorSelect);
-								colorSelect++;
-							}
-							var gx0 = currHorizontalAxis.calculate(x0) * graphWidth;
-							var gx1 = currHorizontalAxis.calculate(x1) * graphWidth;
-							var gy0 = currVerticalAxis.calculate(y0) * graphHeight;
-							var gy1 = currVerticalAxis.calculate(y1) * graphHeight;
-							context.beginPath();
-							context.moveTo(gx0,-gy0);
-							context.lineTo(gx1,-gy1);
-							context.stroke();
 						}
-					}
-					else
-					{
-						if (currHorizontalAxis === null)
-							console.log("Unable to identify axis " + currData._horizontalAxisID);
-						if (currVerticalAxis === null)
-							console.log("Unable to identify axis " + currData._verticalAxisID);
+						else
+						{
+							if (currHorizontalAxis === null)
+								console.log("Unable to identify axis " + currData._horizontalAxisID);
+							if (currVerticalAxis === null)
+								console.log("Unable to identify axis " + currData._verticalAxisID);
+						}
 					}
 				}
 			}

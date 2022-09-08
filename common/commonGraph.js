@@ -490,38 +490,131 @@ class GraphAxis
 		this._calculate_graph_parameters();
 	}
 	
-	_labelsSpaceRequired()
+	_labelsSpaceRequired(context)
 	{
-		var fontsize = getFontSize(this._labelFont);
-		var fontSizePx = 0;
-		if (fontsize !== undefined && fontsize !== null)
-		{
-			if (fontsize.units == 'em')
-				fontSizePx = fontsize.value * 16.0;
-			else if (fontsize.units == 'px')
-				fontSizePx = fontsize.value;
+		var max_label_size = 0;
+		context.save();
+			context.font = this._labelFont;
+			if (this._log)
+			{
+				if (this._enableMajor)
+				{
+					var stepMajor = this._labelMajorStep;
+					if (stepMajor === undefined || stepMajor === null)
+					{
+						stepMajor = this._suggestedMajorStep;
+					}
+					var stepMinor = this._labelMinorStep;
+					if (stepMinor === undefined || stepMinor === null)
+					{
+						stepMinor = this._suggestedMinorStep;
+					}
+					var invStep = 1.0  / stepMajor;
+					var minLabel = Math.floor(Math.log10(this._min) * invStep) * stepMajor;
+					var maxLabel = Math.ceil(Math.log10(this._max) * invStep) * stepMajor;
+					var lbl;
+
+					for (lbl = minLabel; lbl <= maxLabel; lbl += stepMajor)
+					{
+						var stepMajor10 = Math.pow(10.0,stepMajor);
+						var lbl10 = Math.pow(10.0,lbl);
+						var stepLabel = 1;
+						if (lbl < 0)
+							stepLabel = lbl10;
+						if (lbl10 >= this._min && lbl10 <= this._max)
+						{
+							var label = this._labelFormatter.format(lbl10,stepLabel);
+							var width = context.measureText(label).width + this._tickMajorLabelOffset;
+							if (width > max_label_size)
+								max_label_size = width;
+						}
+						if (this._enableMinor)
+						{
+							if (stepMinor >= 10) // increment in decades
+							{
+								var i;
+								for (i = stepMinor; i < stepMajor10; i *= stepMinor)
+								{
+									var lbli = lbl10 * i;
+									if (lbli >= this._min && lbli <= this._max)
+									{
+										var label = this._labelFormatter.format(lbli,stepLabel);
+										var width = context.measureText(label).width + this._tickMajorLabelOffset;
+										if (width > max_label_size)
+											max_label_size = width;
+									}
+								}
+							}
+							else
+							{
+								var i;
+								for (i = stepMinor; i < 10; i += stepMinor)
+								{
+									if (i != 1)
+									{
+										var lbli = lbl10 * i;
+										if (lbli >= this._min && lbli <= this._max)
+										{
+											var label = this._labelFormatter.format(lbli,stepLabel);
+											var width = context.measureText(label).width + this._tickMinorLabelOffset;
+											if (width > max_label_size)
+												max_label_size = width;
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 			else
-				fontSizePx = 12.0;// who knows how this will  be interpreted by the renderer
-		}
-		var labelMaxLength;
-		if (this._labelFormatter._isAngle)
-		{
-			labelMaxLength = this._labelFormatter._angleFormat.length * fontSizePx;
-			if (this._showUnitsAngle)
-				labelMaxLength += fontSizePx;
-		}
-		else if (this._labelFormatter._isTime)
-		{
-			labelMaxLength = this._labelFormatter._timeFormat.length * fontSizePx;
-			if (this._showUnitsTime && !this._timeUnitsColons && this._labelFormatter._timeFormat.search("ap") == -1)
-				labelMaxLength += fontSizePx;
-		}
-		else
-		{
-			labelMaxLength = Math.floor(Math.log10(this._max) + 1) * fontSizePx;
-		}
-//		labelMaxLength *= 0.7; // font size refers to height; width is about 0.5; 0.6 is safelt larger than nearly all fonts
-		return labelMaxLength + this._tickMajorLabelOffset
+			{			
+				if (this._enableMajor)
+				{
+					var stepMajor = this._labelMajorStep;
+					if (stepMajor === undefined || stepMajor === null)
+					{
+						stepMajor = this._suggestedMajorStep;
+					}
+					var stepMinor = this._labelMinorStep;
+					if (stepMinor === undefined || stepMinor === null)
+					{
+						stepMinor = this._suggestedMinorStep;
+					}
+					var invStep = 1.0  / stepMajor;
+					var minLabel = Math.floor(this._min * invStep) * stepMajor;
+					var maxLabel = Math.ceil(this._max * invStep) * stepMajor;
+					var lbl;
+
+					for (lbl = minLabel; lbl <= maxLabel; lbl += stepMajor)
+					{
+						if (lbl >= this._min && lbl <= this._max)
+						{
+							var label = this._labelFormatter.format(lbl,stepMajor);
+							var width = context.measureText(label).width + this._tickMajorLabelOffset;
+							if (width > max_label_size)
+								max_label_size = width;
+						}
+						if (this._enableMinor)
+						{
+							var i;
+							for (i = stepMinor; i < stepMajor; i += stepMinor)
+							{
+								var lbli = lbl + i;
+								if (lbli >= this._min && lbli <= this._max)
+								{
+									var label = this._labelFormatter.format(lbli,stepMinor);
+									var width = context.measureText(label).width + this._tickMinorLabelOffset;
+									if (width > max_label_size)
+										max_label_size = width;
+								}
+							}
+						}
+					}
+				}
+			}
+		context.restore();
+		return Math.ceil(max_label_size);
 	}
 	drawTitle(context,dir,size,side)
 	{
@@ -530,12 +623,15 @@ class GraphAxis
 			x = 0.5 * size;
 		else if (this._titleAlign == "right")
 			x = 1.0 * size;
-		var offset = this._labelsSpaceRequired();
+		var offset = this._labelsSpaceRequired(context) + 4;
 		
 		context.save();
 			context.fillStyle = this._titleColor;
 			context.font = this._titleFont;
-			context.textBaseline = "middle";
+			if ((dir + side) == 1)
+				context.textBaseline = "bottom";
+			else
+				context.textBaseline = "top";
 			context.textAlign = this._titleAlign;
 			if (side == 1)
 			{
@@ -842,7 +938,7 @@ class GraphAxis
 			this.log = (value == 0);
 	}
 	
-	requiredSpace()
+	requiredSpace(context)
 	{
 		var fontsize = getFontSize(this._titleFont);
 		var fontSizePx = 0;
@@ -855,8 +951,8 @@ class GraphAxis
 			else
 				fontSizePx = 12.0;// who knows how this will  be interpreted by the renderer
 		}
-		var titleSpace = fontSizePx + 2;// + this._titleOffset;
-		var labelSpace = this._labelsSpaceRequired();
+		var titleSpace = fontSizePx + 6;// + this._titleOffset;
+		var labelSpace = this._labelsSpaceRequired(context);
 
 		return titleSpace + labelSpace;
 	
@@ -1395,7 +1491,7 @@ class Graph
 		// first find out how big the axis titles and labels are
 		for (i = 0; i < 2 && i < this._axisHorizontal.length; i++)
 		{
-			var neededSpace = this._axisHorizontal[i].requiredSpace();
+			var neededSpace = this._axisHorizontal[i].requiredSpace(context);
 			axisVerticalSpace += neededSpace;
 			if (i == 0)
 				yOffsetGraph = neededSpace;
@@ -1404,7 +1500,7 @@ class Graph
 
 		for (i = 0; i < 2 && i < this._axisVertical.length; i++)
 		{
-			var neededSpace = this._axisVertical[i].requiredSpace();
+			var neededSpace = this._axisVertical[i].requiredSpace(context);
 			axisHorizontalSpace += neededSpace;
 			if (i == 0)
 				xOffsetGraph = neededSpace;

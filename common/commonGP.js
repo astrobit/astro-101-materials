@@ -66,6 +66,8 @@ function binarySearch(sortedArray,findValue,key)
 //
 // random Gaussian disribution
 //Source: https://stackoverflow.com/questions/25582882/javascript-math-random-normal-distribution-gaussian-bell-curve/36481059#36481059
+// Note: this generates a semi-normal distribution wherein all data lies within
+// approximately one standard deviation of the mean.
 // modified to allow a mean and standard deviation
 // input: mean (Number) - the value around which the distribution should vary
 //        stdev (Number) - the standard deviation of the distribution
@@ -75,11 +77,65 @@ function binarySearch(sortedArray,findValue,key)
 //
 /////////////////////////////////////////////////////////////////////////
 
-function random_gaussian(mean, stdev) { 
-    var u = 0, v = 0;
+function random_gaussian_old(mean, stdev)
+{ 
+    var u = 0;
     while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
-    while(v === 0) v = Math.random();
+    var v = Math.random();
     return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v ) * stdev / Math.PI * 0.5 + mean;
+}
+
+
+/////////////////////////////////////////////////////////////////////////
+//
+// function error_function
+//
+// Error Function (erf), using the Bürmann series
+// 
+// input: x (Number) - the value at which to calculate the error function
+// output: (Number) the error function evaluated at x
+//
+/////////////////////////////////////////////////////////////////////////
+
+const g_errf_twooversqrtpi = 2.0 / Math.sqrt(Math.PI);
+const g_errf_errfC1 = 31.0 / 200.0;
+const g_errf_errfC2 = 341.0 / 20000.0;
+
+function error_function(x)
+{
+	var exsq = Math.exp(-x * x);
+	var sign = 1;
+	if (x < 0)
+		sign = -1;
+	return sign * g_errf_twooversqrtpi * Math.sqrt(1.0 - exsq) * (g_errf_twooversqrtpi + g_errf_errfC1 * exsq - g_errf_errfC2 * exsq * exsq);
+}
+
+var g_gauss_gset = null;
+function random_gaussian(mean, stdev)
+{ 
+	var ret;
+	if (g_gauss_gset == null)
+	{
+		var rsq;
+		var v1;
+		var v2;
+		do
+		{
+			v1 = 2.0 * Math.random() - 1.0;
+			v2 = 2.0 * Math.random() - 1.0;
+			rsq = v1 * v1 + v2 * v2;
+		}
+		while (rsq >= 1.0 || rsq == 0.0);
+		var fac = Math.sqrt(-2.0 * Math.log(rsq) / rsq);
+		ret = v2 * fac * stdev + mean;
+		g_gauss_gset = v1 * fac;
+	}
+	else
+	{
+		ret = g_gauss_gset * stdev + mean;
+		g_gauss_gset = null;
+	}
+	return ret;
 }
 
 /////////////////////////////////////////////////////////////////////////

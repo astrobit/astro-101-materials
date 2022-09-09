@@ -184,6 +184,24 @@ function download(data, filename, type) {
 // an additional key `rounding' is included that is for use with
 // the .toFixed method to ensure proper display of values
 /////////////////////////////////////////////////////////////////////////
+class Sig_Figs
+{
+	constructor(value,uncertainty,rounding)
+	{
+		this.value = value;
+		this.uncertainty = uncertainty;
+		this.rounding = rounding;
+	}
+	get value_string()
+	{
+		return this.value.toFixed(this.rounding)
+	}
+	get uncertainty_string()
+	{
+		return this.uncertainty.toFixed(this.rounding)
+	}
+	
+}
 function sig_figs(value, uncertainty)
 {
 	var uncertainty_res = -1;
@@ -210,7 +228,7 @@ function sig_figs(value, uncertainty)
 		value_res = Math.round(value / mult) * mult;
 	}
 	
-	return {value:value_res, uncertainty: uncertainty_res, rounding: rounding};
+	return new Sig_Figs(value_res,uncertainty_res,rounding);
 }
 /////////////////////////////////////////////////////////////////////////
 //

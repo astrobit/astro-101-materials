@@ -724,11 +724,11 @@ class StarSpTypeColorActivity
 		{
 			var curr = stars[i]
 
-			if (ValidateValue(curr.B) && ValidateValue(curr.V))
+			if (ValidateValue(curr.B) && ValidateValue(curr.V) && ValidateValue(curr.num_sp_type))
 			{
 				var x = curr.num_sp_type;
 				var y = curr.B - curr.V;
-				if (ValidateValue(x) && ValidateValue(y) && x > 100 && ValidateValue(curr.num_sp_type_subtype))
+				if (ValidateValue(x) && ValidateValue(y) && x > 100 && x <= 600 && ValidateValue(curr.num_sp_type_subtype))
 				{
 					var data = new GraphDatum(x,y);
 					this._asteroidData.push(data);
@@ -839,6 +839,150 @@ class StarSpTypeColorActivity
 				var b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
 				var m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
 				var eqnString = "B - V = (" + m.value.toString() + "±" + m.uncertainty.toString() + ") n + (" + b.value.toString() + "±" + b.uncertainty.toString() + ")";
+				context.fillText(eqnString, 250,0);
+			}
+			context.translate(0,35);
+		}
+		context.restore();
+	}
+
+}
+
+class StarColorColorActivity
+{
+	constructor()
+	{
+		this._title = "Measure B - V Color and V - R Color of Stars";
+		this._loglogAllowed = false;
+		this._linearAnalysisAllowed = true;
+
+		this._asteroidData = new Array();
+		var max_x = 0;
+		var min_x = 1000000;
+		var max_y = 0;
+		var min_y = 1000;
+					
+		var twoPi = Math.PI * 2.0;
+		var i;
+		for (i = 0; i < stars.length; i++)
+		{
+			var curr = stars[i]
+
+			if (ValidateValue(curr.B) && ValidateValue(curr.V) && ValidateValue(curr.R))
+			{
+				var x = curr.B - curr.V;
+				var y = curr.V - curr.R;
+				if (ValidateValue(x) && ValidateValue(y) && x < 1.5 && y > -0.5)
+				{
+					var data = new GraphDatum(x,y);
+					this._asteroidData.push(data);
+					if (data.x < min_x)
+						min_x = data.x;
+					if (data.x > max_x)
+						max_x = data.x;
+					if (data.y < min_y)
+						min_y = data.y;
+					if (data.y > max_y)
+						max_y = data.y;
+				}			
+			}
+		}
+		this._min_x = Math.floor(min_x * 10.0) / 10.0;
+		this._max_x = Math.ceil(max_x * 10.0) / 10.0;
+		this._min_y = Math.floor(min_y * 10.0) / 10.0;
+		this._max_y = Math.ceil(max_y * 10.0) / 10.0;
+	
+		this._axisHorizontal = new GraphAxis("xaxis","Color Index (B - V)",this._min_x,this._max_x);
+		this._axisVertical = new GraphAxis("yaxis","Color Index (V - R)",this._min_y,this._max_y);
+
+		this._graph = new Graph("position",500,500,"#ffffff");
+		this._graph.addHorizontalAxis(this._axisHorizontal);
+		this._graph.addVerticalAxis(this._axisVertical);
+		this._measurements = new GraphDataSet("data","xaxis", "yaxis", null,1,3,"#7f7f7f",true);
+		this._graph.addDataSet(this._measurements);
+		this._graphTrend = new GraphTrend("data","xaxis", "yaxis", "linear", 0,0,"#ff0000");
+		this._graphTrend.disable = true;
+		this._graph.addTrend(this._graphTrend);
+		this._linearTrendComputed = false;
+		this._loglogTrendComputed = false;
+		
+	}
+	
+	measure(number)
+	{
+		var i;
+		for (i = 0; i < number; i++)
+		{
+			var idx = this._measurements.length;
+			if (idx < this._asteroidData.length)
+				this._measurements.add(this._asteroidData[idx]);
+		}
+		this.average();
+		if (this._linearTrendComputed && this._graphTrend._type == "linear")
+			this.linearRegression(false);
+		if (this._loglogTrendComputed && this._graphTrend._type == "exponential")
+			this.linearRegression(true);
+	}
+	average()
+	{
+		// nothing to do for this case
+	}		
+	linearRegression(loglog)
+	{
+		if (loglog)
+		{
+			this._lls = this._measurements.LinearLeastSquare(true);
+			this._graphTrend._type = "exponential";
+			this._graphTrend._exponent = this._lls.slope;
+			this._graphTrend._coefficent = Math.pow(2.0,this._lls.intercept);
+			this._loglogTrendComputed = true;
+			this._graphTrend.disable = false;
+		}
+		else
+		{
+			this._lls = this._measurements.LinearLeastSquare();
+			this._graphTrend._type = "linear";
+			this._graphTrend._m = this._lls.slope;
+			this._graphTrend._b = this._lls.intercept;
+			this._linearTrendComputed = true;
+			this._graphTrend.disable = false;
+		}
+	}
+	graph(context)
+	{
+		this._graph.draw(context,0,0);
+		context.strokeStyle = "#ffffff";
+		context.fillStyle = "#ffffff";
+		context.font = "20px Arial";
+		context.textBaseline = "middle";
+		context.textAlign = "center";
+		context.save();
+		context.translate(0,510);
+		context.fillText("Number of Measurements: " + this._measurements.length.toString(), 250,0);
+		context.translate(0,35);
+		if (this._lls !== undefined && this._lls !== null)
+		{
+			if (this._lls.type == "Log-Log LLS")
+			{
+				var vD_1 = Math.pow(2.0,this._lls.intercept);
+				var sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
+				var D_1 = sig_figs(vD_1,sD_1);
+				var Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
+				var eqnString = "V - R = ((" + D_1.value.toString() + "±" + D_1.uncertainty.toString() + ")) (B - V)";
+				var expString = "(" + Exp.value.toString() + "±" + Exp.uncertainty.toString() + ")";
+				
+				context.fillText(eqnString, 250,0);
+				var offset = context.measureText(eqnString).width;
+				context.textAlign = "left";
+				context.font = "12px Arial";
+				context.fillText(expString, 250 + offset * 0.5,-8);
+			
+			}
+			else
+			{
+				var b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
+				var m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
+				var eqnString = "V - R = (" + m.value.toString() + "±" + m.uncertainty.toString() + ") (B - V) + (" + b.value.toString() + "±" + b.uncertainty.toString() + ")";
 				context.fillText(eqnString, 250,0);
 			}
 			context.translate(0,35);
@@ -996,6 +1140,7 @@ var asteroidDiameterDistanceActivity = new AsteroidDiameterDistanceActivity();
 var asteroidOrbitalParametersctivity = new AsteroidOrbitalParametersctivity();
 var starSpTypeColorActivity = new StarSpTypeColorActivity();
 var starRedshiftGalLongActivity = new StarRedshiftGalLongActivity();
+var starColorColorActivity = new StarColorColorActivity();
 
 var currentActivity = starPostionActivity;
 
@@ -1046,6 +1191,13 @@ option.text = starRedshiftGalLongActivity._title;
 
 select.add(option)
 
+option = document.createElement("option");
+option.text = starColorColorActivity._title;
+
+select.add(option)
+
+
+
 
 var g_bLogLogDisplay = false;
 
@@ -1063,6 +1215,8 @@ function OnActivitySelect()
 		currentActivity = starSpTypeColorActivity;
 	else if (select.value == starRedshiftGalLongActivity._title)
 		currentActivity = starRedshiftGalLongActivity;
+	else if (select.value == starColorColorActivity._title)
+		currentActivity = starColorColorActivity;
 	else
 		currentActivity = starPostionActivity;
 	if (!currentActivity._loglogAllowed)

@@ -9,7 +9,7 @@ class StarPositionActvity
 		
 		this._RA_Center = 132.92;
 		this._Dec_Center = 37.060;
-		this._scatter = 0.000555556;
+		this._scatter = 2.0 / 3600.0; // 2"
 		
 		this._min_x = (this._RA_Center - 5.0 * this._scatter) / 15.0;
 		this._max_x = (this._RA_Center + 5.0 * this._scatter) / 15.0;
@@ -129,12 +129,12 @@ class StarPositionActvity
 				context.translate(-125,0);
 				context.fillText("Right Ascension",0,0);
 				context.translate(0,25);
-				context.fillText(raDMS.deg.toString() + "°" + raDMS.min.toString() + "'" + raDMS.sec.toString() + "\"",0,0);
+				context.fillText(raDMS.deg.toString() + "h" + raDMS.min.toString() + "m" + raDMS.sec.toString() + "s",0,0);
 				context.translate(0,25);
 				if (this._stdErrRA !== null)
 				{
 					var raErrDMS = degreestoDMS(this._stdErrRA);
-					context.fillText("±" + raErrDMS.sec.toString() + "\"",0,0);
+					context.fillText("±" + raErrDMS.sec.toString() + "s",0,0);
 					context.translate(0,25);
 				}
 			context.restore();

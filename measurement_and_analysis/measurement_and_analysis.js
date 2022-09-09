@@ -398,8 +398,8 @@ class AsteroidDiameterBrightnessActivity
 				var sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
 				var D_1 = sig_figs(vD_1,sD_1);
 				var Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "D = ((" + D_1.value.toString() + "±" + D_1.uncertainty.toString() + ") km) M";
-				var expString = "(" + Exp.value.toString() + "±" + Exp.uncertainty.toString() + ")";
+				var eqnString = "D = (" + D_1.standard_notation + " km) M";
+				var expString = Exp.standard_notation;
 				
 				context.fillText(eqnString, 250,0);
 				var offset = context.measureText(eqnString).width;
@@ -412,7 +412,7 @@ class AsteroidDiameterBrightnessActivity
 			{
 				var b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
 				var m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "D = (" + m.value.toString() + "±" + m.uncertainty.toString() + ") M + (" + b.value.toString() + "±" + b.uncertainty.toString() + ") km";
+				var eqnString = "D = " + m.standard_notation + " M + " + b.standard_notation + " km";
 				context.fillText(eqnString, 250,0);
 			}
 			context.translate(0,35);
@@ -536,8 +536,8 @@ class AsteroidDiameterDistanceActivity
 				var sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
 				var D_1 = sig_figs(vD_1,sD_1);
 				var Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "D = ((" + D_1.value.toString() + "±" + D_1.uncertainty.toString() + ")) a";
-				var expString = "(" + Exp.value.toString() + "±" + Exp.uncertainty.toString() + ")";
+				var eqnString = "D = (" + D_1.standard_notation + ") a";
+				var expString = Exp.standard_notation;
 				
 				context.fillText(eqnString, 250,0);
 				var offset = context.measureText(eqnString).width;
@@ -550,7 +550,7 @@ class AsteroidDiameterDistanceActivity
 			{
 				var b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
 				var m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "D = (" + m.value.toString() + "±" + m.uncertainty.toString() + ") km/au a + (" + b.value.toString() + "±" + b.uncertainty.toString() + ") km";
+				var eqnString = "D = " + m.standard_notation + " km/au a + (" + b.standard_notation + " km";
 				context.fillText(eqnString, 250,0);
 			}
 			context.translate(0,35);
@@ -678,8 +678,8 @@ class AsteroidOrbitalParametersctivity
 				var sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
 				var D_1 = sig_figs(vD_1,sD_1);
 				var Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "i = ((" + D_1.value.toString() + "±" + D_1.uncertainty.toString() + ")) Ω";
-				var expString = "(" + Exp.value.toString() + "±" + Exp.uncertainty.toString() + ")";
+				var eqnString = "i = (" + D_1.standard_notation + ") Ω";
+				var expString = Exp.standard_notation;
 				
 				context.fillText(eqnString, 250,0);
 				var offset = context.measureText(eqnString).width;
@@ -692,7 +692,7 @@ class AsteroidOrbitalParametersctivity
 			{
 				var b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
 				var m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "i = (" + m.value.toString() + "±" + m.uncertainty.toString() + ") Ω + (" + b.value.toString() + "±" + b.uncertainty.toString() + ")°";
+				var eqnString = "i = " + m.standard_notation + " Ω + " + b.standard_notation + "°";
 				context.fillText(eqnString, 250,0);
 			}
 			context.translate(0,35);
@@ -824,8 +824,8 @@ class StarSpTypeColorActivity
 				var sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
 				var D_1 = sig_figs(vD_1,sD_1);
 				var Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "B - V = ((" + D_1.value.toString() + "±" + D_1.uncertainty.toString() + ")) n";
-				var expString = "(" + Exp.value.toString() + "±" + Exp.uncertainty.toString() + ")";
+				var eqnString = "B - V = (" + D_1.standard_notation + ") n";
+				var expString = Exp.standard_notation;
 				
 				context.fillText(eqnString, 250,0);
 				var offset = context.measureText(eqnString).width;
@@ -838,7 +838,7 @@ class StarSpTypeColorActivity
 			{
 				var b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
 				var m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "B - V = (" + m.value.toString() + "±" + m.uncertainty.toString() + ") n + (" + b.value.toString() + "±" + b.uncertainty.toString() + ")";
+				var eqnString = "B - V = " + m.standard_notation + " n + " + b.standard_notation;
 				context.fillText(eqnString, 250,0);
 			}
 			context.translate(0,35);
@@ -968,8 +968,8 @@ class StarColorColorActivity
 				var sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
 				var D_1 = sig_figs(vD_1,sD_1);
 				var Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "V - R = ((" + D_1.value.toString() + "±" + D_1.uncertainty.toString() + ")) (B - V)";
-				var expString = "(" + Exp.value.toString() + "±" + Exp.uncertainty.toString() + ")";
+				var eqnString = "V - R = (" + D_1.standard_notation + ") (B - V)";
+				var expString = Exp.standard_notation;
 				
 				context.fillText(eqnString, 250,0);
 				var offset = context.measureText(eqnString).width;
@@ -982,7 +982,7 @@ class StarColorColorActivity
 			{
 				var b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
 				var m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "V - R = (" + m.value.toString() + "±" + m.uncertainty.toString() + ") (B - V) + (" + b.value.toString() + "±" + b.uncertainty.toString() + ")";
+				var eqnString = "V - R = " + m.standard_notation + " (B - V) + " + b.standard_notation;
 				context.fillText(eqnString, 250,0);
 			}
 			context.translate(0,35);
@@ -1110,9 +1110,9 @@ class StarRedshiftGalLongActivity
 				var sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
 				var D_1 = sig_figs(vD_1,sD_1);
 				var Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "z = ((" + D_1.value.toString() + "±" + D_1.uncertainty.toString() + ")) ℓ";
-				var expString = "(" + Exp.value.toString() + "±" + Exp.uncertainty.toString() + ")";
-				
+				var eqnString = "z = (" + D_1.standard_notation + ") ℓ";
+				var expString = Exp.standard_notation;
+
 				context.fillText(eqnString, 250,0);
 				var offset = context.measureText(eqnString).width;
 				context.textAlign = "left";
@@ -1124,7 +1124,7 @@ class StarRedshiftGalLongActivity
 			{
 				var b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
 				var m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "z = (" + m.value.toString() + "±" + m.uncertainty.toString() + ") deg.⁻¹ ℓ + (" + b.value.toString() + "±" + b.uncertainty.toString() + ")";
+				var eqnString = "z = " + m.standard_notation + " deg.⁻¹ ℓ + " + b.standard_notation;
 				context.fillText(eqnString, 250,0);
 			}
 			context.translate(0,35);

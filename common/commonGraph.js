@@ -979,6 +979,56 @@ class GraphAxis
 	
 }
 
+class GraphTrend
+{
+
+	constructor(id,horizontalAxisID, verticalAxisID, type, m,b, color )
+	{
+		this.id = id;
+		this.disable = false;
+		this._horizontalAxisID = horizontalAxisID;
+		this._verticalAxisID = verticalAxisID;
+		if (type == "linear")
+		{
+			this._m = m;
+			this._b = b;
+		}
+		else
+		{
+			this._exponent = m;
+			this._coefficent = b;
+		}
+		this._color = color;
+		this._type = type;
+	}
+	y(x)
+	{
+		var ret = null;
+		if (this._type == "linear")
+		{
+			ret = this._m * x + this._b;
+		}
+		else
+		{
+			ret = this._coefficent * Math.pow(x,this._exponent);
+		}
+		return ret;
+	}
+	x(y)
+	{
+		var ret = null;
+		if (this._type == "linear")
+		{
+			ret = (y - this._b) / this._m;
+		}
+		else
+		{
+			ret = Math.pow(y / this._coefficent, 1.0 / this._exponent);
+		}
+		return ret;
+	}
+	
+}
 class GraphDatum
 {
 	constructor(x,y,xerror,yerror)
@@ -1028,6 +1078,33 @@ class GraphDataSet
 		}
 	}
 	// 2-dimensional linear fitting using least squares
+	clear()
+	{
+		this._data = new Array();
+	}
+	replace(data)
+	{
+		this._data = data;
+	}
+	trend(loglog)
+	{
+		var ret = null;
+		if (this._data !== undefined && this._data !== null && this._data.length > 2)
+		{
+			var trend = this.LinearLeastSquare(loglog);
+			if (trend !== null)
+			{
+				var type;
+				if (loglog)
+					type = "linear";
+				else
+					type = "exponential";
+					
+				ret = new GraphTrend(this.id + " trend",this.horizontalAxisID, this.verticalAxisID, type, trend.slope,trend.intercept, null );
+			}
+		}
+		return ret;
+	}
 
 	LinearLeastSquare(loglog)
 	{
@@ -1112,56 +1189,6 @@ class GraphDataSet
 	{
 		return this.LinearLeastSquare(true);
 	}	
-}
-class GraphTrend
-{
-
-	constructor(id,horizontalAxisID, verticalAxisID, type, m,b, color )
-	{
-		this.id = id;
-		this.disable = false;
-		this._horizontalAxisID = horizontalAxisID;
-		this._verticalAxisID = verticalAxisID;
-		if (type == "linear")
-		{
-			this._m = m;
-			this._b = b;
-		}
-		else
-		{
-			this._exponent = m;
-			this._coefficent = b;
-		}
-		this._color = color;
-		this._type = type;
-	}
-	y(x)
-	{
-		var ret = null;
-		if (this._type == "linear")
-		{
-			ret = this._m * x + this._b;
-		}
-		else
-		{
-			ret = this._coefficent * Math.pow(x,this._exponent);
-		}
-		return ret;
-	}
-	x(y)
-	{
-		var ret = null;
-		if (this._type == "linear")
-		{
-			ret = (y - this._b) / this._m;
-		}
-		else
-		{
-			ret = Math.pow(y / this._coefficent, 1.0 / this._exponent);
-		}
-		return ret;
-	}
-	
 }
 class Graph
 {

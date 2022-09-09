@@ -200,6 +200,33 @@ class Sig_Figs
 	{
 		return this.uncertainty.toFixed(this.rounding)
 	}
+	get standard_notation()
+	{
+		var log_value = Math.log10(Math.abs(this.value));
+		if (log_value >= 4 || log_value <= -4)
+		{
+			var sign = (this.value < 0);
+			var power = Math.pow(10.0,-Math.floor(log_value));
+			var exp = Math.floor(log_value);
+			var exp_u = Math.floor(Math.log10(this.uncertainty));
+			
+			var mantissa = this.value * power;
+			var mantissa_u = this.uncertainty * power;
+			var rounding = exp - exp_u
+			if (rounding < 0)
+				rounding = 0;
+			
+//			return "(" + this.value_string + " ± " + this.uncertainty_string + ")";
+			var exponent = toSuperscript(exp.toFixed(0));
+			if (sign)
+				return "(-" + mantissa.toFixed(rounding) + " ± " + mantissa_u.toFixed(rounding) + ")×10" + exponent;
+			else
+				return "(" + mantissa.toFixed(rounding) + " ± " + mantissa_u.toFixed(rounding) + ")×10" + exponent;
+		}
+		else
+			return "(" + this.value_string + " ± " + this.uncertainty_string + ")";
+	}
+	
 	
 }
 function sig_figs(value, uncertainty)

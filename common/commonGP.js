@@ -218,10 +218,7 @@ class Sig_Figs
 			
 //			return "(" + this.value_string + " ± " + this.uncertainty_string + ")";
 			var exponent = toSuperscript(exp.toFixed(0));
-			if (sign)
-				return "(-" + mantissa.toFixed(rounding) + " ± " + mantissa_u.toFixed(rounding) + ")×10" + exponent;
-			else
-				return "(" + mantissa.toFixed(rounding) + " ± " + mantissa_u.toFixed(rounding) + ")×10" + exponent;
+			return "(" + mantissa.toFixed(rounding) + " ± " + mantissa_u.toFixed(rounding) + ")×10" + exponent;
 		}
 		else
 			return "(" + this.value_string + " ± " + this.uncertainty_string + ")";

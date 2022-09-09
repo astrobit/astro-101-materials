@@ -18,7 +18,7 @@ theCanvas.onmouseleave = commonUIOnMouseLeave;
 var theContext = theCanvas.getContext("2d");
 
 
-var btnCurr = new SpringButton("SlewNorth",theCanvas.width * 0.5 + 375,70,50,50,function(){latDir = 1;},function(){latDir = 0;});
+/*var btnCurr = new SpringButton("SlewNorth",theCanvas.width * 0.5 + 375,70,50,50,function(){latDir = 1;},function(){latDir = 0;});
 btnCurr.text = "🡡";
 commonUIRegister(btnCurr);
 
@@ -45,7 +45,7 @@ slewButtonArray.push(slewSlow);
 var radioSlew = new Radio("Slew","Fast",slewSelect,slewButtonArray);
 
 commonUIRegister(radioSlew);
-
+*/
 btnFindMilkyWay = new Button("Find Milky Way",theCanvas.width * 0.5 + 330,280,140,30,findHome);
 btnFindMilkyWay.disabled = true;
 commonUIRegister(btnFindMilkyWay);
@@ -347,87 +347,48 @@ function drawCurrentHome(cx,ty,size)
 	theContext.restore(state);
 }
 
+var g_graphHubble = new Graph("Hubble Diagram",250,350,"#ffffff");
+var g_graphAxisDistance = new GraphAxis("xaxis","Distance (100 Mpc)",0,15);
+var g_graphAxisRedshift = new GraphAxis("yaxis","Velocity (1000 km/s)",0,125);
+var g_graphdatasetMeasurements = new GraphDataSet("data","xaxis", "yaxis", null,1,4,"#ff0000",true);
+var g_graphdatatrendMeasurements = new GraphTrend("Hubble Diagram trend","xaxis", "yaxis", "linear", 0,0,"#0000ff" );
+g_graphdatatrendMeasurements.disabled = true;
+
+g_graphHubble.addHorizontalAxis(g_graphAxisDistance);
+g_graphHubble.addVerticalAxis(g_graphAxisRedshift);
+g_graphHubble.addDataSet(g_graphdatasetMeasurements);
+g_graphHubble.addTrend(g_graphdatatrendMeasurements);
+
 function drawHubble(cx,ty,width,height)
 {
-	var state = theContext.save();
-
-	theContext.translate(cx - width * 0.5 + 60,ty + height - 50 + 10);
-	var gh = height - 60;
-	var gw = width - 80;
-	theContext.strokeStyle = '#FFFFFF';
-	theContext.beginPath();
-	theContext.moveTo(0,-gh);
-	theContext.lineTo(0,0);
-	theContext.lineTo(gw,0);
-	theContext.stroke();
-
-	theContext.textBaseline = "middle";
-	theContext.font = "16px Arial";
-	var idxLcl;
-	for (idxLcl = 0; idxLcl < 6; idxLcl++)
-	{
-		var y = -gh / 5.0 * idxLcl;
-		theContext.strokeStyle = '#FFFFFF';
-		theContext.fillStyle = '#FFFFFF';
-		theContext.beginPath();
-		theContext.moveTo(0,y);
-		theContext.lineTo(-10,y);
-		theContext.stroke();
-		var text = (idxLcl * 25.0).toFixed(0);
-		theContext.fillText(text,-15 - theContext.measureText(text).width,y);
-	}
-	var stateX = theContext.save();
-	theContext.translate(-50,-0.5 * gh);
-	theContext.rotate(-Math.PI * 0.5);
-	var text = "Velocity (1000 km/s)"
-	theContext.fillText(text, -theContext.measureText(text).width * 0.5,0);
-
-	theContext.restore(stateX);
-
-	theContext.textBaseline = "top";
-	for (idxLcl = 0; idxLcl < 16; idxLcl+=2)
-	{
-		var x = gw / 15.0 * idxLcl;
-		theContext.strokeStyle = '#FFFFFF';
-		theContext.fillStyle = '#FFFFFF';
-		theContext.beginPath();
-		theContext.moveTo(x,0);
-		theContext.lineTo(x,10);
-		theContext.stroke();
-		var text = (idxLcl * 1.0).toFixed(0);
-		theContext.fillText(text,x - theContext.measureText(text).width * 0.5,10);
-	}
-	var text = "Distance (100 Mpc)"
-	theContext.fillText(text,0.5 * gw - theContext.measureText(text).width * 0.5,25);
+	g_graphHubble.width = width;
+	g_graphHubble.height = height;
+	var x = cx - width * 0.5;
+	var y = ty;
+	
 
 
-	if (hubbleLaw.measH0u > 0)
-	{
-		theContext.strokeStyle = "#0000FF"
-		theContext.beginPath();
-		if (hubbleLaw.measIntercept >= 0)
-			theContext.moveTo(0,-hubbleLaw.measIntercept  / 125000.0 * gh );
-		else
-			theContext.moveTo(-hubbleLaw.measIntercept / hubbleLaw.measH0 / 1500.0 * gw,0 );
-		theContext.lineTo(gw,-(1500.0 * hubbleLaw.measH0 + hubbleLaw.measIntercept) / 125000.0 * gh);
-		theContext.stroke();
-	}
+	g_graphdatatrendMeasurements.disable = !(hubbleLaw.measH0u > 0);
+	g_graphdatatrendMeasurements._m = hubbleLaw.measH0 / 10.0;// / 1000.0 * 100.0;;
+	g_graphdatatrendMeasurements._b = hubbleLaw.measIntercept / 1000.0;
 
-	theContext.fillStyle = '#FF0000';
+	g_graphdatasetMeasurements.clear();
 	for (idxLcl = 0; idxLcl < listMeasurements.length; idxLcl++)
 	{
 		if (listMeasurements[idxLcl]._fromGalaxy == currentHome && listMeasurements[idxLcl]._dist_u > 0 && listMeasurements[idxLcl]._redshift_u > 0)
 		{
+			var datum = new GraphDatum(listMeasurements[idxLcl]._dist / 100.0,listMeasurements[idxLcl]._redshift * 299.792458);
+			g_graphdatasetMeasurements.add(datum);
+/*			g_graphdatasetMeasurements.
 			var v = listMeasurements[idxLcl]._redshift * 299792.458;
 			var x = listMeasurements[idxLcl]._dist / 1500.0 * gw;
 			var y = -v / 125000.0 * gh;
 			theContext.beginPath();
 			theContext.arc(x,y,2,0,2.0 * Math.PI);
-			theContext.fill();
+			theContext.fill();*/
 		}
 	}
-
-	theContext.restore(state);
+	g_graphHubble.draw(theContext,0,0);
 }
 
 
@@ -467,9 +428,9 @@ function draw()
 		var x = 0;
 		var width = 0;
 		var H0sf = sig_figs(hubbleLaw.measH0,hubbleLaw.measH0u);
-		var text = ' = ' + H0sf.value.toFixed(H0sf.rounding) + '±';
+		var text = ' = ' + H0sf.value_string + '±';
 		if (hubbleLaw.measH0u > 0) 
-			text += H0sf.uncertainty.toFixed(H0sf.rounding) + ' km/s/Mpc';
+			text += H0sf.uncertainty_string + ' km/s/Mpc';
 		else
 			text += '∞ km/s/Mpc';
 
@@ -494,7 +455,7 @@ function draw()
 	theContext.fillStyle = "#7F7F7F";
 	theContext.textBaseline = "bottom";
 	theContext.font = "24px Arial";
-	drawTextCenter(theContext,"Telescope Controls",theCanvas.width * 0.5 + 375 + 25,24);
+	drawTextCenter(theContext,"Telescope Pointing",theCanvas.width * 0.5 + 375 + 25,24);
 
 	var decD = degreestoDMSDisplayable(degrees(viewLat));
 	var raD = degreestoDMSDisplayable(degrees(viewLong));

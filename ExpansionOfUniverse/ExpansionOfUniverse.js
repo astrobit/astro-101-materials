@@ -293,13 +293,13 @@ function drawCurrentTargetInfo(cx,ty,size)
 {
 	var state = theContext.save();
 
-	theContext.translate(cx - 75,ty + size);
+	theContext.translate(cx - 75,ty + size + 5);
 	theContext.fillStyle = "#7F7F7F";
 	theContext.font = size + "px Arial";
-	theContext.fillText("Galaxy",-180,0);
-	theContext.fillText("V",0,0);
-	theContext.fillText("z",150,0);
-	theContext.fillText("D (Mpc)",240,0);
+	theContext.fillText("Galaxy",-140,0);
+	theContext.fillText("V",55,0);
+	theContext.fillText("z",167,0);
+	theContext.fillText("D (Mpc)",257,0);
 	theContext.fillStyle = "#FFFFFF";
 	theContext.strokeStyle = "#7F7F7F";
 	theContext.beginPath();
@@ -320,7 +320,7 @@ function drawCurrentTargetInfo(cx,ty,size)
 			if (measData._Mv_u > 0)
 			{
 				var Mv = sig_figs(measData._Mv,measData._Mv_u);
-				theContext.fillText(Mv.value.toFixed(Mv.rounding) + '±' + Mv.uncertainty.toFixed(Mv.rounding),0,(idxLcl + 1.25) * size);
+				theContext.fillText(Mv.standard_notation,0,(idxLcl + 1.25) * size);
 			}
 			if (measData._redshift_u > 0)
 			{
@@ -329,7 +329,7 @@ function drawCurrentTargetInfo(cx,ty,size)
 			if (measData._dist_u > 0)
 			{
 				var dist = sig_figs(measData._dist,measData._dist_u);
-				theContext.fillText(dist.value.toFixed(dist.rounding) + '±' + dist.uncertainty.toFixed(dist.rounding),240,(idxLcl + 1.25) * size);
+				theContext.fillText(dist.standard_notation,240,(idxLcl + 1.25) * size);
 			}
 		}
 	}
@@ -428,27 +428,27 @@ function draw()
 		var x = 0;
 		var width = 0;
 		var H0sf = sig_figs(hubbleLaw.measH0,hubbleLaw.measH0u);
-		var text = ' = ' + H0sf.value_string + '±';
+		var text = "H" + toSubscript("0") + ' = ';
 		if (hubbleLaw.measH0u > 0) 
-			text += H0sf.uncertainty_string + ' km/s/Mpc';
+			text += H0sf.standard_notation + ' km/s/Mpc';
 		else
-			text += '∞ km/s/Mpc';
+			text += "(" + H0sf.value_string + "± ∞) km/s/Mpc";
 
 		theContext.font = "24px Arial";
-		width += theContext.measureText("H").width;
-		theContext.font = "18px Arial";
-		width += theContext.measureText("0").width;
-		theContext.font = "24px Arial";
+//		width += theContext.measureText("H").width;
+//		theContext.font = "18px Arial";
+//		width += theContext.measureText("0").width;
+//		theContext.font = "24px Arial";
 		width += theContext.measureText(text).width;
 
 		x = 175 - width * 0.5;
 		theContext.font = "24px Arial";
-		theContext.fillText("H",x,300);
-		x += theContext.measureText("H").width;
-		theContext.font = "18px Arial";
-		theContext.fillText("0",x,309);
-		x += theContext.measureText("0").width;
-		theContext.font = "24px Arial";
+//		theContext.fillText("H",x,300);
+//		x += theContext.measureText("H").width;
+//		theContext.font = "18px Arial";
+//		theContext.fillText("0",x,309);
+//		x += theContext.measureText("0").width;
+//		theContext.font = "24px Arial";
 		theContext.fillText(text,x,300);
 	}
 

@@ -105,6 +105,10 @@ class StarPositionActvity
 		var line = this._measurements.LinearLeastSquare()
 		// nothing to do for this case
 	}
+	clear()
+	{
+		this._measurements.clear();
+	}
 	graph(context)
 	{
 		this._graph.draw(context,0,0);
@@ -267,6 +271,13 @@ class AsteroidNearJupiter
 			this._graphTrend.disable = false;
 		}
 	}
+	clear()
+	{
+		this._measurements.clear();
+		this._graphTrend.disable = true;
+		this._linearTrendComputed = false;
+		this._loglogTrendComputed = false;
+	}
 	graph(context)
 	{
 		this._graph.draw(context,0,0);
@@ -377,6 +388,13 @@ class AsteroidDiameterBrightnessActivity
 			this._linearTrendComputed = true;
 			this._graphTrend.disable = false;
 		}
+	}
+	clear()
+	{
+		this._measurements.clear();
+		this._graphTrend.disable = true;
+		this._linearTrendComputed = false;
+		this._loglogTrendComputed = false;
 	}
 	graph(context)
 	{
@@ -515,6 +533,13 @@ class AsteroidDiameterDistanceActivity
 			this._linearTrendComputed = true;
 			this._graphTrend.disable = false;
 		}
+	}
+	clear()
+	{
+		this._measurements.clear();
+		this._graphTrend.disable = true;
+		this._linearTrendComputed = false;
+		this._loglogTrendComputed = false;
 	}
 	graph(context)
 	{
@@ -657,6 +682,13 @@ class AsteroidOrbitalParametersctivity
 			this._linearTrendComputed = true;
 			this._graphTrend.disable = false;
 		}
+	}
+	clear()
+	{
+		this._measurements.clear();
+		this._graphTrend.disable = true;
+		this._linearTrendComputed = false;
+		this._loglogTrendComputed = false;
 	}
 	graph(context)
 	{
@@ -804,6 +836,13 @@ class StarSpTypeColorActivity
 			this._graphTrend.disable = false;
 		}
 	}
+	clear()
+	{
+		this._measurements.clear();
+		this._graphTrend.disable = true;
+		this._linearTrendComputed = false;
+		this._loglogTrendComputed = false;
+	}
 	graph(context)
 	{
 		this._graph.draw(context,0,0);
@@ -948,6 +987,13 @@ class StarColorColorActivity
 			this._graphTrend.disable = false;
 		}
 	}
+	clear()
+	{
+		this._measurements.clear();
+		this._graphTrend.disable = true;
+		this._linearTrendComputed = false;
+		this._loglogTrendComputed = false;
+	}
 	graph(context)
 	{
 		this._graph.draw(context,0,0);
@@ -1090,6 +1136,13 @@ class StarRedshiftGalLongActivity
 			this._graphTrend.disable = false;
 		}
 	}
+	clear()
+	{
+		this._measurements.clear();
+		this._graphTrend.disable = true;
+		this._linearTrendComputed = false;
+		this._loglogTrendComputed = false;
+	}
 	graph(context)
 	{
 		this._graph.draw(context,0,0);
@@ -1203,22 +1256,26 @@ var g_bLogLogDisplay = false;
 
 function OnActivitySelect()
 {
+	var newActivity = null;
 	if (select.value == asteroidNearJupiterActivity._title)
-		currentActivity = asteroidNearJupiterActivity;
+		newActivity = asteroidNearJupiterActivity;
 	else if (select.value == asteroidDiameterBrightnessActivity._title)
-		currentActivity = asteroidDiameterBrightnessActivity;
+		newActivity = asteroidDiameterBrightnessActivity;
 	else if (select.value == asteroidDiameterDistanceActivity._title)
-		currentActivity = asteroidDiameterDistanceActivity;
+		newActivity = asteroidDiameterDistanceActivity;
 	else if (select.value == asteroidOrbitalParametersctivity._title)
-		currentActivity = asteroidOrbitalParametersctivity;
+		newActivity = asteroidOrbitalParametersctivity;
 	else if (select.value == starSpTypeColorActivity._title)
-		currentActivity = starSpTypeColorActivity;
+		newActivity = starSpTypeColorActivity;
 	else if (select.value == starRedshiftGalLongActivity._title)
-		currentActivity = starRedshiftGalLongActivity;
+		newActivity = starRedshiftGalLongActivity;
 	else if (select.value == starColorColorActivity._title)
-		currentActivity = starColorColorActivity;
+		newActivity = starColorColorActivity;
 	else
-		currentActivity = starPostionActivity;
+		newActivity = starPostionActivity;
+	if (newActivity != currentActivity)
+		currentActivity.clear();
+	currentActivity = newActivity;
 	if (!currentActivity._loglogAllowed)
 	{
 		g_bLogLogDisplay = false;

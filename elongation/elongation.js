@@ -1,45 +1,45 @@
-var theCanvas = document.getElementById("theCanvas");
+let theCanvas = document.getElementById("theCanvas");
 theCanvas.onselectstart = function () { return false; } // prevent selection of text below the canvas when you click on it
 
-var theContext = theCanvas.getContext("2d");
+let theContext = theCanvas.getContext("2d");
 
-var minimumControlsHeightTop = 130;
+let minimumControlsHeightTop = 130;
 
 theCanvas.height = window.innerHeight - 60;
 //theCanvas.width = theCanvas.height;
 
-var elongationMapHeight = theCanvas.height / 2 - minimumControlsHeightTop;
-var elongationMapWidth = elongationMapHeight * 2;
-var SSmapWidth = elongationMapHeight
-var SSmapHeight = elongationMapHeight
-var phaseWidth = elongationMapHeight
-var phaseHeight = elongationMapHeight
+let elongationMapHeight = theCanvas.height / 2 - minimumControlsHeightTop;
+let elongationMapWidth = elongationMapHeight * 2;
+let SSmapWidth = elongationMapHeight
+let SSmapHeight = elongationMapHeight
+let phaseWidth = elongationMapHeight
+let phaseHeight = elongationMapHeight
 
-var elongationMapX = theCanvas.width / 2
-var elongationMapY = elongationMapHeight / 2;
+let elongationMapX = theCanvas.width / 2
+let elongationMapY = elongationMapHeight / 2;
 
-var buttonsTimeY = elongationMapY + elongationMapHeight / 2 + 45;
-var buttonsPlanetsY = buttonsTimeY + 50;
+let buttonsTimeY = elongationMapY + elongationMapHeight / 2 + 45;
+let buttonsPlanetsY = buttonsTimeY + 50;
 
-var bottomSpace = theCanvas.width - SSmapWidth - phaseWidth
+let bottomSpace = theCanvas.width - SSmapWidth - phaseWidth
 
-var modelButtonsY = buttonsPlanetsY + 50 + SSmapHeight + 10
+let modelButtonsY = buttonsPlanetsY + 50 + SSmapHeight + 10
 
-var phaseX = theCanvas.width - bottomSpace / 3 - phaseWidth / 2;
-var phaseY = buttonsPlanetsY + 50 + phaseHeight / 2;
+let phaseX = theCanvas.width - bottomSpace / 3 - phaseWidth / 2;
+let phaseY = buttonsPlanetsY + 50 + phaseHeight / 2;
 
-var SSmapX = bottomSpace / 3.0 + SSmapWidth * 0.5;
-var SSmapY = buttonsPlanetsY + 50 + SSmapHeight / 2;
+let SSmapX = bottomSpace / 3.0 + SSmapWidth * 0.5;
+let SSmapY = buttonsPlanetsY + 50 + SSmapHeight / 2;
 
-var tutorialControlsY0 = theCanvas.height - 30;
-var tutorialControlsY1 = theCanvas.height - 30;
+let tutorialControlsY0 = theCanvas.height - 30;
+let tutorialControlsY1 = theCanvas.height - 30;
 
-var g_speed = 1.0;//0.25;
-var pause = true;
-var zoom = 100.0;
+let g_speed = 1.0;//0.25;
+let pause = true;
+let zoom = 100.0;
 
-var g_simpleSolarSystem = true;
-var g_planetView = new Object();
+let g_simpleSolarSystem = true;
+let g_planetView = new Object();
 
 const kRadians = Math.PI / 180.0;
 const kDegrees = 180.0 / Math.PI;
@@ -67,8 +67,8 @@ function zoomout(event)
 	zoom *= 0.5;
 }
 
-var selectedElongation = 1; // Venus
-var selectedPlanet = "Venus"
+let selectedElongation = 1; // Venus
+let selectedPlanet = "Venus"
 function selectPlanet(value)
 {
 	selectedPlanet = value;
@@ -99,7 +99,7 @@ function selectPlanet(value)
 	}
 }
 
-var radButtons = new Array();
+let radButtons = new Array();
 
 radButtons.push(new RadioButton("Mercury","Mercury",theCanvas.width / 2 - 295,buttonsPlanetsY,80,25));
 radButtons.push(new RadioButton("Venus","Venus",theCanvas.width / 2 - 210,buttonsPlanetsY,80,25));
@@ -116,7 +116,7 @@ function selectComplexity(value)
 {
 	g_simpleSolarSystem = (value == "Simple Model");
 }
-var modelButtons = new Array();
+let modelButtons = new Array();
 modelButtons.push(new RadioButton("Simple Model","Simple Model",SSmapX - 140 - 5,modelButtonsY,140,25));
 modelButtons.push(new RadioButton("Real Model","Real Model",SSmapX + 5,modelButtonsY,140,25));
 if (g_simpleSolarSystem)
@@ -126,7 +126,7 @@ else
 
 
 
-var button = new Button("ZoomIn",SSmapX + SSmapHeight / 2 - 45,SSmapY - SSmapHeight / 2 + 5,40,40,zoomin);
+let button = new Button("ZoomIn",SSmapX + SSmapHeight / 2 - 45,SSmapY - SSmapHeight / 2 + 5,40,40,zoomin);
 button.text = "+";
 button.textFont = "30px Arial";
 button.insideStyle = "#000000"
@@ -137,24 +137,24 @@ button.textFont = "30px Arial";
 button.insideStyle = "#000000"
 commonUIRegister(button);
 
-var g_basespeed = 1.0;
+let g_basespeed = 1.0;
 
 
-var times = String.fromCharCode(0x00d7)
-var pauseButtonText = '| |'
-var playButtonText = String.fromCharCode(0x25b6);
-var reverseButtonText = String.fromCharCode(0x25c0);
+let times = String.fromCharCode(0x00d7)
+let pauseButtonText = '| |'
+let playButtonText = String.fromCharCode(0x25b6);
+let reverseButtonText = String.fromCharCode(0x25c0);
 
-var timesMTwoFiftySix = reverseButtonText + '256'
-var timesMSixtyFour = reverseButtonText + '64'
-var timesMSixteen = reverseButtonText + '16'
-var timesMFour = reverseButtonText + '4'
-var timesMOne = reverseButtonText + '1'
-var timesOne = playButtonText + '1'
-var timesFour = playButtonText + '4'
-var timesSixteen = playButtonText + '16'
-var timesSixtyFour = playButtonText + '64'
-var timesTwoFiftySix = playButtonText + '256'
+const timesMTwoFiftySix = reverseButtonText + '256'
+const timesMSixtyFour = reverseButtonText + '64'
+const timesMSixteen = reverseButtonText + '16'
+const timesMFour = reverseButtonText + '4'
+const timesMOne = reverseButtonText + '1'
+const timesOne = playButtonText + '1'
+const timesFour = playButtonText + '4'
+const timesSixteen = playButtonText + '16'
+const timesSixtyFour = playButtonText + '64'
+const timesTwoFiftySix = playButtonText + '256'
 function selectSpeed(value)
 {
 	switch (value)
@@ -194,7 +194,7 @@ function selectSpeed(value)
 }
 
 
-var speedButtons = new Array();
+let speedButtons = new Array();
 speedButtons.push(new RadioButton(timesMTwoFiftySix,timesMTwoFiftySix,theCanvas.width / 2 - 230,buttonsTimeY,40,40));
 speedButtons.push(new RadioButton(timesMSixtyFour,timesMSixtyFour,theCanvas.width / 2 - 190,buttonsTimeY,40,40));
 speedButtons.push(new RadioButton(timesMSixteen,timesMSixteen,theCanvas.width / 2 - 150,buttonsTimeY,40,40));
@@ -224,13 +224,13 @@ function requestAdvanceYear(event)
 	g_timer += 365.0;
 }
 
-var advanceDay = new Button("+1d",theCanvas.width / 2 + 250,buttonsTimeY,40,40,requestAdvanceDay);
+let advanceDay = new Button("+1d",theCanvas.width / 2 + 250,buttonsTimeY,40,40,requestAdvanceDay);
 commonUIRegister(advanceDay);
-var advanceWeek = new Button("+7d",theCanvas.width / 2 + 290,buttonsTimeY,40,40,requestAdvanceWeek);
+let advanceWeek = new Button("+7d",theCanvas.width / 2 + 290,buttonsTimeY,40,40,requestAdvanceWeek);
 commonUIRegister(advanceWeek);
-var advanceMonth = new Button("+30d",theCanvas.width / 2 + 330,buttonsTimeY,40,40,requestAdvanceMonth);
+let advanceMonth = new Button("+30d",theCanvas.width / 2 + 330,buttonsTimeY,40,40,requestAdvanceMonth);
 commonUIRegister(advanceMonth);
-var advanceYear = new Button("+1y",theCanvas.width / 2 + 370,buttonsTimeY,40,40,requestAdvanceYear);
+let advanceYear = new Button("+1y",theCanvas.width / 2 + 370,buttonsTimeY,40,40,requestAdvanceYear);
 commonUIRegister(advanceYear);
 
 function requestBackDay(event)
@@ -250,13 +250,13 @@ function requestBackYear(event)
 	g_timer -= 365.0;
 }
 
-var backDay = new Button("-1d",theCanvas.width / 2 - 290,buttonsTimeY,40,40,requestBackDay);
+let backDay = new Button("-1d",theCanvas.width / 2 - 290,buttonsTimeY,40,40,requestBackDay);
 commonUIRegister(backDay);
-var backWeek = new Button("-7d",theCanvas.width / 2 - 330,buttonsTimeY,40,40,requestBackWeek);
+let backWeek = new Button("-7d",theCanvas.width / 2 - 330,buttonsTimeY,40,40,requestBackWeek);
 commonUIRegister(backWeek);
-var backMonth = new Button("-30d",theCanvas.width / 2 - 370,buttonsTimeY,40,40,requestBackMonth);
+let backMonth = new Button("-30d",theCanvas.width / 2 - 370,buttonsTimeY,40,40,requestBackMonth);
 commonUIRegister(backMonth);
-var backYear = new Button("-1y",theCanvas.width / 2 - 410,buttonsTimeY,40,40,requestBackYear);
+let backYear = new Button("-1y",theCanvas.width / 2 - 410,buttonsTimeY,40,40,requestBackYear);
 commonUIRegister(backYear);
 
 function requestPause(event)
@@ -272,7 +272,7 @@ function requestPause(event)
 	}
 }
 
-var playButton = new Button("Pause",theCanvas.width / 2 - 20,buttonsTimeY,40,40,requestPause);
+let playButton = new Button("Pause",theCanvas.width / 2 - 20,buttonsTimeY,40,40,requestPause);
 if (pause)
 	playButton.text = playButtonText;
 else
@@ -428,7 +428,7 @@ function tutorialDraw(context,state)
 	}
 }
 
-var g_tutorial = new Tutorial();
+let g_tutorial = new Tutorial();
 
 function tutorialSkip(event)
 {
@@ -453,13 +453,13 @@ function tutorialRewind(event)
 }
 
 g_tutorial.drawer = tutorialDraw;
-var tutorialSkipButton = new Button("Skip Tutorial",theCanvas.width / 2 - 60,tutorialControlsY0,120,25,tutorialSkip);
-var tutorialAdvanceButton = new Button("Next",theCanvas.width / 2 + 70,tutorialControlsY0,40,25,tutorialAdvance);
-var tutorialRewindButton = new Button("Prev",theCanvas.width / 2 - 110,tutorialControlsY0,40,25,tutorialRewind);
+let tutorialSkipButton = new Button("Skip Tutorial",theCanvas.width / 2 - 60,tutorialControlsY0,120,25,tutorialSkip);
+let tutorialAdvanceButton = new Button("Next",theCanvas.width / 2 + 70,tutorialControlsY0,40,25,tutorialAdvance);
+let tutorialRewindButton = new Button("Prev",theCanvas.width / 2 - 110,tutorialControlsY0,40,25,tutorialRewind);
 
-var tutorialSkipButtonModel = new Button("Skip Tutorial",theCanvas.width / 2 - 60,tutorialControlsY1,120,25,tutorialSkip);
-var tutorialAdvanceButtonModel = new Button("Next",theCanvas.width / 2 + 70,tutorialControlsY1,40,25,tutorialAdvance);
-var tutorialRewindButtonModel = new Button("Prev",theCanvas.width / 2 - 110,tutorialControlsY1,40,25,tutorialRewind);
+let tutorialSkipButtonModel = new Button("Skip Tutorial",theCanvas.width / 2 - 60,tutorialControlsY1,120,25,tutorialSkip);
+let tutorialAdvanceButtonModel = new Button("Next",theCanvas.width / 2 + 70,tutorialControlsY1,40,25,tutorialAdvance);
+let tutorialRewindButtonModel = new Button("Prev",theCanvas.width / 2 - 110,tutorialControlsY1,40,25,tutorialRewind);
 
 g_tutorial.disableStandardUI();
 g_tutorial.addUI(0,tutorialSkipButton);
@@ -493,17 +493,17 @@ g_tutorial.addUI(7,tutorialAdvanceButton);
 g_tutorial.addUI(7,tutorialRewindButton);
 
 
-var tutorialCompleted = window.localStorage.getItem("tutorialComplete");
+let tutorialCompleted = window.localStorage.getItem("tutorialComplete");
 if (!tutorialCompleted)
 	g_tutorial.activate();
 
 commonUIRegister(g_tutorial);
 
-var replayTutorialButton = new Button("Tutorial",theCanvas.width - 210,modelButtonsY,100,25,tutorialStart);
+let replayTutorialButton = new Button("Tutorial",theCanvas.width - 210,modelButtonsY,100,25,tutorialStart);
 replayTutorialButton.textFont = "24px Arial";
 commonUIRegister(replayTutorialButton);
 
-var g_about = new Tutorial();
+let g_about = new Tutorial();
 
 function aboutShow(event)
 {
@@ -533,23 +533,23 @@ function aboutDraw(context,state)
 
 g_about.drawer = aboutDraw;
 
-var aboutOKButton= new Button("OK",theCanvas.width / 2,modelButtonsY,40,25,aboutDone);
+let aboutOKButton= new Button("OK",theCanvas.width / 2,modelButtonsY,40,25,aboutDone);
 aboutOKButton.textFont = "24px Arial";
 
 g_about.disableStandardUI();
 g_about.addUI(0,aboutOKButton);
 commonUIRegister(g_about);
 
-var aboutButton= new Button("About",theCanvas.width - 100,modelButtonsY,80,25,aboutShow);
+let aboutButton= new Button("About",theCanvas.width - 100,modelButtonsY,80,25,aboutShow);
 aboutButton.textFont = "24px Arial";
 commonUIRegister(aboutButton);
 
 
-var g_SelectedPlanetData = {};
-var twoPi = Math.PI * 2.0;
-var degrees = 180.0 / Math.PI;
-var g_SunLongitude = 0;
-var g_timer = 2456083.27000; //2451545.0;
+let g_SelectedPlanetData = {};
+const twoPi = Math.PI * 2.0;
+//const degrees = 180.0 / Math.PI;
+let g_SunLongitude = 0;
+let g_timer = 2456083.27000; //2451545.0;
 
 function drawSSmap()
 {
@@ -561,9 +561,7 @@ function drawSSmap()
 
 	theContext.translate(SSmapX,SSmapY);
 // set the size of the Sun based on the Zoom level
-	var sunSize = 0.03 * zoom;
-	if (sunSize < 3.0)
-		sunSize = 3.0;
+	const sunSize = Math.max(3.0,0.03 * zoom);
 // draw the Sun
 	theContext.fillStyle  = "#FFFF00";
 	theContext.beginPath();
@@ -575,22 +573,22 @@ function drawSSmap()
 		if (!g_simpleSolarSystem)
 		{
 			theContext.save();
-			var e =value.orbitalParameters.orbitalEccentricity
-			var d = value.orbitalParameters.semiMajorAxis * e * zoom;
-			var longPerRad = value.orbitalParameters.longitudePerihelion;
-			var longPerSin = Math.sin(longPerRad);
-			var longPerCos = Math.cos(longPerRad);
-			var semiMajorAxis = zoom * value.orbitalParameters.semiMajorAxis * Math.cos(value.orbitalParameters.orbitalInclination);
-			var semiMinorAxis = zoom * value.orbitalParameters.semiMajorAxis * Math.sqrt(1.0 - e * e);
+			const e =value.orbitalParameters.orbitalEccentricity
+			const d = value.orbitalParameters.semiMajorAxis * e * zoom;
+			const longPerRad = value.orbitalParameters.longitudePerihelion;
+			const longPerSin = Math.sin(longPerRad);
+			const longPerCos = Math.cos(longPerRad);
+			const semiMajorAxis = zoom * value.orbitalParameters.semiMajorAxis * Math.cos(value.orbitalParameters.orbitalInclination);
+			const semiMinorAxis = zoom * value.orbitalParameters.semiMajorAxis * Math.sqrt(1.0 - e * e);
 //			theContext.scale(zoom * value.semiMajorAxis,zoom * value.semiMajorAxis);
 //			theContext.translate(-e * semiMajorAxis,0);
 			theContext.strokeStyle  = "#3F3F3F";
-			var j;
+			let j;
 			theContext.beginPath();
 			for (j = 0; j <= 360.0; j++)
 			{
-				var x = semiMajorAxis * Math.cos(-j * kRadians) - e * semiMajorAxis;
-				var y = semiMinorAxis * Math.sin(-j * kRadians);
+				const x = semiMajorAxis * Math.cos(-j * kRadians) - e * semiMajorAxis;
+				const y = semiMinorAxis * Math.sin(-j * kRadians);
 
 				if (j == 0)
 				{
@@ -641,25 +639,25 @@ function drawSSmap()
 
 function drawElongationMap()
 {
-	var halfHeight = elongationMapHeight * 0.5;
-	var halfWidth = elongationMapWidth * 0.5;
-	var qtrWidth = elongationMapWidth * 0.25;
+	const halfHeight = elongationMapHeight * 0.5;
+	const halfWidth = elongationMapWidth * 0.5;
+	const qtrWidth = elongationMapWidth * 0.25;
 
 	theContext.save();
 	theContext.translate(elongationMapX,elongationMapY);
-	var sunLongitude = -g_planetView["Earth"].planetHelio.theta * degrees;
-	var projection = new Mollweide(sunLongitude,0.0);
+	const sunLongitude = -g_planetView["Earth"].planetHelio.theta * kDegrees;
+	const projection = new Mollweide(sunLongitude,0.0);
 // draw the stars on the map
 	if (starsReady)
 	{
-		var mapImage = new ImgData(theContext, elongationMapX - halfWidth, elongationMapY - halfHeight, elongationMapWidth, elongationMapHeight);
-		var len = stars.length;
-		var i;
+		const mapImage = new ImgData(theContext, elongationMapX - halfWidth, elongationMapY - halfHeight, elongationMapWidth, elongationMapHeight);
+		const len = stars.length;
+		let i;
 		for (i = 0; i < len; i++)
 		{
 			//console.log("here " + stars[i].latitude + " " + stars[i].longitude + " " + projection.x + " " + projection.y);
-			var starProj = projection.calculate(stars[i].eclat, stars[i].eclong);
-			var color = UBVRItoRGB(stars[i].U, stars[i].B, stars[i].V, stars[i].R, stars[i].I);
+			const starProj = projection.calculate(stars[i].eclat, stars[i].eclong);
+			const color = UBVRItoRGB(stars[i].U, stars[i].B, stars[i].V, stars[i].R, stars[i].I);
 			drawStar(mapImage, (starProj.x + 1.0) * halfWidth, (starProj.y + 1.0) * halfHeight, 2.0, color);
 /*			theContext.fillStyle  = UBVRItoRGB(stars[i].U,stars[i].B,stars[i].V,stars[i].R,stars[i].I).style;
 			theContext.beginPath();
@@ -686,7 +684,7 @@ function drawElongationMap()
 	theContext.lineTo(halfWidth,0);
 	theContext.stroke();
 // draw the Sun on the map
-	var sunSize = 0.5 * halfWidth / 180.0;
+	const sunSize = 0.5 * halfWidth / 180.0;
 	theContext.fillStyle  = "#FFFF00";
 	theContext.beginPath();
 	theContext.arc(0,0,sunSize,0,2.0*Math.PI,true);
@@ -694,7 +692,7 @@ function drawElongationMap()
 	theContext.fill();
 
 // draw the selected planet on the map
-	var planetProj = projection.calculate(g_planetView[selectedPlanet].elongLat * degrees,g_planetView[selectedPlanet].elongLong * degrees + sunLongitude);
+	const planetProj = projection.calculate(g_planetView[selectedPlanet].elongLat * kDegrees,g_planetView[selectedPlanet].elongLong * kDegrees + sunLongitude);
 	theContext.fillStyle  = g_planetView[selectedPlanet].style;
 	theContext.beginPath();
 	theContext.arc(planetProj.x * halfWidth,planetProj.y * halfHeight,2,0,2.0*Math.PI,true);
@@ -736,10 +734,10 @@ function drawElongationMap()
 	theContext.stroke();
 	drawTextCenter(theContext,"+180",halfWidth,10);
 	
-	var elongationDisplayValue = g_planetView[selectedPlanet].elongLong * degrees;
+	let elongationDisplayValue = g_planetView[selectedPlanet].elongLong * kDegrees;
 	if (elongationDisplayValue > 180.0)
 		elongationDisplayValue = elongationDisplayValue - 360.0;
-	var elongationDisplay = (Math.round(elongationDisplayValue * 10.0) / 10.0).toString();
+	let elongationDisplay = (Math.round(elongationDisplayValue * 10.0) / 10.0).toString();
 	if (elongationDisplay.charAt(elongationDisplay.length - 2) != '.')
 		elongationDisplay = elongationDisplay + ".0"
 // draw planet information on the map
@@ -750,8 +748,8 @@ function drawElongationMap()
 	drawTextRight(theContext,"Elongation: " ,-55,35);
 	drawTextRight(theContext,elongationDisplay + String.fromCharCode(0x00b0),-5,35);
 
-	var timerReadable = Math.round(g_timer / 365.0 * 100.0 - 6716.0) / 100.0
-	var timerDisplay = timerReadable.toString();
+	const timerReadable = Math.round(g_timer / 365.0 * 100.0 - 6716.0) / 100.0
+	let timerDisplay = timerReadable.toString();
 	if (timerDisplay.charAt(timerDisplay.length - 3) != '.')
 	{
 		if (timerDisplay.charAt(timerDisplay.length - 2) == '.')
@@ -759,8 +757,8 @@ function drawElongationMap()
 		else
 			timerDisplay = timerDisplay + '.00'
 	}
-	var timerReadableDays = Math.round(g_timer * 100.0) / 100.0;
-	var timerDisplayDays = timerReadableDays.toString();
+	const timerReadableDays = Math.round(g_timer * 100.0) / 100.0;
+	let timerDisplayDays = timerReadableDays.toString();
 	if (timerDisplayDays.charAt(timerDisplayDays.length - 3) != '.')
 	{
 		if (timerDisplayDays.charAt(timerDisplayDays.length - 2) == '.')
@@ -771,11 +769,11 @@ function drawElongationMap()
 
 
 	theContext.fillText("Date: ",50,35);
-	var calend = JDtoGregorian(g_timer);
-	var monthDisplay = calend.month.toString();
+	const calend = JDtoGregorian(g_timer);
+	let monthDisplay = calend.month.toString();
 	if (calend.month < 10)
 		monthDisplay = "0" + monthDisplay;
-	var dayDisplay = Math.floor(calend.day).toString()
+	let dayDisplay = Math.floor(calend.day).toString()
 	if (calend.day < 10)
 		dayDisplay = "0" + dayDisplay;
 	drawTextRight(theContext,calend.year + "/" + monthDisplay + '/' + dayDisplay,160,35);
@@ -786,8 +784,8 @@ function drawElongationMap()
 
 function drawPhase()
 {
-	var halfHeight = phaseHeight * 0.5;
-//	var halfWidth = phaseWidth * 0.5;
+	const halfHeight = phaseHeight * 0.5;
+//	let halfWidth = phaseWidth * 0.5;
 
 	theContext.save();
 	theContext.translate(phaseX,phaseY);
@@ -796,17 +794,17 @@ function drawPhase()
 	theContext.textBaseline = "top";
 	drawTextCenter(theContext,"View of Planet",0.0,-halfHeight);
 	theContext.textBaseline = "bottom";
-	var phaseDisplay = (Math.round(g_planetView[selectedPlanet].phase*10.0)/10.0).toString();
+	let phaseDisplay = (Math.round(g_planetView[selectedPlanet].phase*10.0)/10.0).toString();
 	if (phaseDisplay.charAt(phaseDisplay.length - 2) != '.')
 		phaseDisplay = phaseDisplay + ".0"
 	drawTextRight(theContext,"Phase: " + phaseDisplay,-70,halfHeight);
 
-	var appBrightDisplay = (Math.round(g_planetView[selectedPlanet].appBright*10.0)/10.0).toString();
+	let appBrightDisplay = (Math.round(g_planetView[selectedPlanet].appBright*10.0)/10.0).toString();
 	if (appBrightDisplay.charAt(appBrightDisplay.length - 2) != '.')
 		appBrightDisplay = appBrightDisplay + ".0"
 	theContext.fillText("V: " + appBrightDisplay,70,halfHeight);
 
-	var angSizeDisplay = (Math.round(g_planetView[selectedPlanet].angSizeEq * 2.0 * 180.0 * 3600.0 / Math.PI * 10.0) / 10.0).toString();
+	let angSizeDisplay = (Math.round(g_planetView[selectedPlanet].angSizeEq * 2.0 * 180.0 * 3600.0 / Math.PI * 10.0) / 10.0).toString();
 	if (angSizeDisplay.charAt(angSizeDisplay.length - 2) != '.')
 		angSizeDisplay = angSizeDisplay + ".0"
 	angSizeDisplay += '"';
@@ -814,8 +812,8 @@ function drawPhase()
 	theContext.fillText(angSizeDisplay,2,halfHeight);
 
 
-	var sizeEq = (halfHeight - 60) * g_planetView[selectedPlanet].angSizeEq / 1.5029224114395615801287337173096e-4;// / g_planetView[selectedPlanet].angSizeAvg;
-	var sizePol = (halfHeight - 60) * g_planetView[selectedPlanet].angSizePolar / 1.5029224114395615801287337173096e-4;// / g_planetView[selectedPlanet].angSizeAvg;
+	const sizeEq = (halfHeight - 60) * g_planetView[selectedPlanet].angSizeEq / 1.5029224114395615801287337173096e-4;// / g_planetView[selectedPlanet].angSizeAvg;
+	const sizePol = (halfHeight - 60) * g_planetView[selectedPlanet].angSizePolar / 1.5029224114395615801287337173096e-4;// / g_planetView[selectedPlanet].angSizeAvg;
 
 	if (g_planetView[selectedPlanet].phase != 0.0)
 	{
@@ -827,13 +825,13 @@ function drawPhase()
 		{
 			for (i = 1; i <= 180; i++)
 			{
-				var thetaRad = i * Math.PI / 180.0;
+				const thetaRad = i * Math.PI / 180.0;
 				theContext.lineTo(sizeEq * Math.sin(thetaRad),-sizePol * Math.cos(thetaRad));
 			}
-			var radX = (g_planetView[selectedPlanet].phase - 2.0) * 0.5;
+			let radX = (g_planetView[selectedPlanet].phase - 2.0) * 0.5;
 			for (i = 180; i > 0; i--)
 			{
-				var thetaRad = i * Math.PI / 180.0;
+				const thetaRad = i * Math.PI / 180.0;
 				theContext.lineTo(-sizeEq * radX * Math.sin(thetaRad),-sizePol * Math.cos(thetaRad));
 			}
 		}
@@ -841,13 +839,13 @@ function drawPhase()
 		{
 			for (i = 1; i <= 180; i++)
 			{
-				var thetaRad = i * Math.PI / 180.0;
+				const thetaRad = i * Math.PI / 180.0;
 				theContext.lineTo(-sizeEq * Math.sin(thetaRad),-sizePol * Math.cos(thetaRad));
 			}
-			var radX = (g_planetView[selectedPlanet].phase - 6.0) * 0.5;
+			let radX = (g_planetView[selectedPlanet].phase - 6.0) * 0.5;
 			for (i = 180; i > 0; i--)
 			{
-				var thetaRad = i * Math.PI / 180.0;
+				const thetaRad = i * Math.PI / 180.0;
 				theContext.lineTo(-sizeEq * radX * Math.sin(thetaRad),-sizePol * Math.cos(thetaRad));
 			}
 		}
@@ -857,7 +855,7 @@ function drawPhase()
 	theContext.restore();
 }
 
-var datechange;
+let datechange;
 function work(){
 
 
@@ -867,7 +865,7 @@ function work(){
 
 // determine which planet is currently selected
 
-	var dateJD = g_timer;
+	const dateJD = g_timer;
 	if (g_simpleSolarSystem)
 	{
 		g_planetView['Mercury'] = Planets.Mercury.getSimplePosition(dateJD);

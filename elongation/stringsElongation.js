@@ -68,7 +68,7 @@ const ElongationStringInternal =
 	}
 }
 
-var ElongationStrings = ElongationStringInternal[navigator.language];
+let ElongationStrings = ElongationStringInternal[navigator.language];
 
 if (ElongationStrings === undefined)
 	ElongationStrings = ElongationStringInternal['en'];

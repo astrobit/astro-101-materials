@@ -43,10 +43,10 @@ class StarPositionActvity
 	
 	measure(number)
 	{
-		var i;
+		let i;
 		for (i = 0; i < number; i++)
 		{
-			var curr = new GraphDatum(random_gaussian(this._RA_Center,this._scatter)/15.0,random_gaussian(this._Dec_Center,this._scatter));
+			const curr = new GraphDatum(random_gaussian(this._RA_Center,this._scatter)/15.0,random_gaussian(this._Dec_Center,this._scatter));
 			this._measurements.add(curr);
 		}
 		this.average();
@@ -55,45 +55,45 @@ class StarPositionActvity
 	{
 		if (this._measurements.length > 0)
 		{
-			var raSum = 0;
-			var decSum = 0;
-			var ra2Sum = 0;
-			var dec2Sum = 0;
-			var i;
+			let raSum = 0;
+			let decSum = 0;
+			let ra2Sum = 0;
+			let dec2Sum = 0;
+			let i;
 			for (i = 0; i < this._measurements.length; i++)
 			{
-				var curr = this._measurements.at(i);
+				const curr = this._measurements.at(i);
 				raSum += curr.x;
 				ra2Sum += (curr.x * curr.x);
 				decSum += curr.y;
 				dec2Sum += (curr.y * curr.y);
 			}
-			var invCount = 1.0 / this._measurements.length;
+			const invCount = 1.0 / this._measurements.length;
 			this._averageRA = raSum * invCount;
 			this._averageDec = decSum * invCount;
-			var averageVarRA = ra2Sum * invCount;
-			var averageVarDec = dec2Sum * invCount;
+			const averagevarRA = ra2Sum * invCount;
+			const averagevarDec = dec2Sum * invCount;
 			
 			if (this._measurements.length > 1)
 			{
-				var varRA2Sum = 0;
-				var varDec2Sum = 0;
+				let letRA2Sum = 0;
+				let letDec2Sum = 0;
 				for (i = 0; i < this._measurements.length; i++)
 				{
-					var curr = this._measurements.at(i);
+					let curr = this._measurements.at(i);
 					
-					var varRA = (curr.x - this._averageRA);
-					var varDec = (curr.y - this._averageDec);
-					varRA2Sum += varRA * varRA;
-					varDec2Sum += varDec * varDec;
+					let letRA = (curr.x - this._averageRA);
+					let letDec = (curr.y - this._averageDec);
+					letRA2Sum += letRA * letRA;
+					letDec2Sum += letDec * letDec;
 				}
 
-				var invCountStdDev = Math.sqrt(1.0 / (this._measurements.length - 1));
-				this._stdDevRA = Math.sqrt(varRA2Sum * invCountStdDev);
-//				this._stdDevRA = Math.sqrt(averageVarRA - invCount * this._averageRA * this._averageRA);
+				let invCountStdDev = Math.sqrt(1.0 / (this._measurements.length - 1));
+				this._stdDevRA = Math.sqrt(letRA2Sum * invCountStdDev);
+//				this._stdDevRA = Math.sqrt(averageletRA - invCount * this._averageRA * this._averageRA);
 //				this._stdDevRA = Math.sqrt(ra2Sum + this._averageRA * this._averageRA - 2.0 * raSum * this._averageRA ) * invCountStdDev;
-				this._stdDevDec = Math.sqrt(varDec2Sum * invCountStdDev);
-//				this._stdDevDec = Math.sqrt(averageVarDec - invCount * this._averageDec * this._averageDec);
+				this._stdDevDec = Math.sqrt(letDec2Sum * invCountStdDev);
+//				this._stdDevDec = Math.sqrt(averageletDec - invCount * this._averageDec * this._averageDec);
 //				this._stdDevDec = Math.sqrt(dec2Sum + this._averageDec * this._averageDec - 2.0 * decSum * this._averageDec ) * invCountStdDev;
 				this._stdErrRA = this._stdDevRA * Math.sqrt(invCount);
 				this._stdErrDec = this._stdDevDec * Math.sqrt(invCount);
@@ -102,7 +102,7 @@ class StarPositionActvity
 	}		
 	linearRegression()
 	{
-		var line = this._measurements.LinearLeastSquare()
+		const line = this._measurements.LinearLeastSquare()
 		// nothing to do for this case
 	}
 	clear()
@@ -123,8 +123,8 @@ class StarPositionActvity
 		context.translate(0,25);
 		if (this._averageRA !== null && this._averageDec !== null)
 		{
-			var raDMS = degreestoDMS(this._averageRA);
-			var decDMS = degreestoDMS(this._averageDec);
+			const raDMS = degreestoDMS(this._averageRA);
+			const decDMS = degreestoDMS(this._averageDec);
 			context.translate(250,0);
 
 			context.fillText("Averages",0,0);
@@ -137,7 +137,7 @@ class StarPositionActvity
 				context.translate(0,25);
 				if (this._stdErrRA !== null)
 				{
-					var raErrDMS = degreestoDMS(this._stdErrRA);
+					const raErrDMS = degreestoDMS(this._stdErrRA);
 					context.fillText("±" + raErrDMS.sec.toString() + "s",0,0);
 					context.translate(0,25);
 				}
@@ -151,7 +151,7 @@ class StarPositionActvity
 				context.translate(0,25);
 				if (this._stdErrDec !== null)
 				{
-					var decErrDMS = degreestoDMS(this._stdErrDec);
+					const decErrDMS = degreestoDMS(this._stdErrDec);
 					context.fillText("±" + decErrDMS.sec.toString() + "\"",0,0);
 					context.translate(0,25);
 				}
@@ -163,9 +163,9 @@ class StarPositionActvity
 }
 
 
-var randomizedAsteroidList = new Array();
+let randomizedAsteroidList = new Array();
 
-var g_irand;
+let g_irand;
 
 for (g_irand = 0; g_irand < minorPlanetsTrojans.length; g_irand++)
 {
@@ -181,24 +181,24 @@ class AsteroidNearJupiter
 		this._loglogAllowed = false;
 		this._linearAnalysisAllowed = true;
 
-		var jd = 2459800.5;
-		var jupiter = Planets.Jupiter.orbitalParameters.getOrbitalPosition(jd); 
+		const jd = 2459800.5;
+		const jupiter = Planets.Jupiter.orbitalParameters.getOrbitalPosition(jd); 
 		this._asteroidData = new Array();
-		var max_y = 1;
-		var min_y = 1000;
+		let max_y = 1;
+		let min_y = 1000;
 					
-		var twoPi = Math.PI * 2.0;
-		var i;
+		const twoPi = Math.PI * 2.0;
+		let i;
 		for (i = 0; i < randomizedAsteroidList.length; i++)
 		{
-			var curr = randomizedAsteroidList[i].orbitalParameters.getOrbitalPosition(jd);
-			var relPosition = curr.helioLongitude - jupiter.helioLongitude;
-			var fPi = Math.floor(relPosition / twoPi);
+			let curr = randomizedAsteroidList[i].orbitalParameters.getOrbitalPosition(jd);
+			let relPosition = curr.helioLongitude - jupiter.helioLongitude;
+			let fPi = Math.floor(relPosition / twoPi);
 			relPosition -= fPi * twoPi;
 			if (relPosition > Math.PI)
 				relPosition -= twoPi;
 			
-			var data = new GraphDatum(relPosition * 180.0 / Math.PI,randomizedAsteroidList[i].orbitalParameters.semiMajorAxis);
+			let data = new GraphDatum(relPosition * 180.0 / Math.PI,randomizedAsteroidList[i].orbitalParameters.semiMajorAxis);
 			this._asteroidData.push(data);
 			if (data.y < min_y)
 				min_y = data.y;
@@ -233,10 +233,10 @@ class AsteroidNearJupiter
 	
 	measure(number)
 	{
-		var i;
+		let i;
 		for (i = 0; i < number; i++)
 		{
-			var idx = this._measurements.length;
+			const idx = this._measurements.length;
 			if (idx < this._asteroidData.length)
 				this._measurements.add(this._asteroidData[idx]);
 		}
@@ -304,19 +304,19 @@ class AsteroidDiameterBrightnessActivity
 		this._linearAnalysisAllowed = true;
 
 		this._asteroidData = new Array();
-		var max_x = 0.00001;
-		var min_x = 1000000;
-		var max_y = 0;
-		var min_y = 1000;
+		let max_x = 0.00001;
+		let min_x = 1000000;
+		let max_y = 0;
+		let min_y = 1000;
 					
-		var twoPi = Math.PI * 2.0;
-		var i;
+		const twoPi = Math.PI * 2.0;
+		let i;
 		for (i = 0; i < randomizedAsteroidList.length; i++)
 		{
-			var curr = randomizedAsteroidList[i]
+			const curr = randomizedAsteroidList[i]
 			if (curr.H !== null && curr.diameter !== null)
 			{
-				var data = new GraphDatum(curr.H,curr.diameter);
+				let data = new GraphDatum(curr.H,curr.diameter);
 				this._asteroidData.push(data);
 				if (data.x < min_x)
 					min_x = data.x;
@@ -351,10 +351,10 @@ class AsteroidDiameterBrightnessActivity
 	
 	measure(number)
 	{
-		var i;
+		let i;
 		for (i = 0; i < number; i++)
 		{
-			var idx = this._measurements.length;
+			const idx = this._measurements.length;
 			if (idx < this._asteroidData.length)
 				this._measurements.add(this._asteroidData[idx]);
 		}
@@ -412,15 +412,15 @@ class AsteroidDiameterBrightnessActivity
 		{
 			if (this._lls.type == "Log-Log LLS")
 			{
-				var vD_1 = Math.pow(2.0,this._lls.intercept);
-				var sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
-				var D_1 = sig_figs(vD_1,sD_1);
-				var Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "D = (" + D_1.standard_notation + " km) M";
-				var expString = Exp.standard_notation;
+				const vD_1 = Math.pow(2.0,this._lls.intercept);
+				const sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
+				const D_1 = sig_figs(vD_1,sD_1);
+				const Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
+				const eqnString = "D = (" + D_1.standard_notation + " km) M";
+				const expString = Exp.standard_notation;
 				
 				context.fillText(eqnString, 250,0);
-				var offset = context.measureText(eqnString).width;
+				let offset = context.measureText(eqnString).width;
 				context.textAlign = "left";
 				context.font = "12px Arial";
 				context.fillText(expString, 250 + offset * 0.5,-8);
@@ -428,9 +428,9 @@ class AsteroidDiameterBrightnessActivity
 			}
 			else
 			{
-				var b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
-				var m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "D = " + m.standard_notation + " M + " + b.standard_notation + " km";
+				const b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
+				const m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
+				const eqnString = "D = " + m.standard_notation + " M + " + b.standard_notation + " km";
 				context.fillText(eqnString, 250,0);
 			}
 			context.translate(0,35);
@@ -449,19 +449,19 @@ class AsteroidDiameterDistanceActivity
 		this._linearAnalysisAllowed = true;
 
 		this._asteroidData = new Array();
-		var max_x = 0.00001;
-		var min_x = 1000000;
-		var max_y = 0;
-		var min_y = 1000;
+		let max_x = 0.00001;
+		let min_x = 1000000;
+		let max_y = 0;
+		let min_y = 1000;
 					
-		var twoPi = Math.PI * 2.0;
-		var i;
+		const twoPi = Math.PI * 2.0;
+		let i;
 		for (i = 0; i < randomizedAsteroidList.length; i++)
 		{
-			var curr = randomizedAsteroidList[i]
+			let curr = randomizedAsteroidList[i]
 			if (curr.a !== null && curr.diameter !== null)
 			{
-				var data = new GraphDatum(curr.a,curr.diameter);
+				const data = new GraphDatum(curr.a,curr.diameter);
 				this._asteroidData.push(data);
 				if (data.x < min_x)
 					min_x = data.x;
@@ -496,10 +496,10 @@ class AsteroidDiameterDistanceActivity
 	
 	measure(number)
 	{
-		var i;
+		let i;
 		for (i = 0; i < number; i++)
 		{
-			var idx = this._measurements.length;
+			let idx = this._measurements.length;
 			if (idx < this._asteroidData.length)
 				this._measurements.add(this._asteroidData[idx]);
 		}
@@ -557,15 +557,15 @@ class AsteroidDiameterDistanceActivity
 		{
 			if (this._lls.type == "Log-Log LLS")
 			{
-				var vD_1 = Math.pow(2.0,this._lls.intercept);
-				var sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
-				var D_1 = sig_figs(vD_1,sD_1);
-				var Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "D = (" + D_1.standard_notation + ") a";
-				var expString = Exp.standard_notation;
+				const vD_1 = Math.pow(2.0,this._lls.intercept);
+				const sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
+				const D_1 = sig_figs(vD_1,sD_1);
+				const Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
+				const eqnString = "D = (" + D_1.standard_notation + ") a";
+				const expString = Exp.standard_notation;
 				
 				context.fillText(eqnString, 250,0);
-				var offset = context.measureText(eqnString).width;
+				let offset = context.measureText(eqnString).width;
 				context.textAlign = "left";
 				context.font = "12px Arial";
 				context.fillText(expString, 250 + offset * 0.5,-8);
@@ -573,9 +573,9 @@ class AsteroidDiameterDistanceActivity
 			}
 			else
 			{
-				var b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
-				var m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "D = " + m.standard_notation + " km/au a + (" + b.standard_notation + " km";
+				const b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
+				const m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
+				let eqnString = "D = " + m.standard_notation + " km/au a + (" + b.standard_notation + " km";
 				context.fillText(eqnString, 250,0);
 			}
 			context.translate(0,35);
@@ -594,21 +594,21 @@ class AsteroidOrbitalParametersctivity
 		this._linearAnalysisAllowed = true;
 
 		this._asteroidData = new Array();
-		var max_x = 0.00001;
-		var min_x = 1000000;
-		var max_y = 0;
-		var min_y = 1000;
+		let max_x = 0.00001;
+		let min_x = 1000000;
+		let max_y = 0;
+		let min_y = 1000;
 					
-		var twoPi = Math.PI * 2.0;
-		var i;
+		const twoPi = Math.PI * 2.0;
+		let i;
 		for (i = 0; i < randomizedAsteroidList.length; i++)
 		{
-			var curr = randomizedAsteroidList[i]
-			var x = curr.om;
-			var y = curr.i;
+			let curr = randomizedAsteroidList[i]
+			let x = curr.om;
+			let y = curr.i;
 			if (ValidateValue(x) && ValidateValue(y))
 			{
-				var data = new GraphDatum(x,y);
+				const data = new GraphDatum(x,y);
 				this._asteroidData.push(data);
 				if (data.x < min_x)
 					min_x = data.x;
@@ -645,10 +645,10 @@ class AsteroidOrbitalParametersctivity
 	
 	measure(number)
 	{
-		var i;
+		let i;
 		for (i = 0; i < number; i++)
 		{
-			var idx = this._measurements.length;
+			const idx = this._measurements.length;
 			if (idx < this._asteroidData.length)
 				this._measurements.add(this._asteroidData[idx]);
 		}
@@ -706,15 +706,15 @@ class AsteroidOrbitalParametersctivity
 		{
 			if (this._lls.type == "Log-Log LLS")
 			{
-				var vD_1 = Math.pow(2.0,this._lls.intercept);
-				var sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
-				var D_1 = sig_figs(vD_1,sD_1);
-				var Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "i = (" + D_1.standard_notation + ") Ω";
-				var expString = Exp.standard_notation;
+				const vD_1 = Math.pow(2.0,this._lls.intercept);
+				const sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
+				const D_1 = sig_figs(vD_1,sD_1);
+				const Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
+				const eqnString = "i = (" + D_1.standard_notation + ") Ω";
+				const expString = Exp.standard_notation;
 				
 				context.fillText(eqnString, 250,0);
-				var offset = context.measureText(eqnString).width;
+				const offset = context.measureText(eqnString).width;
 				context.textAlign = "left";
 				context.font = "12px Arial";
 				context.fillText(expString, 250 + offset * 0.5,-8);
@@ -722,9 +722,9 @@ class AsteroidOrbitalParametersctivity
 			}
 			else
 			{
-				var b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
-				var m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "i = " + m.standard_notation + " Ω + " + b.standard_notation + "°";
+				const b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
+				const m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
+				const eqnString = "i = " + m.standard_notation + " Ω + " + b.standard_notation + "°";
 				context.fillText(eqnString, 250,0);
 			}
 			context.translate(0,35);
@@ -745,24 +745,24 @@ class StarSpTypeColorActivity
 		this._linearAnalysisAllowed = true;
 
 		this._asteroidData = new Array();
-		var max_x = 0;
-		var min_x = 1000000;
-		var max_y = 0;
-		var min_y = 1000;
+		let max_x = 0;
+		let min_x = 1000000;
+		let max_y = 0;
+		let min_y = 1000;
 					
-		var twoPi = Math.PI * 2.0;
-		var i;
+		const twoPi = Math.PI * 2.0;
+		let i;
 		for (i = 0; i < stars.length; i++)
 		{
-			var curr = stars[i]
+			let curr = stars[i]
 
 			if (ValidateValue(curr.B) && ValidateValue(curr.V) && ValidateValue(curr.num_sp_type))
 			{
-				var x = curr.num_sp_type;
-				var y = curr.B - curr.V;
+				const x = curr.num_sp_type;
+				const y = curr.B - curr.V;
 				if (ValidateValue(x) && ValidateValue(y) && x > 100 && x <= 600 && ValidateValue(curr.num_sp_type_subtype))
 				{
-					var data = new GraphDatum(x,y);
+					let data = new GraphDatum(x,y);
 					this._asteroidData.push(data);
 					if (data.x < min_x)
 						min_x = data.x;
@@ -798,10 +798,10 @@ class StarSpTypeColorActivity
 	
 	measure(number)
 	{
-		var i;
+		let i;
 		for (i = 0; i < number; i++)
 		{
-			var idx = this._measurements.length;
+			const idx = this._measurements.length;
 			if (idx < this._asteroidData.length)
 				this._measurements.add(this._asteroidData[idx]);
 		}
@@ -859,15 +859,15 @@ class StarSpTypeColorActivity
 		{
 			if (this._lls.type == "Log-Log LLS")
 			{
-				var vD_1 = Math.pow(2.0,this._lls.intercept);
-				var sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
-				var D_1 = sig_figs(vD_1,sD_1);
-				var Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "B - V = (" + D_1.standard_notation + ") n";
-				var expString = Exp.standard_notation;
+				const vD_1 = Math.pow(2.0,this._lls.intercept);
+				const sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
+				const D_1 = sig_figs(vD_1,sD_1);
+				const Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
+				const eqnString = "B - V = (" + D_1.standard_notation + ") n";
+				const expString = Exp.standard_notation;
 				
 				context.fillText(eqnString, 250,0);
-				var offset = context.measureText(eqnString).width;
+				const offset = context.measureText(eqnString).width;
 				context.textAlign = "left";
 				context.font = "12px Arial";
 				context.fillText(expString, 250 + offset * 0.5,-8);
@@ -875,9 +875,9 @@ class StarSpTypeColorActivity
 			}
 			else
 			{
-				var b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
-				var m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "B - V = " + m.standard_notation + " n + " + b.standard_notation;
+				const b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
+				const m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
+				const eqnString = "B - V = " + m.standard_notation + " n + " + b.standard_notation;
 				context.fillText(eqnString, 250,0);
 			}
 			context.translate(0,35);
@@ -896,24 +896,24 @@ class StarColorColorActivity
 		this._linearAnalysisAllowed = true;
 
 		this._asteroidData = new Array();
-		var max_x = 0;
-		var min_x = 1000000;
-		var max_y = 0;
-		var min_y = 1000;
+		let max_x = 0;
+		let min_x = 1000000;
+		let max_y = 0;
+		let min_y = 1000;
 					
-		var twoPi = Math.PI * 2.0;
-		var i;
+		const twoPi = Math.PI * 2.0;
+		let i;
 		for (i = 0; i < stars.length; i++)
 		{
-			var curr = stars[i]
+			let curr = stars[i]
 
 			if (ValidateValue(curr.B) && ValidateValue(curr.V) && ValidateValue(curr.R))
 			{
-				var x = curr.B - curr.V;
-				var y = curr.V - curr.R;
+				const x = curr.B - curr.V;
+				const y = curr.V - curr.R;
 				if (ValidateValue(x) && ValidateValue(y) && x < 1.5 && y > -0.5)
 				{
-					var data = new GraphDatum(x,y);
+					const data = new GraphDatum(x,y);
 					this._asteroidData.push(data);
 					if (data.x < min_x)
 						min_x = data.x;
@@ -949,10 +949,10 @@ class StarColorColorActivity
 	
 	measure(number)
 	{
-		var i;
+		let i;
 		for (i = 0; i < number; i++)
 		{
-			var idx = this._measurements.length;
+			const idx = this._measurements.length;
 			if (idx < this._asteroidData.length)
 				this._measurements.add(this._asteroidData[idx]);
 		}
@@ -1010,15 +1010,15 @@ class StarColorColorActivity
 		{
 			if (this._lls.type == "Log-Log LLS")
 			{
-				var vD_1 = Math.pow(2.0,this._lls.intercept);
-				var sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
-				var D_1 = sig_figs(vD_1,sD_1);
-				var Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "V - R = (" + D_1.standard_notation + ") (B - V)";
-				var expString = Exp.standard_notation;
+				const vD_1 = Math.pow(2.0,this._lls.intercept);
+				const sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
+				const D_1 = sig_figs(vD_1,sD_1);
+				const Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
+				const eqnString = "V - R = (" + D_1.standard_notation + ") (B - V)";
+				const expString = Exp.standard_notation;
 				
 				context.fillText(eqnString, 250,0);
-				var offset = context.measureText(eqnString).width;
+				const offset = context.measureText(eqnString).width;
 				context.textAlign = "left";
 				context.font = "12px Arial";
 				context.fillText(expString, 250 + offset * 0.5,-8);
@@ -1026,9 +1026,9 @@ class StarColorColorActivity
 			}
 			else
 			{
-				var b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
-				var m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "V - R = " + m.standard_notation + " (B - V) + " + b.standard_notation;
+				const b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
+				const m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
+				const eqnString = "V - R = " + m.standard_notation + " (B - V) + " + b.standard_notation;
 				context.fillText(eqnString, 250,0);
 			}
 			context.translate(0,35);
@@ -1048,22 +1048,22 @@ class StarRedshiftGalLongActivity
 		this._linearAnalysisAllowed = true;
 
 		this._asteroidData = new Array();
-		var max_x = 0;
-		var min_x = 1000000;
-		var max_y = 0;
-		var min_y = 1000;
+		let max_x = 0;
+		let min_x = 1000000;
+		let max_y = 0;
+		let min_y = 1000;
 					
-		var twoPi = Math.PI * 2.0;
-		var i;
+		const twoPi = Math.PI * 2.0;
+		let i;
 		for (i = 0; i < stars.length; i++)
 		{
-			var curr = stars[i]
+			let curr = stars[i]
 
-			var x = curr.gallong;
-			var y = curr.rvz_redshift;
+			const x = curr.gallong;
+			const y = curr.rvz_redshift;
 			if (ValidateValue(x) && ValidateValue(y))
 			{
-				var data = new GraphDatum(x,y);
+				const data = new GraphDatum(x,y);
 				this._asteroidData.push(data);
 				if (data.x < min_x)
 					min_x = data.x;
@@ -1098,10 +1098,10 @@ class StarRedshiftGalLongActivity
 	
 	measure(number)
 	{
-		var i;
+		let i;
 		for (i = 0; i < number; i++)
 		{
-			var idx = this._measurements.length;
+			const idx = this._measurements.length;
 			if (idx < this._asteroidData.length)
 				this._measurements.add(this._asteroidData[idx]);
 		}
@@ -1159,15 +1159,15 @@ class StarRedshiftGalLongActivity
 		{
 			if (this._lls.type == "Log-Log LLS")
 			{
-				var vD_1 = Math.pow(2.0,this._lls.intercept);
-				var sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
-				var D_1 = sig_figs(vD_1,sD_1);
-				var Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "z = (" + D_1.standard_notation + ") ℓ";
-				var expString = Exp.standard_notation;
+				const vD_1 = Math.pow(2.0,this._lls.intercept);
+				const sD_1 = vD_1 * this._lls.intercept_uncertainty * Math.log(2.0);
+				const D_1 = sig_figs(vD_1,sD_1);
+				const Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
+				const eqnString = "z = (" + D_1.standard_notation + ") ℓ";
+				const expString = Exp.standard_notation;
 
 				context.fillText(eqnString, 250,0);
-				var offset = context.measureText(eqnString).width;
+				const offset = context.measureText(eqnString).width;
 				context.textAlign = "left";
 				context.font = "12px Arial";
 				context.fillText(expString, 250 + offset * 0.5,-8);
@@ -1175,9 +1175,9 @@ class StarRedshiftGalLongActivity
 			}
 			else
 			{
-				var b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
-				var m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
-				var eqnString = "z = " + m.standard_notation + " deg.⁻¹ ℓ + " + b.standard_notation;
+				const b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
+				const m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
+				const eqnString = "z = " + m.standard_notation + " deg.⁻¹ ℓ + " + b.standard_notation;
 				context.fillText(eqnString, 250,0);
 			}
 			context.translate(0,35);
@@ -1186,18 +1186,18 @@ class StarRedshiftGalLongActivity
 	}
 
 }
-var starPostionActivity = new StarPositionActvity();
-var asteroidNearJupiterActivity = new AsteroidNearJupiter();
-var asteroidDiameterBrightnessActivity = new AsteroidDiameterBrightnessActivity();
-var asteroidDiameterDistanceActivity = new AsteroidDiameterDistanceActivity();
-var asteroidOrbitalParametersctivity = new AsteroidOrbitalParametersctivity();
-var starSpTypeColorActivity = new StarSpTypeColorActivity();
-var starRedshiftGalLongActivity = new StarRedshiftGalLongActivity();
-var starColorColorActivity = new StarColorColorActivity();
+let starPostionActivity = new StarPositionActvity();
+let asteroidNearJupiterActivity = new AsteroidNearJupiter();
+let asteroidDiameterBrightnessActivity = new AsteroidDiameterBrightnessActivity();
+let asteroidDiameterDistanceActivity = new AsteroidDiameterDistanceActivity();
+let asteroidOrbitalParametersctivity = new AsteroidOrbitalParametersctivity();
+let starSpTypeColorActivity = new StarSpTypeColorActivity();
+let starRedshiftGalLongActivity = new StarRedshiftGalLongActivity();
+let starColorColorActivity = new StarColorColorActivity();
 
-var currentActivity = starPostionActivity;
+let currentActivity = starPostionActivity;
 
-var theCanvas = document.getElementById("theCanvas");
+let theCanvas = document.getElementById("theCanvas");
 theCanvas.onselectstart = function () { return false; }
 theCanvas.onmousedown = commonUIOnMouseDown;
 theCanvas.onmouseup = commonUIOnMouseUp;
@@ -1205,10 +1205,10 @@ theCanvas.onclick = commonUIOnClick;
 theCanvas.onmousemove = commonUIOnMouseMove;
 theCanvas.onmouseleave = commonUIOnMouseLeave;
 
-var theContext = theCanvas.getContext("2d");
+let theContext = theCanvas.getContext("2d");
 
-var select = document.getElementById("selectActivity");
-var option = document.createElement("option");
+let select = document.getElementById("selectActivity");
+let option = document.createElement("option");
 option.text = starPostionActivity._title;
 
 select.add(option)
@@ -1252,11 +1252,11 @@ select.add(option)
 
 
 
-var g_bLogLogDisplay = false;
+let g_bLogLogDisplay = false;
 
 function OnActivitySelect()
 {
-	var newActivity = null;
+	let newActivity = null;
 	if (select.value == asteroidNearJupiterActivity._title)
 		newActivity = asteroidNearJupiterActivity;
 	else if (select.value == asteroidDiameterBrightnessActivity._title)
@@ -1279,25 +1279,25 @@ function OnActivitySelect()
 	if (!currentActivity._loglogAllowed)
 	{
 		g_bLogLogDisplay = false;
-		var btn = document.getElementById("buttonLogPlot");
+		let btn = document.getElementById("buttonLogPlot");
 		btn.innerText = "Display Log-Log Plot";
 		btn.disabled = true;
 	}
 	else
 	{
 		g_bLogLogDisplay = false;
-		var btn = document.getElementById("buttonLogPlot");
+		let btn = document.getElementById("buttonLogPlot");
 		btn.innerText = "Display Log-Log Plot";
 		btn.disabled = false;
 	}
 	if (!currentActivity._linearAnalysisAllowed)
 	{
-		var btn = document.getElementById("buttonLinearRegression");
+		let btn = document.getElementById("buttonLinearRegression");
 		btn.disabled = true;
 	}
 	else
 	{
-		var btn = document.getElementById("buttonLinearRegression");
+		let btn = document.getElementById("buttonLinearRegression");
 		btn.disabled = false;
 	}
 	
@@ -1324,7 +1324,7 @@ function OnLogPlotSelect()
 	{
 		g_bLogLogDisplay = !g_bLogLogDisplay;
 	}
-	var btn = document.getElementById("buttonLogPlot");
+	let btn = document.getElementById("buttonLogPlot");
 	if (g_bLogLogDisplay)
 	{
 		btn.innerText = "Display Linear Plot";
@@ -1335,12 +1335,12 @@ function OnLogPlotSelect()
 	}
 		
 }
-var g_currentNumMeasure = 1;
+let g_currentNumMeasure = 1;
 function OnMeasurmentNumberSelect()
 {
-	var measNum = document.getElementById("rangeMeasurementNumber");
-	var measBus = document.getElementById("buttonMeasure");
-	var N = 10 ** (new Number(measNum.value));
+	const measNum = document.getElementById("rangeMeasurementNumber");
+	let measBus = document.getElementById("buttonMeasure");
+	let N = 10 ** (new Number(measNum.value));
 	if (N > 1)
 		measBus.innerText = "Make " + N.toString() + " Measurements";
 	else
@@ -1348,7 +1348,7 @@ function OnMeasurmentNumberSelect()
 	g_currentNumMeasure = N;
 }
 
-var minimumControlsHeightTop = 130;
+//const minimumControlsHeightTop = 130;
 
 theCanvas.height = window.innerHeight - 120; // 60 larger than normal (60) to accomodate drop down box
 theCanvas.width = window.innerWidth;

@@ -1,6 +1,6 @@
 
 
-var theCanvas = document.getElementById("theCanvas");
+let theCanvas = document.getElementById("theCanvas");
 theCanvas.onselectstart = function () { return false; }
 theCanvas.onmousedown = commonUIOnMouseDown;
 theCanvas.onmouseup = commonUIOnMouseUp;
@@ -8,35 +8,31 @@ theCanvas.onclick = commonUIOnClick;
 theCanvas.onmousemove = commonUIOnMouseMove;
 theCanvas.onmouseleave = commonUIOnMouseLeave;
 
-var theContext = theCanvas.getContext("2d");
+let theContext = theCanvas.getContext("2d");
 
 
-var minimumControlsHeightTop = 130;
+const minimumControlsHeightTop = 130;
 
 theCanvas.height = window.innerHeight - 60;
 theCanvas.width = window.innerWidth;
 //theCanvas.width = theCanvas.height;
 
-var modelButtonsY = theCanvas.height - 30;
-var buttonsControlsY = modelButtonsY - 30;
-//var buttonsZoomY = buttonsControlsY - 30;
+const modelButtonsY = theCanvas.height - 30;
+const buttonsControlsY = modelButtonsY - 30;
+//let buttonsZoomY = buttonsControlsY - 30;
 
-var buttonsTimeY = buttonsControlsY - 50;
-var dateDisplayTopY = buttonsTimeY - 25.0;
-var dateDisplayY = dateDisplayTopY + 20.0;
-var displayBottomY = dateDisplayTopY - 5.0;
-var displayHeight = displayBottomY;
-if (displayHeight < 0)
-	displayHeight = 10;
-if (theCanvas.width < displayHeight)
-	displayHeight = theCanvas.width;
-var displayCenterX = theCanvas.width / 2;
-var displayCenterY = displayBottomY - displayHeight / 2;
+const buttonsTimeY = buttonsControlsY - 50;
+const dateDisplayTopY = buttonsTimeY - 25.0;
+const dateDisplayY = dateDisplayTopY + 20.0;
+const displayBottomY = dateDisplayTopY - 5.0;
+const displayHeight = Math.min(Math.max(10,displayBottomY),theCanvas.width);
+const displayCenterX = theCanvas.width / 2;
+const displayCenterY = displayBottomY - displayHeight / 2;
 
 
-var g_simpleSolarSystem = true;
-var g_speed = 1.0;
-var g_zoom = 1.0 / 20.0; // 1/30 arcsec
+let g_simpleSolarSystem = true;
+let g_speed = 1.0;
+let g_zoom = 1.0 / 20.0; // 1/30 arcsec
 
 function speedup(event)
 {
@@ -57,26 +53,25 @@ function zoomout(event)
 }
 
 
-var g_basespeed = 1.0;
-var g_speed = 1.0;
-var g_pause = true;
+let g_basespeed = 1.0;
+let g_pause = true;
 
 
-var times = String.fromCharCode(0x00d7)
-var pauseButtonText = '| |'
-var playButtonText = String.fromCharCode(0x25b6);
-var reverseButtonText = String.fromCharCode(0x25c0);
+const times = String.fromCharCode(0x00d7)
+const pauseButtonText = '| |'
+const playButtonText = String.fromCharCode(0x25b6);
+const reverseButtonText = String.fromCharCode(0x25c0);
 
-var timesMTwoFiftySix = reverseButtonText + '256'
-var timesMSixtyFour = reverseButtonText + '64'
-var timesMSixteen = reverseButtonText + '16'
-var timesMFour = reverseButtonText + '4'
-var timesMOne = reverseButtonText + '1'
-var timesOne = playButtonText + '1'
-var timesFour = playButtonText + '4'
-var timesSixteen = playButtonText + '16'
-var timesSixtyFour = playButtonText + '64'
-var timesTwoFiftySix = playButtonText + '256'
+const timesMTwoFiftySix = reverseButtonText + '256'
+const timesMSixtyFour = reverseButtonText + '64'
+const timesMSixteen = reverseButtonText + '16'
+const timesMFour = reverseButtonText + '4'
+const timesMOne = reverseButtonText + '1'
+const timesOne = playButtonText + '1'
+const timesFour = playButtonText + '4'
+const timesSixteen = playButtonText + '16'
+const timesSixtyFour = playButtonText + '64'
+const timesTwoFiftySix = playButtonText + '256'
 function selectSpeed(value)
 {
 	switch (value)
@@ -115,7 +110,7 @@ function selectSpeed(value)
 	}
 }
 
-var speedButtons = new Array();
+let speedButtons = new Array();
 speedButtons.push(new RadioButton(timesMTwoFiftySix,timesMTwoFiftySix ,theCanvas.width / 2 - 230,buttonsTimeY,40,40));
 speedButtons.push(new RadioButton(timesMSixtyFour,timesMSixtyFour     ,theCanvas.width / 2 - 190,buttonsTimeY,40,40));
 speedButtons.push(new RadioButton(timesMSixteen,timesMSixteen         ,theCanvas.width / 2 - 150,buttonsTimeY,40,40));
@@ -145,13 +140,13 @@ function requestAdvanceYear(event)
 	g_timer += 365.0;
 }
 
-var advanceDay = new Button("+1d",theCanvas.width / 2 + 250,buttonsTimeY,40,40,requestAdvanceDay);
+let advanceDay = new Button("+1d",theCanvas.width / 2 + 250,buttonsTimeY,40,40,requestAdvanceDay);
 commonUIRegister(advanceDay);
-var advanceWeek = new Button("+7d",theCanvas.width / 2 + 290,buttonsTimeY,40,40,requestAdvanceWeek);
+let advanceWeek = new Button("+7d",theCanvas.width / 2 + 290,buttonsTimeY,40,40,requestAdvanceWeek);
 commonUIRegister(advanceWeek);
-var advanceMonth = new Button("+30d",theCanvas.width / 2 + 330,buttonsTimeY,40,40,requestAdvanceMonth);
+let advanceMonth = new Button("+30d",theCanvas.width / 2 + 330,buttonsTimeY,40,40,requestAdvanceMonth);
 commonUIRegister(advanceMonth);
-var advanceYear = new Button("+1y",theCanvas.width / 2 + 370,buttonsTimeY,40,40,requestAdvanceYear);
+let advanceYear = new Button("+1y",theCanvas.width / 2 + 370,buttonsTimeY,40,40,requestAdvanceYear);
 commonUIRegister(advanceYear);
 
 function requestBackDay(event)
@@ -171,13 +166,13 @@ function requestBackYear(event)
 	g_timer -= 365.0;
 }
 
-var backDay = new Button("-1d",theCanvas.width / 2 - 290,buttonsTimeY,40,40,requestBackDay);
+let backDay = new Button("-1d",theCanvas.width / 2 - 290,buttonsTimeY,40,40,requestBackDay);
 commonUIRegister(backDay);
-var backWeek = new Button("-7d",theCanvas.width / 2 - 330,buttonsTimeY,40,40,requestBackWeek);
+let backWeek = new Button("-7d",theCanvas.width / 2 - 330,buttonsTimeY,40,40,requestBackWeek);
 commonUIRegister(backWeek);
-var backMonth = new Button("-30d",theCanvas.width / 2 - 370,buttonsTimeY,40,40,requestBackMonth);
+let backMonth = new Button("-30d",theCanvas.width / 2 - 370,buttonsTimeY,40,40,requestBackMonth);
 commonUIRegister(backMonth);
-var backYear = new Button("-1y",theCanvas.width / 2 - 410,buttonsTimeY,40,40,requestBackYear);
+let backYear = new Button("-1y",theCanvas.width / 2 - 410,buttonsTimeY,40,40,requestBackYear);
 commonUIRegister(backYear);
 
 
@@ -194,7 +189,7 @@ function requestPause(event)
 	}
 }
 
-var playButton = new Button("Pause",theCanvas.width / 2 - 20,buttonsTimeY,40,40,requestPause);
+let playButton = new Button("Pause",theCanvas.width / 2 - 20,buttonsTimeY,40,40,requestPause);
 if (g_pause)
 	playButton.text = playButtonText;
 else
@@ -203,7 +198,7 @@ playButton.textFont = "24px Arial";
 commonUIRegister(playButton);
 
 
-var g_PLXenable = true;
+let g_PLXenable = true;
 function requestParallax(event)
 {
 	g_PLXenable = !g_PLXenable;
@@ -217,7 +212,7 @@ function requestParallax(event)
 	}
 }
 
-var g_PMenable = true;
+let g_PMenable = true;
 function requestProperMotion(event)
 {
 	g_PMenable = !g_PMenable;
@@ -231,10 +226,10 @@ function requestProperMotion(event)
 	}
 }
 
-var plxEnableButton = new Button("Parallax",theCanvas.width / 2 - 290,modelButtonsY,140,25,requestParallax);
+let plxEnableButton = new Button("Parallax",theCanvas.width / 2 - 290,modelButtonsY,140,25,requestParallax);
 plxEnableButton.insideStyle = "#007F00";
 commonUIRegister(plxEnableButton);
-var pmEnableButton = new Button("Proper Motion",theCanvas.width / 2 - 145,modelButtonsY,140,25,requestProperMotion);
+let pmEnableButton = new Button("Proper Motion",theCanvas.width / 2 - 145,modelButtonsY,140,25,requestProperMotion);
 pmEnableButton.insideStyle = "#007F00";
 commonUIRegister(pmEnableButton);
 
@@ -242,7 +237,7 @@ function selectComplexity(value)
 {
 	g_simpleSolarSystem = (value == "Simple Model");
 }
-var modelButtons = new Array();
+let modelButtons = new Array();
 modelButtons.push(new RadioButton("Simple Model","Simple Model",theCanvas.width / 2 + 5,modelButtonsY,140,25));
 modelButtons.push(new RadioButton("Real Model","Real Model",theCanvas.width / 2 + 150,modelButtonsY,140,25));
 if (g_simpleSolarSystem)
@@ -250,7 +245,7 @@ if (g_simpleSolarSystem)
 else
 	commonUIRegister(new Radio("Model","Real Model",selectComplexity,modelButtons));
 
-var slew = [0,0];
+let slew = [0,0];
 function requestviewNorthStart(event)
 {
 	slew[1] = 1;
@@ -260,7 +255,7 @@ function requestviewNorthEnd(event)
 	slew[1] = 0;
 }
 
-var viewNorth = new SpringButton(String.fromCharCode(0x25b2),displayCenterX + displayHeight * 0.5 + 70,displayCenterY - 155,40,40,requestviewNorthStart,requestviewNorthEnd);
+let viewNorth = new SpringButton(String.fromCharCode(0x25b2),displayCenterX + displayHeight * 0.5 + 70,displayCenterY - 155,40,40,requestviewNorthStart,requestviewNorthEnd);
 commonUIRegister(viewNorth);
 
 function requestviewSouthStart(event)
@@ -272,7 +267,7 @@ function requestviewSouthEnd(event)
 	slew[1] = 0;
 }
 
-var viewSouth = new SpringButton(String.fromCharCode(0x25bc),displayCenterX + displayHeight * 0.5 + 70,displayCenterY - 65,40,40, requestviewSouthStart, requestviewSouthEnd);
+let viewSouth = new SpringButton(String.fromCharCode(0x25bc),displayCenterX + displayHeight * 0.5 + 70,displayCenterY - 65,40,40, requestviewSouthStart, requestviewSouthEnd);
 commonUIRegister(viewSouth);
 function requestviewEastStart(event)
 {
@@ -283,7 +278,7 @@ function requestviewEastEnd(event)
 	slew[0] = 0;
 }
 
-var viewEast = new SpringButton(String.fromCharCode(0x25c4),displayCenterX + displayHeight * 0.5 + 25,displayCenterY - 110,40,40, requestviewEastStart, requestviewEastEnd);
+let viewEast = new SpringButton(String.fromCharCode(0x25c4),displayCenterX + displayHeight * 0.5 + 25,displayCenterY - 110,40,40, requestviewEastStart, requestviewEastEnd);
 commonUIRegister(viewEast);
 
 function requestviewWestStart(event)
@@ -294,10 +289,10 @@ function requestviewWestEnd(event)
 {
 	slew[0] = 0;
 }
-var viewWest = new SpringButton(String.fromCharCode(0x25ba),displayCenterX + displayHeight * 0.5 + 115,displayCenterY - 110,40,40, requestviewWestStart, requestviewWestEnd);
+let viewWest = new SpringButton(String.fromCharCode(0x25ba),displayCenterX + displayHeight * 0.5 + 115,displayCenterY - 110,40,40, requestviewWestStart, requestviewWestEnd);
 commonUIRegister(viewWest);
 
-var zoomAdjust = 0;
+let zoomAdjust = 0;
 function requestZoomInStart(event)
 {
 	zoomAdjust = 1;
@@ -308,7 +303,7 @@ function requestZoomInEnd(event)
 	zoomAdjust = 0;
 }
 
-var zoomIn = new SpringButton("+",displayCenterX + displayHeight * 0.5 + 115,displayCenterY - 200,40,40, requestZoomInStart, requestZoomInEnd);
+let zoomIn = new SpringButton("+",displayCenterX + displayHeight * 0.5 + 115,displayCenterY - 200,40,40, requestZoomInStart, requestZoomInEnd);
 commonUIRegister(zoomIn);
 
 function requestZoomOutStart(event)
@@ -321,10 +316,10 @@ function requestZoomOutEnd(event)
 	zoomAdjust = 0;
 }
 
-var zoomOut = new SpringButton("-",displayCenterX + displayHeight * 0.5 + 25,displayCenterY - 200,40,40, requestZoomOutStart, requestZoomOutEnd);
+let zoomOut = new SpringButton("-",displayCenterX + displayHeight * 0.5 + 25,displayCenterY - 200,40,40, requestZoomOutStart, requestZoomOutEnd);
 commonUIRegister(zoomOut);
 
-var g_timer = 2451544.0;//2456083.27000; //2451545.0;
+let g_timer = 2451544.0;//2456083.27000; //2451545.0;
 
 function selectNextPlxStar(event)
 {
@@ -347,9 +342,9 @@ function selectPrevPlxStar(event)
 	selectStar(highPlx[currPlxidx]);
 }
 
-var nextPlx = new Button(String.fromCharCode(0x25ba), displayCenterX - displayHeight * 0.5 - 45, displayCenterY - displayHeight * 0.5 + 25,40,20,selectNextPlxStar);
+let nextPlx = new Button(String.fromCharCode(0x25ba), displayCenterX - displayHeight * 0.5 - 45, displayCenterY - displayHeight * 0.5 + 25,40,20,selectNextPlxStar);
 commonUIRegister(nextPlx);
-var prevPlx = new Button(String.fromCharCode(0x25c4), displayCenterX - displayHeight * 0.5 - 195, displayCenterY - displayHeight * 0.5 + 25,40,20,selectPrevPlxStar);
+let prevPlx = new Button(String.fromCharCode(0x25c4), displayCenterX - displayHeight * 0.5 - 195, displayCenterY - displayHeight * 0.5 + 25,40,20,selectPrevPlxStar);
 commonUIRegister(prevPlx);
 
 function selectNextPMStar(event)
@@ -371,40 +366,40 @@ function selectPrevPMStar(event)
 	selectStar(highPM[currPMidx]);
 }
 
-var nextPM = new Button(String.fromCharCode(0x25ba), displayCenterX - displayHeight * 0.5 - 45, displayCenterY - displayHeight * 0.5,40,20,selectNextPMStar);
+let nextPM = new Button(String.fromCharCode(0x25ba), displayCenterX - displayHeight * 0.5 - 45, displayCenterY - displayHeight * 0.5,40,20,selectNextPMStar);
 commonUIRegister(nextPM);
-var prevPM = new Button(String.fromCharCode(0x25c4), displayCenterX - displayHeight * 0.5 - 195, displayCenterY - displayHeight * 0.5,40,20,selectPrevPMStar);
+let prevPM = new Button(String.fromCharCode(0x25c4), displayCenterX - displayHeight * 0.5 - 195, displayCenterY - displayHeight * 0.5,40,20,selectPrevPMStar);
 commonUIRegister(prevPM);
 
 
-var starData = new Array();
-var starPositionsCalculated = false;
-var selectedStar = null;
+let starData = new Array();
+let starPositionsCalculated = false;
+let selectedStar = null;
 
-var viewRA = 0.0;
-var viewDec = 0.0;
-var viewMatrix = new ThreeMatrix();
-var idxLcl = 0;
+let viewRA = 0.0;
+let viewDec = 0.0;
+let viewMatrix = new ThreeMatrix();
+let idxLcl = 0;
 
 function updateViewMatrix()
 {
-	var raRad = radians(viewRA);
-	var decRad = radians(viewDec);
-	var cosRA = Math.cos(raRad);
-	var sinRA = Math.sin(raRad);
-	var cosDec = Math.cos(decRad);
-	var sinDec = Math.sin(decRad);
+	const raRad = radians(viewRA);
+	const decRad = radians(viewDec);
+	const cosRA = Math.cos(raRad);
+	const sinRA = Math.sin(raRad);
+	const cosDec = Math.cos(decRad);
+	const sinDec = Math.sin(decRad);
 
-	var cosRAp90 = Math.cos(raRad + Math.PI * 0.5);
-	var sinRAp90 = Math.sin(raRad + Math.PI * 0.5);
+	const cosRAp90 = Math.cos(raRad + Math.PI * 0.5);
+	const sinRAp90 = Math.sin(raRad + Math.PI * 0.5);
 
-	var cosDecp90 = Math.cos(decRad + Math.PI * 0.5);
-	var sinDecp90 = Math.sin(decRad + Math.PI * 0.5);
+	const cosDecp90 = Math.cos(decRad + Math.PI * 0.5);
+	const sinDecp90 = Math.sin(decRad + Math.PI * 0.5);
 
 
-	var viewX = new ThreeVector(cosRA * cosDec, sinRA * cosDec, sinDec);
-	var viewY = new ThreeVector(cosRAp90, sinRAp90, 0.0);
-	var viewZ = new ThreeVector(cosRA * cosDecp90, sinRA * cosDecp90, sinDecp90);
+	const viewX = new ThreeVector(cosRA * cosDec, sinRA * cosDec, sinDec);
+	const viewY = new ThreeVector(cosRAp90, sinRAp90, 0.0);
+	const viewZ = new ThreeVector(cosRA * cosDecp90, sinRA * cosDecp90, sinDecp90);
 
 	viewMatrix.setRowVector(0, viewX);
 	viewMatrix.setRowVector(1, viewY);
@@ -423,12 +418,12 @@ function selectStar(index)
 	}
 }
 
-var highPM = new Array();
-var highPlx = new Array();
+let highPM = new Array();
+let highPlx = new Array();
 	
-var currList = 0;
-var currPMidx = 0;
-var currPlxidx = 0;
+let currList = 0;
+let currPMidx = 0;
+let currPlxidx = 0;
 
 function preprocessStars()
 {
@@ -436,7 +431,7 @@ function preprocessStars()
 	{
 		for (idxLcl = 0; idxLcl < stars.length; idxLcl++)
 		{
-			var dataCurrent = new SpatialStarData();
+			let dataCurrent = new SpatialStarData();
 			dataCurrent.calculate(stars[idxLcl].ra, stars[idxLcl].dec, stars[idxLcl].plx_value, stars[idxLcl].rvz_redshift, stars[idxLcl].pmra, stars[idxLcl].pmdec);
 			starData.push(dataCurrent);
 
@@ -455,7 +450,7 @@ function preprocessStars()
 
 preprocessStars();
 
-var standbyTimer = 0;
+let standbyTimer = 0;
 
 function work(){
 	theContext.clearRect(0, 0, theCanvas.width, theCanvas.height);
@@ -468,7 +463,7 @@ function work(){
 	if (!starsReady)
 		standbyTimer += 1.0 / 30.0;
 		
-	var timeSeconds = (g_timer - 2451544.00000) * 86400.0;
+	const timeSeconds = (g_timer - 2451544.00000) * 86400.0;
 	
 	if (slew[0] != 0 || slew[1] != 0)
 	{
@@ -496,7 +491,7 @@ function work(){
 	const kRadians = Math.PI / 180.0;
 	const kDegrees = 180.0 / Math.PI;
 
-	var posEarth = new Object();
+	let posEarth = new Object();
 	if (g_simpleSolarSystem)
 	{
 		posEarth = Planets.Earth.getSimplePosition(g_timer);
@@ -506,7 +501,7 @@ function work(){
 		posEarth = Planets.Earth.getTruePosition(g_timer);
 	}
 	
-	var Earth = posEarth.planetHelio.copy();
+	let Earth = posEarth.planetHelio.copy();
 	Earth.selfScale(14959787070000.0); // convert from AU to cm
 
 	theContext.save();
@@ -516,37 +511,35 @@ function work(){
 	theContext.stroke();
 	theContext.clip();
 
-	var arcSecRadians = Math.PI / 648000.0; // 1" in radians
-	var radiansArcSec = 648000.0 / Math.PI; // 1 radian in arc-sec
-	var scaling = 648000.0 / Math.PI * 0.5;
-	var scalingDeg = 1.0 * 0.5;
-	var aperture = 1000.0;
-	var resolution = 1.22 * 5.5e-7 / aperture;// / scaling  * 0.5;
-	var seeing = 1.1;
-	var diff_patt_size = resolution;
-	if (diff_patt_size < seeing)
-		diff_patt_size = seeing;
+	const arcSecRadians = Math.PI / 648000.0; // 1" in radians
+	const radiansArcSec = 648000.0 / Math.PI; // 1 radian in arc-sec
+	const scaling = 648000.0 / Math.PI * 0.5;
+	const scalingDeg = 1.0 * 0.5;
+	const aperture = 1000.0;
+	const resolution = 1.22 * 5.5e-7 / aperture;// / scaling  * 0.5;
+	const seeing = 1.1;
+	const diff_patt_size = Math.max(seeing,resolution);
 	
-	var halfSize = displayHeight * 0.5;
+	const halfSize = displayHeight * 0.5;
 	if (starsReady)
 	{
 		if (!starPositionsCalculated)
 		{
 			preprocessStars();
 		}
-		var arcsecPixels = arcSecRadians * scaling * g_zoom * halfSize;
+		//let arcsecPixels = arcSecRadians * scaling * g_zoom * halfSize;
 		
 				
 		
-		var arcsecPixels = scalingDeg * g_zoom * halfSize;
-		var arcsecDegrees = 1.0 / 3600.0;
-		var viewRAarcsec = viewRA * 3600.0
-		var viewDecarcsec = viewDec * 3600.0
+		const arcsecPixels = scalingDeg * g_zoom * halfSize;
+		const arcsecDegrees = 1.0 / 3600.0;
+		const viewRAarcsec = viewRA * 3600.0
+		const viewDecarcsec = viewDec * 3600.0
 
-		var angWidth = displayHeight / arcsecPixels;
-		var xstart = Math.floor(angWidth * 0.5);
-		var xend = Math.ceil(angWidth * 0.5);
-		var lineSpacing = 1.0;
+		const angWidth = displayHeight / arcsecPixels;
+		const xstart = Math.floor(angWidth * 0.5);
+		const xend = Math.ceil(angWidth * 0.5);
+		let lineSpacing = 1.0;
 		if (angWidth > 7200.0)
 			lineSpacing = 3600.0;
 		else if (angWidth > 3600)
@@ -566,10 +559,10 @@ function work(){
 		else if (angWidth > 30)
 			lineSpacing = 2.0;
 			
-		var offsetX = (viewRAarcsec - Math.floor(viewRAarcsec));
+		let offsetX = (viewRAarcsec - Math.floor(viewRAarcsec));
 
 		theContext.strokeStyle = "#1F1F1F";
-		var x;
+		let x;
 		for (x = -xstart; x < xend; x += lineSpacing)
 		{
 			theContext.beginPath();
@@ -594,12 +587,12 @@ function work(){
 		theContext.moveTo(displayCenterX - 0.5 * arcSecRadians * scaling * g_zoom * halfSize,displayCenterY + 0.9 * halfSize);
 		theContext.lineTo(displayCenterX + 0.5 * arcSecRadians * scaling * g_zoom * halfSize,displayCenterY + 0.9 * halfSize);
 		theContext.stroke();
-		var map = new ImgData(theContext, displayCenterX - displayHeight / 2, displayCenterY - displayHeight / 2, displayHeight, displayHeight);
+		let map = new ImgData(theContext, displayCenterX - displayHeight / 2, displayCenterY - displayHeight / 2, displayHeight, displayHeight);
 		for (idxLcl = 0; idxLcl < stars.length; idxLcl++)
 		{
 	//		if (inview[idxLcl])
 			{
-//				var StarID = stars[idxLcl].main_id;
+//				let StarID = stars[idxLcl].main_id;
 	//			StarPMRA = grp[idxLcl].pmra;
 	//			StarPMDec = grp[idxLcl].pmdec;
 	//			StarPlx = grp[idxLcl].plx_value;
@@ -611,30 +604,30 @@ function work(){
 	//			if (StarID == "* alf CMa")
 	//				console.log("here");
 
-				var StarPDate = starData[idxLcl].positionApparent.copy();
-				var StarPDateUnit = StarPDate.unit;
-				var StarMDate = starData[idxLcl].velocity.scale(timeSeconds);
+				let StarPDate = starData[idxLcl].positionApparent.copy();
+				const StarPDateUnit = StarPDate.unit;
+				const StarMDate = starData[idxLcl].velocity.scale(timeSeconds);
 				if (g_PMenable)
 					StarPDate.selfAdd(StarMDate);
 				if (g_PLXenable)
 					StarPDate.selfSubtract(Earth);
-				var viewPos = viewMatrix.dot(StarPDate.unit); // transform relative position into view coordinates
+				const viewPos = viewMatrix.dot(StarPDate.unit); // transform relative position into view coordinates
 				if (Math.abs(viewPos.theta) < Math.PI * 0.5 || Math.abs(viewPos.theta) > 1.5 * Math.PI) // needs to be in front of telescope
 				{
-					var x = viewPos.theta * scaling * g_zoom * halfSize;
-					var y = viewPos.psi * scaling * g_zoom * halfSize
-					var size = diff_patt_size * halfSize * g_zoom * 0.5;
+					const x = viewPos.theta * scaling * g_zoom * halfSize;
+					const y = viewPos.psi * scaling * g_zoom * halfSize
+					let size = diff_patt_size * halfSize * g_zoom * 0.5;
 					if ((x + size) >= -halfSize && (x - size) <= halfSize && (y + size) >= -halfSize && (y - size) < halfSize)
 					{
-						var starColor = UBVRItoRGB(null, stars[idxLcl].B, stars[idxLcl].V, stars[idxLcl].R, null, 0.0, 18.0);
+						const starColor = UBVRItoRGB(null, stars[idxLcl].B, stars[idxLcl].V, stars[idxLcl].R, null, 0.0, 18.0);
 						drawStar(map, x + halfSize, y + halfSize, size, starColor);
 /*
 						if (size < 1)
 							size = 1;
-						var layer = 0;
+						let layer = 0;
 						for (layer = 0; layer < size; layer += 0.5)
 						{
-							var clrLcl = starColor.copy();
+							let clrLcl = starColor.copy();
 							clrLcl.scale(layer / size);
 							theContext.fillStyle = clrLcl.style;
 							theContext.beginPath();
@@ -649,8 +642,8 @@ function work(){
 	}
 	else
 	{
-		var dots = standbyTimer % 2.0;
-		var dotsText = "";
+		const dots = standbyTimer % 2.0;
+		let dotsText = "";
 		if (dots > 0.50)
 			dotsText += ".";
 		if (dots > 1.00)
@@ -673,35 +666,35 @@ function work(){
 
 		theContext.font = "20px Arial";
 		drawTextCenter(theContext,stars[selectedStar].main_id,displayCenterX - halfSize - 100,displayCenterY - 145);
-		var plxDisplayValue = Math.round(stars[selectedStar].plx_value * 10.0) / 10000.0;
-		var plxDisplay = plxDisplayValue.toString();
+		const plxDisplayValue = Math.round(stars[selectedStar].plx_value * 10.0) / 10000.0;
+		const plxDisplay = plxDisplayValue.toString();
 		drawTextCenter(theContext,"Parallax: " + plxDisplay + "\"",displayCenterX - halfSize - 100,displayCenterY - 115);
-		var pmRADisplayValue = Math.round(stars[selectedStar].pmra * 10.0) / 10000.0;
-		var pmRADisplay = pmRADisplayValue.toString();
+		const pmRADisplayValue = Math.round(stars[selectedStar].pmra * 10.0) / 10000.0;
+		const pmRADisplay = pmRADisplayValue.toString();
 		drawTextCenter(theContext,"PM (ra): " + pmRADisplay + "\"/yr",displayCenterX - halfSize - 100,displayCenterY - 65);
-		var pmDecDisplayValue = Math.round(stars[selectedStar].pmdec * 10.0) / 10000.0;
-		var pmDecDisplay = pmDecDisplayValue.toString();
+		const pmDecDisplayValue = Math.round(stars[selectedStar].pmdec * 10.0) / 10000.0;
+		const pmDecDisplay = pmDecDisplayValue.toString();
 		drawTextCenter(theContext,"PM (dec): " + pmDecDisplay + "\"/yr",displayCenterX - halfSize - 100,displayCenterY - 40);
 
-		var raD = degreestoHMSDisplayable(stars[selectedStar].ra);
+		let raD = degreestoHMSDisplayable(stars[selectedStar].ra);
 		theContext.fillStyle = "#00FF00";
 		drawTextCenter(theContext,"RA (J2000)",displayCenterX - halfSize - 100,displayCenterY + 10);
 		theContext.fillStyle = "#FFFFFF";
 		drawTextCenter(theContext,raD.hr + "h " + raD.min + "m " + raD.sec + "s",displayCenterX - halfSize - 100,displayCenterY + 35);
 
-		var decD = degreestoDMSDisplayable(stars[selectedStar].dec);
+		let decD = degreestoDMSDisplayable(stars[selectedStar].dec);
 		theContext.fillStyle = "#00FF00";
 		drawTextCenter(theContext,"Dec (J2000)",displayCenterX - halfSize - 100,displayCenterY + 60);
 		theContext.fillStyle = "#FFFFFF";
 		drawTextCenter(theContext,decD.deg + String.fromCharCode(0x00b0) + " " + decD.min + "\' " + decD.sec + "\"",displayCenterX - halfSize - 100,displayCenterY + 85);
 
-		var StarPDate = starData[selectedStar].positionApparent.copy();
-		var StarMDate = starData[selectedStar].velocity.scale(timeSeconds);
+		let StarPDate = starData[selectedStar].positionApparent.copy();
+		const StarMDate = starData[selectedStar].velocity.scale(timeSeconds);
 		if (g_PMenable)
 			StarPDate.selfAdd(StarMDate);
 		if (g_PLXenable)
 			StarPDate.selfSubtract(Earth);
-		var raDate = degrees(StarPDate.theta);
+		let raDate = degrees(StarPDate.theta);
 		if (raDate < 0)
 			raDate += 360.0;
 			
@@ -719,20 +712,20 @@ function work(){
 
 	}
 
-	var raD = degreestoHMSDisplayable(viewRA);
+	const raD = degreestoHMSDisplayable(viewRA);
 	theContext.fillStyle = "#00FF00";
 	drawTextCenter(theContext,"RA (J2000)",displayCenterX + halfSize + 90,displayCenterY + 0);
 	theContext.fillStyle = "#FFFFFF";
 	drawTextCenter(theContext,raD.hr + "h " + raD.min + "m " + raD.sec + "s",displayCenterX + halfSize + 90,displayCenterY + 25);
 
-	var decD = degreestoDMSDisplayable(viewDec);
+	const decD = degreestoDMSDisplayable(viewDec);
 	theContext.fillStyle = "#00FF00";
 	drawTextCenter(theContext,"Dec (J2000)",displayCenterX + halfSize + 90,displayCenterY + 50);
 	theContext.fillStyle = "#FFFFFF";
 	drawTextCenter(theContext,decD.deg + String.fromCharCode(0x00b0) + " " + decD.min + "\' " + decD.sec + "\"",displayCenterX + halfSize + 90,displayCenterY + 75);
 
-	var timerReadableDays = Math.round(g_timer * 100.0) / 100.0;
-	var timerDisplayDays = timerReadableDays.toString();
+	const timerReadableDays = Math.round(g_timer * 100.0) / 100.0;
+	let timerDisplayDays = timerReadableDays.toString();
 	if (timerDisplayDays.charAt(timerDisplayDays.length - 3) != '.')
 	{
 		if (timerDisplayDays.charAt(timerDisplayDays.length - 2) == '.')
@@ -745,11 +738,11 @@ function work(){
 
 	theContext.fillStyle = "#FFFFFF";
 	theContext.font = "20px Arial";
-	var calend = JDtoGregorian(g_timer);
-	var monthDisplay = calend.month.toString();
+	const calend = JDtoGregorian(g_timer);
+	let monthDisplay = calend.month.toString();
 	if (calend.month < 10)
 		monthDisplay = "0" + monthDisplay;
-	var dayDisplay = Math.floor(calend.day).toString()
+	let dayDisplay = Math.floor(calend.day).toString()
 	if (calend.day < 10)
 		dayDisplay = "0" + dayDisplay;
 	drawTextRight(theContext,"Date: " + calend.year + "/" + monthDisplay + '/' + dayDisplay,displayCenterX - 5,dateDisplayY);

@@ -3,7 +3,7 @@
 
 // Function to download data to a file
 function download(data, filename, type) {
-    var file = new Blob([data], {type: type});
+    let file = new Blob([data], {type: type});
     if (window.navigator.msSaveOrOpenBlob) // IE10+
         window.navigator.msSaveOrOpenBlob(file, filename);
     else { // Others

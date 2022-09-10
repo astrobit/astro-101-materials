@@ -1,10 +1,10 @@
 ﻿
 
-var framerate = 1.0 / 30.0;
+const framerate = 1.0 / 30.0;
 
 
-var H0 = (Math.random() - 0.5) * 2.0 + 72.0; // the value of the Hubble constant in this universe
-var currentHome = 0; // set the default home galaxy to the Milky Way
+const H0 = (Math.random() - 0.5) * 2.0 + 72.0; // the value of the Hubble constant in this universe
+let currentHome = 0; // set the default home galaxy to the Milky Way
 
 class LuminosityFunction
 {
@@ -29,13 +29,13 @@ class LuminosityFunction
 	}
 }
 
-var LF = new LuminosityFunction(2e10,-0.47,1,60);
+let LF = new LuminosityFunction(2e10,-0.47,1,60);
 function randL()
 {
-	var v = Math.random();
-	var x = 1.0;
-	var f = LF.LF(x);
-	var n = 0;
+	let v = Math.random();
+	let x = 1.0;
+	let f = LF.LF(x);
+	let n = 0;
 	while (Math.abs(f - v) > 0.0001 && n < 100)
 	{
 		dx = (f - v) / LF.dLF(x);
@@ -53,10 +53,10 @@ function randL()
 
 
 
-var listHomesMeasurements = new Array();
+let listHomesMeasurements = new Array();
 function addHomeToList(idxToAdd)
 {
-	var found = false;
+	let found = false;
 	for (idx = 0; idx < listHomesMeasurements.length && !found; idx++)
 	{
 		found = listHomesMeasurements[idx] == idxToAdd;
@@ -65,10 +65,10 @@ function addHomeToList(idxToAdd)
 		listHomesMeasurements.push(idxToAdd);
 }
 
-var listMeasurements = new Array();
+let listMeasurements = new Array();
 function addMeasurementSetToList(measurementSet)
 {
-	var found = false;
+	let found = false;
 	for (idx = 0; idx < listMeasurements.length && !found; idx++)
 	{
 		found = listMeasurements[idx]._thisGalaxy == measurementSet._thisGalaxy && listMeasurements[idx]._fromGalaxy == measurementSet._fromGalaxy;
@@ -118,39 +118,39 @@ class MeasurementSet
 	computeValues()
 	{
 		this.clearMeasurements();
-//		var relPos = this._position.subtract(universe[currentHome]._position)
-//		var dist_True = relPos.radius;
+//		let relPos = this._position.subtract(universe[currentHome]._position)
+//		let dist_True = relPos.radius;
 
-		var dist = 0;
-		var rv = 0;
-		var vrot = 0;
-		var flux = 0;
+		let dist = 0;
+		let rv = 0;
+		let vrot = 0;
+		let flux = 0;
 
-		var distSum = 0;
-		var rvSum = 0;
-		var vrotSum = 0;
-		var fluxSum = 0;
+		let distSum = 0;
+		let rvSum = 0;
+		let vrotSum = 0;
+		let fluxSum = 0;
 
-		var distSq = 0;
-		var rvSq = 0;
-		var vrotSq = 0;
-		var fluxSq = 0;
+		let distSq = 0;
+		let rvSq = 0;
+		let vrotSq = 0;
+		let fluxSq = 0;
 
-		var dist_u = -1;
-		var rv_u = -1;
-		var vrot_u = -1;
-		var flux_u = -1;
+		let dist_u = -1;
+		let rv_u = -1;
+		let vrot_u = -1;
+		let flux_u = -1;
 
-		var distVar = 0;
-		var rvVar = 0;
-		var vrotVar = 0;
-		var fluxVar = 0;
+		let distvar = 0;
+		let rvvar = 0;
+		let vrotvar = 0;
+		let fluxvar = 0;
 
-		var Ndist =0;
-		var Nrv = 0;
-		var Nvrot = 0;
-		var Nflux = 0;
-		var idxLcl;
+		let Ndist =0;
+		let Nrv = 0;
+		let Nvrot = 0;
+		let Nflux = 0;
+		let idxLcl;
 
 		for (idxLcl = 0; idxLcl < this._measurements.length; idxLcl++)
 		{
@@ -191,37 +191,37 @@ class MeasurementSet
 			vrot  = vrotSum / Nvrot;
 		if (Nflux != 0)
 			flux  = fluxSum / Nflux;
-		distVar = distSq + Ndist * dist * dist - 2.0 * distSum * dist;
-		rvVar = rvSq + Nrv * rv * rv - 2.0 * rvSum * rv;
-		vrotVar = vrotSq + Nvrot * vrot * vrot - 2.0 * vrotSum * vrot;
-		fluxVar = fluxSq + Nflux * flux * flux - 2.0 * fluxSum * flux;
+		distvar = distSq + Ndist * dist * dist - 2.0 * distSum * dist;
+		rvvar = rvSq + Nrv * rv * rv - 2.0 * rvSum * rv;
+		vrotvar = vrotSq + Nvrot * vrot * vrot - 2.0 * vrotSum * vrot;
+		fluxvar = fluxSq + Nflux * flux * flux - 2.0 * fluxSum * flux;
 		
 		if (Ndist > 1)
-			dist_u = Math.sqrt(distVar / ((Ndist - 1.0) * Ndist));
+			dist_u = Math.sqrt(distvar / ((Ndist - 1.0) * Ndist));
 		if (Nrv > 1)
-			rv_u = Math.sqrt(rvVar / ((Nrv - 1.0) * Nrv));
+			rv_u = Math.sqrt(rvvar / ((Nrv - 1.0) * Nrv));
 		if (Nvrot > 1)
-			vrot_u = Math.sqrt(vrotVar / ((Nvrot - 1.0) * Nvrot));
+			vrot_u = Math.sqrt(vrotvar / ((Nvrot - 1.0) * Nvrot));
 		if (Nflux > 1)
-			flux_u = Math.sqrt(fluxVar / ((Nflux - 1.0) * Nflux));
+			flux_u = Math.sqrt(fluxvar / ((Nflux - 1.0) * Nflux));
 
 // Tully-Fisher Distance
 //L = 4e10 * Math.pow(v / 200.0,4.0); // solar luminosities, v in km/s
-		var dist_tf = 0;
-		var dist_tf_u = -1;
+		let dist_tf = 0;
+		let dist_tf_u = -1;
 		if (Nflux != 0 && Nvrot != 0 && this._dist_True >= 35.0)
 		{
-			var lum_tf =  4.0e10 * Math.pow(vrot / 200.0,4.0);
-			var lum_tf_u = 4.0 * lum_tf * vrot_u / vrot;
+			const lum_tf =  4.0e10 * Math.pow(vrot / 200.0,4.0);
+			const lum_tf_u = 4.0 * lum_tf * vrot_u / vrot;
 			dist = Math.sqrt(lum_tf / (flux / kLuminositySolar) * 0.25 / Math.PI) / (1.0e6 * kParsec_cm);
-			var ul = 0.5 * lum_tf_u / lum_tf;
-			var uf = 0.5 * flux_u / flux;
+			const ul = 0.5 * lum_tf_u / lum_tf;
+			const uf = 0.5 * flux_u / flux;
 			dist_u = dist * Math.sqrt(ul * ul + uf * uf);
 		}
 		if (flux_u != -1)
 		{
 			// solar flux
-			var fluxSun = kLuminositySolar / (1.49597870700e13 * 1.49597870700e13 * 4.0 * Math.PI);
+			const fluxSun = kLuminositySolar / (1.49597870700e13 * 1.49597870700e13 * 4.0 * Math.PI);
 			this._Mv = -2.5 * Math.log10(flux / fluxSun) - 26.75;
 			this._Mv_u = 2.5 * flux_u / flux / Math.log(10.0);
 		}
@@ -251,7 +251,7 @@ const kUniverseSize = 1000.0; // Mpc
 const kMaxPeculiarVelocity = 1400.0; // km/s
 function randPos()
 {
-		var position;
+		let position;
 		position = new ThreeVector((Math.random() - 0.5) * 2.0 * kUniverseSize, // Mpc
 									(Math.random() - 0.5) * 2.0 * kUniverseSize, // Mpc
 									(Math.random() - 0.5) * 2.0 * kUniverseSize); // Mpc
@@ -259,7 +259,7 @@ function randPos()
 }
 function getRelPos(myPos,otherPos)
 {
-		var relPos = otherPos.subtract(myPos);
+		let relPos = otherPos.subtract(myPos);
 		if (relPos.x > kUniverseSize)
 			relPos.x -= (2.0 * kUniverseSize);
 		if (relPos.x < -kUniverseSize)
@@ -320,21 +320,21 @@ class Galaxy
 	}
 	getMeasurementSet(homeIdx)
 	{
-		var homeStr = homeIdx.toString();
-		var ret = undefined;
+		const homeStr = homeIdx.toString();
+		let ret = undefined;
 		if (homeStr in this._measurements)
 			ret = this._measurements[homeStr];
 		return ret;
 	}
 	addGetMeasurementSet(homeIdx)
 	{
-		var homeStr = homeIdx.toString();
-		var ret = undefined;
+		const homeStr = homeIdx.toString();
+		let ret = undefined;
 		if (homeStr in this._measurements)
 			ret = this._measurements[homeStr];
 		else
 		{
-			var relPos = getRelPos(this._position,universe[homeIdx]._position);
+			const relPos = getRelPos(this._position,universe[homeIdx]._position);
 			ret = new MeasurementSet(this._myIdx,homeIdx,relPos.radius);
 			addMeasurementSetToList(ret);
 			this._measurements[homeStr] = ret;
@@ -344,62 +344,62 @@ class Galaxy
 
 	takeImage(SN,aperture)
 	{
-		var relPos = getRelPos(this._position,universe[currentHome]._position);
-		var dist = relPos.magnitude;
-		var collectingArea = Math.PI * aperture * aperture * 0.25;
+		const relPos = getRelPos(this._position,universe[currentHome]._position);
+		const dist = relPos.magnitude;
+		const collectingArea = Math.PI * aperture * aperture * 0.25;
 		const greenPhotonEnergy = kPlanck * kSpeedLight / (550.0e-7);
-		var flux = this._luminosity * kLuminositySolar * Math.pow(dist * 1.0e6 * kParsec_cm,-2.0) * 0.25 / Math.PI; // erg/s/cm^2
-		var intFlux = flux * collectingArea; // erg/s
-		var photonFlux = intFlux / greenPhotonEnergy; // photons / s
-		var exposure = SN * SN / photonFlux; // s
-		var photoxFluxExpsoure = exposure * photonFlux; // photons
-		var measPhotonFlux = random_gaussian(photoxFluxExpsoure,Math.sqrt(photoxFluxExpsoure)); // photons
-		var measPhotonFlux_err = Math.sqrt(measPhotonFlux); // photons
-		var measFlux = measPhotonFlux * greenPhotonEnergy / exposure / collectingArea; // erg/s/cm^2
-		var measFlux_err = measPhotonFlux_err * greenPhotonEnergy / exposure / collectingArea; // erg / s / cm^2
+		const flux = this._luminosity * kLuminositySolar * Math.pow(dist * 1.0e6 * kParsec_cm,-2.0) * 0.25 / Math.PI; // erg/s/cm^2
+		const intFlux = flux * collectingArea; // erg/s
+		const photonFlux = intFlux / greenPhotonEnergy; // photons / s
+		const exposure = SN * SN / photonFlux; // s
+		const photoxFluxExpsoure = exposure * photonFlux; // photons
+		const measPhotonFlux = random_gaussian(photoxFluxExpsoure,Math.sqrt(photoxFluxExpsoure)); // photons
+		const measPhotonFlux_err = Math.sqrt(measPhotonFlux); // photons
+		const measFlux = measPhotonFlux * greenPhotonEnergy / exposure / collectingArea; // erg/s/cm^2
+		const measFlux_err = measPhotonFlux_err * greenPhotonEnergy / exposure / collectingArea; // erg / s / cm^2
 		
-		var measDist = 0;
-		var measDist_err = -1;
+		let measDist = 0;
+		let measDist_err = -1;
 		if (dist < 35.0)
 		{
 			measDist = dist * (1.0 + random_gaussian(0,1.0 / SN)); // Mpc
 			measDist_err = measDist / SN; // Mpc
 		}
-		var measurementSet = this.addGetMeasurementSet(currentHome);
+		let measurementSet = this.addGetMeasurementSet(currentHome);
 		measurementSet.addMeasurement(new Measurement(currentHome,measPhotonFlux, measPhotonFlux_err, measFlux,measFlux_err,measDist,measDist_err,0,-1,0,-1));
 		addHomeToList(currentHome);
 	}
 
 	takeSpectrum(resolution)
 	{
-		var relPos = getRelPos(this._position,universe[currentHome]._position);
-		var dist = relPos.radius;
+		const relPos = getRelPos(this._position,universe[currentHome]._position);
+		const dist = relPos.radius;
 		relPos.selfUnit();
 
-		var ux = relPos.x;
-		var uy = relPos.y;
-		var uz = relPos.z;
+		const ux = relPos.x;
+		const uy = relPos.y;
+		const uz = relPos.z;
 
-		var vPec = this._velocityPeculiar.r;
+		const vPec = this._velocityPeculiar.r;
 
-		var vx = this._velocityPeculiarUnit.x;
-		var vy = this._velocityPeculiarUnit.y;
-		var vz = this._velocityPeculiarUnit.z;
+		const vx = this._velocityPeculiarUnit.x;
+		const vy = this._velocityPeculiarUnit.y;
+		const vz = this._velocityPeculiarUnit.z;
 
-		var rv_Hubble = H0 * dist;
-		var rv_pec = (vx * ux + vy * uy + vz * uz) * vPec;
-		var rv = rv_Hubble + rv_pec;
-		var measRv = random_gaussian(rv,resolution);
+		const rv_Hubble = H0 * dist;
+		const rv_pec = (vx * ux + vy * uy + vz * uz) * vPec;
+		const rv = rv_Hubble + rv_pec;
+		const measRv = random_gaussian(rv,resolution);
 
-		var beta = measRv / kSpeedLight_kms; 
-		var redshift = Math.sqrt((1 + beta) / (1 - beta)) - 1;
+		const beta = measRv / kSpeedLight_kms; 
+		const redshift = Math.sqrt((1 + beta) / (1 - beta)) - 1;
 		
 // Tully-Fisher
 //L = 4e10 * Math.pow(v / 200.0,4.0); // solar luminosities, v in km/s
-		var vrot = Math.pow(this._luminosity / 4.0e10,0.25) * 200.0;
-		var measVrot = random_gaussian(vrot,resolution);
+		const vrot = Math.pow(this._luminosity / 4.0e10,0.25) * 200.0;
+		const measVrot = random_gaussian(vrot,resolution);
 
-		var measurementSet = this.addGetMeasurementSet(currentHome);
+		let measurementSet = this.addGetMeasurementSet(currentHome);
 		measurementSet.addMeasurement(new Measurement(currentHome,0,-1,0,-1,0,-1,measRv,resolution,measVrot,resolution));
 		addHomeToList(currentHome);
 	}
@@ -429,14 +429,14 @@ class Telescope
 		this._pixelSizeSkyarcSec = this._pixelSizeSkyDegrees * 3600.0;
 	}
 }
-var telescopes = new Array();
-var currentTelescope = 0;
+let telescopes = new Array();
+let currentTelescope = 0;
 telescopes.push(new Telescope("the Telescope", 0.0, 0.0, 15.0, 3000.0, 2048, 2048 * 0.024, 45000));
 
 
 function takeImage()
 {
-	var idxLcl;
+	let idxLcl;
 	for (idxLcl = 0; idxLcl < inViewList.length; idxLcl++)
 	{
 		universe[inViewList[idxLcl].idx].takeImage(50.0,telescopes[currentTelescope]._diameter * 100.0);
@@ -447,7 +447,7 @@ function takeImage()
 
 function takeSpectrum()
 {
-	var idxLcl;
+	let idxLcl;
 	for (idxLcl = 0; idxLcl < inViewList.length; idxLcl++)
 	{
 		universe[inViewList[idxLcl].idx].takeSpectrum(10.0);
@@ -458,14 +458,14 @@ function takeSpectrum()
 
 
 
-var universe = new Array();
+let universe = new Array();
 
 const kNumGalaxies = 1000;
 
 function createUniverse()
 {
-	var debug = false;
-	var home = new Galaxy(0);
+	let debug = false;
+	let home = new Galaxy(0);
 	home._position.x = 0;
 	home._position.y = 0;
 	home._position.z = 0;
@@ -481,42 +481,42 @@ function createUniverse()
 	universe.push(home);
 	
 	if (debug) {
-		var tempX = new Galaxy(1);
+		let tempX = new Galaxy(1);
 		tempX._position.x = 100;
 		tempX._position.y = 0;
 		tempX._position.z = 0;
 		tempX._id = 'Test x';
 		universe.push(tempX);
 
-		var tempMX = new Galaxy(2);
+		let tempMX = new Galaxy(2);
 		tempMX._position.x = -100;
 		tempMX._position.y = 0;
 		tempMX._position.z = 0;
 		tempMX._id = 'Test -x';
 		universe.push(tempMX);
 
-		var tempZ = new Galaxy(3);
+		let tempZ = new Galaxy(3);
 		tempZ._position.x = 0;
 		tempZ._position.y = 0;
 		tempZ._position.z = 100;
 		tempZ._id = 'Test Z';
 		universe.push(tempZ);
 
-		var tempMZ = new Galaxy(4);
+		let tempMZ = new Galaxy(4);
 		tempMZ._position.x = 0;
 		tempMZ._position.y = 0;
 		tempMZ._position.z = -100;
 		tempMZ._id = 'Test -Z';
 		universe.push(tempMZ);
 
-		var tempY = new Galaxy(5);
+		let tempY = new Galaxy(5);
 		tempY._position.x = 0;
 		tempY._position.y = 100;
 		tempY._position.z = 0;
 		tempY._id = 'Test Y';
 		universe.push(tempY);
 
-		var tempMY = new Galaxy(6);
+		let tempMY = new Galaxy(6);
 		tempMY._position.x = 0;
 		tempMY._position.y = -100;
 		tempMY._position.z = 0;
@@ -525,7 +525,7 @@ function createUniverse()
 	}
 	else
 	{
-		var idxLcl;
+		let idxLcl;
 		// start at 1 since the Milky way is the first in the list.
 		for (idxLcl = 1; idxLcl < kNumGalaxies; idxLcl++)
 		{
@@ -535,9 +535,9 @@ function createUniverse()
 }
 
 
-var latDir = 0.0;
-var longDir = 0.0;
-var slew = radians(20.0);
+let latDir = 0.0;
+let longDir = 0.0;
+let slew = radians(20.0);
 
 function slewSelect(value)
 {
@@ -549,13 +549,13 @@ function slewSelect(value)
 }
 
 
-var btnReturnMilkyWay;
-var btnMoveHome;
-var btnFindMilkyWay;
+let btnReturnMilkyWay;
+let btnMoveHome;
+let btnFindMilkyWay;
 
 function moveHome(toMW)
 {
-	var idxLcl;
+	let idxLcl;
 	if (toMW)
 	{
 		currentHome = 0;
@@ -574,21 +574,21 @@ function moveHome(toMW)
 //				this._d = d;
 //			}
 //		};
-//		var nearestList = new Array();
+//		let nearestList = new Array();
 
-//		var u = Math.random();
+//		let u = Math.random();
 //		while (u == 0) Math.random();
 
 //		for (idxLcl = 0; idxLcl < universe.length; idxLcl++)
 //		{
-//		var relPos = getRelPos(universe[idxLcl]._position,universe[homeIdx]._position);
+//		const relPos = getRelPos(universe[idxLcl]._position,universe[homeIdx]._position);
 //			if (idxLcl != currentHome)
 //				nearestList.push(new GalData(idxLcl,relPos.radius));
 //
 //		}
 //		nearestList.sort(function(a, b){return a._d - b._d});
 
-//		var nearIdx = Math.round(u * 15);
+//		const nearIdx = Math.round(u * 15);
 //		currentHome = nearestList[nearIdx]._i;
 	}
 	setView(0.0,0.0);
@@ -604,8 +604,8 @@ function findHome()
 {
 	if (currentHome != 0)
 	{
-		var relPos = getRelPos(universe[currentHome]._position,universe[0]._position);
-//		var relPos = universe[0]._position.subtract(universe[currentHome]._position);
+		const relPos = getRelPos(universe[currentHome]._position,universe[0]._position);
+//		let relPos = universe[0]._position.subtract(universe[currentHome]._position);
 		setSlewTarget(relPos.psi,relPos.theta);
 //		setView(relPos.psi,relPos.theta);
 //		update = true;
@@ -613,8 +613,8 @@ function findHome()
 //	draw();
 }
 
-var targetLat = null;
-var targetLong = null;
+let targetLat = null;
+let targetLong = null;
 
 function setSlewTarget(lat,long)
 {
@@ -626,36 +626,34 @@ function setSlewTarget(lat,long)
 	}
 }
 
-var autoSlewSpeed = 0.0;
-var autoSlewTimer = 0.0;
+let autoSlewSpeed = 0.0;
+let autoSlewTimer = 0.0;
 
 function slewToTarget()
 {
 	if(targetLat !== null && targetLong !== null)
 	{
 	
-		var delLat = targetLat - viewLat;
+		const delLat = targetLat - viewLat;
 
-		var delLong = targetLong - viewLong;
+		let delLong = targetLong - viewLong;
 		if (delLong > Math.PI)
 			delLong = -2.0 * Math.PI + delLong;
 		else if (delLong < -Math.PI)
 			delLong = 2.0 * Math.PI + delLong;
 			
-		var modLong = delLong;// * Math.cos(delLat);
-		var distRemaining = Math.sqrt(modLong * modLong + delLat * delLat);
+		const modLong = delLong;// * Math.cos(delLat);
+		const distRemaining = Math.sqrt(modLong * modLong + delLat * delLat);
 		if (distRemaining > 0.00007) // ~15 arc-sec
 		{
-			var timerEffect = Math.min(autoSlewTimer / 2.0,1.0);
-			var timestep = 1.0 / 30.0;
+			const timerEffect = Math.min(autoSlewTimer / 2.0,1.0);
+			const timestep = 1.0 / 30.0;
 			autoSlewSpeed = Math.min(Math.max(15.0 * distRemaining / 0.10 * timerEffect,0.01),15.0);
 			
-			var currDel = autoSlewSpeed * timestep / distRemaining;
-			if (currDel > 0.9)
-				currDel = 0.9;
+			const currDel = Math.min(autoSlewSpeed * timestep / distRemaining,0.9);
 			slewView(delLat * currDel,delLong * currDel);
 
-			var vL = viewLong % (2.0 * Math.PI);
+			let vL = viewLong % (2.0 * Math.PI);
 			if (vL >= Math.PI)
 				vL -= 2.0 * Math.PI;
 			else if (vL < -Math.PI)
@@ -684,30 +682,30 @@ function slewToTarget()
 
 function downloadMeasurements()
 {
-	var idxLcl;
-	var data = 'Galaxy, From Galaxy, Flux (erg/s/au^2), Flux Uncertainty (erg/s/au^2), Cepheid Distance (Mpc), Cepheid Distance Uncertainty (Mpc), Radial Velocity (km/s), Radial Velocity Uncertainty (km/s), Rotational Velocity (km/s), Rotational Velocity Uncertainty (km/s)\n';
+	let idxLcl;
+	let data = 'Galaxy, From Galaxy, Flux (erg/s/au^2), Flux Uncertainty (erg/s/au^2), Cepheid Distance (Mpc), Cepheid Distance Uncertainty (Mpc), Radial Velocity (km/s), Radial Velocity Uncertainty (km/s), Rotational Velocity (km/s), Rotational Velocity Uncertainty (km/s)\n';
 	for (idxLcl = 0; idxLcl < listMeasurements.length; idxLcl++)
 	{
-		var jLcl;
-		var gIdx  = listMeasurements[idxLcl]._thisGalaxy;
-		var hIdx  = listMeasurements[idxLcl]._fromGalaxy;
+		let jLcl;
+		const gIdx  = listMeasurements[idxLcl]._thisGalaxy;
+		const hIdx  = listMeasurements[idxLcl]._fromGalaxy;
 
 		for (jLcl = 0; jLcl < listMeasurements[idxLcl]._measurements.length; jLcl++)
 		{
-			var flux = sig_figs(listMeasurements[idxLcl]._measurements[jLcl]._flux,listMeasurements[idxLcl]._measurements[jLcl]._flux_u);
-			var dist = sig_figs(listMeasurements[idxLcl]._measurements[jLcl]._dist,listMeasurements[idxLcl]._measurements[jLcl]._dist_u);
-			var radVel = sig_figs(listMeasurements[idxLcl]._measurements[jLcl]._rv,listMeasurements[idxLcl]._measurements[jLcl]._rv_u);
-			var rotVel = sig_figs(listMeasurements[idxLcl]._measurements[jLcl]._vrot,listMeasurements[idxLcl]._measurements[jLcl]._vrot_u);
+			const flux = sig_figs(listMeasurements[idxLcl]._measurements[jLcl]._flux,listMeasurements[idxLcl]._measurements[jLcl]._flux_u);
+			const dist = sig_figs(listMeasurements[idxLcl]._measurements[jLcl]._dist,listMeasurements[idxLcl]._measurements[jLcl]._dist_u);
+			const radVel = sig_figs(listMeasurements[idxLcl]._measurements[jLcl]._rv,listMeasurements[idxLcl]._measurements[jLcl]._rv_u);
+			const rotVel = sig_figs(listMeasurements[idxLcl]._measurements[jLcl]._vrot,listMeasurements[idxLcl]._measurements[jLcl]._vrot_u);
 
 			data += universe[gIdx]._id + ', ' + universe[hIdx]._id
-			+ ', ' + flux.value.toFixed(flux.rounding)
-			+ ', ' + flux.uncertainty.toFixed(flux.rounding)
-			+ ', ' + dist.value.toFixed(dist.rounding)
-			+ ', ' + dist.uncertainty.toFixed(dist.rounding)
-			+ ', ' + radVel.value.toFixed(radVel.rounding)
-			+ ', ' + radVel.uncertainty.toFixed(radVel.rounding)
-			+ ', ' + rotVel.value.toFixed(rotVel.rounding)
-			+ ', ' + rotVel.uncertainty.toFixed(rotVel.rounding)
+			+ ', ' + flux.value_string
+			+ ', ' + flux.uncertainty_string
+			+ ', ' + dist.value_string
+			+ ', ' + dist.uncertainty_string
+			+ ', ' + radVel.value_string
+			+ ', ' + radVel.uncertainty_string
+			+ ', ' + rotVel.value_string
+			+ ', ' + rotVel.uncertainty_string
 			+ '\n';
 		}
 	}
@@ -715,33 +713,33 @@ function downloadMeasurements()
 }
 function downloadAnalysis()
 {
-	var idxLcl;
-	var data = 'Galaxy, From Galaxy, Distance (Mpc), Distance Uncertainty (Mpc), Radial Velocity (km/s), Radial Velocity Uncertainty (km/s), V Magnitude, V Magnitude Uncertainty, Redshift, Redshift Uncertainty\n';
+	let idxLcl;
+	let data = 'Galaxy, From Galaxy, Distance (Mpc), Distance Uncertainty (Mpc), Radial Velocity (km/s), Radial Velocity Uncertainty (km/s), V Magnitude, V Magnitude Uncertainty, Redshift, Redshift Uncertainty\n';
 	for (kLcl = 0; kLcl < listHomesMeasurements.length; kLcl++)
 	{
 		for (idxLcl = 0; idxLcl < listMeasurements.length; idxLcl++)
 		{
-			var gIdx  = listMeasurements[idxLcl]._thisGalaxy;
-			var hIdx  = listMeasurements[idxLcl]._fromGalaxy;
+			const gIdx  = listMeasurements[idxLcl]._thisGalaxy;
+			const hIdx  = listMeasurements[idxLcl]._fromGalaxy;
 			if (hIdx == listHomesMeasurements[kLcl])
 			{
 				if (listMeasurements[idxLcl]._measurements.length > 0)
 				{
-					var dist = sig_figs(listMeasurements[idxLcl]._dist,listMeasurements[idxLcl]._dist_u);
-					var radVel = sig_figs(listMeasurements[idxLcl]._redshift * 299792.458,listMeasurements[idxLcl]._redshift_u * 299792.458);
-					var Mv = sig_figs(listMeasurements[idxLcl]._Mv,listMeasurements[idxLcl]._Mv_u);
-					var redshift = sig_figs(listMeasurements[idxLcl]._redshift,listMeasurements[idxLcl]._redshift_u);
+					const dist = sig_figs(listMeasurements[idxLcl]._dist,listMeasurements[idxLcl]._dist_u);
+					const radVel = sig_figs(listMeasurements[idxLcl]._redshift * 299792.458,listMeasurements[idxLcl]._redshift_u * 299792.458);
+					const Mv = sig_figs(listMeasurements[idxLcl]._Mv,listMeasurements[idxLcl]._Mv_u);
+					const redshift = sig_figs(listMeasurements[idxLcl]._redshift,listMeasurements[idxLcl]._redshift_u);
 
 					data += universe[gIdx]._id
 					+ ', ' + universe[hIdx]._id
-					+ ', ' + dist.value.toFixed(dist.rounding)
-					+ ', ' + dist.uncertainty.toFixed(dist.rounding)
-					+ ', ' + radVel.value.toFixed(radVel.rounding)
-					+ ', ' + radVel.uncertainty.toFixed(radVel.rounding)
-					+ ', ' + Mv.value.toFixed(Mv.rounding)
-					+ ', ' + Mv.uncertainty.toFixed(Mv.rounding)
-					+ ', ' + redshift.value.toFixed(redshift.rounding)
-					+ ', ' + redshift.uncertainty.toFixed(redshift.rounding)
+					+ ', ' + dist.value_string
+					+ ', ' + dist.uncertainty_string
+					+ ', ' + radVel.value_string
+					+ ', ' + radVel.uncertainty_string
+					+ ', ' + Mv.value_string
+					+ ', ' + Mv.uncertainty_string
+					+ ', ' + redshift.value_string
+					+ ', ' + redshift.uncertainty_string
 					+ '\n';
 				}
 			}
@@ -763,12 +761,12 @@ class HubbleData
 
 function determineHubbleLaw(idx)
 {
-	var v = new Array();
-	var vu = new Array();
-	var d = new Array();
-	var du = new Array();
-	var ret = new Object;
-	var idxLcl;
+	let v = new Array();
+	let vu = new Array();
+	let d = new Array();
+	let du = new Array();
+	let ret = new Object;
+	let idxLcl;
 	for (idxLcl = 0; idxLcl < listMeasurements.length; idxLcl++)
 	{
 		if (listMeasurements[idxLcl]._fromGalaxy == idx && listMeasurements[idxLcl]._dist_u != -1 && listMeasurements[idxLcl]._redshift_u != -1)
@@ -781,7 +779,7 @@ function determineHubbleLaw(idx)
 	}
 	if (v.length > 2)
 	{
-		var lls = new LLS(d,v);
+		const lls = new LLS(d,v);
 		ret.measH0 = lls.slope;
 		ret.measH0u = lls.slope_uncertainty;
 		ret.measIntercept = lls.intercept;
@@ -789,7 +787,7 @@ function determineHubbleLaw(idx)
 	}
 	else if (v.length == 2)
 	{
-		var recip = 1.0 / (d[1] - d[0]);
+		const recip = 1.0 / (d[1] - d[0]);
 		ret.measH0 = (v[1] - v[0]) * recip;
 				
 		ret.measH0u = recip * Math.sqrt((vu[1] * vu[1] + vu[0] * vu[0]) + (du[1] * du[1] + du[0] * du[0]) * ret.measH0 * ret.measH0);
@@ -805,7 +803,7 @@ function determineHubbleLaw(idx)
 	}
 	return ret;
 }
-var hubbleLaw = {measH0:0,measH0u:-2,measIntercept:0,measInterceptu:-2};
+let hubbleLaw = {measH0:0,measH0u:-2,measIntercept:0,measInterceptu:-2};
 function updateHubbleLaw()
 {
 	hubbleLaw = determineHubbleLaw(currentHome);
@@ -814,68 +812,68 @@ function updateHubbleLaw()
 	
 function downloadHubbleAnalysis()
 {
-	var idxLcl;
-	var data = 'From Galaxy, H0 (km/s/Mpc), H0 Uncertainty (km/s/Mpc)\n';
+	let idxLcl;
+	let data = 'From Galaxy, H0 (km/s/Mpc), H0 Uncertainty (km/s/Mpc)\n';
 
 
 
 	for (kLcl = 0; kLcl < listHomesMeasurements.length; kLcl++)
 	{
-		var law = determineHubbleLaw(listHomesMeasurements[kLcl]);
-		var H0sf = sig_figs(law.measH0,law.measH0u);
-		var H0intsf = sig_figs(law.measIntercept,law.measInterceptu);
+		const law = determineHubbleLaw(listHomesMeasurements[kLcl]);
+		const H0sf = sig_figs(law.measH0,law.measH0u);
+		const H0intsf = sig_figs(law.measIntercept,law.measInterceptu);
 
 		data +=
 			universe[listHomesMeasurements[kLcl]]._id
-			+ ', ' + H0sf.value.toFixed(H0sf.rounding)
-			+ ', ' + H0sf.uncertainty.toFixed(H0sf.rounding)
+			+ ', ' + H0sf.value_string
+			+ ', ' + H0sf.uncertainty_string
 			+ '\n';
 	}
 	download(data,"ExpansionOfUniverseH0.csv","csv");
 }
 
-var inViewList = new Array();
+let inViewList = new Array();
 
 function getPointInEllipse(x,y,a,b,cosOrientation,sinOrientation)
 {
-	var xp = x *cosOrientation - y * sinOrientation;
-	var yp = y * cosOrientation + x * sinOrientation;
-	var xe = xp / a;
-	var ye = yp / b;
+	const xp = x *cosOrientation - y * sinOrientation;
+	const yp = y * cosOrientation + x * sinOrientation;
+	const xe = xp / a;
+	const ye = yp / b;
 
 	return {x: xp, xe: xe,y: yp, ye: ye};
 }
 
 function testPointInEllipse(x,y,a,b,cosOrientation,sinOrientation)
 {
-	var coord = getPointInEllipse(x,y,a,b,cosOrientation,sinOrientation)
+	const coord = getPointInEllipse(x,y,a,b,cosOrientation,sinOrientation)
 	return ((coord.xe * coord.xe + coord.ye * coord.ye) <= 1.0) // point is in the ellipse
 }
 
-var viewMatrix = new ThreeMatrix();
-var viewLong = 0.0;
-var viewLat = 0.0;
+let viewMatrix = new ThreeMatrix();
+let viewLong = 0.0;
+let viewLat = 0.0;
 setView(0.0,0.0);
 
 function updateViewMatrix()
 {
-	var raRad = viewLong;
-	var decRad = viewLat;
-	var cosRA = Math.cos(raRad);
-	var sinRA = Math.sin(raRad);
-	var cosDec = Math.cos(decRad);
-	var sinDec = Math.sin(decRad);
+	const raRad = viewLong;
+	const decRad = viewLat;
+	const cosRA = Math.cos(raRad);
+	const sinRA = Math.sin(raRad);
+	const cosDec = Math.cos(decRad);
+	const sinDec = Math.sin(decRad);
 
-	var cosRAp90 = Math.cos(raRad + Math.PI * 0.5);
-	var sinRAp90 = Math.sin(raRad + Math.PI * 0.5);
+	const cosRAp90 = Math.cos(raRad + Math.PI * 0.5);
+	const sinRAp90 = Math.sin(raRad + Math.PI * 0.5);
 
-	var cosDecp90 = Math.cos(decRad + Math.PI * 0.5);
-	var sinDecp90 = Math.sin(decRad + Math.PI * 0.5);
+	const cosDecp90 = Math.cos(decRad + Math.PI * 0.5);
+	const sinDecp90 = Math.sin(decRad + Math.PI * 0.5);
 
 
-	var viewX = new ThreeVector(cosRA * cosDec, sinRA * cosDec, sinDec);
-	var viewY = new ThreeVector(cosRAp90, sinRAp90, 0.0);
-	var viewZ = new ThreeVector(cosRA * cosDecp90, sinRA * cosDecp90, sinDecp90);
+	const viewX = new ThreeVector(cosRA * cosDec, sinRA * cosDec, sinDec);
+	const viewY = new ThreeVector(cosRAp90, sinRAp90, 0.0);
+	const viewZ = new ThreeVector(cosRA * cosDecp90, sinRA * cosDecp90, sinDecp90);
 
 	viewMatrix.setRowVector(0, viewX);
 	viewMatrix.setRowVector(1, viewY);
@@ -888,7 +886,7 @@ function setView(lat,long)
 	if (lat < Math.PI && lat > -Math.PI)
 		viewLat = lat;
 	
-	var vL = long % (2.0 * Math.PI);
+	let vL = long % (2.0 * Math.PI);
 	if (vL >= Math.PI)
 		vL -= 2.0 * Math.PI;
 	else if (vL < -Math.PI)
@@ -905,7 +903,7 @@ function slewView(latDelta,longDelta)
 		viewLat = (Math.PI * 0.5);
 	if (viewLat < (-Math.PI * 0.5))
 		viewLat = (-Math.PI * 0.5);
-	var vL = viewLong % (2.0 * Math.PI);
+	let vL = viewLong % (2.0 * Math.PI);
 	if (vL >= Math.PI)
 		vL -= 2.0 * Math.PI;
 	else if (vL < -Math.PI)
@@ -929,29 +927,29 @@ function checkUpdate()
 		const kRadians = Math.PI / 180.0;
 		const kDegrees = 180.0 / Math.PI;
 		const kArcSecRadians = kDegrees * 3600.0;
-		var scaling = 1.0 / telescopes[currentTelescope]._pixelSizeSky;
+		const scaling = 1.0 / telescopes[currentTelescope]._pixelSizeSky;
 
-		var halfTelRes = 0.5 * telescopes[currentTelescope]._CCDresolution;
+		const halfTelRes = 0.5 * telescopes[currentTelescope]._CCDresolution;
 
-		var idxLcl;
+		let idxLcl;
 		for (idxLcl = 0; idxLcl < universe.length; idxLcl++)
 		{
 			if (idxLcl != currentHome)
 			{
-				var relPos = getRelPos(universe[currentHome]._position,universe[idxLcl]._position);
+				const relPos = getRelPos(universe[currentHome]._position,universe[idxLcl]._position);
 
-				var viewPos = viewMatrix.dot(relPos.unit); // transform relative position into view coordinates
-				var angSize = universe[idxLcl]._sizeBasis / relPos.r; // radians
-				var maxAngle = telescopes[currentTelescope]._FOV + angSize;
+				const viewPos = viewMatrix.dot(relPos.unit); // transform relative position into view coordinates
+				const angSize = universe[idxLcl]._sizeBasis / relPos.r; // radians
+				const maxAngle = telescopes[currentTelescope]._FOV + angSize;
 				if ((Math.abs(viewPos.theta) < maxAngle || Math.abs(viewPos.theta) > (2.0 * Math.PI - maxAngle)) &&
 				Math.abs(viewPos.psi) < maxAngle) // needs to be in front of telescope
 				{
-					var angSizePx = angSize * scaling; // pixels
-					var x = viewPos.theta * scaling; // pixels
-					var y = viewPos.psi * scaling; // pixels
+					const angSizePx = angSize * scaling; // pixels
+					const x = viewPos.theta * scaling; // pixels
+					const y = viewPos.psi * scaling; // pixels
 
-					var viewGalaxy = {}
-					var inView = true;
+					let viewGalaxy = {}
+					let inView = true;
 					// center of the galaxy is within the field of view of the telescope
 /*					if (x >= -halfTelRes && x <= halfTelRes &&
 						y >= -halfTelRes && y <= halfTelRes)
@@ -961,8 +959,8 @@ function checkUpdate()
 					}
 					else
 					{
-						var eqSize;
-						var polSize;
+						let eqSize;
+						let polSize;
 						// calculate if the corners of the CCD are within the ellipse of the galaxy, disk, or bulge
 						if (universe[idxLcl]._galaxyType == 0) // elliptical
 						{
@@ -973,12 +971,12 @@ function checkUpdate()
 						{
 							eqSize = universe[idxLcl]._diskSize * angSizePx;
 							polSize = universe[idxLcl]._diskSize * angSizePx * universe[idxLcl]._cosOrientationFace;
-							var bulgeSize = universe[idxLcl]._bulgeSize * angSizePx;
+							let bulgeSize = universe[idxLcl]._bulgeSize * angSizePx;
 							if (polSize < bulgeSize)
 								polSize = bulgeSize;
 						}
-						var CosOr = universe[idxLcl]._cosOrientation;
-						var SinOr = universe[idxLcl]._sinOrientation;
+						let CosOr = universe[idxLcl]._cosOrientation;
+						let SinOr = universe[idxLcl]._sinOrientation;
 						inView = testPointInEllipse(-telescopes[currentTelescope]._CCDresolution * 0.5 - x,-telescopes[currentTelescope]._CCDresolution * 0.5 - y,eqSize,polSize,CosOr,SinOr);
 						if (!inView)
 							inView = testPointInEllipse(telescopes[currentTelescope]._CCDresolution * 0.5 - x,-telescopes[currentTelescope]._CCDresolution * 0.5 - y,eqSize,polSize,CosOr,SinOr);
@@ -993,8 +991,8 @@ function checkUpdate()
 						viewGalaxy.idx = idxLcl;
 						viewGalaxy.x = x;
 						viewGalaxy.y = y;
-						var flux = universe[idxLcl]._luminosity * Math.pow(relPos.radius * 2.06265e11,-2);
-						var Mv = -2.5 * Math.log10(flux) - 26.75;
+						const flux = universe[idxLcl]._luminosity * Math.pow(relPos.radius * 2.06265e11,-2);
+						const Mv = -2.5 * Math.log10(flux) - 26.75;
 
 
 						viewGalaxy.pixelScale = angSizePx;
@@ -1012,18 +1010,18 @@ function checkUpdate()
 
 function findNearestGalaxy(lat,long)
 {
-	var bestIdx = -1;
-	var bestDist = 0;
-	var relPosBest;
-	var idxLcl;
-	var lookPos = new ThreeVector(Math.cos(long) * Math.cos(lat),Math.sin(long) * Math.cos(lat),Math.sin(lat));
+	let bestIdx = -1;
+	let bestDist = 0;
+	let relPosBest;
+	let idxLcl;
+	const lookPos = new ThreeVector(Math.cos(long) * Math.cos(lat),Math.sin(long) * Math.cos(lat),Math.sin(lat));
 	for (idxLcl = 0; idxLcl < universe.length; idxLcl++)
 	{
 		if (idxLcl != currentHome)
 		{
-			var relPos = getRelPos(universe[currentHome]._position,universe[idxLcl]._position);
-			var relPosUnit = relPos.unit;
-			var dot = relPosUnit.dot(lookPos);
+			const relPos = getRelPos(universe[currentHome]._position,universe[idxLcl]._position);
+			const relPosUnit = relPos.unit;
+			const dot = relPosUnit.dot(lookPos);
 			if (dot > 0 && dot > bestDist)
 			{
 				bestDist = dot;

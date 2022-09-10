@@ -3,7 +3,7 @@
 // Copyright (c) 2020,2021, Brian W. Mulligan
 
 
-var theCanvas = document.getElementById("theCanvas");
+let theCanvas = document.getElementById("theCanvas");
 theCanvas.onselectstart = function () { return false; }
 theCanvas.onmousedown = commonUIOnMouseDown;
 theCanvas.onmouseup = commonUIOnMouseUp;
@@ -15,10 +15,10 @@ theCanvas.onmouseleave = commonUIOnMouseLeave;
 //theCanvas.height = window.innerHeight - 60;
 //theCanvas.width = theCanvas.height;
 
-var theContext = theCanvas.getContext("2d");
+let theContext = theCanvas.getContext("2d");
 
 
-/*var btnCurr = new SpringButton("SlewNorth",theCanvas.width * 0.5 + 375,70,50,50,function(){latDir = 1;},function(){latDir = 0;});
+/*let btnCurr = new SpringButton("SlewNorth",theCanvas.width * 0.5 + 375,70,50,50,function(){latDir = 1;},function(){latDir = 0;});
 btnCurr.text = "🡡";
 commonUIRegister(btnCurr);
 
@@ -26,7 +26,7 @@ btnCurr = new SpringButton("SlewSouth",theCanvas.width * 0.5 + 375,170,50,50,fun
 btnCurr.text = "🡣";
 commonUIRegister(btnCurr);
 
-var btnCurr = new SpringButton("SlewEast",theCanvas.width * 0.5 + 425,120,50,50,function(){longDir = 1;},function(){longDir = 0;});
+let btnCurr = new SpringButton("SlewEast",theCanvas.width * 0.5 + 425,120,50,50,function(){longDir = 1;},function(){longDir = 0;});
 btnCurr.text = "🡢";
 commonUIRegister(btnCurr);
 
@@ -34,15 +34,15 @@ btnCurr = new SpringButton("SlewWest",theCanvas.width * 0.5 + 325,120,50,50,func
 btnCurr.text = "🡠";
 commonUIRegister(btnCurr);
 
-var slewButtonArray = new Array();
+let slewButtonArray = new Array();
 
-var slewFast = new RadioButton("Fast","Fast",theCanvas.width * 0.5 + 335,230,60,40);
-var slewSlow = new RadioButton("Slow","Slow",theCanvas.width * 0.5 + 405,230,60,40);
+let slewFast = new RadioButton("Fast","Fast",theCanvas.width * 0.5 + 335,230,60,40);
+let slewSlow = new RadioButton("Slow","Slow",theCanvas.width * 0.5 + 405,230,60,40);
 
 slewButtonArray.push(slewFast);
 slewButtonArray.push(slewSlow);
 
-var radioSlew = new Radio("Slew","Fast",slewSelect,slewButtonArray);
+let radioSlew = new Radio("Slew","Fast",slewSelect,slewButtonArray);
 
 commonUIRegister(radioSlew);
 */
@@ -72,7 +72,7 @@ commonUIRegister(btnReturnMilkyWay);
 btnMoveHome = new Button("Move to a New Galaxy",theCanvas.width * 0.5 + 5,775,220,30,function(){moveHome(false);});
 commonUIRegister(btnMoveHome);
 
-var projection = new Mollweide(0,0);
+let projection = new Mollweide(0,0);
 
 function drawMap(context,width,height)//cx,cy,width,height)
 {
@@ -88,18 +88,18 @@ function drawMap(context,width,height)//cx,cy,width,height)
 	drawEllipseByCenter(context,0,0,width,height)
 	
 	context.fillStyle = "#FFFFFF";
-	var idxLcl;
+	let idxLcl;
 	
 	for (idxLcl = 0; idxLcl < universe.length; idxLcl++)
 	{
 		if (idxLcl != currentHome)
 		{
 			
-			var relPos = getRelPos(universe[currentHome]._position,universe[idxLcl]._position);
-			var dist = relPos.radius;
-			var long = relPos.theta * 180.0 / Math.PI;//Math.atan2(universe[idxLcl]._position.y - universe[currentHome]._position.y,universe[idxLcl]._position.x - universe[currentHome]._position.x);
-			var lat = relPos.psi * 180.0 / Math.PI;//Math.asin(z / dist);
-			var proj = projection.calculate(lat,long);
+			const relPos = getRelPos(universe[currentHome]._position,universe[idxLcl]._position);
+			const dist = relPos.radius;
+			const long = relPos.theta * 180.0 / Math.PI;//Math.atan2(universe[idxLcl]._position.y - universe[currentHome]._position.y,universe[idxLcl]._position.x - universe[currentHome]._position.x);
+			const lat = relPos.psi * 180.0 / Math.PI;//Math.asin(z / dist);
+			const proj = projection.calculate(lat,long);
 			
 			context.fillStyle = "#FFFFFF";
 
@@ -114,8 +114,8 @@ function drawMap(context,width,height)//cx,cy,width,height)
 	}
 	
 	context.strokeStyle = '#FFFF00';
-	var proj = projection.calculate(viewLat * 180.0 / Math.PI,viewLong * 180.0 / Math.PI);
-	var radius = 3;//telescopes[0]._FOVdegrees * 0.5 / 360.0 * width;//Math.max(telescopes[0]._FOVdegrees * 0.5 / 360.0 * width,3);
+	const proj = projection.calculate(viewLat * 180.0 / Math.PI,viewLong * 180.0 / Math.PI);
+	const radius = 3;//telescopes[0]._FOVdegrees * 0.5 / 360.0 * width;//Math.max(telescopes[0]._FOVdegrees * 0.5 / 360.0 * width,3);
 	context.beginPath();
 	context.arc(proj.x * width  * 0.5,-proj.y * height  * 0.5,radius,0,2.0 * Math.PI);
 	context.stroke();
@@ -125,12 +125,12 @@ function drawMap(context,width,height)//cx,cy,width,height)
 
 function clickMap(event,x,y)
 {
-	var pos = projection.calculateReverse(x * 2.0 - 1.0,1.0 - y * 2.0);
-	var nearest = findNearestGalaxy(radians(pos.lat),radians(pos.long));
+	const pos = projection.calculateReverse(x * 2.0 - 1.0,1.0 - y * 2.0);
+	const nearest = findNearestGalaxy(radians(pos.lat),radians(pos.long));
 	setSlewTarget(nearest.lat,nearest.long);
 }
 
-var viewMap = new Clickable("Sky Map",theCanvas.width * 0.5 - 250,40,500,250,clickMap,drawMap);
+let viewMap = new Clickable("Sky Map",theCanvas.width * 0.5 - 250,40,500,250,clickMap,drawMap);
 commonUIRegister(viewMap);
 
 
@@ -138,7 +138,7 @@ commonUIRegister(viewMap);
 
 function scaleColor(x,color)
 {
-	var ret = new RGB();
+	let ret = new RGB();
 	ret.r = Math.floor((224.0 * (1.0 - color) + 32.0) * x);
 	ret.g = ret.r;
 	ret.b = Math.floor((128.0 * color + 128.0) * x);
@@ -152,7 +152,7 @@ function scaleColorElliptical(x,color)
 }
 function scaleColorSpiral(x,color)
 {
-	var ret = new RGB();
+	let ret = new RGB();
 	ret.b = Math.floor(256.0 * x);
 	ret.r = Math.floor((color - 0.3) / 0.7 * 256.0 * x);//Math.floor(256.0 * (1.0 - color) * x);
 	ret.g = ret.r;
@@ -161,22 +161,22 @@ function scaleColorSpiral(x,color)
 
 function drawElliptical(context,size,color,x)
 {
-	var effSize = Math.floor(size);
-	var midX = effSize * 0.5;
-	var midY = effSize * 0.5;
-	var imgData = context.createImageData(effSize, effSize);
-	var color = scaleColorElliptical(x,color)
-	var i;
+	const effSize = Math.floor(size);
+	const midX = effSize * 0.5;
+	const midY = effSize * 0.5;
+	let imgData = context.createImageData(effSize, effSize);
+	const colorLCl = scaleColorElliptical(x,color)
+	let i;
 	for (i = 0; i < imgData.data.length; i += 4) 
 	{
-		var x = ((i * 0.25) % effSize) - midX;
-		var y = Math.floor((i * 0.25) / effSize) - midY;
-		var r = Math.sqrt(x * x + y * y) / size * 2.0;
+		let x = ((i * 0.25) % effSize) - midX;
+		let y = Math.floor((i * 0.25) / effSize) - midY;
+		let r = Math.sqrt(x * x + y * y) / size * 2.0;
 
-		imgData.data[i+0] = color.r;
-		imgData.data[i+1] = color.g;
-		imgData.data[i+2] = color.b;
-		var alpha = Math.floor((1.0 - r) * 256.0);
+		imgData.data[i+0] = colorLCl.r;
+		imgData.data[i+1] = colorLCl.g;
+		imgData.data[i+2] = colorLCl.b;
+		let alpha = Math.floor((1.0 - r) * 256.0);
 		if (alpha > 255)
 			alpha = 255;
 		else if (alpha < 0)
@@ -196,9 +196,9 @@ function drawTelescopeField(cx,cy,radius)
 	inView = new Array();
 	inViewDist = new Array();
 	
-	var telescopePixelToViewPixel = radius / telescopes[currentTelescope]._CCDresolution;
+	const telescopePixelToViewPixel = radius / telescopes[currentTelescope]._CCDresolution;
 
-	var state = theContext.save();
+	const state = theContext.save();
 
 	theContext.translate(cx,cy);
 	// draw black background for image
@@ -211,14 +211,14 @@ function drawTelescopeField(cx,cy,radius)
 	theContext.closePath();
 	theContext.stroke();
 
-	var imgData = theContext.getImageData(cx - radius, cy - radius, 2 * radius, 2 * radius);
-	var lclList = new Array();
+	let imgData = theContext.getImageData(cx - radius, cy - radius, 2 * radius, 2 * radius);
+	let lclList = new Array();
 
-	var idxLcl;
+	let idxLcl;
 	for (idxLcl = 0; idxLcl < inViewList.length; idxLcl++)
 	{
-		var curr = universe[inViewList[idxLcl].idx];
-		var currLcl = new Object();
+		const curr = universe[inViewList[idxLcl].idx];
+		let currLcl = new Object();
 		currLcl.eqDiskSize = null;
 		currLcl.polDiskSize = null;
 		currLcl.colorDisk = null;
@@ -251,18 +251,18 @@ function drawTelescopeField(cx,cy,radius)
 		{
 			for (idxLcl = 0; idxLcl < lclList.length; idxLcl++)
 			{
-				var curr = lclList[idxLcl];
+				const curr = lclList[idxLcl];
 
-				var coordDisk = null;
-				var reDisk = null;
+				let coordDisk = null;
+				let reDisk = null;
 				if (curr.eqDiskSize !== null)
 				{
 					coordDisk = getPointInEllipse((x - radius) - curr.x,(y - radius) - curr.y,curr.eqDiskSize,curr.polDiskSize,curr._cosOrientation,curr._sinOrientation);
 					reDisk = Math.sqrt(coordDisk.xe * coordDisk.xe + coordDisk.ye * coordDisk.ye);
 					if (reDisk <= 1.0)// && coordDisk.ye < 0) // point is in the ellipse
 					{
-						var alpha = Math.exp(-reDisk * reDisk * reDisk * reDisk * 4.5); // std. dev = 1/3
-						var imgIdx = (y * 2 * radius + x) * 4;
+						const alpha = Math.exp(-reDisk * reDisk * reDisk * reDisk * 4.5); // std. dev = 1/3
+						const imgIdx = (y * 2 * radius + x) * 4;
 						imgData.data[imgIdx + 0] = Math.floor((1.0 - alpha) * imgData.data[imgIdx + 0] + alpha * curr.colorDisk.r);
 						imgData.data[imgIdx + 1] = Math.floor((1.0 - alpha) * imgData.data[imgIdx + 1] + alpha * curr.colorDisk.g);
 						imgData.data[imgIdx + 2] = Math.floor((1.0 - alpha) * imgData.data[imgIdx + 2] + alpha * curr.colorDisk.b);
@@ -270,12 +270,12 @@ function drawTelescopeField(cx,cy,radius)
 					}
 				}
 
-				var coord = getPointInEllipse((x - radius) - curr.x,(y - radius) - curr.y,curr.eqSize,curr.polSize,curr._cosOrientation,curr._sinOrientation);
-				var re = Math.sqrt(coord.xe * coord.xe + coord.ye * coord.ye);
+				const coord = getPointInEllipse((x - radius) - curr.x,(y - radius) - curr.y,curr.eqSize,curr.polSize,curr._cosOrientation,curr._sinOrientation);
+				const re = Math.sqrt(coord.xe * coord.xe + coord.ye * coord.ye);
 				if (re <= 1.0) // point is in the ellipse
 				{
-					var alpha = Math.exp(-re * re * 4.5); // std. dev = 1/3
-					var imgIdx = (y * 2 * radius + x) * 4;
+					const alpha = Math.exp(-re * re * 4.5); // std. dev = 1/3
+					const imgIdx = (y * 2 * radius + x) * 4;
 					imgData.data[imgIdx + 0] = Math.floor((1.0 - alpha) * imgData.data[imgIdx + 0] + alpha * curr.color.r);
 					imgData.data[imgIdx + 1] = Math.floor((1.0 - alpha) * imgData.data[imgIdx + 1] + alpha * curr.color.g);
 					imgData.data[imgIdx + 2] = Math.floor((1.0 - alpha) * imgData.data[imgIdx + 2] + alpha * curr.color.b);
@@ -291,7 +291,7 @@ function drawTelescopeField(cx,cy,radius)
 
 function drawCurrentTargetInfo(cx,ty,size)
 {
-	var state = theContext.save();
+	const state = theContext.save();
 
 	theContext.translate(cx - 75,ty + size + 5);
 	theContext.fillStyle = "#7F7F7F";
@@ -306,20 +306,20 @@ function drawCurrentTargetInfo(cx,ty,size)
 	theContext.moveTo(-180,size * 0.125);
 	theContext.lineTo(330,size * 0.125);
 	theContext.stroke();
-	var idxLcl;
+	let idxLcl;
 	for (idxLcl = 0; idxLcl < inViewList.length; idxLcl++)
 	{
-		var curr = universe[inViewList[idxLcl].idx];
-		var relPos = getRelPos(universe[currentHome]._position,curr._position);
-		var id = curr._id;
-		var dist = relPos.r;
+		const curr = universe[inViewList[idxLcl].idx];
+		const relPos = getRelPos(universe[currentHome]._position,curr._position);
+		const id = curr._id;
+		const dist = relPos.r;
 		theContext.fillText(id,-180,(idxLcl + 1.25) * size);
-		var measData = curr.getMeasurementSet(currentHome);
+		const measData = curr.getMeasurementSet(currentHome);
 		if (typeof measData !== 'undefined')
 		{
 			if (measData._Mv_u > 0)
 			{
-				var Mv = sig_figs(measData._Mv,measData._Mv_u);
+				const Mv = sig_figs(measData._Mv,measData._Mv_u);
 				theContext.fillText(Mv.standard_notation,0,(idxLcl + 1.25) * size);
 			}
 			if (measData._redshift_u > 0)
@@ -328,7 +328,7 @@ function drawCurrentTargetInfo(cx,ty,size)
 			}
 			if (measData._dist_u > 0)
 			{
-				var dist = sig_figs(measData._dist,measData._dist_u);
+				const dist = sig_figs(measData._dist,measData._dist_u);
 				theContext.fillText(dist.standard_notation,240,(idxLcl + 1.25) * size);
 			}
 		}
@@ -337,21 +337,21 @@ function drawCurrentTargetInfo(cx,ty,size)
 }
 function drawCurrentHome(cx,ty,size)
 {
-	var state = theContext.save();
+	const state = theContext.save();
 	theContext.fillStyle = "#7F7F7F";
 	theContext.font = size + "px Arial";
 
 	theContext.translate(cx,ty);
-	var homeString = "Home Galaxy: " + universe[currentHome]._id;
+	const homeString = "Home Galaxy: " + universe[currentHome]._id;
 	theContext.fillText(homeString,-0.5 * theContext.measureText(homeString).width,0);
 	theContext.restore(state);
 }
 
-var g_graphHubble = new Graph("Hubble Diagram",250,350,"#ffffff");
-var g_graphAxisDistance = new GraphAxis("xaxis","Distance (100 Mpc)",0,15);
-var g_graphAxisRedshift = new GraphAxis("yaxis","Velocity (1000 km/s)",0,125);
-var g_graphdatasetMeasurements = new GraphDataSet("data","xaxis", "yaxis", null,1,4,"#ff0000",true);
-var g_graphdatatrendMeasurements = new GraphTrend("Hubble Diagram trend","xaxis", "yaxis", "linear", 0,0,"#0000ff" );
+let g_graphHubble = new Graph("Hubble Diagram",250,350,"#ffffff");
+let g_graphAxisDistance = new GraphAxis("xaxis","Distance (100 Mpc)",0,15);
+let g_graphAxisRedshift = new GraphAxis("yaxis","Velocity (1000 km/s)",0,125);
+let g_graphdatasetMeasurements = new GraphDataSet("data","xaxis", "yaxis", null,1,4,"#ff0000",true);
+let g_graphdatatrendMeasurements = new GraphTrend("Hubble Diagram trend","xaxis", "yaxis", "linear", 0,0,"#0000ff" );
 g_graphdatatrendMeasurements.disabled = true;
 
 g_graphHubble.addHorizontalAxis(g_graphAxisDistance);
@@ -363,8 +363,8 @@ function drawHubble(cx,ty,width,height)
 {
 	g_graphHubble.width = width;
 	g_graphHubble.height = height;
-	var x = cx - width * 0.5;
-	var y = ty;
+	const x = cx - width * 0.5;
+	const y = ty;
 	
 
 
@@ -377,12 +377,12 @@ function drawHubble(cx,ty,width,height)
 	{
 		if (listMeasurements[idxLcl]._fromGalaxy == currentHome && listMeasurements[idxLcl]._dist_u > 0 && listMeasurements[idxLcl]._redshift_u > 0)
 		{
-			var datum = new GraphDatum(listMeasurements[idxLcl]._dist / 100.0,listMeasurements[idxLcl]._redshift * 299.792458);
+			let datum = new GraphDatum(listMeasurements[idxLcl]._dist / 100.0,listMeasurements[idxLcl]._redshift * 299.792458);
 			g_graphdatasetMeasurements.add(datum);
 /*			g_graphdatasetMeasurements.
-			var v = listMeasurements[idxLcl]._redshift * 299792.458;
-			var x = listMeasurements[idxLcl]._dist / 1500.0 * gw;
-			var y = -v / 125000.0 * gh;
+			let v = listMeasurements[idxLcl]._redshift * 299792.458;
+			let x = listMeasurements[idxLcl]._dist / 1500.0 * gw;
+			let y = -v / 125000.0 * gh;
 			theContext.beginPath();
 			theContext.arc(x,y,2,0,2.0 * Math.PI);
 			theContext.fill();*/
@@ -403,7 +403,7 @@ function draw()
 
 	theContext.textBaseline = "bottom";
 	theContext.font = "24px Arial";
-	var text = "Map of the Sky"
+	let text = "Map of the Sky"
 	theContext.fillText(text,(theCanvas.width - theContext.measureText(text).width) * 0.5,24);
 	theContext.font = "14px Arial";
 	text = "Yellow circle shows where the telescope is pointing."
@@ -425,10 +425,10 @@ function draw()
 	theContext.fillStyle = "#FF0000";
 	if (hubbleLaw.measH0u > 0)
 	{
-		var x = 0;
-		var width = 0;
-		var H0sf = sig_figs(hubbleLaw.measH0,hubbleLaw.measH0u);
-		var text = "H" + toSubscript("0") + ' = ';
+		let x = 0;
+		let width = 0;
+		const H0sf = sig_figs(hubbleLaw.measH0,hubbleLaw.measH0u);
+		let text = "H" + toSubscript("0") + ' = ';
 		if (hubbleLaw.measH0u > 0) 
 			text += H0sf.standard_notation + ' km/s/Mpc';
 		else
@@ -457,8 +457,8 @@ function draw()
 	theContext.font = "24px Arial";
 	drawTextCenter(theContext,"Telescope Pointing",theCanvas.width * 0.5 + 375 + 25,24);
 
-	var decD = degreestoDMSDisplayable(degrees(viewLat));
-	var raD = degreestoDMSDisplayable(degrees(viewLong));
+	const decD = degreestoDMSDisplayable(degrees(viewLat));
+	const raD = degreestoDMSDisplayable(degrees(viewLong));
 	theContext.fillStyle = "#FFFFFF";
 	theContext.font = "14px Arial";
 	text = decD.deg + String.fromCharCode(0x00b0) + " " + decD.min + "\' " + decD.sec + "\"";

@@ -446,7 +446,7 @@ function createConstellations()
 		constellationData[i].pathData = new Array();
 		for (j = 0; j < constellationData[i].paths.length; j++)
 		{
-			let j;
+			let k;
 			let pathCurr = new Array();
 			for (k = 0; k < constellationData[i].paths[j].length; k++)
 			{

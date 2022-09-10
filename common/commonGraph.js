@@ -1104,6 +1104,13 @@ class GraphDataSet
 
 	LinearLeastSquare(loglog)
 	{
+		let _m = null;
+		let _b = null;
+		let _om = null;
+		let _ob = null;
+		let _oy = null;
+		let count = 0;
+		let dof = 0;
 		if (this._data.length > 1)
 		{
 			let sY = 0;
@@ -1138,11 +1145,8 @@ class GraphDataSet
 			}
 			const invN = 1.0 / count;
 			const invDelta = 1.0 / (count * sX2 - sX * sX);
-			const _m = (count * sXY - sX * sY) * invDelta;
-			const _b = (sX2 * sY - sX * sXY) * invDelta;
-			let _om;
-			let _ob;
-			let _oy;
+			_m = (count * sXY - sX * sY) * invDelta;
+			_b = (sX2 * sY - sX * sXY) * invDelta;
 			if (count > 2)
 			{
 				for (idxLcl = 0; idxLcl < count; idxLcl++)
@@ -1168,6 +1172,7 @@ class GraphDataSet
 				_oy = Math.sqrt(sOy / (count - 2.0));
 				_ob = Math.sqrt(sX2 * invDelta) * _oy;
 				_om = Math.sqrt(count * invDelta) * _oy;
+				dof = count - 2;
 			}
 			else
 			{
@@ -1177,7 +1182,7 @@ class GraphDataSet
 			}
 		}
 		const type = (loglog) ? "Log-Log LLS" : "Linear LLS";
-		return {type: type, slope: _m, slope_uncertainty: _om, intercept: _b, intercept_uncertainty: _ob, S: _oy, DOF: count - 2};
+		return {type: type, slope: _m, slope_uncertainty: _om, intercept: _b, intercept_uncertainty: _ob, S: _oy, DOF: dof};
 	}
 	LogLogLinearLeastSquare()
 	{

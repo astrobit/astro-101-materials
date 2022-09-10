@@ -57,7 +57,7 @@ const ColorSkyStringInternal =
 	}
 }
 
-var ColorSkyStrings = ColorSkyStringInternal[navigator.language];
+let ColorSkyStrings = ColorSkyStringInternal[navigator.language];
 
 if (ColorSkyStrings === undefined)
 	ColorSkyStrings = ColorSkyStringInternal['en'];

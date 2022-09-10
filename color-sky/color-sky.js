@@ -1,18 +1,18 @@
 
-var theCanvas = document.getElementById("mapCanvas");
+let theCanvas = document.getElementById("mapCanvas");
 theCanvas.onselectstart = function () { return false; } // prevent selection of text below the canvas when you click on it
-var theContext = theCanvas.getContext("2d");
+let theContext = theCanvas.getContext("2d");
 
-var timer = 0;
+let timer = 0;
 
 
-var projectionType = "Mollweide";
-var displayConstellations = "zodiac";
-var filter = "none"
-var displayCoordinates = "Equatorial"
-var zoom = 1.0;
-var zoomCenterX = 0;
-var zoomCenterY = 0;
+let projectionType = "Mollweide";
+let displayConstellations = "zodiac";
+let filter = "none"
+let displayCoordinates = "Equatorial"
+let zoom = 1.0;
+let zoomCenterX = 0;
+let zoomCenterY = 0;
 
 const minimumButtonsHeight = 280;
 theCanvas.height = window.innerHeight - 60;
@@ -20,8 +20,8 @@ theCanvas.width = window.innerWidth - 20;
 
 const offsetButtonsText = 10;
 const offsetTextButtons = 50;
-var mapHeight = theCanvas.height - minimumButtonsHeight;
-var mapWidth = 2 * mapHeight;
+let mapHeight = theCanvas.height - minimumButtonsHeight;
+let mapWidth = 2 * mapHeight;
 if (mapWidth > theCanvas.width - 80)
 {
 	mapWidth = theCanvas.width - 80;
@@ -29,17 +29,17 @@ if (mapWidth > theCanvas.width - 80)
 }
 
 
-var mapCenterX = theCanvas.width / 2;
-var mapCenterY = mapHeight / 2 + 5;
-var filterTextY = mapHeight + offsetTextButtons;
-var filterButtonY = filterTextY + offsetButtonsText;
-var constellationTextY = filterButtonY + offsetTextButtons;
-var constellationButtonsY = constellationTextY + offsetButtonsText;
-var coordinatesTextY = constellationButtonsY + offsetTextButtons;
-var coordinatesButtonsY = coordinatesTextY + offsetButtonsText;
-var tutorialControlsY0 = coordinatesButtonsY + offsetTextButtons + 10;
-var aboutTutorialButtonsY = tutorialControlsY0;
-var tutorialTextOffset = -20;
+const mapCenterX = theCanvas.width / 2;
+const mapCenterY = mapHeight / 2 + 5;
+const filterTextY = mapHeight + offsetTextButtons;
+const filterButtonY = filterTextY + offsetButtonsText;
+const constellationTextY = filterButtonY + offsetTextButtons;
+const constellationButtonsY = constellationTextY + offsetButtonsText;
+const coordinatesTextY = constellationButtonsY + offsetTextButtons;
+const coordinatesButtonsY = coordinatesTextY + offsetButtonsText;
+const tutorialControlsY0 = coordinatesButtonsY + offsetTextButtons + 10;
+const aboutTutorialButtonsY = tutorialControlsY0;
+const tutorialTextOffset = -20;
 
 
 
@@ -47,8 +47,8 @@ function onWheel(event)
 {
 	if (event.deltaY != 0)
 	{
-//		var Xeffective = ((event.offsetX - theCanvas.width / 2)) / zoom + zoomCenterX
-//		var Yeffective = ((event.offsetY - theCanvas.height / 2)) / zoom + zoomCenterY
+//		let Xeffective = ((event.offsetX - theCanvas.width / 2)) / zoom + zoomCenterX
+//		let Yeffective = ((event.offsetY - theCanvas.height / 2)) / zoom + zoomCenterY
 //		zoomCenterX = Xeffective;
 //		zoomCenterY = Yeffective;
 		zoom *= Math.pow(2.0,-event.deltaY / 200.0);
@@ -69,7 +69,7 @@ function selectFilter(value)
 	draw();
 }
 
-var radButtons = new Array();
+let radButtons = new Array();
 
 radButtons.push(new RadioButton("No Filter","none",theCanvas.width / 2 - 265,filterButtonY,80,25));
 radButtons[radButtons.length - 1].text = "No Filter";
@@ -89,7 +89,7 @@ radButtons[radButtons.length - 1].text = "R";
 radButtons.push(new RadioButton("I Filter","I",theCanvas.width / 2 + 185,filterButtonY,80,25));
 radButtons[radButtons.length - 1].text = "I";
 
-var filterRadio = new Radio("Filter","none",selectFilter,radButtons);
+let filterRadio = new Radio("Filter","none",selectFilter,radButtons);
 commonUIRegister(filterRadio);
 
 
@@ -99,7 +99,7 @@ function selectConstellation(constellation)
 	draw();
 }
 
-var radButtonsConst = new Array();
+let radButtonsConst = new Array();
 
 radButtonsConst.push(new RadioButton("No Constellations","none",theCanvas.width / 2 - 210,constellationButtonsY,80,25));
 radButtonsConst[radButtonsConst.length - 1].text = "None";
@@ -125,7 +125,7 @@ function selectCoordinateSystem(coordinates)
 	displayCoordinates = coordinates;
 	draw();
 }
-var coordButtonsConst = new Array();
+let coordButtonsConst = new Array();
 
 coordButtonsConst.push(new RadioButton("Equatorial","Equatorial",theCanvas.width / 2 - 140,coordinatesButtonsY,90,25));
 coordButtonsConst[coordButtonsConst.length - 1].text = "Equatorial";
@@ -136,7 +136,7 @@ coordButtonsConst[coordButtonsConst.length - 1].text = "Ecliptic";
 coordButtonsConst.push(new RadioButton("Galactic","Galactic",theCanvas.width / 2 + 50,coordinatesButtonsY,90,25));
 coordButtonsConst[coordButtonsConst.length - 1].text = "Galactic";
 
-var radioCoord = new Radio("Coordinate System","Equatorial",selectCoordinateSystem,coordButtonsConst);
+let radioCoord = new Radio("Coordinate System","Equatorial",selectCoordinateSystem,coordButtonsConst);
 commonUIRegister(radioCoord);
 
 
@@ -295,7 +295,7 @@ function tutorialDraw(context,state)
 	}
 }
 
-var g_tutorial = new Tutorial();
+let g_tutorial = new Tutorial();
 
 function tutorialSkip(event)
 {
@@ -384,9 +384,9 @@ function tutorialRewind(event)
 }
 
 g_tutorial.drawer = tutorialDraw;
-var tutorialSkipButton = new Button("Skip Tutorial",theCanvas.width / 2 - 60,tutorialControlsY0,120,25,tutorialSkip);
-var tutorialAdvanceButton = new Button("Next",theCanvas.width / 2 + 70,tutorialControlsY0,40,25,tutorialAdvance);
-var tutorialRewindButton = new Button("Prev",theCanvas.width / 2 - 110,tutorialControlsY0,40,25,tutorialRewind);
+let tutorialSkipButton = new Button("Skip Tutorial",theCanvas.width / 2 - 60,tutorialControlsY0,120,25,tutorialSkip);
+let tutorialAdvanceButton = new Button("Next",theCanvas.width / 2 + 70,tutorialControlsY0,40,25,tutorialAdvance);
+let tutorialRewindButton = new Button("Prev",theCanvas.width / 2 - 110,tutorialControlsY0,40,25,tutorialRewind);
 
 g_tutorial.disableStandardUI();
 g_tutorial.addUI(0,tutorialSkipButton);
@@ -429,17 +429,17 @@ g_tutorial.addUI(9,tutorialRewindButton);
 
 
 
-var tutorialCompleted = window.localStorage.getItem("tutorialCompleteColorSky");
+let tutorialCompleted = window.localStorage.getItem("tutorialCompleteColorSky");
 if (!tutorialCompleted)
 	g_tutorial.activate();
 
 commonUIRegister(g_tutorial);
 
-var replayTutorialButton = new Button("Tutorial",theCanvas.width - 210,aboutTutorialButtonsY,100,25,tutorialStart);
+let replayTutorialButton = new Button("Tutorial",theCanvas.width - 210,aboutTutorialButtonsY,100,25,tutorialStart);
 replayTutorialButton.textFont = "24px Arial";
 commonUIRegister(replayTutorialButton);
 
-var g_about = new Tutorial();
+let g_about = new Tutorial();
 
 function aboutShow(event)
 {
@@ -471,25 +471,25 @@ function aboutDraw(context,state)
 
 g_about.drawer = aboutDraw;
 
-var aboutOKButton= new Button("OK",theCanvas.width / 2,tutorialControlsY0,40,25,aboutDone);
+let aboutOKButton= new Button("OK",theCanvas.width / 2,tutorialControlsY0,40,25,aboutDone);
 aboutOKButton.textFont = "24px Arial";
 
 g_about.disableStandardUI();
 g_about.addUI(0,aboutOKButton);
 commonUIRegister(g_about);
 
-var aboutButton= new Button("About",theCanvas.width - 100,aboutTutorialButtonsY,80,25,aboutShow);
+let aboutButton= new Button("About",theCanvas.width - 100,aboutTutorialButtonsY,80,25,aboutShow);
 aboutButton.textFont = "24px Arial";
 commonUIRegister(aboutButton);
 
 function draw(){
 
-	var mapWidthDraw = mapWidth * zoom;
-	var mapHeightDraw = mapHeight * zoom;
-	var mapCenterXDraw = mapCenterX - zoomCenterX * zoom;
-	var mapCenterYDraw = mapCenterY - zoomCenterY * zoom;
+	const mapWidthDraw = mapWidth * zoom;
+	const mapHeightDraw = mapHeight * zoom;
+	const mapCenterXDraw = mapCenterX - zoomCenterX * zoom;
+	const mapCenterYDraw = mapCenterY - zoomCenterY * zoom;
 
-	var skyMap = new SkyMap(theContext,mapCenterXDraw,mapCenterYDraw,mapWidthDraw,mapHeightDraw);
+	let skyMap = new SkyMap(theContext,mapCenterXDraw,mapCenterYDraw,mapWidthDraw,mapHeightDraw);
 	skyMap.filter = filter;
 	skyMap.displayConstellations = displayConstellations;
 	skyMap.coordinates = displayCoordinates;
@@ -578,7 +578,7 @@ function draw(){
 }
 
 
-var waitForReadyTimer = 0.0;
+let waitForReadyTimer = 0.0;
 
 function waitForReady()
 {
@@ -591,8 +591,8 @@ function waitForReady()
 		theContext.fillStyle = "#FFFFFF";
 		theContext.font = "20px Ariel";
 		drawTextCenter(theContext,"Please Wait",theCanvas.width * 0.5,theCanvas.height * 0.5 - 15);
-		var timerDots = Math.floor(waitForReadyTimer * 4.0) % 4;
-		var dots = "";
+		const timerDots = Math.floor(waitForReadyTimer * 4.0) % 4;
+		let dots = "";
 		if (timerDots == 0)
 			dots = "."
 		else if (timerDots == 1)

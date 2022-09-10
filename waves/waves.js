@@ -2,8 +2,8 @@
 
 
 
-var theCanvas = document.getElementById("theCanvas");
-var theContext = theCanvas.getContext("2d");
+let theCanvas = document.getElementById("theCanvas");
+let theContext = theCanvas.getContext("2d");
 
 theCanvas.onselectstart = function () { return false; }
 theCanvas.onmousedown = commonUIOnMouseDown;
@@ -24,14 +24,14 @@ onResize();
 
 theContext.fillTextCenter = function (text,x,y)
 {
-	var align = this.textAlign;
+	const align = this.textAlign;
 	this.textAlign = "center";
 	this.fillText(text,x,y);
 	this.textAlign = align;
 }
 theContext.fillTextRight = function (text,x,y)
 {
-	var align = this.textAlign;
+	const align = this.textAlign;
 	this.textAlign = "right";
 	this.fillText(text,x,y);
 	this.textAlign = align;
@@ -280,20 +280,10 @@ class wave_pulse
 	}
 	y(x,t)
 	{
-		if (x == 100)
-		{
-			var i = 1;
-			i = x + 1;
-		}
-		if (x == 900)
-		{
-			var i = 1;
-			i = x + 1;
-		}
-		var ret;
-		var vT = this._pulse_period * this._velocity;
-		var xeff = x % vT;
-		var pulse_x;
+		let ret;
+		const vT = this._pulse_period * this._velocity;
+		let xeff = x % vT;
+		let pulse_x;
 		if (this._direction < 0)
 		{
 			pulse_x = vT - (this._velocity * t) % vT
@@ -302,7 +292,7 @@ class wave_pulse
 		{
 			pulse_x = (this._velocity * t) % vT
 		}
-		var delx = pulse_x - xeff;
+		let delx = pulse_x - xeff;
 		if (delx < 0)
 			delx = vT + delx;
 		if ((delx >= 0 && delx < this._wavelength) ||
@@ -332,7 +322,7 @@ function onReflectionLengthChange(value)
 	g_reflectionLength = theCanvas.width - (1.0 - value) * wave_right.wavelength;
 }
 
-var sliderReflectionLength = new Slider(theCanvas.width * 0.5,390,0.0001,1.0,1.0);
+let sliderReflectionLength = new Slider(theCanvas.width * 0.5,390,0.0001,1.0,1.0);
 sliderReflectionLength.width = 800;
 sliderReflectionLength.label = "Reflection Length";
 sliderReflectionLength.labelStyle = "#00FFFF";
@@ -343,18 +333,18 @@ sliderReflectionLength.disabled = true;
 commonUIRegister(sliderReflectionLength);
 
 
-var velocity = 25	; // pixels / sec
-var frequency = 0.5;
-var wavelength = velocity / frequency;
-var amplitude = 25;
+let velocity = 25	; // pixels / sec
+let frequency = 0.5;
+let wavelength = velocity / frequency;
+let amplitude = 25;
 
-var wave_right = new wave_data(velocity,frequency,amplitude,0);
-var wave_left = new wave_data(-velocity,frequency,amplitude,0);
+let wave_right = new wave_data(velocity,frequency,amplitude,0);
+let wave_left = new wave_data(-velocity,frequency,amplitude,0);
 
-var pulse_frequency = velocity / theCanvas.width;
+let pulse_frequency = velocity / theCanvas.width;
 
-var pulse_wave_right = new wave_pulse(velocity,frequency,amplitude,pulse_frequency);
-var pulse_wave_left = new wave_pulse(-velocity,frequency,amplitude,pulse_frequency);
+let pulse_wave_right = new wave_pulse(velocity,frequency,amplitude,pulse_frequency);
+let pulse_wave_left = new wave_pulse(-velocity,frequency,amplitude,pulse_frequency);
 
 
 
@@ -384,7 +374,7 @@ function pulseFreqWaveRightOnChange(value)
 	pulse_wave_right.pulse_frequency = value * pulse_frequency;
 }
 
-var sliderPulseFreqA = new Slider(theCanvas.width * 0.5 + 375,150,0.01,10,1.0);
+let sliderPulseFreqA = new Slider(theCanvas.width * 0.5 + 375,150,0.01,10,1.0);
 sliderPulseFreqA.label = "Pulse Frequency";
 sliderPulseFreqA.labelStyle = "#00FF00";
 sliderPulseFreqA.labelFont = "16px Ariel"
@@ -393,25 +383,25 @@ sliderPulseFreqA.visible = false;
 sliderPulseFreqA.disabled = true;
 commonUIRegister(sliderPulseFreqA);
 
-var sliderFreqA = new Slider(theCanvas.width * 0.5 - 375,150,0.5,2,0.5);
+let sliderFreqA = new Slider(theCanvas.width * 0.5 - 375,150,0.5,2,0.5);
 sliderFreqA.label = "Frequency";
 sliderFreqA.labelStyle = "#00FF00";
 sliderFreqA.labelFont = "16px Ariel"
 sliderFreqA.onChange = freqWaveRightOnChange;
 commonUIRegister(sliderFreqA);
-var sliderVelocityA = new Slider(theCanvas.width * 0.5 - 125,150,1,1000,25);
+let sliderVelocityA = new Slider(theCanvas.width * 0.5 - 125,150,1,1000,25);
 sliderVelocityA.label = "Velocity";
 sliderVelocityA.labelStyle = "#00FF00";140
 sliderVelocityA.labelFont = "16px Ariel"
 sliderVelocityA.onChange = velocityWaveRightOnChange;
 commonUIRegister(sliderVelocityA);
-var sliderAmplitudeA = new Slider(theCanvas.width * 0.5 + 125,150,0,50,25);
+let sliderAmplitudeA = new Slider(theCanvas.width * 0.5 + 125,150,0,50,25);
 sliderAmplitudeA.label = "Amplitude";
 sliderAmplitudeA.labelStyle = "#00FF00";
 sliderAmplitudeA.labelFont = "16px Ariel"
 sliderAmplitudeA.onChange = amplitudeWaveRightOnChange;
 commonUIRegister(sliderAmplitudeA);
-var sliderPhaseA = new Slider(theCanvas.width * 0.5 + 375,150,0,359,0);
+let sliderPhaseA = new Slider(theCanvas.width * 0.5 + 375,150,0,359,0);
 sliderPhaseA.label = "Phase";
 sliderPhaseA.labelStyle = "#00FF00";
 sliderPhaseA.labelFont = "16px Ariel"
@@ -445,7 +435,7 @@ function pulseFreqWaveLeftOnChange(value)
 }
 
 
-var sliderPulseFreqB = new Slider(theCanvas.width * 0.5 + 375,390,0.01,10,1.0);
+let sliderPulseFreqB = new Slider(theCanvas.width * 0.5 + 375,390,0.01,10,1.0);
 sliderPulseFreqB.label = "Pulse Frequency";
 sliderPulseFreqB.labelStyle = "#0000FF";
 sliderPulseFreqB.labelFont = "16px Ariel"
@@ -454,32 +444,32 @@ sliderPulseFreqB.visible = false;
 sliderPulseFreqB.disabled = true;
 commonUIRegister(sliderPulseFreqB);
 
-var sliderFreqB = new Slider(theCanvas.width * 0.5 - 375,390,0.5,2,0.5);
+let sliderFreqB = new Slider(theCanvas.width * 0.5 - 375,390,0.5,2,0.5);
 sliderFreqB.label = "Frequency";
 sliderFreqB.labelStyle = "#0000FF";
 sliderFreqB.labelFont = "16px Ariel"
 sliderFreqB.onChange = freqWaveLeftOnChange;
 commonUIRegister(sliderFreqB);
-var sliderVelocityB = new Slider(theCanvas.width * 0.5 - 125,390,1,1000,25);
+let sliderVelocityB = new Slider(theCanvas.width * 0.5 - 125,390,1,1000,25);
 sliderVelocityB.label = "Velocity";
 sliderVelocityB.labelStyle = "#0000FF";
 sliderVelocityB.labelFont = "16px Ariel"
 sliderVelocityB.onChange = velocityWaveLeftOnChange;
 commonUIRegister(sliderVelocityB);
-var sliderAmplitudeB = new Slider(theCanvas.width * 0.5 + 125,390,0,50,25);
+let sliderAmplitudeB = new Slider(theCanvas.width * 0.5 + 125,390,0,50,25);
 sliderAmplitudeB.label = "Amplitude";
 sliderAmplitudeB.labelStyle = "#0000FF";
 sliderAmplitudeB.labelFont = "16px Ariel"
 sliderAmplitudeB.onChange = amplitudeWaveLeftOnChange;
 commonUIRegister(sliderAmplitudeB);
-var sliderPhaseB = new Slider(theCanvas.width * 0.5 + 375,390,0,390,0);
+let sliderPhaseB = new Slider(theCanvas.width * 0.5 + 375,390,0,390,0);
 sliderPhaseB.label = "Phase";
 sliderPhaseB.labelStyle = "#0000FF";
 sliderPhaseB.labelFont = "16px Ariel"
 sliderPhaseB.onChange = phaseWaveLeftOnChange;
 commonUIRegister(sliderPhaseB);
 
-var g_Type = "wave";
+let g_Type = "wave";
 function typeSelect(value)
 {
 	g_Type = value;
@@ -513,15 +503,15 @@ function typeSelect(value)
 	}
 }
 
-var rbtnTypeArray = new Array();
-var rbtnWaves = new RadioButton("Waves","wave",theCanvas.width * 0.5 - 105,20,100,30);
+let rbtnTypeArray = new Array();
+let rbtnWaves = new RadioButton("Waves","wave",theCanvas.width * 0.5 - 105,20,100,30);
 rbtnTypeArray.push(rbtnWaves);
-var rbtnPulses = new RadioButton("Pulses","pulse",theCanvas.width * 0.5 + 5,20,100,30);
+let rbtnPulses = new RadioButton("Pulses","pulse",theCanvas.width * 0.5 + 5,20,100,30);
 rbtnTypeArray.push(rbtnPulses);
-var radioType = new Radio("Type","wave",typeSelect,rbtnTypeArray);
+let radioType = new Radio("Type","wave",typeSelect,rbtnTypeArray);
 commonUIRegister(radioType);
 
-var g_Motion = "dual";
+let g_Motion = "dual";
 function motionSelect(value)
 {
 	g_Motion = value;
@@ -571,19 +561,19 @@ function motionSelect(value)
 	}
 }
 
-var rbtnMotionArray = new Array();
-var rbtnLeftRight = new RadioButton("Left & Right","dual",theCanvas.width * 0.5 - 105,60,100,30);
+let rbtnMotionArray = new Array();
+let rbtnLeftRight = new RadioButton("Left & Right","dual",theCanvas.width * 0.5 - 105,60,100,30);
 rbtnMotionArray.push(rbtnLeftRight);
-var rbtnReflect = new RadioButton("Reflection","reflect",theCanvas.width * 0.5 + 5,60,100,30);
+let rbtnReflect = new RadioButton("Reflection","reflect",theCanvas.width * 0.5 + 5,60,100,30);
 rbtnMotionArray.push(rbtnReflect);
-var radioMotion = new Radio("Motion","dual",motionSelect,rbtnMotionArray);
+let radioMotion = new Radio("Motion","dual",motionSelect,rbtnMotionArray);
 commonUIRegister(radioMotion);
 
-var g_timestep = 1.0 / 30.0;
-var g_timer = 0.0;
-var g_slewSpeed = 0.01;
+let g_timestep = 1.0 / 30.0;
+let g_timer = 0.0;
+const g_slewSpeed = 0.01;
 
-var g_pause = false;
+let g_pause = false;
 function pause()
 {
 	g_pause = !g_pause;
@@ -592,7 +582,7 @@ function pause()
 	else
 		btnPause.text = "Pause"
 }
-var btnPause = new Button("Pause",theCanvas.width * 0.5 + 150,20,80,30,pause);
+let btnPause = new Button("Pause",theCanvas.width * 0.5 + 150,20,80,30,pause);
 commonUIRegister(btnPause);
 
 function step()
@@ -600,7 +590,7 @@ function step()
 	if (g_pause)
 		g_timer += g_timestep;
 }
-var btnStep = new Button("Step",theCanvas.width * 0.5 + 240,20,60,30,step);
+let btnStep = new Button("Step",theCanvas.width * 0.5 + 240,20,60,30,step);
 commonUIRegister(btnStep);
 
 function work()
@@ -609,7 +599,7 @@ function work()
 		g_timer += g_timestep;
 
 
-	var x;
+	let x;
 	
 	theContext.clearRect(0, 0, theCanvas.width, theCanvas.height);
 	theContext.fillStyle = '#000000';
@@ -619,13 +609,13 @@ function work()
 
 	if (g_Motion == "reflect")
 	{
-		var L = g_reflectionLength / wave_right.wavelength;
+		const L = g_reflectionLength / wave_right.wavelength;
 		theContext.fillStyle = "#00FFFF";
-		var Lr = Math.round(L * 1000.0) / 1000.0;
-		var Ls = Lr.toString();
+		const Lr = Math.round(L * 1000.0) / 1000.0;
+		let Ls = Lr.toString();
 		if (Ls.indexOf(".") == -1)
 			Ls += '.';
-		var addCnt = 0;
+		let addCnt = 0;
 		while (addCnt < 3 && Ls.charAt(Ls.length - 4) != '.')
 		{
 			Ls += '0';
@@ -635,7 +625,7 @@ function work()
 		theContext.fillText(Ls,theCanvas.width * 0.5 + 500,370);
 	}
 
-	var horizOffset = 0;
+	let horizOffset = 0;
 	if (g_Motion != "dual")
 		horizOffset = (theCanvas.width - g_reflectionLength) * 0.5;
 

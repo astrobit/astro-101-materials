@@ -310,7 +310,7 @@ class Radio
 		this.visible = true;
 		this.disabled = false;
 		this.radioButtonArray = radioButtonArray;
-		var i;
+		let i;
 		for (i = 0; i < this.radioButtonArray.length; i++)
 		{
 			this.radioButtonArray[i].selected = (this.radioButtonArray[i].value == initalValue);
@@ -320,7 +320,7 @@ class Radio
 
 	draw(context)
 	{
-		var i;
+		let i;
 		for (i = 0; i < this.radioButtonArray.length; i++)
 		{
 			this.radioButtonArray[i].draw(context);
@@ -330,8 +330,8 @@ class Radio
 	{
 		if (!this.disabled)
 		{
-			var found = -1;
-			var i;
+			let found = -1;
+			let i;
 			for (i = 0; i < this.radioButtonArray.length && found == -1; i++)
 			{
 				if (this.radioButtonArray[i].test(event))
@@ -351,8 +351,8 @@ class Radio
 	}
 	test(event)
 	{
-		var i;
-		var ret = false;
+		let i;
+		let ret = false;
 		for (i = 0; i < this.radioButtonArray.length && !ret; i++)
 		{
 			ret = this.radioButtonArray[i].test(event);
@@ -361,7 +361,7 @@ class Radio
 	}
 	setState(value)
 	{
-		var found = null;
+		let found = null;
 		for (i = 0; i < this.radioButtonArray.length; i++)
 		{
 			if (value == this.radioButtonArray[i].value)
@@ -405,8 +405,8 @@ class Clickable
 	{
 		if (this.onClicker !== null)
 		{
-			var x = (event.offsetX - this.x) / this.width;
-			var y = (event.offsetY - this.y) / this.height;
+			const x = (event.offsetX - this.x) / this.width;
+			const y = (event.offsetY - this.y) / this.height;
 			this.onClicker(event,x,y);
 		}
 	}
@@ -516,8 +516,8 @@ class Slider
 					else
 						context.fillStyle = this.labelStyle;
 					
-					var fontSize = this.labelFont.search("px");
-					var size;
+					const fontSize = this.labelFont.search("px");
+					let size;
 					if (this.labelFont.charAt(fontSize - 2) < '0' ||  this.labelFont.charAt(fontSize - 2) > '9')
 					{
 						size = parseInt(this.labelFont.substring(fontSize - 1,fontSize));
@@ -529,11 +529,11 @@ class Slider
 						else
 							size = parseInt(this.labelFont.substring(fontSize - 3,fontSize));
 					}
-					var x = 0;
-					var y = 0;
-					var positionDash = this.labelPosition.search("-");
-					var positionHorizontal = this.labelPosition.substring(0,positionDash);
-					var positionVertical = this.labelPosition.substring(positionDash + 1);
+					let x = 0;
+					let y = 0;
+					const positionDash = this.labelPosition.search("-");
+					const positionHorizontal = this.labelPosition.substring(0,positionDash);
+					const positionVertical = this.labelPosition.substring(positionDash + 1);
 					
 					
 					if (positionVertical == "middle")
@@ -610,8 +610,8 @@ class Slider
 				context.closePath();
 				context.fill();
 				
-				var cursorX;
-				var cursorY;
+				let cursorX;
+				let cursorY;
 				if (this.vertical)
 				{
 					cursorX = 0;
@@ -648,12 +648,12 @@ class Slider
 	}
 	onMouseDown(event)
 	{
-		var acted = false;
+		let acted = false;
 		if (!this.disabled && this.visible && this.test(event))
 		{
-			var cursorPos = this._value * this._slope + this._offset;
-			var relX;
-			var relY;
+			let cursorPos = this._value * this._slope + this._offset;
+			let relX;
+			let relY;
 			if (this.vertical)
 			{
 				cursorPos *= this.height;
@@ -668,7 +668,7 @@ class Slider
 			}
 			if (this.roundCursor)
 			{
-				var r = relX * relX + relY * relY - this.cursorSize * this.cursorSize;
+				const r = relX * relX + relY * relY - this.cursorSize * this.cursorSize;
 				if (r < 0)
 					this.hasMouse = true;				
 			}
@@ -685,7 +685,7 @@ class Slider
 	}
 	onMouseUp(event)
 	{
-		var acted = false;
+		let acted = false;
 		if (this.hasMouse)
 		{
 			this.hasMouse = false;
@@ -695,10 +695,10 @@ class Slider
 	}
 	onMouseMove(event)
 	{
-		var acted = false;
+		let acted = false;
 		if (this.hasMouse)
 		{
-			var relPos;
+			let relPos;
 			if (this.vertical)
 			{
 				relPos = (event.offsetY - this.y) / this.height + 0.5;
@@ -726,10 +726,10 @@ class Slider
 	
 	onClick(event)
 	{
-		var acted = false;
+		let acted = false;
 		if (!this.disabled && this.visible && this.test(event))
 		{
-			var rel;
+			let rel;
 			if (this.vertical)
 				rel = (event.offsetY - this.y) / this.height;
 			else
@@ -746,10 +746,8 @@ class Slider
 	}
 	test(event)
 	{
-		var relX;
-		var relY;
-		relX = (event.offsetY - this.y) / this.height;
-		relY = (event.offsetX - this.x) / this.width;
+		const relX = (event.offsetY - this.y) / this.height;;
+		const relY = (event.offsetX - this.x) / this.width;
 		
 		return (this.visible && (-0.5 <= relX && relX <= 0.5 && -0.5 <= relY && relY <= 0.5));
 	}
@@ -768,21 +766,22 @@ class CommonUIContainer
 }
 
 
-var commonUIContainer = new CommonUIContainer()
-var commonUITutorialContainer = new CommonUIContainer()
-var commonUIhasMouse = null;
+let commonUIContainer = new CommonUIContainer()
+let commonUITutorialContainer = new CommonUIContainer()
+let commonUIhasMouse = null;
 
 function commonUIRegister(uiObject)
 {
-	var otype = uiObject instanceof Tutorial;
+	const otype = uiObject instanceof Tutorial;
+	let idx;
 	if (otype)
 	{
-		var idx = commonUITutorialContainer.registry.length;
+		idx = commonUITutorialContainer.registry.length;
 		commonUITutorialContainer.registry.push(uiObject);
 	}
 	else
 	{
-		var idx = commonUIContainer.registry.length;
+		idx = commonUIContainer.registry.length;
 		commonUIContainer.registry.push(uiObject);
 	}
 	return idx;
@@ -816,8 +815,8 @@ function commonUIResetOnMouseUp()
 
 function commonUIOnClick(event)
 {
-	var i;
-	var tutorialActive = false;
+	let i;
+	let tutorialActive = false;
 	for (i = 0; i < commonUITutorialContainer.registry.length && !tutorialActive; i++)
 	{
 		if ("onClick" in commonUITutorialContainer.registry[i] && commonUITutorialContainer.registry[i].active)
@@ -842,8 +841,8 @@ function commonUIOnClick(event)
 
 function commonUIOnMouseDown(event)
 {
-	var i;
-	var tutorialActive = false;
+	let i;
+	let tutorialActive = false;
 	for (i = 0; i < commonUITutorialContainer.registry.length && !tutorialActive; i++)
 	{
 		if ("onMouseDown" in commonUITutorialContainer.registry[i] && commonUITutorialContainer.registry[i].active)
@@ -873,8 +872,8 @@ function commonUIOnMouseDown(event)
 
 function commonUIOnMouseUp(event)
 {
-	var i;
-	var tutorialActive = false;
+	let i;
+	let tutorialActive = false;
 	for (i = 0; i < commonUITutorialContainer.registry.length && !tutorialActive; i++)
 	{
 		if ("onMouseUp" in commonUITutorialContainer.registry[i] && commonUITutorialContainer.registry[i].active)
@@ -915,7 +914,7 @@ function commonUIOnMouseLeave(event)
 function commonUIdraw(context)
 {
 	// check for active tutorials
-	var i;
+	let i;
 	for (i = 0; i < commonUIContainer.registry.length; i++)
 	{
 		if ("draw" in commonUIContainer.registry[i])

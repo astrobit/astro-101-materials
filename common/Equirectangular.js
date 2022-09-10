@@ -4,8 +4,8 @@ class Equirectangular
 {
 	calculate(latitude,longitude)
 	{ // ignore central latitude for now. Use of central latitude requires additional projection and gets complicated
-		var cenLatRad =  this.centralLatitude * Math.PI / 180.0;
-		var delLong = (longitude - this.centralLongitude) / 180.0;
+		const cenLatRad =  this.centralLatitude * Math.PI / 180.0;
+		let delLong = (longitude - this.centralLongitude) / 180.0;
 		if (delLong > 1.0)
 			delLong = 1.0 - delLong;
 		else if (delLong < -1.0)
@@ -15,8 +15,8 @@ class Equirectangular
 	}
 	calculateReverse(x,y)
 	{
-		var lat = y * 90.0 / Math.cos(cenLatRad) + this.centralLatitude;
-		var long = x * 180.0 + this.centralLongitude;
+		const lat = y * 90.0 / Math.cos(cenLatRad) + this.centralLatitude;
+		let long = x * 180.0 + this.centralLongitude;
 		long += 360.0;
 		long %= 360.0;
 		if (long > 180.0)

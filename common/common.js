@@ -3,14 +3,14 @@
 
 function drawTextCenter(context,text,x,y)
 {
-	var align = context.textAlign;
+	let align = context.textAlign;
 	context.textAlign = "center";
 	context.fillText(text,x,y);
 	context.textAlign = align;
 }
 function drawTextRight(context,text,x,y)
 {
-	var align = context.textAlign;
+	let align = context.textAlign;
 	context.textAlign = "right";
 	context.fillText(text,x,y);
 	context.textAlign = align;
@@ -18,14 +18,12 @@ function drawTextRight(context,text,x,y)
 
 function drawArrow(context,x0,y0,x1,y1,style,linewidth,tipsizelength,tipsizewidth,open)
 {
-	var txr,txr,txl,tyl;
-	var len = Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
+	let txr,txl,tyl;
+	const len = Math.sqrt((x1 - x0) * (x1 - x0) + (y1 - y0) * (y1 - y0));
 	
-	var angle = Math.atan2((y1 - y0)/len, (x1 - x0)/len);
-	var lx1, ly1;
-	var effline = len - tipsizelength;
-	if (effline < 0)
-		effline = 0; 
+	const angle = Math.atan2((y1 - y0)/len, (x1 - x0)/len);
+	let lx1, ly1;
+	const effline = Math.max(0,len - tipsizelength);
 	lx1 = effline * Math.cos(angle) + x0;
 	ly1 = effline * Math.sin(angle) + y0;
 	//console.log(x0 + " " + y1 + " " + lx1 + " " + ly1);
@@ -36,9 +34,9 @@ function drawArrow(context,x0,y0,x1,y1,style,linewidth,tipsizelength,tipsizewidt
 	
 	txl = -(tipsizewidth + linewidth) * 0.5 * Math.sin(angle) + lx1;
 	tyl = (tipsizewidth + linewidth) * 0.5 * Math.cos(angle) + ly1;
-	var strokestylesave= theContext.strokeStyle;
-	var fillstylesave= theContext.fillStyle;
-	var linewidthsave= theContext.lineWidth;
+	const strokestylesave= theContext.strokeStyle;
+	const fillstylesave= theContext.fillStyle;
+	const linewidthsave= theContext.lineWidth;
 	
 	context.strokeStyle = style;
 	context.fillStyle = style;
@@ -75,7 +73,7 @@ function drawEllipseByCenter(ctx, cx, cy, w, h) {
 }
 
 function drawEllipse(ctx, x, y, w, h) {
-  var kappa = 4.0 / 3.0 * (Math.sqrt(2) - 1);//.5522848,
+  const kappa = 4.0 / 3.0 * (Math.sqrt(2) - 1);//.5522848,
       ox = (w / 2) * kappa, // control point offset horizontal
       oy = (h / 2) * kappa, // control point offset vertical
       xe = x + w,           // x-end
@@ -98,7 +96,7 @@ function drawEllipseByCenterFill(ctx, cx, cy, w, h) {
 }
 
 function drawEllipseFill(ctx, x, y, w, h) {
-  var kappa = 4.0 / 3.0 * (Math.sqrt(2) - 1);//.5522848,
+  const kappa = 4.0 / 3.0 * (Math.sqrt(2) - 1);//.5522848,
       ox = (w / 2) * kappa, // control point offset horizontal
       oy = (h / 2) * kappa, // control point offset vertical
       xe = x + w,           // x-end
@@ -170,15 +168,15 @@ class RGB
 	get style()
 	{
 		// create an HTML color style based on RGB values
-		var sR = Math.floor(this._r).toString(16);
+		let sR = Math.floor(this._r).toString(16);
 		if (this._r < 16) // if the value is small enough for one hex digit, add a leading zero
 			sR = "0" + sR;
 
-		var sG = Math.floor(this._g).toString(16);
+		let sG = Math.floor(this._g).toString(16);
 		if (this._g < 16) // if the value is small enough for one hex digit, add a leading zero
 			sG = "0" + sG;
 
-		var sB = Math.floor(this._b).toString(16);
+		let sB = Math.floor(this._b).toString(16);
 		if (this._b < 16) // if the value is small enough for one hex digit, add a leading zero
 			sB = "0" + sB;
 		return "#" + sR + sG + sB;
@@ -187,7 +185,7 @@ class RGB
 	{
 		if (value >= 0.0)
 		{
-			var valueLcl = value;
+			let valueLcl = value;
 			if (this._r * valueLcl > 255)
 				valueLcl = 255 / this._r;
 			if (this._g * valueLcl > 255)
@@ -260,13 +258,13 @@ class ImgData
 	{
 		if (typeof this._imgData !== 'undefined' && this._imgData !== null)
 		{
-			var ctxLcl = this._context;
+			let ctxLcl = this._context;
 			if (typeof context !== 'undefined' && context !== null)
 				ctxLcl = context;
-			var xl = this._x;
+			let xl = this._x;
 			if (typeof x !== 'undefined' && x !== null)
 				xl = x;
-			var yl = this._y;
+			let yl = this._y;
 			if (typeof y !== 'undefined' && y !== null)
 				yl = y;
 			ctxLcl.putImageData(this._imgData, xl, yl);
@@ -281,12 +279,12 @@ class ImgData
 	{
 		if (typeof this._imgData !== 'undefined' && this._imgData !== null && x < this._width && y < this._height)
 		{
-			var xl = Math.floor(x);
-			var yl = Math.floor(y);
-			var idx = (yl * this._width + xl) *4;
-			var r = this._imgData.data[idx + 0];
-			var g = this._imgData.data[idx + 1];
-			var b = this._imgData.data[idx + 2];
+			const xl = Math.floor(x);
+			const yl = Math.floor(y);
+			const idx = (yl * this._width + xl) *4;
+			const r = this._imgData.data[idx + 0];
+			const g = this._imgData.data[idx + 1];
+			const b = this._imgData.data[idx + 2];
 
 			return new RGB(r, g, b);
 		}
@@ -295,17 +293,17 @@ class ImgData
 	}
 	getAtAbsolute(x, y)
 	{
-		var xr = x - this._x;
-		var yr = y - this._y;
+		const xr = x - this._x;
+		const yr = y - this._y;
 		return this.getAtRelative(xr, yr);
 	}
 	setAtRelative(x, y, rgb)
 	{
 		if (typeof this._imgData !== 'undefined' && this._imgData !== null && x < this._width && y < this._height)
 		{
-			var xl = Math.floor(x);
-			var yl = Math.floor(y);
-			var idx = (yl * this._width + xl) * 4;
+			const xl = Math.floor(x);
+			const yl = Math.floor(y);
+			const idx = (yl * this._width + xl) * 4;
 
 			this._imgData.data[idx] = rgb.r;
 			this._imgData.data[idx + 1] = rgb.b;
@@ -314,20 +312,20 @@ class ImgData
 	}
 	setAtAbsolute(x, y,rgb)
 	{
-		var xr = x - this._x;
-		var yr = y - this._y;
+		const xr = x - this._x;
+		const yr = y - this._y;
 		this.setAtRelative(xr, yr,rgb);
 	}
 	addAtRelative(x, y, rgb)
 	{
-		var clr = this.getAtRelative(x, y);
+		let clr = this.getAtRelative(x, y);
 		clr.add(rgb);
 		this.setAtRelative(x, y, clr);
 	}
 	addAtAbsolute(x, y, rgb)
 	{
-		var xr = x - this._x;
-		var yr = y - this._y;
+		const xr = x - this._x;
+		const yr = y - this._y;
 		this.addAtRelative(xr, yr, rgb);
 	}
 }

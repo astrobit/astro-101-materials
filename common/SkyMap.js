@@ -3,7 +3,7 @@ class SkyMap
 {
 	project()
 	{
-		var projector;
+		let projector;
 		if (this.projectionTypeInternal == "Equirectangular")
 			projector = new Equirectangular(this.centralRA,0.0)
 		else if (this.projectionTypeInternal == "Mercator")
@@ -11,15 +11,15 @@ class SkyMap
 		else
 			projector = new Mollweide(this.centralRA,0.0);
 		this.starsProjection = new Array();
-		var i;
+		let i;
 		for (i = 0; i < stars.length; i++)
 		{
-			var rgb = UBVRItoRGB(stars[i].U,stars[i].B,stars[i].V,stars[i].R,stars[i].I,0,6)
-			var rgbB_U = UBVRItoRGB(stars[i].U,null,null,null,null,0,6);
-			var rgbB_B = UBVRItoRGB(null,stars[i].B,null,null,null,0,6);
-			var rgbB_V = UBVRItoRGB(null,null,stars[i].V,null,null,0,6);
-			var rgbB_R = UBVRItoRGB(null,null,null,stars[i].R,null,0,6);
-			var rgbB_I = UBVRItoRGB(null,null,null,null,stars[i].I,0,6);
+			const rgb = UBVRItoRGB(stars[i].U,stars[i].B,stars[i].V,stars[i].R,stars[i].I,0,6)
+			const rgbB_U = UBVRItoRGB(stars[i].U,null,null,null,null,0,6);
+			const rgbB_B = UBVRItoRGB(null,stars[i].B,null,null,null,0,6);
+			const rgbB_V = UBVRItoRGB(null,null,stars[i].V,null,null,0,6);
+			const rgbB_R = UBVRItoRGB(null,null,null,stars[i].R,null,0,6);
+			const rgbB_I = UBVRItoRGB(null,null,null,null,stars[i].I,0,6);
 			var projection;
 			switch (this.coordinatesInternal)
 			{
@@ -40,9 +40,9 @@ class SkyMap
 	}
 	constructor(context,x,y,width,height)
 	{
-//var projectionType = "Mollweide";
-//var displayConstellations = true;
-//var filter = "B"
+//const projectionType = "Mollweide";
+//const displayConstellations = true;
+//const filter = "B"
 		this.xCenter = x;
 		this.yCenter = y;
 		this.width = width;
@@ -137,10 +137,10 @@ class SkyMap
 	}
 	draw()
 	{
-		var mapWidth = this.width;
-		var mapHeight = this.height;
-		var mapCenterX = this.xCenter;
-		var mapCenterY = this.yCenter;
+		const mapWidth = this.width;
+		const mapHeight = this.height;
+		const mapCenterX = this.xCenter;
+		const mapCenterY = this.yCenter;
 
 	// draw a black square for the map area box
 		this.context.fillStyle = "#000000";
@@ -159,12 +159,12 @@ class SkyMap
 		this.context.lineTo(mapCenterX + mapWidth * 0.5,mapCenterY);
 		this.context.stroke();
 
-		var mapImage = new ImgData(this.context, mapCenterX - mapWidth * 0.5, mapCenterY - mapHeight * 0.5, mapWidth, mapHeight);
+		const mapImage = new ImgData(this.context, mapCenterX - mapWidth * 0.5, mapCenterY - mapHeight * 0.5, mapWidth, mapHeight);
 	// draw the stars on the map
 		var i;
 		for (i = 0; i < this.starsProjection.length; i++)
 		{
-			var color;
+			let color;
 			if (this.filterInternal == "none")
 				color = this.starsProjection[i].style;
 			else if (this.filterInternal == "U")
@@ -177,9 +177,7 @@ class SkyMap
 				color = this.starsProjection[i].styleR;
 			else if (this.filterInternal == "I")
 				color = this.starsProjection[i].styleI;
-			var size = 3.0 - stars[this.starsProjection[i].idx].V / 6.0;
-			if (size < 1.0)
-				size = 1.0;
+			const size = Math.max(1,3.0 - stars[this.starsProjection[i].idx].V / 6.0);
 			drawStar(mapImage, (-this.starsProjection[i].x + 1.0) * mapWidth * 0.5, (-this.starsProjection[i].y + 1.0) * mapHeight * 0.5, size, color);
 /*			if (rad < 1.0)
 				rad = 1.0;
@@ -194,7 +192,7 @@ class SkyMap
 	// draw the constallations on the map
 		if (this.displayConstellationLevel != "none")
 		{
-			var constellationLevel = 0;
+			let constellationLevel = 0;
 			if (this.displayConstellationLevel == "zodiac")
 				constellationLevel = 4;
 			if (this.displayConstellationLevel == "major")
@@ -206,7 +204,7 @@ class SkyMap
 
 			for (i = 0; i < constellationData.length; i++)
 			{
-				var j;
+				let j;
 				for (j = 0; j < constellationData[i].pathData.length; j++)
 				{
 					if ((constellationData[i].type == "zodiac" && constellationLevel <= 4) ||
@@ -223,17 +221,17 @@ class SkyMap
 						if (constellationData[i].type == "obscure")
 							this.context.strokeStyle  = this.obscureConstellationStyle;
 						this.context.beginPath();
-						var k;
-						var datacount = 0;
-						var xlast = null;
+						let k;
+						let datacount = 0;
+						let xlast = null;
 						for (k = 0; k < constellationData[i].pathData[j].length; k++)
 						{
-							var idx = constellationData[i].pathData[j][k]
+							const idx = constellationData[i].pathData[j][k]
 							if (stars[idx].pidx !== null)
 							{
-								var pidx = stars[idx].pidx
-								var x = mapCenterX - this.starsProjection[pidx].x * mapWidth * 0.5;
-								var y = mapCenterY - this.starsProjection[pidx].y * mapHeight * 0.5;
+								const pidx = stars[idx].pidx
+								const x = mapCenterX - this.starsProjection[pidx].x * mapWidth * 0.5;
+								const y = mapCenterY - this.starsProjection[pidx].y * mapHeight * 0.5;
 								if (xlast != null && Math.abs(x - xlast) > mapWidth * 0.25) // span map edges
 								{
 									this.context.stroke();

@@ -10,7 +10,7 @@
 // note: I've made these type designations based on my own knowledge of the sky. I live in the U.S., so the northern hemisphere constellations are more familiar to me,
 // so the "major" constellations are definitely biased. I'm happy to add southern hemisphere major constellations if there are some that are commonly recognized that I haven't included.
 
-var constellationData = [
+const constellationData = [
 	{name:"Andromeda", type:"minor", paths:[ 
 			["* alf And","* del And","* bet And","* gam01 And"],
 			["* eta And","* zet And","* eps And","* del And","* pi. And","* iot And","* kap And","* lam And"],
@@ -442,15 +442,15 @@ function createConstellations()
 {
 	for (i = 0; i < constellationData.length; i++)
 	{
-		var j;
+		let j;
 		constellationData[i].pathData = new Array();
 		for (j = 0; j < constellationData[i].paths.length; j++)
 		{
-			var j;
-			var pathCurr = new Array();
+			let j;
+			let pathCurr = new Array();
 			for (k = 0; k < constellationData[i].paths[j].length; k++)
 			{
-				var idx = starFindByID(constellationData[i].paths[j][k]);
+				const idx = starFindByID(constellationData[i].paths[j][k]);
 				if (idx !== null)
 				{
 					pathCurr.push(idx);
@@ -464,7 +464,7 @@ function createConstellations()
 		}
 	}
 }
-var constellationsReady = false;
+let constellationsReady = false;
 
 function prepareConstellations()
 {

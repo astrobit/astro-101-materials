@@ -61,7 +61,7 @@ class ThreeVector
 	}
 	scale(scalar)
 	{
-		var ret = new ThreeVector(this);
+		let ret = new ThreeVector(this);
 		ret.selfScale(scalar);
 		return ret;
 	}
@@ -71,7 +71,7 @@ class ThreeVector
 	}
 	get unit()
 	{
-		var ret = new ThreeVector(this);
+		let ret = new ThreeVector(this);
 		ret.selfScale(1.0 / ret._r);
 		return ret;
 	}
@@ -229,7 +229,7 @@ class ThreeMatrix
 	}
 	getRowVector(row)
 	{
-		var ret = undefined;
+		let ret = undefined;
 		switch (row)
 		{
 		case 0:
@@ -248,7 +248,7 @@ class ThreeMatrix
 	}
 	setRowVector(row,vector)
 	{
-		var ret = undefined;
+		let ret = undefined;
 		switch (row)
 		{
 		case 0:
@@ -287,9 +287,9 @@ class ThreeMatrix
 	{
 		if (rho instanceof ThreeVector)
 		{
-//			var rowVectX = this.getRowVector(0);
-//			var rowVectY = this.getRowVector(1);
-//			var rowVectZ = this.getRowVector(2);
+//			const rowVectX = this.getRowVector(0);
+//			const rowVectY = this.getRowVector(1);
+//			const rowVectZ = this.getRowVector(2);
 			return new ThreeVector(this.data[0]._x * rho._x + this.data[1]._x * rho._y + this.data[2]._x * rho._z,
 									this.data[0]._y * rho._x + this.data[1]._y * rho._y + this.data[2]._y * rho._z,
 									this.data[0]._z * rho._x + this.data[1]._z * rho._y + this.data[2]._z * rho._z);
@@ -300,7 +300,7 @@ class ThreeMatrix
 		}
 		else if (rho instanceof ThreeMatrix)
 		{
-			var ret = new ThreeMatrix(this);
+			let ret = new ThreeMatrix(this);
 			ret.selfDot(rho);
 			return ret;
 		}
@@ -314,7 +314,7 @@ class ThreeMatrix
 	}
 	scale(scalar)
 	{
-		var ret = new ThreeMatrix(this);
+		let ret = new ThreeMatrix(this);
 		ret.selfScale(scalar);
 	}
 	selfScale(scalar)
@@ -325,9 +325,9 @@ class ThreeMatrix
 	}
 	selfDot(matrix)
 	{
-//		var rowVectX = this.getRowVector(0);
-//		var rowVectY = this.getRowVector(1);
-//		var rowVectZ = this.getRowVector(2);
+//		const rowVectX = this.getRowVector(0);
+//		const rowVectY = this.getRowVector(1);
+//		const rowVectZ = this.getRowVector(2);
 
 		this.data[0].updateXYZ(this._data[0]._x * matrix.data[0]._x,this._data[1]._x * matrix.data[0]._y,this._data[2]._x * matrix.data[0]._z);
 		this.data[1].updateXYZ(this._data[0]._y * matrix.data[1]._x,this._data[1]._y * matrix.data[1]._y,this._data[2]._y * matrix.data[1]._z);
@@ -349,15 +349,15 @@ class ThreeMatrix
 	}
 	transpose()
 	{
-		var m = new ThreeMatrix(this);
+		let m = new ThreeMatrix(this);
 		m.selfTranspose();
 		return m;
 	}
 	selfTranspose()
 	{
-		var colVectA = new ThreeVector(this.data[0]);
-		var colVectB = new ThreeVector(this.data[1]);
-		var colVectC = new ThreeVector(this.data[2]);
+		const colVectA = new ThreeVector(this.data[0]);
+		const colVectB = new ThreeVector(this.data[1]);
+		const colVectC = new ThreeVector(this.data[2]);
 		
 		this.data[0].updateXYZ(colVectA._x,colVectB._x,colVectC._x);
 		this.data[1].updateXYZ(colVectA._y,colVectB._y,colVectC._y);
@@ -366,9 +366,9 @@ class ThreeMatrix
 
 	loadBasis(vectX,vectY,vectZ)
 	{
-		var basisX;
-		var basisY;
-		var basisZ;
+		let basisX;
+		let basisY;
+		let basisZ;
 		if ((vectX instanceof ThreeVector && vectY instanceof ThreeVector && (typeof vectZ == 'undefined' || vectZ === null)) || (vectX instanceof ThreeVector && vectY instanceof ThreeVector && vecZ instanceof ThreeVector))
 		{
 			basisX = vectX.unit;

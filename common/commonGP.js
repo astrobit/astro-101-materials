@@ -16,18 +16,18 @@
 
 function binarySearch(sortedArray,findValue,key)
 {
-	var imin = 0;
-	var imax = sortedArray.length - 1;
-	var ret = null;
+	let imin = 0;
+	let imax = sortedArray.length - 1;
+	let ret = null;
 	if (sortedArray.length > 0)
 	{
-		var i;
-		var found = false;
+		let i;
+		let found = false;
 		do
 		{
 			i = Math.floor((imax + imin) / 2);
 //			console.log(i + " " + imin + " " + imax)
-			var	testVal;
+			let	testVal;
 			if (typeof key === 'undefined' || key === null)
 				testVal = sortedArray[i];
 			else
@@ -77,12 +77,32 @@ function binarySearch(sortedArray,findValue,key)
 //
 /////////////////////////////////////////////////////////////////////////
 
-function random_gaussian_old(mean, stdev)
+let g_gauss_gset = null;
+function random_gaussian(mean, stdev)
 { 
-    var u = 0;
-    while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
-    var v = Math.random();
-    return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v ) * stdev / Math.PI * 0.5 + mean;
+	let ret;
+	if (g_gauss_gset == null)
+	{
+		let rsq;
+		let v1;
+		let v2;
+		do
+		{
+			v1 = 2.0 * Math.random() - 1.0;
+			v2 = 2.0 * Math.random() - 1.0;
+			rsq = v1 * v1 + v2 * v2;
+		}
+		while (rsq >= 1.0 || rsq == 0.0);
+		const fac = Math.sqrt(-2.0 * Math.log(rsq) / rsq);
+		ret = v2 * fac * stdev + mean;
+		g_gauss_gset = v1 * fac;
+	}
+	else
+	{
+		ret = g_gauss_gset * stdev + mean;
+		g_gauss_gset = null;
+	}
+	return ret;
 }
 
 
@@ -103,40 +123,11 @@ const g_errf_errfC2 = 341.0 / 20000.0;
 
 function error_function(x)
 {
-	var exsq = Math.exp(-x * x);
-	var sign = 1;
-	if (x < 0)
-		sign = -1;
+	const exsq = Math.exp(-x * x);
+	const sign = Math.sign(x);
 	return sign * g_errf_twooversqrtpi * Math.sqrt(1.0 - exsq) * (g_errf_twooversqrtpi + g_errf_errfC1 * exsq - g_errf_errfC2 * exsq * exsq);
 }
 
-var g_gauss_gset = null;
-function random_gaussian(mean, stdev)
-{ 
-	var ret;
-	if (g_gauss_gset == null)
-	{
-		var rsq;
-		var v1;
-		var v2;
-		do
-		{
-			v1 = 2.0 * Math.random() - 1.0;
-			v2 = 2.0 * Math.random() - 1.0;
-			rsq = v1 * v1 + v2 * v2;
-		}
-		while (rsq >= 1.0 || rsq == 0.0);
-		var fac = Math.sqrt(-2.0 * Math.log(rsq) / rsq);
-		ret = v2 * fac * stdev + mean;
-		g_gauss_gset = v1 * fac;
-	}
-	else
-	{
-		ret = g_gauss_gset * stdev + mean;
-		g_gauss_gset = null;
-	}
-	return ret;
-}
 
 /////////////////////////////////////////////////////////////////////////
 //
@@ -157,11 +148,11 @@ function random_gaussian(mean, stdev)
 /////////////////////////////////////////////////////////////////////////
 
 function download(data, filename, type) {
-    var file = new Blob([data], {type: type});
+    let file = new Blob([data], {type: type});
     if (window.navigator && window.navigator.msSaveOrOpenBlob) // IE10+
         window.navigator.msSaveOrOpenBlob(file, filename);
     else { // Others
-        var a = document.createElement("a"),
+        let a = document.createElement("a"),
                 url = URL.createObjectURL(file);
         a.href = url;
         a.download = filename;
@@ -202,22 +193,20 @@ class Sig_Figs
 	}
 	get standard_notation()
 	{
-		var log_value = Math.log10(Math.abs(this.value));
+		const log_value = Math.log10(Math.abs(this.value));
 		if (log_value >= 4 || log_value <= -4)
 		{
-			var sign = (this.value < 0);
-			var power = Math.pow(10.0,-Math.floor(log_value));
-			var exp = Math.floor(log_value);
-			var exp_u = Math.floor(Math.log10(this.uncertainty));
+			const sign = (this.value < 0);
+			const power = Math.pow(10.0,-Math.floor(log_value));
+			const exp = Math.floor(log_value);
+			const exp_u = Math.floor(Math.log10(this.uncertainty));
 			
-			var mantissa = this.value * power;
-			var mantissa_u = this.uncertainty * power;
-			var rounding = exp - exp_u
-			if (rounding < 0)
-				rounding = 0;
+			const mantissa = this.value * power;
+			const mantissa_u = this.uncertainty * power;
+			const rounding = Math.max(0,exp - exp_u);
 			
 //			return "(" + this.value_string + " ± " + this.uncertainty_string + ")";
-			var exponent = toSuperscript(exp.toFixed(0));
+			const exponent = toSuperscript(exp.toFixed(0));
 			return "(" + mantissa.toFixed(rounding) + " ± " + mantissa_u.toFixed(rounding) + ")×10" + exponent;
 		}
 		else
@@ -228,26 +217,22 @@ class Sig_Figs
 }
 function sig_figs(value, uncertainty)
 {
-	var uncertainty_res = -1;
-	var value_res = 0;
-	var rounding = 0;
+	let uncertainty_res = -1;
+	let value_res = 0;
+	let rounding = 0;
 	if (uncertainty > 0)
 	{
-		var uncertainty_log = Math.floor(Math.log10(uncertainty));
-		rounding = -uncertainty_log;
-		if (rounding < 0)
-			rounding = 0;
-		var mult = Math.pow(10,uncertainty_log);
+		const uncertainty_log = Math.floor(Math.log10(uncertainty));
+		rounding = Math.max(0,-uncertainty_log);
+		const mult = Math.pow(10,uncertainty_log);
 		uncertainty_res = Math.round(uncertainty / mult) * mult;
 		value_res = Math.round(value / mult) * mult;
 	}
 	else if (value > 0)
 	{
-		var value_log = Math.floor(Math.log10(value));
-		rounding = -value_log;
-		if (rounding < 0)
-			rounding = 0;
-		var mult = Math.pow(10,value_log);
+		const value_log = Math.floor(Math.log10(value));
+		rounding = Math.max(0,-value_log);
+		const mult = Math.pow(10,value_log);
 		uncertainty_res = uncertainty;
 		value_res = Math.round(value / mult) * mult;
 	}
@@ -267,9 +252,9 @@ function sig_figs(value, uncertainty)
 
 function toSubscript(value)
 {
-	var vstring = value.toString();
-	var ret = new String();
-	var i;
+	const vstring = value.toString();
+	let ret = new String();
+	let i;
 	for (i = 0; i < vstring.length; i++)
 	{
 		switch(vstring.charAt(i))
@@ -331,9 +316,9 @@ function toSubscript(value)
 
 function toSuperscript(value)
 {
-	var vstring = value.toString();
-	var ret = new String();
-	var i;
+	const vstring = value.toString();
+	let ret = new String();
+	let i;
 	for (i = 0; i < vstring.length; i++)
 	{
 		switch(vstring.charAt(i))
@@ -396,17 +381,17 @@ function toSuperscript(value)
 
 function getFontSize(font)
 {
-	var ret = new Object();
+	let ret = new Object();
 	// if font is a style, look for font-size
-	var style = font.search("font-size:");
-	var value = new String();
-	var units = new String();
-	var charCode0 = String('0').charCodeAt(0);
-	var charCode9 = String('9').charCodeAt(0);
+	const style = font.search("font-size:");
+	let value = new String();
+	let units = new String();
+	const charCode0 = String('0').charCodeAt(0);
+	const charCode9 = String('9').charCodeAt(0);
 	
 	if (style >= 0)
 	{
-		var i = style + 10;
+		let i = style + 10;
 		while (i < font.length && (font.charAt(i) == ' ' || font.charAt(i) == '\t'))
 			i++;
 		while (i < font.length && ((font.charCodeAt(i) >= charCode0 && font.charCodeAt(i) <= charCode9) || font.charAt(i) == '.'))
@@ -424,7 +409,7 @@ function getFontSize(font)
 	}
 	else
 	{	
-		var i = 0;
+		let i = 0;
 		// find the number
 		while (i < font.length && (font.charCodeAt(i) < charCode0 || font.charCodeAt(i) > charCode9))
 		{
@@ -461,7 +446,7 @@ function getFontSize(font)
 /////////////////////////////////////////////////////////////////////////
 
 function shuffle(array) {
-  var m = array.length, t, i;
+  let m = array.length, t, i;
 
   // While there remain elements to shuffle…
   while (m) {

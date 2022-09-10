@@ -45,32 +45,32 @@ class LabelFormatter
 	
 	format(value,step)
 	{
-		var absValue = Math.abs(value);
-		var ret = new String();
-		var log10 = Math.log10(absValue);
-		var log10Step = Math.log10(step);
-		var exponentStep = Math.floor(log10Step);
-		var isZero = value == 0.0;
+		const absValue = Math.abs(value);
+		let ret = new String();
+		const log10 = Math.log10(absValue);
+		const log10Step = Math.log10(step);
+		const exponentStep = Math.floor(log10Step);
+		const isZero = (value == 0.0);
 		
-		var exponent = Math.floor(log10);
-		var mantissa = Math.pow(10,log10 - exponent);
+		const exponent = Math.floor(log10);
+		const mantissa = Math.pow(10,log10 - exponent);
 		if (this._isAngle || this._isTime)
 		{
-			var deg_hr_format;
-			var min_format = null;
-			var sec_format = null;
-			var am_pm = false;
-			var decimal_deg_hr = 0;
-			var decimal_min = 0;
-			var decimal_sec = 0;
-			var lead_zero_deg_hr = false;
-			var lead_zero_min = false;
-			var lead_zero_sec = false;
+			let deg_hr_format;
+			let min_format = null;
+			let sec_format = null;
+			let am_pm = false;
+			let decimal_deg_hr = 0;
+			let decimal_min = 0;
+			let decimal_sec = 0;
+			let lead_zero_deg_hr = false;
+			let lead_zero_min = false;
+			let lead_zero_sec = false;
 			
 			
 			if (this._isAngle)
 			{
-				var format = this._angleFormat.split(" ");
+				let format = this._angleFormat.split(" ");
 				
 				deg_hr_format = format[0];
 				if (format.length > 1)
@@ -105,7 +105,7 @@ class LabelFormatter
 			}
 			else
 			{
-				var format = this._timeFormat.split(" ");
+				let format = this._timeFormat.split(" ");
 				
 				deg_hr_format = format[0];
 				if (format.length > 1)
@@ -148,13 +148,13 @@ class LabelFormatter
 			
 			if (deg_hr_format.charAt(1) == '.' || deg_hr_format.charAt(2) == '.')
 			{
-				var idx = 2;
+				let idx = 2;
 				if (deg_hr_format.charAt(2) == '.')
 					idx = 3;
-				var i;
+				let i;
 				for (i = 0; i < deg_hr_format.length; i++)
 				{
-					var curr = deg_hr_format.charAt(idx + i);
+					const curr = deg_hr_format.charAt(idx + i);
 					if (curr == 'd' || curr == 'h')
 						decimal_deg_hr += 1;
 				}
@@ -163,13 +163,13 @@ class LabelFormatter
 			
 			if (min_format !== null && (min_format.charAt(1) == '.' || min_format.charAt(2) == '.'))
 			{
-				var idx = 2;
+				let idx = 2;
 				if (min_format.charAt(2) == '.')
 					idx = 3;
-				var i;
+				let i;
 				for (i = 0; i < min_format.length; i++)
 				{
-					var curr = min_format.charAt(idx + i);
+					const curr = min_format.charAt(idx + i);
 					if (curr == 'm')
 						decimal_min += 1;
 				}
@@ -178,33 +178,33 @@ class LabelFormatter
 
 			if (sec_format !== null && (sec_format.charAt(1) == '.' || sec_format.charAt(2) == '.'))
 			{
-				var idx = 2;
+				let idx = 2;
 				if (sec_format.charAt(2) == '.')
 					idx = 3;
-				var i;
+				let i;
 				for (i = 0; i < sec_format.length; i++)
 				{
-					var curr = sec_format.charAt(idx + i);
+					const curr = sec_format.charAt(idx + i);
 					if (curr == 's')
 						decimal_sec += 1;
 				}
 			}
 			lead_zero_sec = (sec_format !== null && sec_format.charAt(0) == '0');
 
-			var degrees_hours;
-			var frac_part = 0;
-			var is_pm = false;
-			var degrees_hours_negative = false;
+			let degrees_hours;
+			let frac_part = 0;
+			let is_pm = false;
+			let degrees_hours_negative = false;
 			if (this._isTime && am_pm && (value < 0 || value >= 24))
 			{
-				var mult = Math.floor(value / 24.0);
+				const mult = Math.floor(value / 24.0);
 				absValue = value - mult * 24.0;
 				frac_part = absValue - Math.floor(absValue);
 				if (decimal_deg_hr == 0)
 					degrees_hours = Math.floor(absValue);
 				else
 				{
-					var mult = Math.pow(10.0,decimal_deg_hr);
+					let mult = Math.pow(10.0,decimal_deg_hr);
 					degrees_hours = Math.round(absValue * mult) / mult;
 				}
 			}
@@ -221,7 +221,7 @@ class LabelFormatter
 				}
 				else
 				{
-					var mult = Math.pow(10.0,decimal_deg_hr);
+					const mult = Math.pow(10.0,decimal_deg_hr);
 					degrees_hours = Math.round(absValue * mult) / mult;
 				}
 				degrees_hours_negative = value < 0;
@@ -259,7 +259,7 @@ class LabelFormatter
 					ret += ' ';
 			
 				frac_part *= 60.0;
-				var minutes;
+				let minutes;
 				if (decimal_min == 0)
 				{
 					minutes = Math.floor(frac_part);
@@ -267,7 +267,7 @@ class LabelFormatter
 				}
 				else
 				{
-					var mult = Math.pow(10.0,decimal_min);
+					const mult = Math.pow(10.0,decimal_min);
 					minutes = Math.round(frac_part * mult) / mult;
 				}
 				if (lead_zero_min && minutes < 10)
@@ -299,14 +299,14 @@ class LabelFormatter
 					ret += ' ';
 			
 				frac_part *= 60.0;
-				var seconds;
+				let seconds;
 				if (decimal_sec == 0)
 				{
 					seconds = Math.floor(frac_part);
 				}
 				else
 				{
-					var mult = Math.pow(10.0,decimal_sec);
+					const mult = Math.pow(10.0,decimal_sec);
 					seconds = Math.round(frac_part * mult) / mult;
 				}
 				if (lead_zero_sec && seconds < 10)
@@ -338,15 +338,15 @@ class LabelFormatter
 				}
 				else if (absValue > 0.001)
 				{
-					var m10 = Math.pow(10,-exponentStep);
+					const m10 = Math.pow(10,-exponentStep);
 					ret += (Math.round(value * m10)/m10).toString();
 				}
 				else
 				{
-					var m10 = Math.pow(10,exponent - exponentStep);
+					const m10 = Math.pow(10,exponent - exponentStep);
 					if (value < 0)
 						ret += '-';
-					var rounded = Math.round(mantissa * m10)/m10;
+					const rounded = Math.round(mantissa * m10)/m10;
 					ret += rounded.toString();
 					if (rounded != 0)
 					{
@@ -367,10 +367,10 @@ class LabelFormatter
 				}
 				else
 				{
-					var m10 = Math.pow(10,exponent - exponentStep);
+					const m10 = Math.pow(10,exponent - exponentStep);
 					if (value < 0)
 						ret += '-';
-					var rounded = Math.round(mantissa * m10)/m10;
+					const rounded = Math.round(mantissa * m10)/m10;
 					ret += rounded.toString();
 					if (rounded != 0)
 					{
@@ -390,10 +390,10 @@ class GraphAxis
 	{
 		if (this._log)
 		{
-			var logMin = Math.log2(this._min);
-			var logMax = Math.log2(this._max);
+			const logMin = Math.log2(this._min);
+			const logMax = Math.log2(this._max);
 			
-			var slope = 1.0 / (logMax - logMin);
+			const slope = 1.0 / (logMax - logMin);
 			if (this._invert)
 			{
 				this._slope = -slope;
@@ -404,8 +404,8 @@ class GraphAxis
 				this._slope = slope;
 				this._offset = -logMin * slope;
 			}
-			var step = Math.abs(this._max / this._min);
-			var logstep = Math.abs(Math.log10(step));
+			const step = Math.abs(this._max / this._min);
+			const logstep = Math.abs(Math.log10(step));
 			
 			this._suggestedMajorStep = Math.ceil(logstep / 5);
 			if (logstep < 2)
@@ -419,8 +419,8 @@ class GraphAxis
 		}
 		else
 		{
-			var delta = (this._max - this._min);
-			var slope = 1.0 / delta;
+			const delta = (this._max - this._min);
+			const slope = 1.0 / delta;
 			if (this._invert)
 			{
 				this._slope = - slope;
@@ -431,11 +431,11 @@ class GraphAxis
 				this._slope = slope;
 				this._offset = -this._min * slope;
 			}
-			var step = Math.abs(delta) * 0.2;
+			const step = Math.abs(delta) * 0.2;
 			// 1, 2, 2.5, 5
-			var logstep = Math.log10(step);
-			var expstep = Math.floor(logstep);
-			var manstep = Math.pow(10,logstep - expstep);
+			const logstep = Math.log10(step);
+			const expstep = Math.floor(logstep);
+			const manstep = Math.pow(10,logstep - expstep);
 			if (manstep < 1.5)
 			{
 				this._suggestedMajorStep = Math.pow(10,expstep);
@@ -501,39 +501,39 @@ class GraphAxis
 	
 	_labelsSpaceRequired(context)
 	{
-		var max_label_size = 0;
+		let max_label_size = 0;
 		context.save();
 			context.font = this._labelFont;
 			if (this._log)
 			{
 				if (this._enableMajor)
 				{
-					var stepMajor = this._labelMajorStep;
+					let stepMajor = this._labelMajorStep;
 					if (stepMajor === undefined || stepMajor === null)
 					{
 						stepMajor = this._suggestedMajorStep;
 					}
-					var stepMinor = this._labelMinorStep;
+					let stepMinor = this._labelMinorStep;
 					if (stepMinor === undefined || stepMinor === null)
 					{
 						stepMinor = this._suggestedMinorStep;
 					}
-					var invStep = 1.0  / stepMajor;
-					var minLabel = Math.floor(Math.log10(this._min) * invStep) * stepMajor;
-					var maxLabel = Math.ceil(Math.log10(this._max) * invStep) * stepMajor;
-					var lbl;
+					const invStep = 1.0  / stepMajor;
+					const minLabel = Math.floor(Math.log10(this._min) * invStep) * stepMajor;
+					const maxLabel = Math.ceil(Math.log10(this._max) * invStep) * stepMajor;
+					let lbl;
 
 					for (lbl = minLabel; lbl <= maxLabel; lbl += stepMajor)
 					{
-						var stepMajor10 = Math.pow(10.0,stepMajor);
-						var lbl10 = Math.pow(10.0,lbl);
-						var stepLabel = 1;
+						const stepMajor10 = Math.pow(10.0,stepMajor);
+						const lbl10 = Math.pow(10.0,lbl);
+						let stepLabel = 1;
 						if (lbl < 0)
 							stepLabel = lbl10;
 						if (lbl10 >= this._min && lbl10 <= this._max)
 						{
-							var label = this._labelFormatter.format(lbl10,stepLabel);
-							var width = context.measureText(label).width + this._tickMajorLabelOffset;
+							const label = this._labelFormatter.format(lbl10,stepLabel);
+							const width = context.measureText(label).width + this._tickMajorLabelOffset;
 							if (width > max_label_size)
 								max_label_size = width;
 						}
@@ -541,14 +541,14 @@ class GraphAxis
 						{
 							if (stepMinor >= 10) // increment in decades
 							{
-								var i;
+								let i;
 								for (i = stepMinor; i < stepMajor10; i *= stepMinor)
 								{
-									var lbli = lbl10 * i;
+									let lbli = lbl10 * i;
 									if (lbli >= this._min && lbli <= this._max)
 									{
-										var label = this._labelFormatter.format(lbli,stepLabel);
-										var width = context.measureText(label).width + this._tickMajorLabelOffset;
+										const label = this._labelFormatter.format(lbli,stepLabel);
+										const width = context.measureText(label).width + this._tickMajorLabelOffset;
 										if (width > max_label_size)
 											max_label_size = width;
 									}
@@ -556,16 +556,16 @@ class GraphAxis
 							}
 							else
 							{
-								var i;
+								let i;
 								for (i = stepMinor; i < 10; i += stepMinor)
 								{
 									if (i != 1)
 									{
-										var lbli = lbl10 * i;
+										let lbli = lbl10 * i;
 										if (lbli >= this._min && lbli <= this._max)
 										{
-											var label = this._labelFormatter.format(lbli,stepLabel);
-											var width = context.measureText(label).width + this._tickMinorLabelOffset;
+											const label = this._labelFormatter.format(lbli,stepLabel);
+											const width = context.measureText(label).width + this._tickMinorLabelOffset;
 											if (width > max_label_size)
 												max_label_size = width;
 										}
@@ -580,40 +580,40 @@ class GraphAxis
 			{			
 				if (this._enableMajor)
 				{
-					var stepMajor = this._labelMajorStep;
+					let stepMajor = this._labelMajorStep;
 					if (stepMajor === undefined || stepMajor === null)
 					{
 						stepMajor = this._suggestedMajorStep;
 					}
-					var stepMinor = this._labelMinorStep;
+					let stepMinor = this._labelMinorStep;
 					if (stepMinor === undefined || stepMinor === null)
 					{
 						stepMinor = this._suggestedMinorStep;
 					}
-					var invStep = 1.0  / stepMajor;
-					var minLabel = Math.floor(this._min * invStep) * stepMajor;
-					var maxLabel = Math.ceil(this._max * invStep) * stepMajor;
-					var lbl;
+					const invStep = 1.0  / stepMajor;
+					const minLabel = Math.floor(this._min * invStep) * stepMajor;
+					const maxLabel = Math.ceil(this._max * invStep) * stepMajor;
+					let lbl;
 
 					for (lbl = minLabel; lbl <= maxLabel; lbl += stepMajor)
 					{
 						if (lbl >= this._min && lbl <= this._max)
 						{
-							var label = this._labelFormatter.format(lbl,stepMajor);
-							var width = context.measureText(label).width + this._tickMajorLabelOffset;
+							const label = this._labelFormatter.format(lbl,stepMajor);
+							const width = context.measureText(label).width + this._tickMajorLabelOffset;
 							if (width > max_label_size)
 								max_label_size = width;
 						}
 						if (this._enableMinor)
 						{
-							var i;
+							let i;
 							for (i = stepMinor; i < stepMajor; i += stepMinor)
 							{
-								var lbli = lbl + i;
+								let lbli = lbl + i;
 								if (lbli >= this._min && lbli <= this._max)
 								{
-									var label = this._labelFormatter.format(lbli,stepMinor);
-									var width = context.measureText(label).width + this._tickMinorLabelOffset;
+									const label = this._labelFormatter.format(lbli,stepMinor);
+									const width = context.measureText(label).width + this._tickMinorLabelOffset;
 									if (width > max_label_size)
 										max_label_size = width;
 								}
@@ -627,12 +627,12 @@ class GraphAxis
 	}
 	drawTitle(context,dir,size,side)
 	{
-		var x = 0;
+		let x = 0;
 		if (this._titleAlign == "center")
 			x = 0.5 * size;
 		else if (this._titleAlign == "right")
 			x = 1.0 * size;
-		var offset = this._labelsSpaceRequired(context) + 4;
+		const offset = this._labelsSpaceRequired(context) + 4;
 		
 		context.save();
 			context.fillStyle = this._titleColor;
@@ -733,40 +733,40 @@ class GraphAxis
 	{
 		if (this._enableMajor)
 		{
-			var stepMajor = this._labelMajorStep;
+			let stepMajor = this._labelMajorStep;
 			if (stepMajor === undefined || stepMajor === null)
 			{
 				stepMajor = this._suggestedMajorStep;
 			}
-			var stepMinor = this._labelMinorStep;
+			let stepMinor = this._labelMinorStep;
 			if (stepMinor === undefined || stepMinor === null)
 			{
 				stepMinor = this._suggestedMinorStep;
 			}
-			var invStep = 1.0  / stepMajor;
-			var minLabel = Math.floor(this._min * invStep) * stepMajor;
-			var maxLabel = Math.ceil(this._max * invStep) * stepMajor;
-			var lbl;
+			const invStep = 1.0  / stepMajor;
+			const minLabel = Math.floor(this._min * invStep) * stepMajor;
+			const maxLabel = Math.ceil(this._max * invStep) * stepMajor;
+			let lbl;
 
 			for (lbl = minLabel; lbl <= maxLabel; lbl += stepMajor)
 			{
 				if (lbl >= this._min && lbl <= this._max)
 				{
-					var x = this.calculate(lbl) * size;
-					var label = this._labelFormatter.format(lbl,stepMajor);
+					const x = this.calculate(lbl) * size;
+					const label = this._labelFormatter.format(lbl,stepMajor);
 					this._drawTick(context,dir,size,side,x,this._tickMajorLength);
 					this._drawLabel(context,dir,size,side,label,x,this._tickMajorLabelOffset);
 				}
 				if (this._enableMinor)
 				{
-					var i;
+					let i;
 					for (i = stepMinor; i < stepMajor; i += stepMinor)
 					{
-						var lbli = lbl + i;
+						let lbli = lbl + i;
 						if (lbli >= this._min && lbli <= this._max)
 						{
-							var x = this.calculate(lbli) * size;
-							var label = this._labelFormatter.format(lbli,stepMinor);
+							const x = this.calculate(lbli) * size;
+							const label = this._labelFormatter.format(lbli,stepMinor);
 							this._drawTick(context,dir,size,side,x,this._tickMinorLength);
 							this._drawLabel(context,dir,size,side,label,x,this._tickMinorLabelOffset);
 						}
@@ -780,32 +780,32 @@ class GraphAxis
 	{
 		if (this._enableMajor)
 		{
-			var stepMajor = this._labelMajorStep;
+			let stepMajor = this._labelMajorStep;
 			if (stepMajor === undefined || stepMajor === null)
 			{
 				stepMajor = this._suggestedMajorStep;
 			}
-			var stepMinor = this._labelMinorStep;
+			let stepMinor = this._labelMinorStep;
 			if (stepMinor === undefined || stepMinor === null)
 			{
 				stepMinor = this._suggestedMinorStep;
 			}
-			var invStep = 1.0  / stepMajor;
-			var minLabel = Math.floor(Math.log10(this._min) * invStep) * stepMajor;
-			var maxLabel = Math.ceil(Math.log10(this._max) * invStep) * stepMajor;
-			var lbl;
+			const invStep = 1.0  / stepMajor;
+			const minLabel = Math.floor(Math.log10(this._min) * invStep) * stepMajor;
+			const maxLabel = Math.ceil(Math.log10(this._max) * invStep) * stepMajor;
+			let lbl;
 
 			for (lbl = minLabel; lbl <= maxLabel; lbl += stepMajor)
 			{
-				var stepMajor10 = Math.pow(10.0,stepMajor);
-				var lbl10 = Math.pow(10.0,lbl);
-				var stepLabel = 1;
+				const stepMajor10 = Math.pow(10.0,stepMajor);
+				const lbl10 = Math.pow(10.0,lbl);
+				let stepLabel = 1;
 				if (lbl < 0)
 					stepLabel = lbl10;
 				if (lbl10 >= this._min && lbl10 <= this._max)
 				{
-					var x = this.calculate(lbl10) * size;
-					var label = this._labelFormatter.format(lbl10,stepLabel);
+					const x = this.calculate(lbl10) * size;
+					const label = this._labelFormatter.format(lbl10,stepLabel);
 					this._drawTick(context,dir,size,side,x,this._tickMajorLength);
 					this._drawLabel(context,dir,size,side,label,x,this._tickMajorLabelOffset);
 				}
@@ -813,14 +813,14 @@ class GraphAxis
 				{
 					if (stepMinor >= 10) // increment in decades
 					{
-						var i;
+						let i;
 						for (i = stepMinor; i < stepMajor10; i *= stepMinor)
 						{
-							var lbli = lbl10 * i;
+							const lbli = lbl10 * i;
 							if (lbli >= this._min && lbli <= this._max)
 							{
-								var x = this.calculate(lbli) * size;
-								var label = this._labelFormatter.format(lbli,stepLabel);
+								const x = this.calculate(lbli) * size;
+								const label = this._labelFormatter.format(lbli,stepLabel);
 								this._drawTick(context,dir,size,side,x,this._tickMinorLength);
 								this._drawLabel(context,dir,size,side,label,x,this._tickMinorLabelOffset);
 							}
@@ -828,16 +828,16 @@ class GraphAxis
 					}
 					else
 					{
-						var i;
+						let i;
 						for (i = stepMinor; i < 10; i += stepMinor)
 						{
 							if (i != 1)
 							{
-								var lbli = lbl10 * i;
+								const lbli = lbl10 * i;
 								if (lbli >= this._min && lbli <= this._max)
 								{
-									var x = this.calculate(lbli) * size;
-									var label = this._labelFormatter.format(lbli,stepLabel);
+									const x = this.calculate(lbli) * size;
+									const label = this._labelFormatter.format(lbli,stepLabel);
 									this._drawTick(context,dir,size,side,x,this._tickMinorLength);
 									this._drawLabel(context,dir,size,side,label,x,this._tickMinorLabelOffset);
 								}
@@ -880,7 +880,7 @@ class GraphAxis
 	
 	calculate(value)
 	{
-		var ret;
+		let ret;
 		if (this._log)
 		{
 			if (value > 0)
@@ -949,8 +949,8 @@ class GraphAxis
 	
 	requiredSpace(context)
 	{
-		var fontsize = getFontSize(this._titleFont);
-		var fontSizePx = 0;
+		const fontsize = getFontSize(this._titleFont);
+		let fontSizePx = 0;
 		if (fontsize !== undefined && fontsize !== null)
 		{
 			if (fontsize.units == 'em')
@@ -960,8 +960,8 @@ class GraphAxis
 			else
 				fontSizePx = 12.0;// who knows how this will  be interpreted by the renderer
 		}
-		var titleSpace = fontSizePx + 6;// + this._titleOffset;
-		var labelSpace = this._labelsSpaceRequired(context);
+		const titleSpace = fontSizePx + 6;// + this._titleOffset;
+		const labelSpace = this._labelsSpaceRequired(context);
 
 		return titleSpace + labelSpace;
 	
@@ -1003,7 +1003,7 @@ class GraphTrend
 	}
 	y(x)
 	{
-		var ret = null;
+		let ret = null;
 		if (this._type == "linear")
 		{
 			ret = this._m * x + this._b;
@@ -1016,7 +1016,7 @@ class GraphTrend
 	}
 	x(y)
 	{
-		var ret = null;
+		let ret = null;
 		if (this._type == "linear")
 		{
 			ret = (y - this._b) / this._m;
@@ -1063,7 +1063,7 @@ class GraphDataSet
 	}
 	at(index)
 	{
-		var ret;
+		let ret;
 		if (index < this._data.length)
 		{
 			ret = this._data[index];
@@ -1088,17 +1088,13 @@ class GraphDataSet
 	}
 	trend(loglog)
 	{
-		var ret = null;
+		let ret = null;
 		if (this._data !== undefined && this._data !== null && this._data.length > 2)
 		{
-			var trend = this.LinearLeastSquare(loglog);
+			const trend = this.LinearLeastSquare(loglog);
 			if (trend !== null)
 			{
-				var type;
-				if (loglog)
-					type = "linear";
-				else
-					type = "exponential";
+				const type = (loglog) ? "exponential" : "linear";
 					
 				ret = new GraphTrend(this.id + " trend",this.horizontalAxisID, this.verticalAxisID, type, trend.slope,trend.intercept, null );
 			}
@@ -1110,20 +1106,20 @@ class GraphDataSet
 	{
 		if (this._data.length > 1)
 		{
-			var sY = 0;
-			var sX = 0;
-			var sX2 = 0;
-			var sXY = 0;
-			var sOy = 0;
-			var idxLcl;
-			var count = 0;
+			let sY = 0;
+			let sX = 0;
+			let sX2 = 0;
+			let sXY = 0;
+			let sOy = 0;
+			let idxLcl;
+			let count = 0;
 			for (idxLcl = 0; idxLcl < this._data.length; idxLcl++)
 			{
 				if (this._data[idxLcl].x !== null && this._data[idxLcl].y !== null)
 				{
-					var xl = this._data[idxLcl].x;
-					var yl = this._data[idxLcl].y;
-					var process = true;
+					let xl = this._data[idxLcl].x;
+					let yl = this._data[idxLcl].y;
+					let process = true;
 					if (loglog !== undefined && loglog)
 					{
 						process = (this._data[idxLcl].x > 0 && this._data[idxLcl].y > 0);
@@ -1140,22 +1136,22 @@ class GraphDataSet
 					}
 				}
 			}
-			var invN = 1.0 / count;
-			var invDelta = 1.0 / (count * sX2 - sX * sX);
-			var _m = (count * sXY - sX * sY) * invDelta;
-			var _b = (sX2 * sY - sX * sXY) * invDelta;
-			var _om;
-			var _ob;
-			var _oy;
+			const invN = 1.0 / count;
+			const invDelta = 1.0 / (count * sX2 - sX * sX);
+			const _m = (count * sXY - sX * sY) * invDelta;
+			const _b = (sX2 * sY - sX * sXY) * invDelta;
+			let _om;
+			let _ob;
+			let _oy;
 			if (count > 2)
 			{
 				for (idxLcl = 0; idxLcl < count; idxLcl++)
 				{
 					if (this._data[idxLcl].x !== null && this._data[idxLcl].y !== null)
 					{
-						var xl = this._data[idxLcl].x;
-						var yl = this._data[idxLcl].y;
-						var process = true;
+						let xl = this._data[idxLcl].x;
+						let yl = this._data[idxLcl].y;
+						let process = true;
 						if (loglog !== undefined && loglog)
 						{
 							process = (this._data[idxLcl].x > 0 && this._data[idxLcl].y > 0);
@@ -1164,7 +1160,7 @@ class GraphDataSet
 						}
 						if (process)
 						{
-							var err = yl - _b - _m * xl;
+							let err = yl - _b - _m * xl;
 							sOy += err * err;
 						}
 					}
@@ -1180,9 +1176,7 @@ class GraphDataSet
 				_om = 0;
 			}
 		}
-		var type = "Linear LLS";
-		if (loglog)
-			type = "Log-Log LLS";
+		const type = (loglog) ? "Log-Log LLS" : "Linear LLS";
 		return {type: type, slope: _m, slope_uncertainty: _om, intercept: _b, intercept_uncertainty: _ob, S: _oy, DOF: count - 2};
 	}
 	LogLogLinearLeastSquare()
@@ -1211,8 +1205,8 @@ class Graph
 	}
 	findAxisByID(id)
 	{
-		var ret = null;
-		var i = 0;
+		let ret = null;
+		let i = 0;
 		for (i = 0; ret === null && i < this._axisHorizontal.length; i++)
 		{
 			if (this._axisHorizontal[i].id == id)
@@ -1227,8 +1221,8 @@ class Graph
 	}
 	findDataByID(id)
 	{
-		var ret = null;
-		var i = 0;
+		let ret = null;
+		let i = 0;
 		for (i = 0; ret === null && i < this._data.length; i++)
 		{
 			if (this._data[i].id == id)
@@ -1240,7 +1234,7 @@ class Graph
 	{
 		if (axis instanceof GraphAxis)
 		{
-			var currAxis = this.findAxisByID(axis.id);
+			const currAxis = this.findAxisByID(axis.id);
 			if (currAxis !== null)
 			{
 				console.log("new GraphAxis " + axis.id + " added to Graph " + this._id + ", but axis with that ID already exists.");
@@ -1259,7 +1253,7 @@ class Graph
 	{
 		if (axis instanceof GraphAxis)
 		{
-			var currAxis = this.findAxisByID(axis.id);
+			const currAxis = this.findAxisByID(axis.id);
 			if (currAxis !== null)
 			{
 				console.log("new GraphAxis " + axis.id + " added to Graph " + this._id + ", but axis with that ID already exists.");
@@ -1278,7 +1272,7 @@ class Graph
 	{
 		if (data instanceof GraphDataSet)
 		{
-			var currAxis = this.findDataByID(data.id);
+			const currAxis = this.findDataByID(data.id);
 			if (currAxis !== null)
 			{
 				console.log("new GraphDataSet " + data.id + " added to Graph " + this._id + ", but data with that ID already exists.");
@@ -1291,7 +1285,7 @@ class Graph
 	{
 		if (trend instanceof GraphTrend)
 		{
-//			var currAxis = this.findDataByID(data.id);
+//			let currAxis = this.findDataByID(data.id);
 //			if (currAxis !== null)
 //			{
 //				console.log("new GraphDataSet " + data.id + " added to Graph " + this._id + ", but data with that ID already exists.");
@@ -1302,7 +1296,7 @@ class Graph
 	}
 	_colorSelect(color)
 	{
-		var ret = 0;
+		let ret = 0;
 		if (this._invertPalette)
 		{
 			color = this._colorMax - color;
@@ -1521,15 +1515,15 @@ class Graph
 	
 	draw (context,x,y)
 	{
-		var i;
-		var axisHorizontalSpace = 0;
-		var axisVerticalSpace = 0;
-		var xOffsetGraph = 0;
-		var yOffsetGraph = 0;
+		let i;
+		let axisHorizontalSpace = 0;
+		let axisVerticalSpace = 0;
+		let xOffsetGraph = 0;
+		let yOffsetGraph = 0;
 		// first find out how big the axis titles and labels are
 		for (i = 0; i < 2 && i < this._axisHorizontal.length; i++)
 		{
-			var neededSpace = this._axisHorizontal[i].requiredSpace(context);
+			const neededSpace = this._axisHorizontal[i].requiredSpace(context);
 			axisVerticalSpace += neededSpace;
 			if (i == 0)
 				yOffsetGraph = neededSpace;
@@ -1538,13 +1532,13 @@ class Graph
 
 		for (i = 0; i < 2 && i < this._axisVertical.length; i++)
 		{
-			var neededSpace = this._axisVertical[i].requiredSpace(context);
+			const neededSpace = this._axisVertical[i].requiredSpace(context);
 			axisHorizontalSpace += neededSpace;
 			if (i == 0)
 				xOffsetGraph = neededSpace;
 		}
-		var graphWidth = this.width - axisHorizontalSpace - 4;
-		var graphHeight = this.height - axisVerticalSpace - 4;
+		const graphWidth = this.width - axisHorizontalSpace - 4;
+		const graphHeight = this.height - axisVerticalSpace - 4;
 		context.save();
 			context.translate(x,y);
 			context.strokeStyle = "#000000";
@@ -1587,20 +1581,20 @@ class Graph
 			context.rect(0, -graphHeight, graphWidth, graphHeight);
 			context.stroke();
 			context.clip();
-			var symbol = 0;
-			var symbolFilled = true;
-			var symbolSize = 10;
-			var colorSelect = 0;
+			let symbol = 0;
+			let symbolFilled = true;
+			let symbolSize = 10;
+			let colorSelect = 0;
 			for (i = 0; i < this._data.length; i++)
 			{
-				var currData = this._data[i];
+				const currData = this._data[i];
 				if (!currData.disable)
 				{
-					var currHorizontalAxis = this.findAxisByID(currData._horizontalAxisID);
-					var currVerticalAxis = this.findAxisByID(currData._verticalAxisID);
+					const currHorizontalAxis = this.findAxisByID(currData._horizontalAxisID);
+					const currVerticalAxis = this.findAxisByID(currData._verticalAxisID);
 					if (currHorizontalAxis !== null && currVerticalAxis !== null)
 					{
-						var j;
+						let j;
 						if (currData._color !== undefined && currData._color !== null)
 						{
 							context.strokeStyle = currData._color;
@@ -1626,8 +1620,8 @@ class Graph
 						{
 							if (currData._data[j].x !== undefined && currData._data[j].x !== null && currData._data[j].y !== undefined && currData._data[j].y !== null)
 							{
-								var x = currHorizontalAxis.calculate(currData._data[j].x) * graphWidth;
-								var y = -currVerticalAxis.calculate(currData._data[j].y) * graphHeight;
+								const x = currHorizontalAxis.calculate(currData._data[j].x) * graphWidth;
+								const y = -currVerticalAxis.calculate(currData._data[j].y) * graphHeight;
 								this._drawSymbol(context,x,y,symbol,symbolFilled,symbolSize);
 								//@@TODO: error bars
 							}
@@ -1646,24 +1640,24 @@ class Graph
 				colorSelect = 0;
 				for (i = 0; i < this._trends.length; i++)
 				{
-					var currData = this._trends[i];
+					const currData = this._trends[i];
 					if (!currData.disable)
 					{
-						var currHorizontalAxis = this.findAxisByID(currData._horizontalAxisID);
-						var currVerticalAxis = this.findAxisByID(currData._verticalAxisID);
+						const currHorizontalAxis = this.findAxisByID(currData._horizontalAxisID);
+						const currVerticalAxis = this.findAxisByID(currData._verticalAxisID);
 						if (currHorizontalAxis !== null && currVerticalAxis !== null)
 						{
 							if (currData._type == "exponential" && currHorizontalAxis.log && currVerticalAxis.log ||
 								currData._type == "linear" && !currHorizontalAxis.log && !currVerticalAxis.log)
 							{
-								var y_minx = currData.y(currHorizontalAxis._min);
-								var y_maxx = currData.y(currHorizontalAxis._max);
-								var x_miny = currData.x(currVerticalAxis._min);
-								var x_maxy = currData.x(currVerticalAxis._max);
-								var x0;
-								var x1;
-								var y0;
-								var y1;
+								const y_minx = currData.y(currHorizontalAxis._min);
+								const y_maxx = currData.y(currHorizontalAxis._max);
+								const x_miny = currData.x(currVerticalAxis._min);
+								const x_maxy = currData.x(currVerticalAxis._max);
+								let x0;
+								let x1;
+								let y0;
+								let y1;
 								if (y_minx >= currVerticalAxis._min && y_minx <= currVerticalAxis._max)
 								{
 									x0 = currHorizontalAxis._min;
@@ -1710,10 +1704,10 @@ class Graph
 									context.strokeStyle = this._colorSelect(colorSelect);
 									colorSelect++;
 								}
-								var gx0 = currHorizontalAxis.calculate(x0) * graphWidth;
-								var gx1 = currHorizontalAxis.calculate(x1) * graphWidth;
-								var gy0 = currVerticalAxis.calculate(y0) * graphHeight;
-								var gy1 = currVerticalAxis.calculate(y1) * graphHeight;
+								const gx0 = currHorizontalAxis.calculate(x0) * graphWidth;
+								const gx1 = currHorizontalAxis.calculate(x1) * graphWidth;
+								const gy0 = currVerticalAxis.calculate(y0) * graphHeight;
+								const gy1 = currVerticalAxis.calculate(y1) * graphHeight;
 								context.beginPath();
 								context.moveTo(gx0,-gy0);
 								context.lineTo(gx1,-gy1);

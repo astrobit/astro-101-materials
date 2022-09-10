@@ -55,7 +55,7 @@ class Tutorial
 				this._drawer(context,this._state);
 			if (this._ui[this._state] !== undefined)
 			{
-				var i;
+				let i;
 				for (i = 0; i < this._ui[this._state].length; i++)
 				{
 					this._ui[this._state][i].draw(context);
@@ -95,7 +95,7 @@ class Tutorial
 	{
 		if (this._active && this._ui[this._state] !== undefined)
 		{
-			var i;
+			let i;
 			for (i = 0; i < this._ui[this._state].length; i++)
 			{
 				if (this._ui[this._state][i].test(event))

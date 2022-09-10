@@ -126,22 +126,22 @@ class OrbitalParameters
 
 	getOrbitalPosition(jd)
 	{
-		var radians = Math.PI / 180.0;
-		var degrees = 180.0 / Math.PI;
-//		var meanLongitudeRadians = meanLongitude * radians;
-//		var longitudePerihelionRadians = longitudePerihelion * radians;
-//		var longitudeAscendingNodeRadians = longitudeAscendingNode * radians;
-//		var orbitalInclinationRadians = orbitalInclination * radians;
+		const radians = Math.PI / 180.0;
+		const degrees = 180.0 / Math.PI;
+//		let meanLongitudeRadians = meanLongitude * radians;
+//		let longitudePerihelionRadians = longitudePerihelion * radians;
+//		let longitudeAscendingNodeRadians = longitudeAscendingNode * radians;
+//		let orbitalInclinationRadians = orbitalInclination * radians;
 
 
-		var meanLongitude = 2.0 * Math.PI / 365.242191 * (jd - this.epoch) / this.periodYears + this._meanLongitude;
-		var meanAnomaly = meanLongitude - this._longitudePerihelion;
+		const meanLongitude = 2.0 * Math.PI / 365.242191 * (jd - this.epoch) / this.periodYears + this._meanLongitude;
+		const meanAnomaly = meanLongitude - this._longitudePerihelion;
 
 		// solve for Eccentric Anomaly using Netwon-Raphson
-		var E = meanAnomaly;
-		var y = E - this.orbitalEccentricity * Math.sin(E) - meanAnomaly;
-		var dy = 1.0 - this.orbitalEccentricity * Math.cos(E);
-		var del = y / dy;
+		let E = meanAnomaly;
+		let y = E - this.orbitalEccentricity * Math.sin(E) - meanAnomaly;
+		let dy = 1.0 - this.orbitalEccentricity * Math.cos(E);
+		let del = y / dy;
 		while (Math.abs(y) > 0.0000001)
 		{
 			E -= del;
@@ -150,19 +150,19 @@ class OrbitalParameters
 			del = y / dy;
 		} 
 		E -= del;
-		var eccentricAnomaly = E;
+		const eccentricAnomaly = E;
 		// calculate true anomaly
-		var tanNuover2 = Math.tan(E * 0.5) * Math.sqrt((1.0 + this.orbitalEccentricity) / (1.0 - this.orbitalEccentricity));
-		var trueAnomaly = Math.atan(tanNuover2) * 2.0;
+		const tanNuover2 = Math.tan(E * 0.5) * Math.sqrt((1.0 + this.orbitalEccentricity) / (1.0 - this.orbitalEccentricity));
+		const trueAnomaly = Math.atan(tanNuover2) * 2.0;
 		// calculate true heliocentric longitude
-		var helioLongitude = trueAnomaly + this._longitudePerihelion;
+		const helioLongitude = trueAnomaly + this._longitudePerihelion;
 		// calculate actual radius
-		var helioRadius = this.semiMajorAxis * (1.0 - this.orbitalEccentricity * this.orbitalEccentricity) / (1.0 + this.orbitalEccentricity * Math.cos(trueAnomaly))
-		var longMascNode = helioLongitude - this._longitudeAscendingNode;
+		const helioRadius = this.semiMajorAxis * (1.0 - this.orbitalEccentricity * this.orbitalEccentricity) / (1.0 + this.orbitalEccentricity * Math.cos(trueAnomaly))
+		const longMascNode = helioLongitude - this._longitudeAscendingNode;
 		// calculate 
-		var helioLatitude = Math.asin(Math.sin(longMascNode) * Math.sin(this._orbitalInclination));
-		var helioLongitudeProjected = Math.atan(Math.tan(longMascNode) * Math.cos(this._orbitalInclination)) + this._longitudeAscendingNode;
-		var radiusProjected = helioRadius * Math.cos(helioLatitude);
+		const helioLatitude = Math.asin(Math.sin(longMascNode) * Math.sin(this._orbitalInclination));
+		const helioLongitudeProjected = Math.atan(Math.tan(longMascNode) * Math.cos(this._orbitalInclination)) + this._longitudeAscendingNode;
+		const radiusProjected = helioRadius * Math.cos(helioLatitude);
 		
 		return new OrbitalPosition(meanLongitude,meanAnomaly,eccentricAnomaly,trueAnomaly,longMascNode,helioLongitude,helioRadius,helioLatitude,helioLongitudeProjected,radiusProjected)
 	}
@@ -173,12 +173,12 @@ class OrbitalParameters
 // https://nssdc.gsfc.nasa.gov/planetary/factsheet/fact_notes.html
 function interpretVSOP2013Parameters(params)
 {
-	var longitudePerihelion = Math.atan2(params.h0,params.k0);
-	var longitudeAscendingNode = Math.atan2(params.q0,params.p0);
-	var orbitalEccentricity = params.k0 / Math.cos(longitudePerihelion);
-	var orbitalInclination = Math.asin(2.0 * params.q0 * Math.cos(longitudeAscendingNode));
+	const longitudePerihelion = Math.atan2(params.h0,params.k0);
+	const longitudeAscendingNode = Math.atan2(params.q0,params.p0);
+	const orbitalEccentricity = params.k0 / Math.cos(longitudePerihelion);
+	const orbitalInclination = Math.asin(2.0 * params.q0 * Math.cos(longitudeAscendingNode));
 
-	var ret = new OrbitalParameters(params.epoch,
+	const ret = new OrbitalParameters(params.epoch,
 									params.a0, // semi-Major axis
 									2.0 * Math.PI / params.n * 1000.0, // period
 									orbitalEccentricity,
@@ -227,8 +227,8 @@ const VSOP2013readable = {
 }
 
 
-var g_earthDataLast;
-var g_earthDataJDLast = -1000000000000;
+let g_earthDataLast;
+let g_earthDataJDLast = -1000000000000;
 function getOrbitalPositionEarth(jd)
 {
 	if (jd != g_earthDataJDLast)
@@ -327,29 +327,29 @@ class PlanetData
 
 	getSimplePosition(jd)
 	{
-		var orbPos = this.orbitalParameters.getOrbitalPosition(jd); 
-		var orbPosEarth = getOrbitalPositionEarth(jd); // note: a bit of a circular reference here
+		const orbPos = this.orbitalParameters.getOrbitalPosition(jd); 
+		const orbPosEarth = getOrbitalPositionEarth(jd); // note: a bit of a circular reference here
 
-		var earthHelio = new ThreeVector(Math.cos(orbPosEarth.meanLongitude), Math.sin(orbPosEarth.meanLongitude), 0.0);
+		const earthHelio = new ThreeVector(Math.cos(orbPosEarth.meanLongitude), Math.sin(orbPosEarth.meanLongitude), 0.0);
 
-		var planetHelio = new ThreeVector(this.orbitalParameters.semiMajorAxis * Math.cos(orbPos.meanLongitude), this.orbitalParameters.semiMajorAxis * Math.sin(orbPos.meanLongitude), 0.0);
+		const planetHelio = new ThreeVector(this.orbitalParameters.semiMajorAxis * Math.cos(orbPos.meanLongitude), this.orbitalParameters.semiMajorAxis * Math.sin(orbPos.meanLongitude), 0.0);
 
-		var vp = new PlanetView();
+		let vp = new PlanetView();
 		vp.calculateViewingParameters(earthHelio,planetHelio,this.orbitalParameters.semiMajorAxis,this.meanrad,this.polrad,this.eqrad,this.Vmag,this.averageColor,null)
 
 		return vp;
 	}
 	getTruePosition(jd)
 	{
-		var orbPos = this.orbitalParameters.getOrbitalPosition(jd); 
-		var orbPosEarth = getOrbitalPositionEarth(jd); 
+		const orbPos = this.orbitalParameters.getOrbitalPosition(jd); 
+		const orbPosEarth = getOrbitalPositionEarth(jd); 
 
-		var earthHelio = new ThreeVector(Math.cos(orbPosEarth.helioLongitude) * Math.cos(orbPosEarth.helioLatitude), Math.sin(orbPosEarth.helioLongitude) * Math.cos(orbPosEarth.helioLatitude), Math.sin(orbPosEarth.helioLatitude));
+		const earthHelio = new ThreeVector(Math.cos(orbPosEarth.helioLongitude) * Math.cos(orbPosEarth.helioLatitude), Math.sin(orbPosEarth.helioLongitude) * Math.cos(orbPosEarth.helioLatitude), Math.sin(orbPosEarth.helioLatitude));
 		earthHelio.selfScale(orbPosEarth.helioRadius);
-		var planetHelio = new ThreeVector(Math.cos(orbPos.helioLongitude) * Math.cos(orbPos.helioLatitude), Math.sin(orbPos.helioLongitude) * Math.cos(orbPos.helioLatitude), Math.sin(orbPos.helioLatitude));
+		const planetHelio = new ThreeVector(Math.cos(orbPos.helioLongitude) * Math.cos(orbPos.helioLatitude), Math.sin(orbPos.helioLongitude) * Math.cos(orbPos.helioLatitude), Math.sin(orbPos.helioLatitude));
 		planetHelio.selfScale(orbPos.helioRadius);
 
-		var vp = new PlanetView();
+		let vp = new PlanetView();
 		vp.calculateViewingParameters(earthHelio,planetHelio,this.orbitalParameters.semiMajorAxis,this.meanrad,this.polrad,this.eqrad,this.Vmag,this.averageColor,null)
 
 		return vp;

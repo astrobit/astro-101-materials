@@ -4,8 +4,8 @@ class Mercator
 {
 	calculate(latitude,longitude)
 	{ // ignore central latitude for now. Use of central latitude requires additional projection and gets complicated
-		var latRad =  latitude * Math.PI / 180.0;
-		var delLong = (longitude - this.centralLongitude) / 180.0;
+		const latRad =  latitude * Math.PI / 180.0;
+		let delLong = (longitude - this.centralLongitude) / 180.0;
 		if (delLong > 1.0)
 			delLong = 1.0 - delLong;
 		else if (delLong < -1.0)
@@ -15,8 +15,8 @@ class Mercator
 	}
 	calculateReverse(x,y)
 	{
-		var lat = (Math.atan(Math.exp(y * this.latScalar)) * 2.0 + Math.PI * 0.5) * 180.0 / Math.PI;
-		var long = x * 180.0 + this.centralLongitude;
+		const lat = (Math.atan(Math.exp(y * this.latScalar)) * 2.0 + Math.PI * 0.5) * 180.0 / Math.PI;
+		let long = x * 180.0 + this.centralLongitude;
 		long += 360.0;
 		long %= 360.0;
 		if (long > 180.0)

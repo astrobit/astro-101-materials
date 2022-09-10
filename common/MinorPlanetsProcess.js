@@ -30,7 +30,7 @@ var g_mpi;
 var g_mpiRadians = Math.PI / 180.0;
 for (g_mpi = 0; g_mpi < minorPlanetsTrojans.length; g_mpi++)
 {
-	var curr = minorPlanetsTrojans[g_mpi];
+	const curr = minorPlanetsTrojans[g_mpi];
 	minorPlanetsTrojans[g_mpi].orbitalParameters = new OrbitalParameters(curr.epoch, curr.a,curr.per_y,curr.e,curr.ma * g_mpiRadians,curr.om * g_mpiRadians,curr.w * g_mpiRadians,curr.i * g_mpiRadians);
 }
 	

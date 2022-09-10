@@ -1,6 +1,6 @@
 
 
-var theCanvas = document.getElementById("theCanvas");
+let theCanvas = document.getElementById("theCanvas");
 theCanvas.onselectstart = function () { return false; }
 theCanvas.onmousedown = commonUIOnMouseDown;
 theCanvas.onmouseup = commonUIOnMouseUp;
@@ -8,19 +8,19 @@ theCanvas.onclick = commonUIOnClick;
 theCanvas.onmousemove = commonUIOnMouseMove;
 theCanvas.onmouseleave = commonUIOnMouseLeave;
 
-var theContext = theCanvas.getContext("2d");
+let theContext = theCanvas.getContext("2d");
 
 
-var minimumControlsHeightTop = 130;
+const minimumControlsHeightTop = 130;
 
 theCanvas.height = window.innerHeight - 60;
 theCanvas.width = window.innerWidth;
 
-var g_muted = true;
-var g_volume = 0.75;
-var g_curr_Sound = null;
+let g_muted = true;
+let g_volume = 0.75;
+let g_curr_Sound = null;
 
-var g_sounds = new Object();
+let g_sounds = new Object();
 g_sounds["128 Hz"] = document.getElementById("128audio");
 g_sounds["128 Hz"].frequency = 128;
 g_sounds["256 Hz"] = document.getElementById("256audio");
@@ -57,21 +57,21 @@ function onMuteSelect()
 }
 
 
-var freqButtonsY = theCanvas.height - 150;
-var volumeControlY = theCanvas.height - 100;
+const freqButtonsY = theCanvas.height - 150;
+const volumeControlY = theCanvas.height - 100;
 
 function volumeControl(value)
 {
 	g_curr_Sound.volume = g_volume * value;
 }
-var sliderVolume = new Slider(theCanvas.width / 2,volumeControlY + 50,0.0,0.5,0.1);
+let sliderVolume = new Slider(theCanvas.width / 2,volumeControlY + 50,0.0,0.5,0.1);
 sliderVolume.width = 400;
 sliderVolume.label = "Volume";
 sliderVolume.labelStyle = "#FFFFFF";
 sliderVolume.onChange = volumeControl;
 commonUIRegister(sliderVolume);
 
-var buttonMute = new Button ("Mute",theCanvas.width / 2 + 40.0,volumeControlY,60,30,onMuteSelect)
+let buttonMute = new Button ("Mute",theCanvas.width / 2 + 40.0,volumeControlY,60,30,onMuteSelect)
 buttonMute.insideStyle = "#FF7F00";
 commonUIRegister(buttonMute);
 
@@ -97,7 +97,7 @@ function selectFrequency(frequency)
 	}
 }
 
-var freqButtonsConst = new Array();
+let freqButtonsConst = new Array();
 
 freqButtonsConst.push(new RadioButton("128 Hz","128 Hz",theCanvas.width / 2 - 310,freqButtonsY,80,25));
 freqButtonsConst.push(new RadioButton("256 Hz","256 Hz",theCanvas.width / 2 - 220,freqButtonsY,80,25));
@@ -107,14 +107,14 @@ freqButtonsConst.push(new RadioButton("2048 Hz","2048 Hz",theCanvas.width / 2 + 
 freqButtonsConst.push(new RadioButton("4096 Hz","4096 Hz",theCanvas.width / 2 + 140,freqButtonsY,80,25));
 freqButtonsConst.push(new RadioButton("8192 Hz","8192 Hz",theCanvas.width / 2 + 230,freqButtonsY,80,25));
 
-var radioCoord = new Radio("Frequency","1024 Hz",selectFrequency,freqButtonsConst);
+let radioCoord = new Radio("Frequency","1024 Hz",selectFrequency,freqButtonsConst);
 commonUIRegister(radioCoord);
 
 
-var g_length = 0.0;
-var g_temperature = 293.15;
-var g_speed_of_sound = Math.sqrt(1.4*1.380649e-23*g_temperature/(28.9647/1000/6.02214076e23));
-var g_slew = 0;
+let g_length = 0.0;
+const g_temperature = 293.15;
+const g_speed_of_sound = Math.sqrt(1.4*1.380649e-23*g_temperature/(28.9647/1000/6.02214076e23));
+let g_slew = 0;
 
 function onRightSelect()
 {
@@ -125,9 +125,9 @@ function onRightRelease()
 	g_slew = 0;
 }
 
-var controlButtonsY = theCanvas.height / 2 - 110;
-var lengthDisplayY = theCanvas.height / 2 - 130;
-var buttonRight = new SpringButton("Right",theCanvas.width / 2 + 5,controlButtonsY,60,30,onRightSelect,onRightRelease)
+const controlButtonsY = theCanvas.height / 2 - 110;
+const lengthDisplayY = theCanvas.height / 2 - 130;
+let buttonRight = new SpringButton("Right",theCanvas.width / 2 + 5,controlButtonsY,60,30,onRightSelect,onRightRelease)
 commonUIRegister(buttonRight);
 
 function onLeftSelect()
@@ -139,7 +139,7 @@ function onLeftRelease()
 	g_slew = 0;
 }
 
-var buttonLeft = new SpringButton("Left",theCanvas.width / 2 - 65,controlButtonsY,60,30,onLeftSelect,onLeftRelease)
+let buttonLeft = new SpringButton("Left",theCanvas.width / 2 - 65,controlButtonsY,60,30,onLeftSelect,onLeftRelease)
 commonUIRegister(buttonLeft);
 
 function onResetSelect()
@@ -147,16 +147,16 @@ function onResetSelect()
 	g_length = 0;
 }
 
-var buttonLeft = new Button("Reset",theCanvas.width / 2 - 135,controlButtonsY,60,30,onResetSelect)
-commonUIRegister(buttonLeft);
+let buttonReset = new Button("Reset",theCanvas.width / 2 - 135,controlButtonsY,60,30,onResetSelect)
+commonUIRegister(buttonReset);
 
 g_curr_Sound = g_sounds["1024 Hz"];
 g_curr_Sound.volume = g_volume * sliderVolume.value;
 
-var halfHeight = theCanvas.height / 2;
+let halfHeight = theCanvas.height / 2;
 
-var g_timestep = 1.0 / 30.0;
-var g_slewSpeed = 0.01;
+const g_timestep = 1.0 / 30.0;
+const g_slewSpeed = 0.01;
 function work(){
 
 	g_length = g_length + g_slew * g_slewSpeed;
@@ -165,12 +165,12 @@ function work(){
 	if (g_length > 150.0)
 		g_length = 150.0;
 		
-	var wavelength = g_speed_of_sound / g_curr_Sound.frequency;
-	var fracWavelength = g_length / 100.0 / wavelength;
+	const wavelength = g_speed_of_sound / g_curr_Sound.frequency;
+	const fracWavelength = g_length / 100.0 / wavelength;
 	
-	var amplitude = (fracWavelength % 0.5 - 0.25) / 0.25;
-	var intensity = 1.0 - amplitude * amplitude;
-	var eff_Volume = (intensity * 0.9 + 0.1);
+	const amplitude = (fracWavelength % 0.5 - 0.25) / 0.25;
+	const intensity = 1.0 - amplitude * amplitude;
+	const eff_Volume = (intensity * 0.9 + 0.1);
 	g_curr_Sound.volume = eff_Volume * g_volume * sliderVolume.value;
 
 	theContext.clearRect(0, 0, theCanvas.width, theCanvas.height);
@@ -180,7 +180,7 @@ function work(){
 	theContext.font = "18px Arial";
 
 	// Draw the current tube length
-	var lengthDisplay = (Math.round(g_length * 10.0) / 10.0).toString();
+	let lengthDisplay = (Math.round(g_length * 10.0) / 10.0).toString();
 	if (lengthDisplay.charAt(lengthDisplay.length - 2) != '.')
 		lengthDisplay = lengthDisplay + ".0"
 	lengthDisplay += ' cm';
@@ -235,10 +235,10 @@ function work(){
 
 	theContext.strokeStyle = "#000000";
 	theContext.beginPath();
-	var angle;
+	let angle;
 	for (angle = -45; angle <= 45; angle += 5)
 	{
-		var angleRad = angle * Math.PI / 180.0;
+		let angleRad = angle * Math.PI / 180.0;
 		theContext.moveTo(theCanvas.width / 2 + 62.0 * Math.sin(angleRad),theCanvas.height / 2 - 62.0 * Math.cos(angleRad));
 		theContext.lineTo(theCanvas.width / 2 + 70.0 * Math.sin(angleRad),theCanvas.height / 2 - 70.0 * Math.cos(angleRad));
 		theContext.stroke();
@@ -247,12 +247,12 @@ function work(){
 	theContext.font = "10px Arial";
 	for (angle = -45; angle <= 45; angle += 15)
 	{
-		var angleRad = angle * Math.PI / 180.0;
+		let angleRad = angle * Math.PI / 180.0;
 		theContext.moveTo(theCanvas.width / 2 + 70.0 * Math.sin(angleRad),theCanvas.height / 2 - 70.0 * Math.cos(angleRad));
 		theContext.lineTo(theCanvas.width / 2 + 78.0 * Math.sin(angleRad),theCanvas.height / 2 - 78.0 * Math.cos(angleRad));
 		theContext.stroke();
-		var strength = (angle + 45.0) / 90.0;
-		var strengthDisplay = (Math.round(strength * 10.0) / 10.0).toString();
+		const strength = (angle + 45.0) / 90.0;
+		let strengthDisplay = (Math.round(strength * 10.0) / 10.0).toString();
 		if (strengthDisplay.charAt(strengthDisplay.length - 2) != '.')
 			strengthDisplay = strengthDisplay + ".0"
 		

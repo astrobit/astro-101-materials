@@ -1,6 +1,6 @@
 
 
-var theCanvas = document.getElementById("theCanvas");
+let theCanvas = document.getElementById("theCanvas");
 theCanvas.onselectstart = function () { return false; }
 theCanvas.onmousedown = commonUIOnMouseDown;
 theCanvas.onmouseup = commonUIOnMouseUp;
@@ -8,36 +8,32 @@ theCanvas.onclick = commonUIOnClick;
 theCanvas.onmousemove = commonUIOnMouseMove;
 theCanvas.onmouseleave = commonUIOnMouseLeave;
 
-var theContext = theCanvas.getContext("2d");
+let theContext = theCanvas.getContext("2d");
 
 
-var minimumControlsHeightTop = 130;
+let minimumControlsHeightTop = 130;
 
 theCanvas.height = window.innerHeight - 60;
 theCanvas.width = window.innerWidth;
 //theCanvas.width = theCanvas.height;
 
-var modelButtonsY = theCanvas.height - 30;
-var buttonsControlsY = modelButtonsY - 30;
-//var buttonsZoomY = buttonsControlsY - 30;
+const modelButtonsY = theCanvas.height - 30;
+const buttonsControlsY = modelButtonsY - 30;
+//let buttonsZoomY = buttonsControlsY - 30;
 
-var buttonsTimeY = buttonsControlsY - 50;
-var dateDisplayTopY = buttonsTimeY - 25.0;
-var dateDisplayY = dateDisplayTopY + 20.0;
-var displayBottomY = dateDisplayTopY - 5.0;
-var displayHeight = displayBottomY;
-if (displayHeight < 0)
-	displayHeight = 10;
-if (theCanvas.width < displayHeight)
-	displayHeight = theCanvas.width;
-var displayCenterX = theCanvas.width / 2;
-var displayCenterY = displayBottomY - displayHeight / 2;
+const buttonsTimeY = buttonsControlsY - 50;
+const dateDisplayTopY = buttonsTimeY - 25.0;
+const dateDisplayY = dateDisplayTopY + 20.0;
+const displayBottomY = dateDisplayTopY - 5.0;
+const displayHeight = Math.min(Math.max(10,displayBottomY),theCanvas.width);
+const displayCenterX = theCanvas.width / 2;
+const displayCenterY = displayBottomY - displayHeight / 2;
 
 
-var g_basespeed = 1.0;
-var g_speed = 1.0;
-var g_pause = true;
-var g_zoom = 1.0 / 20.0; // 1/30 arcsec
+const g_basespeed = 1.0;
+let g_speed = 1.0;
+let g_pause = true;
+let g_zoom = 1.0 / 20.0; // 1/30 arcsec
 
 function speedup(event)
 {
@@ -60,21 +56,21 @@ function zoomout(event)
 
 
 
-var times = String.fromCharCode(0x00d7)
-var pauseButtonText = '| |'
-var playButtonText = String.fromCharCode(0x25b6);
-var reverseButtonText = String.fromCharCode(0x25c0);
+const times = String.fromCharCode(0x00d7)
+const pauseButtonText = '| |'
+const playButtonText = String.fromCharCode(0x25b6);
+const reverseButtonText = String.fromCharCode(0x25c0);
 
-var timesMTwoFiftySix = reverseButtonText + '256'
-var timesMSixtyFour = reverseButtonText + '64'
-var timesMSixteen = reverseButtonText + '16'
-var timesMFour = reverseButtonText + '4'
-var timesMOne = reverseButtonText + '1'
-var timesOne = playButtonText + '1'
-var timesFour = playButtonText + '4'
-var timesSixteen = playButtonText + '16'
-var timesSixtyFour = playButtonText + '64'
-var timesTwoFiftySix = playButtonText + '256'
+const timesMTwoFiftySix = reverseButtonText + '256'
+const timesMSixtyFour = reverseButtonText + '64'
+const timesMSixteen = reverseButtonText + '16'
+const timesMFour = reverseButtonText + '4'
+const timesMOne = reverseButtonText + '1'
+const timesOne = playButtonText + '1'
+const timesFour = playButtonText + '4'
+const timesSixteen = playButtonText + '16'
+const timesSixtyFour = playButtonText + '64'
+const timesTwoFiftySix = playButtonText + '256'
 function selectSpeed(value)
 {
 	switch (value)
@@ -113,7 +109,7 @@ function selectSpeed(value)
 	}
 }
 
-var speedButtons = new Array();
+let speedButtons = new Array();
 speedButtons.push(new RadioButton(timesMTwoFiftySix,timesMTwoFiftySix ,theCanvas.width / 2 - 230,buttonsTimeY,40,40));
 speedButtons.push(new RadioButton(timesMSixtyFour,timesMSixtyFour     ,theCanvas.width / 2 - 190,buttonsTimeY,40,40));
 speedButtons.push(new RadioButton(timesMSixteen,timesMSixteen         ,theCanvas.width / 2 - 150,buttonsTimeY,40,40));
@@ -144,13 +140,13 @@ function requestAdvanceYear(event)
 	g_timer += 365.0;
 }
 
-var advanceDay = new Button("+1d",theCanvas.width / 2 + 250,buttonsTimeY,40,40,requestAdvanceDay);
+let advanceDay = new Button("+1d",theCanvas.width / 2 + 250,buttonsTimeY,40,40,requestAdvanceDay);
 commonUIRegister(advanceDay);
-var advanceWeek = new Button("+7d",theCanvas.width / 2 + 290,buttonsTimeY,40,40,requestAdvanceWeek);
+let advanceWeek = new Button("+7d",theCanvas.width / 2 + 290,buttonsTimeY,40,40,requestAdvanceWeek);
 commonUIRegister(advanceWeek);
-var advanceMonth = new Button("+30d",theCanvas.width / 2 + 330,buttonsTimeY,40,40,requestAdvanceMonth);
+let advanceMonth = new Button("+30d",theCanvas.width / 2 + 330,buttonsTimeY,40,40,requestAdvanceMonth);
 commonUIRegister(advanceMonth);
-var advanceYear = new Button("+1y",theCanvas.width / 2 + 370,buttonsTimeY,40,40,requestAdvanceYear);
+let advanceYear = new Button("+1y",theCanvas.width / 2 + 370,buttonsTimeY,40,40,requestAdvanceYear);
 commonUIRegister(advanceYear);
 
 function requestBackDay(event)
@@ -170,13 +166,13 @@ function requestBackYear(event)
 	g_timer -= 365.0;
 }
 
-var backDay = new Button("-1d",theCanvas.width / 2 - 290,buttonsTimeY,40,40,requestBackDay);
+let backDay = new Button("-1d",theCanvas.width / 2 - 290,buttonsTimeY,40,40,requestBackDay);
 commonUIRegister(backDay);
-var backWeek = new Button("-7d",theCanvas.width / 2 - 330,buttonsTimeY,40,40,requestBackWeek);
+let backWeek = new Button("-7d",theCanvas.width / 2 - 330,buttonsTimeY,40,40,requestBackWeek);
 commonUIRegister(backWeek);
-var backMonth = new Button("-30d",theCanvas.width / 2 - 370,buttonsTimeY,40,40,requestBackMonth);
+let backMonth = new Button("-30d",theCanvas.width / 2 - 370,buttonsTimeY,40,40,requestBackMonth);
 commonUIRegister(backMonth);
-var backYear = new Button("-1y",theCanvas.width / 2 - 410,buttonsTimeY,40,40,requestBackYear);
+let backYear = new Button("-1y",theCanvas.width / 2 - 410,buttonsTimeY,40,40,requestBackYear);
 commonUIRegister(backYear);
 */
 
@@ -193,7 +189,7 @@ function requestPause(event)
 	}
 }
 
-var playButton = new Button("Pause",theCanvas.width / 2 - 20,buttonsTimeY,40,40,requestPause);
+let playButton = new Button("Pause",theCanvas.width / 2 - 20,buttonsTimeY,40,40,requestPause);
 if (g_pause)
 	playButton.text = playButtonText;
 else
@@ -203,7 +199,7 @@ commonUIRegister(playButton);
 
 /*
 
-var zoomAdjust = 0;
+let zoomAdjust = 0;
 function requestZoomInStart(event)
 {
 	zoomAdjust = 1;
@@ -214,7 +210,7 @@ function requestZoomInEnd(event)
 	zoomAdjust = 0;
 }
 
-var zoomIn = new SpringButton("+",displayCenterX + displayHeight * 0.5 + 115,displayCenterY - 200,40,40, requestZoomInStart, requestZoomInEnd);
+let zoomIn = new SpringButton("+",displayCenterX + displayHeight * 0.5 + 115,displayCenterY - 200,40,40, requestZoomInStart, requestZoomInEnd);
 commonUIRegister(zoomIn);
 
 function requestZoomOutStart(event)
@@ -227,10 +223,10 @@ function requestZoomOutEnd(event)
 	zoomAdjust = 0;
 }
 
-var zoomOut = new SpringButton("-",displayCenterX + displayHeight * 0.5 + 25,displayCenterY - 200,40,40, requestZoomOutStart, requestZoomOutEnd);
+let zoomOut = new SpringButton("-",displayCenterX + displayHeight * 0.5 + 25,displayCenterY - 200,40,40, requestZoomOutStart, requestZoomOutEnd);
 commonUIRegister(zoomOut);
 */
-var g_timer = 0.0;//2456083.27000; //2451545.0;
+let g_timer = 0.0;//2456083.27000; //2451545.0;
 
 class Star
 {
@@ -241,23 +237,23 @@ class Star
 	}
 }
 
-var stars = new Array();
+let stars = new Array();
 
 // create general disk stars
-var idxLcl = 0;
+let idxLcl = 0;
 for (idxLcl = 0; idxLcl < 400; idxLcl++)
 {
-	var star = new Star();
+	let star = new Star();
 	stars.push(star);
 }
 // create spriral arms
-var arm = 0;
+let arm = 0;
 for (arm = 0; arm < 4; arm++)
 {
-	var offset = arm * Math.PI * 0.5;
+	let offset = arm * Math.PI * 0.5;
 	for (idxLcl = 0; idxLcl < 200; idxLcl++)
 	{
-		var star = new Star();
+		let star = new Star();
 		star.r = Math.random() * 0.9 + 0.1;
 		star.theta = (star.r * 3.0 * Math.PI) % (2.0 * Math.PI) + offset + (Math.random() - 0.5) * 0.3;
 		stars.push(star);
@@ -266,7 +262,7 @@ for (arm = 0; arm < 4; arm++)
 
 
 
-var standbyTimer = 0;
+let standbyTimer = 0;
 
 function work(){
 	theContext.clearRect(0, 0, theCanvas.width, theCanvas.height);
@@ -294,16 +290,16 @@ function work(){
 	
 	for (idxLcl = 0; idxLcl < stars.length; idxLcl++)
 	{
-		var angvel = 2.0 * Math.PI / stars[idxLcl].r * 0.01;
-		var theta = stars[idxLcl].theta + angvel * g_timer;
-		var size = 3.0;
-		var starColor = UBVRItoRGB(null,0.656,0.0,null,null,0.0,1.0);
-		var layer = 0;
-		var x = stars[idxLcl].r * Math.cos(theta) * displayHeight * 0.5 + displayCenterX;
-		var y = stars[idxLcl].r * Math.sin(theta) * displayHeight * 0.5 + displayCenterY;
+		const angvel = 2.0 * Math.PI / stars[idxLcl].r * 0.01;
+		const theta = stars[idxLcl].theta + angvel * g_timer;
+		const size = 3.0;
+		const starColor = UBVRItoRGB(null,0.656,0.0,null,null,0.0,1.0);
+		let layer = 0;
+		const x = stars[idxLcl].r * Math.cos(theta) * displayHeight * 0.5 + displayCenterX;
+		const y = stars[idxLcl].r * Math.sin(theta) * displayHeight * 0.5 + displayCenterY;
 		for (layer = 0; layer < size; layer += 0.5)
 		{
-			var clrLcl = starColor.copy();
+			let clrLcl = starColor.copy();
 			clrLcl.scale(layer / size);
 			theContext.fillStyle = clrLcl.style;
 			theContext.beginPath();

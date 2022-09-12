@@ -652,7 +652,7 @@ function drawElongationMap()
 	if (starsm6.ready)
 	{
 		const mapImage = new ImgData(theContext, elongationMapX - halfWidth, elongationMapY - halfHeight, elongationMapWidth, elongationMapHeight);
-		const len = stars.length;
+		const len = starsm6.length;
 		let i;
 		for (i = 0; i < len; i++)
 		{

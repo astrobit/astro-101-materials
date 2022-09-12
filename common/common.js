@@ -15,6 +15,13 @@ function drawTextRight(context,text,x,y)
 	context.fillText(text,x,y);
 	context.textAlign = align;
 }
+function drawTextLeft(context,text,x,y)
+{
+	let align = context.textAlign;
+	context.textAlign = "left";
+	context.fillText(text,x,y);
+	context.textAlign = align;
+}
 
 function drawArrow(context,x0,y0,x1,y1,style,linewidth,tipsizelength,tipsizewidth,open)
 {
@@ -120,38 +127,57 @@ class RGB
 	constructor(r,g,b)
 	{
 		this._r = 0;
-		if (r !== null)
+		if (r !== null && r !== undefined)
 			this._r = r;
 		this._g = 0;
-		if (g !== null)
+		if (g !== null && g !== undefined)
 			this._g = g;
 		this._b = 0;
-		if (b !== null)
+		if (b !== null && b !== undefined)
 			this._b = b;
 	}
+	set style(value)
+	{
+		if (value !== null && value !== undefined && typeof(value) == 'string' && value.length == 7 && value.charAt(0) == "#")
+		{
+			this._r = parseInt("0x" + value.substring(1,3));
+			this._g = parseInt("0x" + value.substring(3,5));
+			this._b = parseInt("0x" + value.substring(5,7));
+		}
+	}
+	
 	set r(value)
 	{
-		this._r = value;
-		if (value < 1)
-			this._r = 0;
-		else if (value > 255)
-			this._r = 255;
+		if (value !== null && value !== undefined)
+		{
+			this._r = value;
+			if (value < 1)
+				this._r = 0;
+			else if (value > 255)
+				this._r = 255;
+		}
 	}
 	set g(value)
 	{
-		this._g = value;
-		if (value < 1)
-			this._g = 0;
-		else if (value > 255)
-			this._g = 255;
+		if (value !== null && value !== undefined)
+		{
+			this._g = value;
+			if (value < 1)
+				this._g = 0;
+			else if (value > 255)
+				this._g = 255;
+		}
 	}
 	set b(value)
 	{
-		this._b = value;
-		if (value < 1)
-			this._b = 0;
-		else if (value > 255)
-			this._b = 255;
+		if (value !== null && value !== undefined)
+		{
+			this._b = value;
+			if (value < 1)
+				this._b = 0;
+			else if (value > 255)
+				this._b = 255;
+		}
 	}
 	get r()
 	{

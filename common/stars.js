@@ -32,36 +32,18 @@ if (starsRawJSONData == null)
 //	const query = "https://simbad.u-strasbg.fr/simbad/sim-tap/sync?request=doQuery&lang=adql&format=json&query=SELECT%20*%20FROM%20basic%20JOIN%20allfluxes%20ON%20allfluxes.oidref%20=%20basic.oid%20WHERE%20allfluxes.V%20%3C%206%20OR%20main_id%20=%20%27gam%20cep%27%20OR%20main_id%20=%20%27mu.%20Cet%27%20OR%20main_id%20=%20%27ome%20Dra%27%20OR%20main_id%20=%20%27nu.02%20Dra%27%20OR%20main_id%20=%20%27tet%20Hya%27%20OR%20main_id%20=%20%27iot%20Per%27%20OR%20main_id%20=%20%27ome%20Psc%27%20OR%20main_id%20=%20%27eta%20UMi%27";
 
 	const query = "https://www.astronaos.com/astronomy/stars_m6.json";	
-	if (typeof fetch !== 'undefined')
+	let promise = getFile(query);
+	promise.then(function (value) 
+	{ 
+		starsRawJSONData = value;
+	 	localStorage.setItem("starsData",starsRawJSONData);
+		localStorage.setItem("starsUpdateDateTime",currDateTime);
+		starsProcess();
+	},
+	function (error)
 	{
-		console.log("Fetch request")
-		// use the fetch API if available
-		fetch(query)
-		.then(result => result.text())
-		.then( data => {starsRawJSONData = data;
-		 	localStorage.setItem("starsData",starsRawJSONData);
-			localStorage.setItem("starsUpdateDateTime",currDateTime);
-			starsProcess();
-					})
-	}
-	else // good ol' AJAX
-	{
-		console.log("AJAX request")
-		let starsXHTTP = new XMLHttpRequest();
-
-		starsXHTTP.onreadystatechange = function() {
-		//	console.log(this.readyState + " " + this.status);
-			if (this.readyState == 4 && this.status == 200)
-			{
-				starsRawJSONData = starsXHTTP.responseText;
-		 		localStorage.setItem("starsData",starsRawJSONData);
-				localStorage.setItem("starsUpdateDateTime",currDateTime);
-				starsProcess();
-			}
-		}
-		starsXHTTP.open("GET", query, true);
-		starsXHTTP.send();
-	}
+		console.log("stars.js: error retreiving stars - " + error);
+	});
 }
 else
 {

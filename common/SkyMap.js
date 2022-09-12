@@ -67,8 +67,11 @@ class SkyMap
 		case "Mollweide":
 		case "Equirectangular":
 		case "Mercator":
-			this.projectionTypeInternal = type;
-			this.project();
+			if (this.projectionTypeInternal != type)
+			{
+				this.projectionTypeInternal = type;
+				this.project();
+			}
 			break;
 		default:
 			console.log("Invalid SkyMap projection " + type + ". Only Mollweide, Equirectangular, or Mercator are allowed.")
@@ -105,8 +108,11 @@ class SkyMap
 		case "Equatorial":
 		case "Galactic":
 		case "Ecliptic":
-			this.coordinatesInternal = type;
-			this.project();
+			if (this.coordinatesInternal != type)
+			{
+				this.coordinatesInternal = type;
+				this.project();
+			}
 			break;
 		default:
 			console.log("Invalid SkyMap coordinate system " + type + ". Only Equatorial, Galactic, or Ecliptic are allowed.")

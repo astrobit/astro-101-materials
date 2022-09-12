@@ -4,6 +4,7 @@ commonConst.js
 commonGP.js
 commonGraph.js
 constellation.js
+constellation2.js
 Equirectangular.js
 Mercator.js
 MinorPlanetsProcess.js
@@ -11,7 +12,9 @@ MinorPlanetsTrojans.js
 Mollweide.js
 planets.js
 SkyMap.js
+SkyMap2.js
 stars.js
+stars2.js
 tutorial.js
 ui.js
 VectorMatrix.js

@@ -615,14 +615,15 @@ function drawSSmap()
 		}
 	}
 	//@@NOTE: the projection may be slightly off due to inclination.
-	for (const [key, value] of Object.entries(g_planetView)) {
+	for (const [key, value] of Object.entries(g_planetView)) 
+	{
 		// symbol
 		theContext.fillStyle  = value.style;
 		theContext.beginPath();
 		theContext.arc(zoom * value.planetHelio.radius * Math.cos(-value.planetHelio.theta),zoom * value.planetHelio.radius * Math.sin(-value.planetHelio.theta),2,0,2.0*Math.PI,true);
 		theContext.closePath();
 		theContext.fill();
-}
+	}
 
 
 // draw the lines onto the overhead view to demonstrate the elongation
@@ -648,18 +649,18 @@ function drawElongationMap()
 	const sunLongitude = -g_planetView["Earth"].planetHelio.theta * kDegrees;
 	const projection = new Mollweide(sunLongitude,0.0);
 // draw the stars on the map
-	if (starsReady)
+	if (starsm6.ready)
 	{
 		const mapImage = new ImgData(theContext, elongationMapX - halfWidth, elongationMapY - halfHeight, elongationMapWidth, elongationMapHeight);
 		const len = stars.length;
 		let i;
 		for (i = 0; i < len; i++)
 		{
-			//console.log("here " + stars[i].latitude + " " + stars[i].longitude + " " + projection.x + " " + projection.y);
-			const starProj = projection.calculate(stars[i].eclat, stars[i].eclong);
-			const color = UBVRItoRGB(stars[i].U, stars[i].B, stars[i].V, stars[i].R, stars[i].I);
+			//console.log("here " + starsm6.at(i).latitude + " " + starsm6.at(i).longitude + " " + projection.x + " " + projection.y);
+			const starProj = projection.calculate(starsm6.at(i).eclat, starsm6.at(i).eclong);
+			const color = UBVRItoRGB(starsm6.at(i).U, starsm6.at(i).B, starsm6.at(i).V, starsm6.at(i).R, starsm6.at(i).I);
 			drawStar(mapImage, (starProj.x + 1.0) * halfWidth, (starProj.y + 1.0) * halfHeight, 2.0, color);
-/*			theContext.fillStyle  = UBVRItoRGB(stars[i].U,stars[i].B,stars[i].V,stars[i].R,stars[i].I).style;
+/*			theContext.fillStyle  = UBVRItoRGB(starsm6.at(i).U,starsm6.at(i).B,starsm6.at(i).V,starsm6.at(i).R,starsm6.at(i).I).style;
 			theContext.beginPath();
 			theContext.arc(starProj.x * halfWidth,starProj.y * halfHeight,1,0,2.0*Math.PI,true);
 			theContext.closePath();

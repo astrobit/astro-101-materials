@@ -409,11 +409,11 @@ function updateViewMatrix()
 
 function selectStar(index)
 {
-	if (index < stars.length)
+	if (index < starsm6.length)
 	{
 		selectedStar = index;
-		viewRA = stars[index].ra;
-		viewDec = stars[index].dec;
+		viewRA = starsm6.at(index).ra;
+		viewDec = starsm6.at(index).dec;
 		updateViewMatrix();
 	}
 }
@@ -427,17 +427,17 @@ let currPlxidx = 0;
 
 function preprocessStars()
 {
-	if (starsReady && !starPositionsCalculated)
+	if (starsm6.ready && !starPositionsCalculated)
 	{
-		for (idxLcl = 0; idxLcl < stars.length; idxLcl++)
+		for (idxLcl = 0; idxLcl < starsm6.length; idxLcl++)
 		{
 			let dataCurrent = new SpatialStarData();
-			dataCurrent.calculate(stars[idxLcl].ra, stars[idxLcl].dec, stars[idxLcl].plx_value, stars[idxLcl].rvz_redshift, stars[idxLcl].pmra, stars[idxLcl].pmdec);
+			dataCurrent.calculate(starsm6.at(idxLcl).ra, starsm6.at(idxLcl).dec, starsm6.at(idxLcl).plx_value, starsm6.at(idxLcl).rvz_redshift, starsm6.at(idxLcl).pmra, starsm6.at(idxLcl).pmdec);
 			starData.push(dataCurrent);
 
-			if (Math.abs(stars[idxLcl].pmra) > 100 || Math.abs(stars[idxLcl].pmdec) > 100) // proper motion greater than 100 mas/yr
+			if (Math.abs(starsm6.at(idxLcl).pmra) > 100 || Math.abs(starsm6.at(idxLcl).pmdec) > 100) // proper motion greater than 100 mas/yr
 				highPM.push(idxLcl);
-			if (Math.abs(stars[idxLcl].plx_value) > 100) // parallax > 100 mas
+			if (Math.abs(starsm6.at(idxLcl).plx_value) > 100) // parallax > 100 mas
 				highPlx.push(idxLcl);
 		}
 		starPositionsCalculated = true;	
@@ -458,9 +458,9 @@ function work(){
 	theContext.fillStyle = '#000000';
 	theContext.fillRect(0, 0, theCanvas.width, theCanvas.height);
 
-	if (!g_pause && starsReady)
+	if (!g_pause && starsm6.ready)
 		g_timer = g_timer + 1.0 / 30.0 * g_speed;
-	if (!starsReady)
+	if (!starsm6.ready)
 		standbyTimer += 1.0 / 30.0;
 		
 	const timeSeconds = (g_timer - 2451544.00000) * 86400.0;
@@ -521,7 +521,7 @@ function work(){
 	const diff_patt_size = Math.max(seeing,resolution);
 	
 	const halfSize = displayHeight * 0.5;
-	if (starsReady)
+	if (starsm6.ready)
 	{
 		if (!starPositionsCalculated)
 		{
@@ -588,11 +588,11 @@ function work(){
 		theContext.lineTo(displayCenterX + 0.5 * arcSecRadians * scaling * g_zoom * halfSize,displayCenterY + 0.9 * halfSize);
 		theContext.stroke();
 		let map = new ImgData(theContext, displayCenterX - displayHeight / 2, displayCenterY - displayHeight / 2, displayHeight, displayHeight);
-		for (idxLcl = 0; idxLcl < stars.length; idxLcl++)
+		for (idxLcl = 0; idxLcl < starsm6.length; idxLcl++)
 		{
 	//		if (inview[idxLcl])
 			{
-//				let StarID = stars[idxLcl].main_id;
+//				let StarID = starsm6.at(i).main_id;
 	//			StarPMRA = grp[idxLcl].pmra;
 	//			StarPMDec = grp[idxLcl].pmdec;
 	//			StarPlx = grp[idxLcl].plx_value;
@@ -619,7 +619,7 @@ function work(){
 					let size = diff_patt_size * halfSize * g_zoom * 0.5;
 					if ((x + size) >= -halfSize && (x - size) <= halfSize && (y + size) >= -halfSize && (y - size) < halfSize)
 					{
-						const starColor = UBVRItoRGB(null, stars[idxLcl].B, stars[idxLcl].V, stars[idxLcl].R, null, 0.0, 18.0);
+						const starColor = UBVRItoRGB(null, starsm6.at(idxLcl).B, starsm6.at(idxLcl).V, starsm6.at(idxLcl).R, null, 0.0, 18.0);
 						drawStar(map, x + halfSize, y + halfSize, size, starColor);
 /*
 						if (size < 1)
@@ -656,7 +656,7 @@ function work(){
 	}
 	theContext.restore();
 	
-	if (starsReady && selectedStar !== null)
+	if (starsm6.ready && selectedStar !== null)
 	{
 		theContext.fillStyle = "#FFFFFF";
 		theContext.font = "14px Arial";
@@ -665,24 +665,24 @@ function work(){
 
 
 		theContext.font = "20px Arial";
-		drawTextCenter(theContext,stars[selectedStar].main_id,displayCenterX - halfSize - 100,displayCenterY - 145);
-		const plxDisplayValue = Math.round(stars[selectedStar].plx_value * 10.0) / 10000.0;
+		drawTextCenter(theContext,starsm6.at(selectedStar).main_id,displayCenterX - halfSize - 100,displayCenterY - 145);
+		const plxDisplayValue = Math.round(starsm6.at(selectedStar).plx_value * 10.0) / 10000.0;
 		const plxDisplay = plxDisplayValue.toString();
 		drawTextCenter(theContext,"Parallax: " + plxDisplay + "\"",displayCenterX - halfSize - 100,displayCenterY - 115);
-		const pmRADisplayValue = Math.round(stars[selectedStar].pmra * 10.0) / 10000.0;
+		const pmRADisplayValue = Math.round(starsm6.at(selectedStar).pmra * 10.0) / 10000.0;
 		const pmRADisplay = pmRADisplayValue.toString();
 		drawTextCenter(theContext,"PM (ra): " + pmRADisplay + "\"/yr",displayCenterX - halfSize - 100,displayCenterY - 65);
-		const pmDecDisplayValue = Math.round(stars[selectedStar].pmdec * 10.0) / 10000.0;
+		const pmDecDisplayValue = Math.round(starsm6.at(selectedStar).pmdec * 10.0) / 10000.0;
 		const pmDecDisplay = pmDecDisplayValue.toString();
 		drawTextCenter(theContext,"PM (dec): " + pmDecDisplay + "\"/yr",displayCenterX - halfSize - 100,displayCenterY - 40);
 
-		let raD = degreestoHMSDisplayable(stars[selectedStar].ra);
+		let raD = degreestoHMSDisplayable(starsm6.at(selectedStar).ra);
 		theContext.fillStyle = "#00FF00";
 		drawTextCenter(theContext,"RA (J2000)",displayCenterX - halfSize - 100,displayCenterY + 10);
 		theContext.fillStyle = "#FFFFFF";
 		drawTextCenter(theContext,raD.hr + "h " + raD.min + "m " + raD.sec + "s",displayCenterX - halfSize - 100,displayCenterY + 35);
 
-		let decD = degreestoDMSDisplayable(stars[selectedStar].dec);
+		let decD = degreestoDMSDisplayable(starsm6.at(selectedStar).dec);
 		theContext.fillStyle = "#00FF00";
 		drawTextCenter(theContext,"Dec (J2000)",displayCenterX - halfSize - 100,displayCenterY + 60);
 		theContext.fillStyle = "#FFFFFF";

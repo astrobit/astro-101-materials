@@ -482,6 +482,7 @@ let aboutButton= new Button("About",theCanvas.width - 100,aboutTutorialButtonsY,
 aboutButton.textFont = "24px Arial";
 commonUIRegister(aboutButton);
 
+let skyMap = new SkyMap(starsm6._data);
 function draw(){
 
 	const mapWidthDraw = mapWidth * zoom;
@@ -489,10 +490,11 @@ function draw(){
 	const mapCenterXDraw = mapCenterX - zoomCenterX * zoom;
 	const mapCenterYDraw = mapCenterY - zoomCenterY * zoom;
 
-	let skyMap = new SkyMap(theContext,mapCenterXDraw,mapCenterYDraw,mapWidthDraw,mapHeightDraw);
 	skyMap.filter = filter;
 	skyMap.displayConstellations = displayConstellations;
 	skyMap.coordinates = displayCoordinates;
+	skyMap.stars = starsm6._data;
+
 
 // draw a black square for the map area box
 	theContext.fillStyle = "#000000";
@@ -501,7 +503,7 @@ function draw(){
 	theContext.save()
 	theContext.rect(mapCenterX - 0.5 * mapWidth,mapCenterY - 0.5 * mapHeight,mapWidth,mapHeight);
 	theContext.clip();
-	skyMap.draw();
+	skyMap.draw(theContext,mapCenterXDraw,mapCenterYDraw,mapWidthDraw,mapHeightDraw);
 	theContext.restore();
 
 
@@ -582,7 +584,7 @@ let waitForReadyTimer = 0.0;
 
 function waitForReady()
 {
-	if (!constellationsReady || !starsReady)
+	if (!constellationsReady || !starsm6.ready)
 	{
 		theContext.fillStyle = "#000000";
 		theContext.fillRect(0,0,theCanvas.width,theCanvas.height);

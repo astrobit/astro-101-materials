@@ -72,7 +72,7 @@ let Phys = new PhysicalConstants();
 function UBVRItoRGB(U,B,V,R,I,brightMag,dimMag)
 {
 	let brightMagInternal = brightMag;
-	if (typeof brightMag === 'undefined' || brightMag === null)
+	if (brightMag === undefined || brightMag === null)
 	{
 		brightMagInternal = 0.0;
 		if (!(commonAstroLogRegister & 0x01))
@@ -82,7 +82,7 @@ function UBVRItoRGB(U,B,V,R,I,brightMag,dimMag)
 		}
 	}
 	let dimMagInternal = dimMag;
-	if (typeof dimMag === 'undefined' || dimMag === null)
+	if (dimMag === undefined || dimMag === null)
 	{
 		dimMagInternal = 6.0;
 		if (!(commonAstroLogRegister & 0x02))
@@ -93,28 +93,28 @@ function UBVRItoRGB(U,B,V,R,I,brightMag,dimMag)
 	}
 
 	let colorIndex = null;
-	if (B !== null && V !== null)
+	if (B !== undefined && B !== null && V !== undefined && V !== null)
 	{
 		colorIndex = B - V;
 		colorBlue = 0.0;
 		colorRed = 1.35;
 		colorYel = 0.65;
 	}
-	else if (V !== null && R !== null)
+	else if (V !== undefined && V !== null && R !== undefined && R !== null)
 	{
 		colorIndex = V - R;
 		colorBlue = 0.0;
 		colorRed = 1.20;
 		colorYel = 0.55;
 	}
-	else if (U !== null && B !== null)
+	else if (U !== undefined && U !== null && B !== undefined && B !== null)
 	{
 		colorIndex = U - B;
 		colorBlue = 0.0;
 		colorRed = 1.10;
 		colorYel = 0.15;
 	}
-	else if (R !== null && I !== null)
+	else if (R !== undefined && R !== null && I !== undefined && I !== null)
 	{
 		colorIndex = R - I;
 		colorBlue = 0.0;
@@ -158,15 +158,15 @@ function UBVRItoRGB(U,B,V,R,I,brightMag,dimMag)
 		}
 	}
 	let brightBasis = null;
-	if (V !== null)
+	if (V !== null && V !== undefined)
 		brightBasis = V;
-	else if (R !== null)
+	else if (R !== null && R !== undefined)
 		brightBasis = R;
-	else if (B !== null)
+	else if (B !== null && B !== undefined)
 		brightBasis = B;
-	else if (U !== null)
+	else if (U !== null && U !== undefined)
 		brightBasis = U;
-	else if (I !== null)
+	else if (I !== null && I !== undefined)
 		brightBasis = I;
 	else
 		brightBasis = dimMagInternal;

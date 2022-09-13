@@ -646,7 +646,7 @@ function drawElongationMap()
 
 	theContext.save();
 	theContext.translate(elongationMapX,elongationMapY);
-	const sunLongitude = -g_planetView["Earth"].planetHelio.theta * kDegrees;
+	const sunLongitude = (180.0 + g_planetView["Earth"].planetHelio.theta * kDegrees) % 360.0;//-g_planetView["Earth"].planetHelio.theta * kDegrees;
 	const projection = new Mollweide(sunLongitude,0.0);
 // draw the stars on the map
 	if (starsm6.ready)
@@ -659,7 +659,7 @@ function drawElongationMap()
 			//console.log("here " + starsm6.at(i).latitude + " " + starsm6.at(i).longitude + " " + projection.x + " " + projection.y);
 			const starProj = projection.calculate(starsm6.at(i).eclat, starsm6.at(i).eclong);
 			const color = UBVRItoRGB(starsm6.at(i).U, starsm6.at(i).B, starsm6.at(i).V, starsm6.at(i).R, starsm6.at(i).I);
-			drawStar(mapImage, (starProj.x + 1.0) * halfWidth, (starProj.y + 1.0) * halfHeight, 2.0, color);
+			drawStar(mapImage, (1.0 - starProj.x) * halfWidth, (1.0 - starProj.y) * halfHeight, 2.0, color);
 /*			theContext.fillStyle  = UBVRItoRGB(starsm6.at(i).U,starsm6.at(i).B,starsm6.at(i).V,starsm6.at(i).R,starsm6.at(i).I).style;
 			theContext.beginPath();
 			theContext.arc(starProj.x * halfWidth,starProj.y * halfHeight,1,0,2.0*Math.PI,true);
@@ -685,7 +685,7 @@ function drawElongationMap()
 	theContext.lineTo(halfWidth,0);
 	theContext.stroke();
 // draw the Sun on the map
-	const sunSize = 0.5 * halfWidth / 180.0;
+	const sunSize = Math.max(0.5 * halfWidth / 180.0,2);
 	theContext.fillStyle  = "#FFFF00";
 	theContext.beginPath();
 	theContext.arc(0,0,sunSize,0,2.0*Math.PI,true);
@@ -696,7 +696,7 @@ function drawElongationMap()
 	const planetProj = projection.calculate(g_planetView[selectedPlanet].elongLat * kDegrees,g_planetView[selectedPlanet].elongLong * kDegrees + sunLongitude);
 	theContext.fillStyle  = g_planetView[selectedPlanet].style;
 	theContext.beginPath();
-	theContext.arc(planetProj.x * halfWidth,planetProj.y * halfHeight,2,0,2.0*Math.PI,true);
+	theContext.arc(-planetProj.x * halfWidth,-planetProj.y * halfHeight,2,0,2.0*Math.PI,true);
 	theContext.closePath();
 	theContext.fill();
 
@@ -713,13 +713,13 @@ function drawElongationMap()
 	theContext.moveTo(-halfWidth,-halfHeight);
 	theContext.lineTo(-halfWidth,0);
 	theContext.stroke();
-	drawTextCenter(theContext,"-180",-halfWidth,10);
+	drawTextCenter(theContext,"+180",-halfWidth,10);
 
 	theContext.beginPath();
 	theContext.moveTo(-qtrWidth,-halfHeight * (1.0 - Math.sqrt(0.75)));
 	theContext.lineTo(-qtrWidth,0);
 	theContext.stroke();
-	drawTextCenter(theContext,"-90",-qtrWidth,10);
+	drawTextCenter(theContext,"+90",-qtrWidth,10);
 
 	drawTextCenter(theContext,"0",0,10);
 
@@ -727,13 +727,13 @@ function drawElongationMap()
 	theContext.moveTo(qtrWidth,-halfHeight * (1.0 - Math.sqrt(0.75)));
 	theContext.lineTo(qtrWidth,0);
 	theContext.stroke();
-	drawTextCenter(theContext,"+90",qtrWidth,10);
+	drawTextCenter(theContext,"-90",qtrWidth,10);
 
 	theContext.beginPath();
 	theContext.moveTo(halfWidth,-halfHeight);
 	theContext.lineTo(halfWidth,0);
 	theContext.stroke();
-	drawTextCenter(theContext,"+180",halfWidth,10);
+	drawTextCenter(theContext,"-180",halfWidth,10);
 	
 	let elongationDisplayValue = g_planetView[selectedPlanet].elongLong * kDegrees;
 	if (elongationDisplayValue > 180.0)

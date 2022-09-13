@@ -257,7 +257,7 @@ class PlanetView
 		this.planetEarthHelio = planetHelio.subtract(earthHelio);
 
 		// create matrix for ecliptic coordinate system
-		this.matrixGeo.loadBasis(earthHelio,null,LinAlg.unitZ)
+		this.matrixGeo.loadBasis(earthHelio,null,LinAlg.unitZ.scale(-1.0))
 		this.matrixGeo.selfTranspose();
 
 		this.planetEarthGeo = this.matrixGeo.dot(this.planetEarthHelio);
@@ -366,11 +366,12 @@ const Planets = {
 	0.022032,// GM
 	0.068,// bond albedo
 	0.142,// geometric albedo
-	-0.613,// V: V magnitude at distance of 1 au with full illumination
+	-0.420,// V: V magnitude at distance of 1 au with full illumination
 	0.034,// obliquity
 	1407.6, // sidPeriodRot
 	4222.6, //synPeriodRot
-	VSOP2013readable.Mercury,// epoch
+	new OrbitalParameters(2455196.50000, 0.387098,0.24085,0.205627,radians(75.56771),radians(48.449),radians(77.612),radians(7.0051)),
+//	VSOP2013readable.Mercury,// epoch
 //	VSOP2013readable.Mercury.epoch,// epoch
 //	VSOP2013readable.Mercury.semiMajorAxis,// semiMajorAxis
 //	VSOP2013readable.Mercury.periodYears,//87.968/365.242191,// tropPeriod
@@ -389,11 +390,12 @@ Venus: new PlanetData(
 	0.32486, // GM
 	0.77, // bond albedo
 	0.689, // geometric albedo
-	-4.38, // V0
+	-4.40, // V0
 	177.36, // obliquity
 	-5832.6, // sidPeriodRot
 	2802.0, //synPeriodRot
-	VSOP2013readable.Venus,// epoch
+	//VSOP2013readable.Venus,// epoch
+	new OrbitalParameters(2455196.50000, 0.723329,0.615207,0.006812,radians(272.30044),radians(76.769),radians(131.54),radians(3.3947)),
 //	2451544.0, // epoch
 //	0.72333199, // semiMajorAxis
 //	224.695/365.242191, // tropPeriod
@@ -416,7 +418,8 @@ Earth: new PlanetData(
 	23.44, // obliquity
 	23.9345, // sidPeriodRot
 	24.0000, //synPeriodRot
-	VSOP2013readable.EMB,// epoch
+	new OrbitalParameters(2455196.50000, 0.999985,0.999996,0.016671,radians(99.556772),radians(0.0000),radians(103.2055),radians(0.00000)),
+//	VSOP2013readable.EMB,// epoch
 //	2451544.0, // epoch
 //	1.00000011, // semiMajorAxis
 //	1.0, // tropPeriod
@@ -436,11 +439,12 @@ Mars: new PlanetData(
 	0.042828, // GM
 	0.250, // bond albedo
 	0.170, // geometric albedo
-	-1.60, // V0
+	-1.52, // V0
 	25.19, // obliquity
 	24.6229, // sidPeriodRot
 	24.6597, //synPeriodRot
-	VSOP2013readable.Mars,// epoch
+	new OrbitalParameters(2455196.50000, 1.523689,1.880765,0.093348,radians(109.09646),radians(49.632),radians(336.217),radians(1.8497)),
+//	VSOP2013readable.Mars,// epoch
 //	2451544.0, // epoch
 //	1.52366231  , // semiMajorAxis
 //	686.973/365.242191, // tropPeriod
@@ -464,7 +468,8 @@ Jupiter: new PlanetData(
 	3.13, // obliquity
 	9.9250, // sidPeriodRot
 	9.9259, //synPeriodRot
-	VSOP2013readable.Jupiter,// epoch
+	new OrbitalParameters(2455196.50000, 5.20278,11.857911,0.048907,radians(337.917132),radians(100.595),radians(14.6633),radians(1.3035)),
+//	VSOP2013readable.Jupiter,// epoch
 //	2451544.0, // epoch
 //	5.20336301  , // semiMajorAxis
 //	4330.595/365.242191, // tropPeriod
@@ -488,7 +493,8 @@ Saturn: new PlanetData(
 	26.73, // obliquity
 	10.656, // sidPeriodRot
 	10.656, //synPeriodRot
-	VSOP2013readable.Saturn,// epoch
+	new OrbitalParameters(2455196.50000, 9.51134,29.310579,0.053853,radians(172.398316),radians(113.752),radians(89.567),radians(2.4873)),
+//	VSOP2013readable.Saturn,// epoch
 //	2451544.0, // epoch
 //	9.53707032  , // semiMajorAxis
 //	10746.94/365.242191, // tropPeriod
@@ -512,7 +518,8 @@ Uranus: new PlanetData(
 	97.77, // obliquity
 	-17.24, // sidPeriodRot
 	17.24, //synPeriodRot
-	VSOP2013readable.Uranus,// epoch
+	new OrbitalParameters(2455196.50000, 19.21814,84.039492,0.046321,radians(356.13540),radians(73.926961),radians(172.884833),radians(0.773059)),
+//	VSOP2013readable.Uranus,// epoch
 //	2451544.0, // epoch
 //	19.1912639  , // semiMajorAxis
 //	30588.740/365.242191, // tropPeriod
@@ -536,7 +543,8 @@ Neptune: new PlanetData(
 	28.32, // obliquity
 	-16.11, // sidPeriodRot
 	16.11, //synPeriodRot
-	VSOP2013readable.Neptune,// epoch
+	new OrbitalParameters(2455196.50000, 30.1985,165.84539,0.010483,radians(326.895127),radians(131.879),radians(23.07),radians(1.7673)),
+//	VSOP2013readable.Neptune,// epoch
 //	2451544.0, // epoch
 //	30.06896348  , // semiMajorAxis
 //	59799.9/365.242191, // tropPeriod

@@ -256,11 +256,12 @@ class ImgData
 {
 	load(context,x,y,width,height)
 	{
-		if (typeof context !== 'undefined' && context !== null &&
-			typeof width !== 'undefined' && width !== null &&
-			typeof height !== 'undefined' && height !== null &&
-			typeof x !== 'undefined' && x !== null &&
-			typeof y !== 'undefined' && y !== null &&
+		if (context !== undefined && context !== null &&
+			width !== undefined && width !== null &&
+			height !== undefined && height !== null &&
+			x !== undefined && x !== null &&
+			y !== undefined && y !== null &&
+			x >= 0 && y >= 0 &&
 			width > 0 && height > 0)
 		{
 			this._context = context;
@@ -282,16 +283,16 @@ class ImgData
 	}
 	draw(context, x, y)
 	{
-		if (typeof this._imgData !== 'undefined' && this._imgData !== null)
+		if (this._imgData !== undefined && this._imgData !== null)
 		{
 			let ctxLcl = this._context;
-			if (typeof context !== 'undefined' && context !== null)
+			if (context !== undefined && context !== null)
 				ctxLcl = context;
 			let xl = this._x;
-			if (typeof x !== 'undefined' && x !== null)
+			if (x !== undefined && x !== null)
 				xl = x;
 			let yl = this._y;
-			if (typeof y !== 'undefined' && y !== null)
+			if (y !== undefined && y !== null)
 				yl = y;
 			ctxLcl.putImageData(this._imgData, xl, yl);
 		}
@@ -303,11 +304,11 @@ class ImgData
 
 	getAtRelative(x, y)
 	{
-		if (typeof this._imgData !== 'undefined' && this._imgData !== null && x < this._width && y < this._height)
+		if (this._imgData !== undefined && this._imgData !== null && x < this._width && y < this._height)
 		{
 			const xl = Math.floor(x);
 			const yl = Math.floor(y);
-			const idx = (yl * this._width + xl) *4;
+			const idx = (yl * this._width + xl) * 4;
 			const r = this._imgData.data[idx + 0];
 			const g = this._imgData.data[idx + 1];
 			const b = this._imgData.data[idx + 2];
@@ -325,7 +326,7 @@ class ImgData
 	}
 	setAtRelative(x, y, rgb)
 	{
-		if (typeof this._imgData !== 'undefined' && this._imgData !== null && x < this._width && y < this._height)
+		if (this._imgData !== undefined && this._imgData !== null && x < this._width && y < this._height)
 		{
 			const xl = Math.floor(x);
 			const yl = Math.floor(y);

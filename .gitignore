@@ -1,7 +1,7 @@
-test/
-Exercises/
-Homework/
+non-apps/test/
+non-apps/Exercises/
+non-apps/Homework/
 *.css~
-/Moon_Project_Website/nbproject/private/
+non-apps//Moon_Project_Website/nbproject/private/
 *.suo
 

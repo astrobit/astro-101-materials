@@ -738,7 +738,7 @@ class AsteroidOrbitalParametersctivity
 
 class StarSpTypeColorActivity
 {
-	constructor()
+	prepare()
 	{
 		this._title = "Measure Spectral Type and Color of Stars";
 		this._loglogAllowed = false;
@@ -751,29 +751,35 @@ class StarSpTypeColorActivity
 		let min_y = 1000;
 					
 		const twoPi = Math.PI * 2.0;
-		let i;
-		for (i = 0; i < stars.length; i++)
-		{
-			let curr = stars[i]
 
-			if (ValidateValue(curr.B) && ValidateValue(curr.V) && ValidateValue(curr.num_sp_type))
+		let i;
+		this._prepared = false;
+		if (stars !== null && stars.length > 0)
+		{
+			for (i = 0; i < stars.length; i++)
 			{
-				const x = curr.num_sp_type;
-				const y = curr.B - curr.V;
-				if (ValidateValue(x) && ValidateValue(y) && x > 100 && x <= 600 && ValidateValue(curr.num_sp_type_subtype))
+				let curr = stars[i]
+
+				if (ValidateValue(curr.B) && ValidateValue(curr.V) && ValidateValue(curr.num_sp_type))
 				{
-					let data = new GraphDatum(x,y);
-					this._asteroidData.push(data);
-					if (data.x < min_x)
-						min_x = data.x;
-					if (data.x > max_x)
-						max_x = data.x;
-					if (data.y < min_y)
-						min_y = data.y;
-					if (data.y > max_y)
-						max_y = data.y;
-				}			
+					const x = curr.num_sp_type;
+					const y = curr.B - curr.V;
+					if (ValidateValue(x) && ValidateValue(y) && x >= 10 && x <= 60 && ValidateValue(curr.num_sp_type_subtype))
+					{
+						let data = new GraphDatum(x,y);
+						this._asteroidData.push(data);
+						if (data.x < min_x)
+							min_x = data.x;
+						if (data.x > max_x)
+							max_x = data.x;
+						if (data.y < min_y)
+							min_y = data.y;
+						if (data.y > max_y)
+							max_y = data.y;
+					}			
+				}
 			}
+			this._prepared = true;
 		}
 		this._min_x = Math.floor(min_x * 10.0) / 10.0;
 		this._max_x = Math.ceil(max_x * 10.0) / 10.0;
@@ -793,9 +799,11 @@ class StarSpTypeColorActivity
 		this._graph.addTrend(this._graphTrend);
 		this._linearTrendComputed = false;
 		this._loglogTrendComputed = false;
-		
 	}
-	
+	constructor()
+	{
+		this.prepare();
+	}
 	measure(number)
 	{
 		let i;
@@ -845,6 +853,9 @@ class StarSpTypeColorActivity
 	}
 	graph(context)
 	{
+		if (!this._prepared)
+			this.prepare();
+			
 		this._graph.draw(context,0,0);
 		context.strokeStyle = "#ffffff";
 		context.fillStyle = "#ffffff";
@@ -889,7 +900,7 @@ class StarSpTypeColorActivity
 
 class StarColorColorActivity
 {
-	constructor()
+	prepare()
 	{
 		this._title = "Measure B - V Color and V - R Color of Stars";
 		this._loglogAllowed = false;
@@ -901,30 +912,35 @@ class StarColorColorActivity
 		let max_y = 0;
 		let min_y = 1000;
 					
+		this._prepared = false;
 		const twoPi = Math.PI * 2.0;
 		let i;
-		for (i = 0; i < stars.length; i++)
+		if (stars !== null && stars.length > 0)
 		{
-			let curr = stars[i]
-
-			if (ValidateValue(curr.B) && ValidateValue(curr.V) && ValidateValue(curr.R))
+			for (i = 0; i < stars.length; i++)
 			{
-				const x = curr.B - curr.V;
-				const y = curr.V - curr.R;
-				if (ValidateValue(x) && ValidateValue(y) && x < 1.5 && y > -0.5)
+				let curr = stars[i]
+
+				if (ValidateValue(curr.B) && ValidateValue(curr.V) && ValidateValue(curr.R))
 				{
-					const data = new GraphDatum(x,y);
-					this._asteroidData.push(data);
-					if (data.x < min_x)
-						min_x = data.x;
-					if (data.x > max_x)
-						max_x = data.x;
-					if (data.y < min_y)
-						min_y = data.y;
-					if (data.y > max_y)
-						max_y = data.y;
-				}			
+					const x = curr.B - curr.V;
+					const y = curr.V - curr.R;
+					if (ValidateValue(x) && ValidateValue(y) && x < 1.5 && y > -0.5)
+					{
+						const data = new GraphDatum(x,y);
+						this._asteroidData.push(data);
+						if (data.x < min_x)
+							min_x = data.x;
+						if (data.x > max_x)
+							max_x = data.x;
+						if (data.y < min_y)
+							min_y = data.y;
+						if (data.y > max_y)
+							max_y = data.y;
+					}			
+				}
 			}
+		this._prepared = true;
 		}
 		this._min_x = Math.floor(min_x * 10.0) / 10.0;
 		this._max_x = Math.ceil(max_x * 10.0) / 10.0;
@@ -945,6 +961,10 @@ class StarColorColorActivity
 		this._linearTrendComputed = false;
 		this._loglogTrendComputed = false;
 		
+	}
+	constructor()
+	{
+		this.prepare();
 	}
 	
 	measure(number)
@@ -996,6 +1016,9 @@ class StarColorColorActivity
 	}
 	graph(context)
 	{
+		if (!this._prepared)
+			this.prepare();
+
 		this._graph.draw(context,0,0);
 		context.strokeStyle = "#ffffff";
 		context.fillStyle = "#ffffff";
@@ -1041,7 +1064,7 @@ class StarColorColorActivity
 
 class StarRedshiftGalLongActivity
 {
-	constructor()
+	prepare()
 	{
 		this._title = "Measure Redshift and Galactic Longitude of Stars";
 		this._loglogAllowed = false;
@@ -1052,28 +1075,32 @@ class StarRedshiftGalLongActivity
 		let min_x = 1000000;
 		let max_y = 0;
 		let min_y = 1000;
-					
+		this._prepared = false;
 		const twoPi = Math.PI * 2.0;
 		let i;
-		for (i = 0; i < stars.length; i++)
+		if (stars !== null && stars.length > 0)
 		{
-			let curr = stars[i]
-
-			const x = curr.gallong;
-			const y = curr.rvz_redshift;
-			if (ValidateValue(x) && ValidateValue(y))
+			for (i = 0; i < stars.length; i++)
 			{
-				const data = new GraphDatum(x,y);
-				this._asteroidData.push(data);
-				if (data.x < min_x)
-					min_x = data.x;
-				if (data.x > max_x)
-					max_x = data.x;
-				if (data.y < min_y)
-					min_y = data.y;
-				if (data.y > max_y)
-					max_y = data.y;
-			}			
+				let curr = stars[i]
+
+				const x = curr.gallong;
+				const y = curr.rvz_redshift;
+				if (ValidateValue(x) && ValidateValue(y))
+				{
+					const data = new GraphDatum(x,y);
+					this._asteroidData.push(data);
+					if (data.x < min_x)
+						min_x = data.x;
+					if (data.x > max_x)
+						max_x = data.x;
+					if (data.y < min_y)
+						min_y = data.y;
+					if (data.y > max_y)
+						max_y = data.y;
+				}			
+			}
+			this._prepared = true;
 		}
 		this._min_x = Math.floor(min_x * 10.0) / 10.0;
 		this._max_x = Math.ceil(max_x * 10.0) / 10.0;
@@ -1094,6 +1121,10 @@ class StarRedshiftGalLongActivity
 		this._linearTrendComputed = false;
 		this._loglogTrendComputed = false;
 		
+	}
+	constructor()
+	{
+		this.prepare();
 	}
 	
 	measure(number)
@@ -1145,6 +1176,9 @@ class StarRedshiftGalLongActivity
 	}
 	graph(context)
 	{
+		if (!this._prepared)
+			this.prepare();
+
 		this._graph.draw(context,0,0);
 		context.strokeStyle = "#ffffff";
 		context.fillStyle = "#ffffff";

@@ -95,7 +95,7 @@ function UBVRItoRGB(U,B,V,R,I,brightMag,dimMag)
 //		{
 //			console.log("using mag 6.0 as dim")
 //			commonAstroLogRegister = commonAstroLogRegister  | 0x02;
-		}
+//		}
 	}
 
 	let cB = 255;
@@ -214,51 +214,25 @@ function UBVRItoRGB(U,B,V,R,I,brightMag,dimMag)
 // output: (number) - the flux in erg/s/cm²/Hz
 //
 /////////////////////////////////////////////////////////////////////////
+const AstroMagnitudeFluxZero = {
+	U: 1.810e-20,
+	B: 4.260e-20,
+	V: 3.640e-20,
+	R: 3.080e-20,
+	I: 2.550e-20,
+	J: 1.600e-20,
+	H: 1.080e-20,
+	K: 0.670e-20,
+	g: 3.370e-20,
+	r: 4.490e-20,
+	i: 4.760e-20 ,
+	z: 4.810e-20 
+};
 
 function MagtoFlux(band,mag)
 {
-	let flux = 0;
 	const mf = Math.pow(10.0,-mag * 0.4);
-	switch (band.charCodeAt(0))
-	{
-	case 85: // U
-		flux = 1.810e-20;
-		break;
-	case 66: // B
-		flux = 4.260e-20;
-		break;
-	case 86: // V
-	default:
-		flux = 3.640e-20;
-		break;
-	case 82: // R
-		flux = 3.080e-20;
-		break;
-	case 73: // I
-		flux = 2.550e-20;
-		break;
-	case 72: // H
-		flux = 1.080e-20;
-		break;
-	case 74: // J
-		flux = 1.600e-20;
-		break;
-	case 75: // K
-		flux = 0.670e-20;
-		break;
-	case 103: // g
-		flux = 3.370e-20;
-		break;
-	case 114: // r
-		flux = 4.490e-20;
-		break;
-	case 105: // i
-		flux = 4.760-20;
-		break;
-	case 122: // z
-		flux = 4.810-20;
-		break;
-	}
+	const flux = (band in AstroMagnitudeFluxZero) ? AstroMagnitudeFluxZero[band] : AstroMagnitudeFluxZero["V"];
 	return mf * flux;
 	
 }
@@ -277,8 +251,8 @@ function MagtoFlux(band,mag)
 
 function fluxToPhotonFlux(wavelength,bandwidth, flux)
 {
-	const w = Phys._kSpeedOfLight * (1.0 / (wavelength - bandwidth * 0.5) - 1.0 / (wavelength + bandwidth * 0.5));
-	const e = Phys._kPlanck * Phys._kSpeedOfLight / wavelength;
+	const w = Phys.kSpeedOfLight * (1.0 / (wavelength - bandwidth * 0.5) - 1.0 / (wavelength + bandwidth * 0.5));
+	const e = Phys.kPlanck * Phys.kSpeedOfLight / wavelength;
 	return flux / e * w;
 }
 
@@ -803,7 +777,7 @@ function airmass(zenith_angle, atmospheric_height, observer_altitude)
 	const cosz = Math.cos(zenith_angle_rad);
 	const hatm = (ValidateValue(atmospheric_height)) ? atmospheric_height : 120.0; // km
 	const hobs = (ValidateValue(observer_altitude)) ? observer_altitude : 0.0; 
-	const rhat = Phys._kRadiusEarth / hatm;
+	const rhat = Phys.kRadiusEarth / hatm;
 	const yhat = hobs / hatm;
 	
 	const X = Math.sqrt(((rhat + yhat) *cosz) ** 2 + 2 * rhat * (1 - yhat) - yhat * yhat + 1) - (rhat + yhat) * cosz;

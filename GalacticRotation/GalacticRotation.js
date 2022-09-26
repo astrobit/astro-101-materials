@@ -190,14 +190,6 @@ function getDiskLuminosity(r)
 	return ret;
 }
 
-function getHaloMass(r)
-{
-	var a = dmIndex;
-	var ret = 0;
-	ret = dmMassFrac * mass * NFWMassFrac(r,a);
-	return ret;
-}
-
 function getLuminosity(r)
 {
 	return getBulgeLuminosity(r) + getDiskLuminosity(r); // halo is dark, so only bulge and disk matter

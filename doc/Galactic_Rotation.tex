@@ -1,0 +1,120 @@
+%------------------------------------------------------------
+%
+\documentclass{article}
+%
+
+\usepackage{amsmath}%
+\usepackage{amsfonts}%
+\usepackage{amssymb}%
+\usepackage{fullpage}
+\usepackage{graphicx}
+%\usepackage{setspace}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage[normalem]{ulem}
+\usepackage[outline]{contour}
+\usepackage{fancyhdr}
+\usepackage[us,12hr]{datetime}
+\usepackage{physunits}
+
+\pagestyle{plain}
+\rfoot{}
+\cfoot{\thepage}
+\lfoot{\textit{Date}: \today\: \currenttime}
+\rhead{}
+\lhead{}
+\chead{}
+
+
+\title{Rotation Curves of Galaxies Page Design}
+\author{Brian W. Mulligan}
+\date{}
+
+\begin{document}
+\maketitle
+\thispagestyle{fancy}
+\section{Methods}
+\subsection{Spherically Symmetric Components (Bulge)}
+I assume an S\'ersic profile for the surface brightness (in physical units) of a component of the galaxy in a given filter, of the form
+\begin{equation} I(r) = \label{eq:SersicSFB} I_0 e^{\left(-\left(\frac{r}{\mathcal{R}}\right)^{\frac{1}{n}}\right)} , \end{equation}
+where $I_0$ is a central surface brightness (at $r$ = 0), $n$ is the S\'ersic index, $r$ is the distance from the center of the galaxy as projected on the sky, and $\mathcal{R}$ is a scale length over which the surface brightness decreases by one e-folding.
+
+
+Assuming this form describes the underlying luminosity integrated over a line of sight in a spherical body, I define a luminosity density 
+\begin{equation} \label{eq:lumDensityUnk} \lambda(R) = \lambda_0 f(R) e^{\left(-\left(\frac{R}{\mathcal{R}}\right)^{\frac{1}{n}}\right)}, \end{equation}
+where $\lambda_0$ is the central luminosity density, $R$ is the spatial distance from the center of the galaxy, and  $f(R)$ is an (as-yet) unknown function.
+
+The surface brightness at a distance $r$ from the center of the galaxy the requires integrating over a column
+\begin{equation} I(r) = \int_{-\infty}^{\infty} \lambda(r^2 + z^2) dz, \end{equation}
+where $z$ describes height above the plane of the sky bisecting the galaxy. Since the galaxy taken to be radially symmetric, the integrands may be simplified to 
+\begin{equation} I(r) = 2\int_{0}^{\infty} \lambda(r^2 + z^2) dz. \end{equation}
+This equation can be simplified by taking $R^2 \equiv r^2 + z^2$, such that $z = \sqrt{R^2 - r^2}$ and $dz = \left(1 - \left(\frac{r}{R}\right)^2\right)^{-\frac{1}{2}}dR$; in this form the equation is
+\begin{equation} \label{eq:Rform} I(r) = 2\int_{r}^{\infty} \lambda_0  f(R) e^{\left(-\left(\frac{R}{\mathcal{R}}\right)^{\frac{1}{n}}\right)}\left(1 - \left(\frac{r}{R}\right)^2\right)^{-\frac{1}{2}}dR. \end{equation}
+Finally, define $x \equiv \left(\frac{R}{\mathcal{R}}\right)^{\frac{1}{n}}$, so that $R = \mathcal{R}x^n$ and $dR = n\mathcal{R}x^{n-1}$, leading to
+\begin{equation}\label{eq:almostThere} I(r) = 2\int_{\left(\frac{r}{\mathcal{R}}\right)^{\frac{1}{n}}}^{\infty} \lambda_0 f(r,x) n \mathcal{R} e^{-x} \frac{x^{2n - 1}}{\sqrt{x^{2n} - \left(\dfrac{r}{\mathcal{R}}\right)^2}} dx. \end{equation}
+In order for this to simplify to Eq. \ref{eq:SersicSFB} requires 
+\begin{equation} \label{eq:Fxr} f(x) = x^{1 - 2n}\sqrt{x^{2n} - \left(\dfrac{r}{\mathcal{R}}\right)^2}.\end{equation}
+ Eq. \ref{eq:almostThere} thus becomes
+\begin{equation} I(r) = 2\int_{\left(\frac{r}{\mathcal{R}}\right)^{\frac{1}{n}}}^{\infty} n \mathcal{R} \lambda_0 e^{-x} dx,  \end{equation}
+leading to the desried result in Eq. \ref{eq:SersicSFB}. We also find from this the central surface brightness
+\begin{equation} I_0 = n \mathcal{R} \lambda_0. \end{equation}
+
+
+The general luminosity density can be found using Eqs.\ref{eq:lumDensityUnk} and \ref{eq:Fxr} and taking $r$ = 0, resulting in
+\begin{equation} \label{eq:lumDensityX} \lambda(x) = \lambda_0 x^{1 - n} e^{-x}. \end{equation}
+I maintain the form using $x$ instead of $R$ to simplify the following integrals.
+
+The luminosity density is related to the mass density by the stellar mass-to-light ratio, $\Upsilon_{\star}$, according to 
+\begin{equation} \rho(x) = \Upsilon_{\star} \lambda(x) = \rho_0 x^{1 - n} e^{-x}, \end{equation}
+where $\rho_0 \equiv \Upsilon_{\star} \lambda_0$.
+
+Now having the density function, we can find the mass interior to a distance $R$ (or $r$) from the center of the galaxy as
+\begin{equation} M(R) = \int_0^{\left(\frac{R}{\mathcal{R}}\right)^{\frac{1}{n}}} 4\pi \mathcal{R}^2 x^{2n} \rho(x) dx, \end{equation}
+where I again assume spherical symmetry and use the relation $R = \mathcal{R} x^n$.
+
+This leads to 
+\begin{equation}\label{eq:Mrintegral} M(R) = \int_0^{\left(\frac{R}{\mathcal{R}}\right)^{\frac{1}{n}}} 4\pi \mathcal{R}^2 \rho_0 x^{n + 1} e^{-x} dx. \end{equation}
+
+For $R = \infty$, this leads to 
+\begin{equation} M(\infty) = 4\pi \mathcal{R}^2 \rho_0 \Gamma(n + 2), \end{equation}
+where $\Gamma$ is the gamma function; this demonstrates that the mass of the galaxy is bounded for $n > 0$.
+
+For finite $R$, we must solve the integral in Eq. \ref{eq:Mrintegral}; this cannot be done analytically, so I use the Taylor expansion for $e$:
+\begin{equation} e^x = \sum_{i} \dfrac{x^i (-1)^i}{i!}, \end{equation}
+
+leading to 
+\begin{equation} M(R) = \int_0^{\left(\frac{R}{\mathcal{R}}\right)^{\frac{1}{n}}} 4\pi \mathcal{R}^2 \rho_0 \sum_{i} \dfrac{x^{1 + n + i} (-1)^i}{i!} dx, \end{equation}
+and resulting in
+\begin{equation} M(R) = 4\pi \mathcal{R}^2 \rho_0 \left(\sum_{i} \dfrac{x^{2 + n + i} (-1)^i}{i!(2 + n + i)}\right)\Bigg|_0^{\left(\frac{R}{\mathcal{R}}\right)^{\frac{1}{n}}}. \end{equation}
+The lower bound $x = 0$ results in 1; the upper bound must be found numerically. Defining 
+\begin{equation}g(i,n,x) \equiv \dfrac{x^{2 + n + i} (-1)^i}{i!(2 + n + i)},\end{equation} 
+and recognizing that the factorial component will increase in magnitude faster than the polynomial component, we sum until we find
+\begin{equation} \dfrac{g(I,n,x)}{\sum_{i=0}^{I} g(i,n,x)} < \varepsilon \end{equation}
+where $\varepsilon$ is a small value (e.g. 0.001).
+
+Now that there is a solution for the mass as a function of radius, we can find the velocity profile
+\begin{equation} v(R) = \sqrt{\dfrac{G M(R)}{R}}, \end{equation}
+where $G$ is the Newtonian gravitational constant.
+
+We can also find the surface brightness profile using the relation
+\begin{equation} \mu(R) = 21.572 + M_\odot + 2.5\log(I(R)), \end{equation}
+where $\mu$ is the surface brightness (in mag. / sq. arc-sec) and $M_\odot$ is the absolute magnitude of the Sun in the desired filter.
+
+
+
+\subsection{Cylindrically Symmetric Components (Disk)}
+The disk has a S\'ersic-like surface brightness profile of the form
+\begin{equation} I(R) = \label{eq:SersicSFBDisk} I_0 e^{\left(-\left(\frac{R}{\mathcal{R}_p}\right)^{\frac{1}{n_r}}\right)} e^{\left(-\left(\frac{h}{\mathcal{H}_p}\right)^{\frac{1}{n_h}}\right)}, \end{equation}
+where $I_0$ is a central surface brightness (at $r,z$ = 0), $n_r$ and $n_h$ are the radial and vertical (respectively) S\'ersic indices, $R$ is the distance along the disk from the center of the galaxy as projected on the plane of the sky, $h$ is height above the center of the disk projected on the plane of the sky, $\mathcal{R}_p$ is a scale length in the along the disk over which the surface brightness decreases by one e-folding, and  $\mathcal{H}_p$ is a scale height above and below the disk in the plane of the sky over which the surface brightness decreases by one e-folding.
+
+I define a luminosity density for the disk 
+\begin{equation} \lambda_{disk}(r,z) = \lambda_0 f(r,z) e^{\left(-\left(\frac{r}{\mathcal{R}}\right)^{\frac{1}{n_r}}\right)} e^{\left(-\left(\frac{z}{\mathcal{H}}\right)^{\frac{1}{n_h}}\right)}, \end{equation}
+where $f(R,z)$ is an as-yet unknown function.
+
+To find the observed surface brightness, we must account for the inclination, $i$, of the disk from the observer's perspective. We view the disk through a column that traverses the disk; the height above the central plane of the sky bisecting is defined as $z$, leading to 
+\begin{equation} z = h \cos i
+
+
+\end{document}

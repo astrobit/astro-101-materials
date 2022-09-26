@@ -781,7 +781,7 @@ function bessel_D(a,x,e)
 /////////////////////////////////////////////////////////////////////////
 
 
-function newton_raphson(x0 f, f_prime, tolerance, epsilon, max_iterations)
+function newton_raphson(x0, f, f_prime, tolerance, epsilon, max_iterations)
 {
 	let i = 0;
 	let x = x0;

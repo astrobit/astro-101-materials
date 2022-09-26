@@ -16,12 +16,30 @@ class SkyMap
 			let i;
 			for (i = 0; i < this._stars.length; i++)
 			{
-				const rgb = UBVRItoRGB(this._stars[i].U,this._stars[i].B,this._stars[i].V,this._stars[i].R,this._stars[i].I,0,6)
-				const rgbB_U = UBVRItoRGB(this._stars[i].U,null,null,null,null,0,6);
-				const rgbB_B = UBVRItoRGB(null,this._stars[i].B,null,null,null,0,6);
-				const rgbB_V = UBVRItoRGB(null,null,this._stars[i].V,null,null,0,6);
-				const rgbB_R = UBVRItoRGB(null,null,null,this._stars[i].R,null,0,6);
-				const rgbB_I = UBVRItoRGB(null,null,null,null,this._stars[i].I,0,6);
+				let rgb;
+				let rgbB_U;
+				let rgbB_B;
+				let rgbB_V;
+				let rgbB_R;
+				let rgbB_I;
+				if (typeof this._stars[i].fluxes != 'undefined')
+				{
+					rgb = UBVRItoRGB(this._stars[i].fluxes.U,this._stars[i].fluxes.B,this._stars[i].fluxes.V,this._stars[i].fluxes.R,this._stars[i].fluxes.I,0,6)
+					rgbB_U = UBVRItoRGB(this._stars[i].fluxes.U,null,null,null,null,0,6);
+					rgbB_B = UBVRItoRGB(null,this._stars[i].fluxes.B,null,null,null,0,6);
+					rgbB_V = UBVRItoRGB(null,null,this._stars[i].fluxes.V,null,null,0,6);
+					rgbB_R = UBVRItoRGB(null,null,null,this._stars[i].fluxes.R,null,0,6);
+					rgbB_I = UBVRItoRGB(null,null,null,null,this._stars[i].fluxes.I,0,6);
+				}
+				else
+				{
+					rgb = UBVRItoRGB(this._stars[i].U,this._stars[i].B,this._stars[i].V,this._stars[i].R,this._stars[i].I,0,6)
+					rgbB_U = UBVRItoRGB(this._stars[i].U,null,null,null,null,0,6);
+					rgbB_B = UBVRItoRGB(null,this._stars[i].B,null,null,null,0,6);
+					rgbB_V = UBVRItoRGB(null,null,this._stars[i].V,null,null,0,6);
+					rgbB_R = UBVRItoRGB(null,null,null,this._stars[i].R,null,0,6);
+					rgbB_I = UBVRItoRGB(null,null,null,null,this._stars[i].I,0,6);
+				}
 				var projection;
 				switch (this.coordinatesInternal)
 				{

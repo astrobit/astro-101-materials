@@ -4,7 +4,7 @@ theCanvas.onselectstart = function () { return false; } // prevent selection of 
 let theContext = theCanvas.getContext("2d");
 
 let minimumControlsHeightTop = 130;
-
+theCanvas.width = window.innerWidth
 theCanvas.height = window.innerHeight - 60;
 //theCanvas.width = theCanvas.height;
 

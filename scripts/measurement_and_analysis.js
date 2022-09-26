@@ -1248,23 +1248,7 @@ option.text = starPostionActivity._title;
 select.add(option)
 
 option = document.createElement("option");
-option.text = asteroidNearJupiterActivity._title;
-
-select.add(option)
-
-option = document.createElement("option");
-option.text = asteroidDiameterBrightnessActivity._title;
-
-select.add(option)
-
-option = document.createElement("option");
-option.text = asteroidDiameterDistanceActivity._title;
-
-select.add(option)
-
-
-option = document.createElement("option");
-option.text = asteroidOrbitalParametersctivity._title;
+option.text = starColorColorActivity._title;
 
 select.add(option)
 
@@ -1274,14 +1258,30 @@ option.text = starSpTypeColorActivity._title;
 select.add(option)
 
 option = document.createElement("option");
-option.text = starRedshiftGalLongActivity._title;
+option.text = asteroidDiameterBrightnessActivity._title;
 
 select.add(option)
 
 option = document.createElement("option");
-option.text = starColorColorActivity._title;
+option.text = asteroidNearJupiterActivity._title;
 
 select.add(option)
+
+option = document.createElement("option");
+option.text = asteroidDiameterDistanceActivity._title;
+
+select.add(option)
+
+option = document.createElement("option");
+option.text = asteroidOrbitalParametersctivity._title;
+
+select.add(option)
+
+option = document.createElement("option");
+option.text = starRedshiftGalLongActivity._title;
+
+select.add(option)
+
 
 
 

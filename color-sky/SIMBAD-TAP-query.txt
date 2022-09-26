@@ -1,1 +1,0 @@
-SELECT *  FROM basic  JOIN allfluxes ON allfluxes.oidref =  basic.oid  WHERE allfluxes.V < 6

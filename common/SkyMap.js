@@ -232,10 +232,10 @@ class SkyMap
 						let xlast = null;
 						for (k = 0; k < constellationData[i].pathData[j].length; k++)
 						{
-							const idx = constellationData[i].pathData[j][k]
-							if (stars[idx].pidx !== null)
+							const star = constellationData[i].pathData[j][k]
+							if (star.pidx !== null)
 							{
-								const pidx = stars[idx].pidx
+								const pidx = star.pidx
 								const x = mapCenterX - this.starsProjection[pidx].x * mapWidth * 0.5;
 								const y = mapCenterY - this.starsProjection[pidx].y * mapHeight * 0.5;
 								if (xlast != null && Math.abs(x - xlast) > mapWidth * 0.25) // span map edges

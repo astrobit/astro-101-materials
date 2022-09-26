@@ -3,7 +3,7 @@ class SkyMap
 {
 	project()
 	{
-		if (this._stars !== undefined && this._stars !== null && this._stars instanceof Array)
+		if (this._stars !== undefined && this._stars !== null && this._stars instanceof Array && this._stars.length > 0)
 		{
 			let projector;
 			if (this.projectionTypeInternal == "Equirectangular")
@@ -259,10 +259,10 @@ class SkyMap
 							let xlast = null;
 							for (k = 0; k < constellationData[i].pathData[j].length; k++)
 							{
-								const idx = constellationData[i].pathData[j][k]
-								if (this._stars[idx].pidx !== null)
+								const star = constellationData[i].pathData[j][k]
+								if (star.pidx !== null)
 								{
-									const pidx = this._stars[idx].pidx
+									const pidx = star.pidx
 									const x = xCenter - this.starsProjection[pidx].x * width * 0.5;
 									const y = yCenter - this.starsProjection[pidx].y * height * 0.5;
 									if (xlast != null && Math.abs(x - xlast) > width * 0.25) // span map edges

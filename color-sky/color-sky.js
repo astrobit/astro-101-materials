@@ -482,7 +482,7 @@ let aboutButton= new Button("About",theCanvas.width - 100,aboutTutorialButtonsY,
 aboutButton.textFont = "24px Arial";
 commonUIRegister(aboutButton);
 
-let skyMap = new SkyMap(starsm6._data);
+let skyMap = null;//new SkyMap(starsm6._data);
 function draw(){
 
 	const mapWidthDraw = mapWidth * zoom;
@@ -607,6 +607,7 @@ function waitForReady()
 	}
 	else
 	{
+		skyMap = new SkyMap(starsm6._data);
 		draw();
 	}
 }

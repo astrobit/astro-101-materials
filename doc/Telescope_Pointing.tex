@@ -1,0 +1,72 @@
+%------------------------------------------------------------
+%
+\documentclass{article}
+%
+
+\usepackage{amsmath}%
+\usepackage{amsfonts}%
+\usepackage{amssymb}%
+\usepackage{fullpage}
+\usepackage{graphicx}
+%\usepackage{setspace}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{tikz}
+\usepackage{xcolor}
+\usepackage[normalem]{ulem}
+\usepackage[outline]{contour}
+\usepackage{fancyhdr}
+\usepackage[us,12hr]{datetime}
+\usepackage{physunits}
+
+\pagestyle{plain}
+\rfoot{}
+\cfoot{\thepage}
+\lfoot{\textit{Date}: \today\: \currenttime}
+\rhead{}
+\lhead{}
+\chead{}
+
+
+\title{Expansion of the Universe Page Design}
+\author{Brian W. Mulligan}
+\date{}
+
+\begin{document}
+\maketitle
+\thispagestyle{fancy}
+\section{Methods}
+\subsection{Symbology Conventions}
+In this work, an arrow above a variable indicates the variable is a vector, e.g., $\vec{a}$, $\vec{b}$; variables with a circumflex (caret) indicate a unit vector, e.g., $\hat{a}$, $\hat{b}$; variables written using a Fraktur script indicate a matrix or reference frame, e.g., $\mathfrak{A}$, $\mathfrak{B}$; caligraphic script will be used to refer to an entity, typically some specific galaxy within the simulation, e.g. $\mathcal{A}$, $\mathcal{B}$; and all other variables are scalar values.
+
+To refer to components of vectors, a subscript $x$, $y$, and $z$ will refer to the 1\textsuperscript{st}, 2\textsuperscript{nd}, and 3\textsuperscript{rd} Euclidian spatial dimensions, respectively, and subscripts $r$, $\theta$, and $\phi$ are used for polar coordinates, refering to magnitude, rotataion about the 3\textsuperscript{rd} Euclidian axis, and rotation about the 1\textsuperscript{st} Euclidian axis, performed after the $\theta$ rotation, respectively. When used with a vector, the arrow symbol will be omitted. For row vectors, $x$, $y$, and $z$ will similarly refer to the 1\textsuperscript{st}, 2\textsuperscript{nd}, and 3\textsuperscript{rd} columns of the vector.
+
+
+If vector components are stated explcitly, square brackets will be used to designate the vector, e.g.
+\begin{equation*} \vec{a} = \begin{bmatrix} a_x \\ a_y \\ a_z \end{bmatrix} \end{equation*}
+indicates a vector $\vec{a}$ consisting of $a_x$, $a_y$, and $a_z$ as the 1\textsuperscript{st}, 2\textsuperscript{nd}, and 3\textsuperscript{rd} Euclidian spatial dimensions, respectively.
+
+For example, for a vector $\vec{a}$, the Euclidian components are $a_x$, $a_y$, and $a_z$, and the polar components $a_r$, $a_\theta$, and $a_\phi$.
+
+When referring to matrices, subscripts $x$, $y$, and $z$ refer to the 1\textsuperscript{st}, 2\textsuperscript{nd}, and 3\textsuperscript{rd} column vectors, respectively, of the matrix, i.e., the basis vectors of the space defined by the matrix; row vectors will be referred to using subscripts $A$, $B$, and $C$, referring to the 1\textsuperscript{st}, 2\textsuperscript{nd}, and 3\textsuperscript{rd} row vectors, respectively.
+
+In some circtumstances, a component of a row vector or column vector of a matrix shall be referred to using a subscript of the form $i,j$, where $i$ is the subscript defining the row or column vector of the matrix, as previously described, and $j$ is the component of the vector, as previously described.
+
+For example, $\mathfrac{A}_{x,z}$ refers to the 3\textsuperscript{rd} Euclidian dimension (`$z$') of the 1\textsuperscript{st} column vector (`$x$') of $\mathfrac{A}$; $\mathfrac{B}_{y,\theta}$ refers to the rotation about the 3\textsuperscript{rd} Euclidian dimension (`$z$') of the 2\textsuperscript{nd} column vector (`$y$') of $\mathfrac{B}$.
+
+The transpose of a matrix or vector is indicated by superscript $T$, and inverse of a matrix is indicated by a superscript $-1$.
+
+\subsection{Spatial Distribution of Galaxies}
+\subsection{Projecting the View Through the Telescope}
+Assume a position $\vec{g}$ of a galaxy $\mathcal{G}$ in space, and a position $\vec{h}$ of another galaxy $\mathcal{H}$ in which lies an observer. The relative position of $\mathcal{G}$ with respect to $\mathcal{H}$ is
+\begin{equation} \vec{o} = \vec{g} - \vec{h}. \end{equation}
+A telescope that the observer is using is pointing in a direction $\hat{t}$. The focal plane of the telescope defines a reference frame $\mathfrak{T}$ such that
+\begin{equation}\begin{array}
+\mathfrak{T}_x &= 
+\mathfrak{T}_y &= \begin{bmatrix} -t_y \\ t_x \\ t_z \end{bmatrix}
+\mathfrak{T}_z &= \hat{t}\\
+\begin{bmatrix} t_y \\ t_x \\ t_x \end{bmatrix}
+\end{equation}
+This reference frame is selected for convenience, such that when an object is projected onto the screen, the $x$ and $y$ coordinates match screen directions $x$ and $y$.
+
+\end{document}

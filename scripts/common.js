@@ -11,6 +11,10 @@
 // Changes
 // - use ValidateValue functions from commonGP
 // - fix and improve the scale function in RGB to correctly set the maximum possible brightness
+// 
+// 2022-Sep-27
+// Changes
+// - fix bug in setAtRelative function that allowed for negative x or y values that would bleed into the right side of the image
 
 
 /////////////////////////////////////////////////////////////////////////
@@ -645,7 +649,7 @@ class ImgData
 /////////////////////////////////////////////////////////////////////////
 	setAtRelative(x, y, rgb)
 	{
-		if (this._imgData !== undefined && this._imgData !== null && x < this._width && y < this._height)
+		if (this._imgData !== undefined && this._imgData !== null && x >= 0 && x < this._width && y >= 0 && y < this._height)
 		{
 			const xl = Math.floor(x);
 			const yl = Math.floor(y);

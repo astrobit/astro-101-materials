@@ -1,0 +1,16 @@
+---
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/user/public_html/astronomy
+    - /bin/cp *.html $DEPLOYPATH
+    - /bin/cp *.css $DEPLOYPATH
+    - /bin/cp README.md $DEPLOYPATH
+    - /bin/cp .gitignore $DEPLOYPATH
+    - /bin/cp LICENSE $DEPLOYPATH
+    - /bin/cp -R doc $DEPLOYPATH
+    - /bin/cp -R images $DEPLOYPATH
+    - /bin/cp -R scripts $DEPLOYPATH
+    - /bin/cp -R sounds $DEPLOYPATH
+    - /bin/cp -R spectra $DEPLOYPATH
+    - /bin/cp -R stars $DEPLOYPATH
+    

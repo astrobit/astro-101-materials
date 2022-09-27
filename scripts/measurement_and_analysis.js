@@ -1334,6 +1334,7 @@ function OnActivitySelect()
 		let btn = document.getElementById("buttonLinearRegression");
 		btn.disabled = false;
 	}
+	draw();
 	
 	
 }
@@ -1343,14 +1344,17 @@ OnActivitySelect(); // call it right away to make sure everything set up correct
 function OnMeasureSelect()
 {
 	currentActivity.measure(g_currentNumMeasure);
+	draw();
 }
 function OnAverageSelect()
 {
 	currentActivity.average();
+	draw();
 }
 function OnLinearRegressionSelect()
 {
 	currentActivity.linearRegression(g_bLogLogDisplay);
+	draw();
 }
 function OnLogPlotSelect()
 {
@@ -1367,6 +1371,7 @@ function OnLogPlotSelect()
 	{
 		btn.innerText = "Display Log-Log Plot";
 	}
+	draw();
 		
 }
 let g_currentNumMeasure = 1;
@@ -1389,7 +1394,7 @@ theCanvas.width = window.innerWidth;
 //theCanvas.width = theCanvas.height;
 
 
-function work(){
+function draw(){
 	theContext.clearRect(0, 0, theCanvas.width, theCanvas.height);
 	theContext.beginPath();
 	theContext.fillStyle = '#000000';
@@ -1413,8 +1418,7 @@ function work(){
 		currentActivity.graph(theContext);
 	theContext.restore();
 
-	window.setTimeout(work, 1.0/30.0);
 }
 
-work();
+draw();
 

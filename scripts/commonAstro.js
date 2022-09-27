@@ -26,6 +26,10 @@
 // - replaced Phys_Const class with a simple Phys const object
 // Removed
 // - Phys_Const class
+//
+// 2022-Sep-26
+// Changes
+// - calculation for Airy disk size was incorrect - fix calculation to use 1/pi instead of 1/2
 
 
 /////////////////////////////////////////////////////////////////////////
@@ -712,7 +716,7 @@ function drawStar(image, x, y, size, color)
 
 function airyDiskSize(wavelength, aperature)
 {
-	return 3.831705970207513 / 2.0 * wavelength / aperature;
+	return 3.831705970207513 / Math.PI * wavelength / aperature;
 }
 
 /////////////////////////////////////////////////////////////////////////

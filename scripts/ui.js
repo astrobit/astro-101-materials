@@ -430,7 +430,7 @@ class Clickable
 
 class Slider
 {
-	constructor(x,y,min,max,value)
+	constructor(x,y,min,max,value,vertical)
 	{
 		this.x = x;
 		this.y = y;
@@ -754,6 +754,359 @@ class Slider
 }
 
 
+class Scroller
+{
+	constructor(x,y,min,max,value,cursor_width,vertical)
+	{
+		this.x = x;
+		this.y = y;
+		if (typeof vertical !== 'undefined' && vertical !== null && vertical)
+		{
+			this.width = 25;
+			this.height = 200;
+			this.vertical = true;
+		}
+		else
+		{
+			this.width = 200;
+			this.height = 25;
+			this.vertical = false;
+		}
+		this.depth = 0;
+		this.visible = true;
+		this.disabled = false;
+		this._value = value;
+		this._min = min;
+		this._max = max;
+		this.roundCursor = true;
+		this.sliderStyle = "#7F7F7F";
+		this.disableSliderStyle = "#3F3F3F";
+		this.cursorStyle = "#00007F";
+		this.disableCursorStyle = "#1F1F3F"
+		this.onChange = null;
+		this.drawer = null;
+		this.hasMouse = false;
+		this.calculateSlope();
+		this.label = null;
+		this.labelStyle = "#000000";
+		this.disablelabelStyle = "#7F7F7F";
+		this.labelFont = "16px Ariel"
+		this.labelPosition = "center-above";
+		this._cursor_width = cursor_width;
+	}
+	calculateSlope()
+	{
+		this._slope = 1.0 / (this._max - this._min);
+		this._offset = -this._min * this._slope - 0.5;
+	}
+	get value()
+	{
+		return this._value;
+	}
+	get cursor_width()
+	{
+		return this._cursor_width;
+	}
+	get min()
+	{
+		return this._min;
+	}
+	get max()
+	{
+		return this._max;
+	}
+	set value(val)
+	{
+		this._value = val;
+		if ((this._value - this.cursor_width * 0.5) < this._min)
+			this._value = this._min + this.cursor_width * 0.5;
+		else if ((this._value + this.cursor_width * 0.5) > this._max)
+			this._value = this._max - this.cursor_width * 0.5;
+	}
+	set min(value)
+	{
+		this._min = value;
+		this.calculateSlope();
+	}
+	set max(value)
+	{
+		this._max = value;
+		this.calculateSlope();
+	}
+	set cursor_width(value)
+	{
+		this._cursor_width = value;
+	}
+	get cursorRadius()
+	{
+		return (this.vertical ? this.width * 0.5: this.height * 0.5);
+	}
+	set cursorRadius(value)
+	{
+		if (this.vertical)
+			this.width = 2.0 * value;
+		else
+			this.height = 2.0 * value;
+	}
+
+	draw(context)
+	{
+		if (this.visible)
+		{
+			context.save();
+			context.translate(this.x,this.y);
+			if (this.drawer !== null)
+				this.drawer();
+			else
+			{
+				if (typeof this.label !== 'undefined' && this.label !== null)
+				{
+					if (this.disabled)
+						context.fillStyle = this.disableLabelStyle;
+					else
+						context.fillStyle = this.labelStyle;
+					
+					const fontSize = this.labelFont.search("px");
+					let size;
+					if (this.labelFont.charAt(fontSize - 2) < '0' ||  this.labelFont.charAt(fontSize - 2) > '9')
+					{
+						size = parseInt(this.labelFont.substring(fontSize - 1,fontSize));
+					}
+					else
+					{
+						if (this.labelFont.charAt(fontSize - 3) < '0' ||  this.labelFont.charAt(fontSize - 3) > '9')
+							size = parseInt(this.labelFont.substring(fontSize - 2,fontSize));
+						else
+							size = parseInt(this.labelFont.substring(fontSize - 3,fontSize));
+					}
+					let x = 0;
+					let y = 0;
+					const positionDash = this.labelPosition.search("-");
+					const positionHorizontal = this.labelPosition.substring(0,positionDash);
+					const positionVertical = this.labelPosition.substring(positionDash + 1);
+					
+					
+					if (positionVertical == "middle")
+						y = 0;
+					else if (positionVertical == "above")
+					{
+						if (this.vertical)
+							y = -this.cursorRadius - 2;
+						else
+							y = -this.height * 0.5 - this.cursorRadius - 2;
+					}
+					else // below
+					{
+						if (this.vertical)
+							y = this.cursorRadius + 2 + size;
+						else
+							y = this.height * 0.5 + this.cursorRadius + size;
+					}
+					if (positionHorizontal == "center")
+					{
+						x = 0;
+						context.font = this.labelFont
+						drawTextCenter(context,this.label,x,y);
+					}
+					else if (positionHorizontal == "left")
+					{
+						if (this.vertical)
+							x = -this.cursorRadius - 2;
+						else
+							x = -this.width * 0.5 - this.cursorRadius - 2;
+						drawTextRight(context,this.label,x,y);
+					}
+					else // right
+					{
+						if (this.vertical)
+							x = this.cursorRadius + 2;
+						else
+							x = this.width * 0.5 + this.cursorRadius + 2;
+						context.fillText(this.label,x,y);
+					}
+					
+				}
+				if (this.disabled)
+					context.fillStyle = this.disableSliderStyle;
+				else
+					context.fillStyle = this.sliderStyle;
+				context.beginPath();
+				context.moveTo(-this.width * 0.5,-this.height * 0.5);
+				if (this.vertical)
+				{
+					if (this.roundCursor)
+						context.arc(0,-this.height * 0.5,this.width * 0.5,Math.PI,0);
+					else
+						context.lineTo(this.width * 0.5,-this.height * 0.5);
+					context.lineTo(this.width * 0.5, this.height * 0.5);
+					if (this.roundCursor)
+						context.arc(0,this.height * 0.5,this.width * 0.5,0,-Math.PI);
+					else
+						context.lineTo(-this.width * 0.5,this.height * 0.5);
+				}
+				else
+				{
+					context.lineTo(this.width * 0.5,-this.height * 0.5);
+					if (this.roundCursor)
+						context.arc(this.width * 0.5,0,this.height * 0.5,-0.5 * Math.PI,0.5 * Math.PI);
+					else
+						context.lineTo(this.width * 0.5,this.height * 0.5);
+					context.lineTo(-this.width * 0.5,this.height * 0.5);
+					if (this.roundCursor)
+						context.arc(-this.width * 0.5,0,this.height * 0.5,0.5 * Math.PI,1.5 * Math.PI);
+					else
+						context.lineTo(-this.width * 0.5,-this.height * 0.5);
+				}
+				context.closePath();
+				context.fill();
+				
+				const cursorHalf = this._cursor_width * 0.5;
+				if (this.disabled)
+					context.fillStyle = this.disableCursorStyle;
+				else
+					context.fillStyle = this.cursorStyle;
+				if (this.vertical)
+				{
+					const cursorMin = this.height * ((this._value - cursorHalf) * this._slope + this._offset);
+					const cursorMax = this.height * ((this._value + cursorHalf) * this._slope + this._offset);
+
+					context.beginPath();
+					context.moveTo(-this.cursorRadius, cursorMin);
+					if (this.roundCursor)
+						context.arc(0,cursorMin,this.cursorRadius,Math.PI,0,false);
+					else
+						context.lineTo(this.cursorRadius, cursorMin);
+					context.lineTo(this.cursorRadius, cursorMax);
+					if (this.roundCursor)
+						context.arc(0,cursorMax,this.cursorRadius,0,-Math.PI,false);
+					else
+						context.lineTo(-this.cursorRadius, cursorMax);
+					context.closePath();
+					context.fill()
+				}
+				else
+				{					
+					const cursorMin = this.width * ((this._value - cursorHalf) * this._slope + this._offset);
+					const cursorMax = this.width * ((this._value + cursorHalf) * this._slope + this._offset);
+
+					context.beginPath();
+					context.moveTo(cursorMin,this.cursorRadius);
+					if (this.roundCursor)
+						context.arc(cursorMin,0,this.cursorRadius,Math.PI * 0.5,Math.PI * 1.5,false);
+					else
+						context.lineTo(cursorMin,-this.cursorRadius);
+					context.lineTo(cursorMax,-this.cursorRadius);
+					if (this.roundCursor)
+						context.arc(cursorMax,0,this.cursorRadius,Math.PI * -0.5, Math.PI * 0.5,false);
+					else
+						context.lineTo(cursorMax,this.cursorRadius );
+					context.closePath();
+					context.fill()
+				}
+				
+			}
+			context.restore();
+		}
+	}
+	onMouseDown(event)
+	{
+		let acted = false;
+		if (!this.disabled && this.visible && this.test(event))
+		{
+			let cursorMin = (this._value - 0.5 * this.cursor_width) * this._slope + this._offset;
+			let cursorMax = (this._value + 0.5 * this.cursor_width) * this._slope + this._offset;
+			let cursorValue = this._value * this._slope + this._offset;
+			if (this.vertical)
+			{
+				cursorMin *= this.height;
+				cursorMax *= this.height;
+				cursorValue *= this.height;
+				const relX = event.offsetX - this.x;
+				const relY = event.offsetY - this.y;
+				this.hasMouse = (relY >= cursorMin && relY <= cursorMax && Math.abs(relX) < (this.width * 0.5)); 
+				this._mousePosOffset = relY - cursorValue;
+			}
+			else
+			{
+			
+				cursorMin *= this.width;
+				cursorMax *= this.width;
+				cursorValue *= this.width;
+				const relX = this.x - event.offsetX;
+				const relY = this.y - event.offsetY;
+				this.hasMouse = (relX >= cursorMin && relX <= cursorMax && Math.abs(relY) < (this.height * 0.5)); 
+				this._mousePosOffset = relX - cursorValue;
+			}
+			
+			acted = this.hasMouse;
+		}
+		return acted;
+	}
+	onMouseUp(event)
+	{
+		let acted = false;
+		if (this.hasMouse)
+		{
+			this.hasMouse = false;
+			acted = true;
+		}
+		return acted;
+	}
+	onMouseMove(event)
+	{
+		let acted = false;
+		if (this.hasMouse)
+		{
+			let rel;
+			if (this.vertical)
+				rel = (event.offsetY - this.y - this._mousePosOffset) / this.height;
+			else
+				rel = (event.offsetX - this.x - this._mousePosOffset) / this.width;
+			if (rel >= -0.5 && rel <= 0.5)
+			{
+				this.value = (this.max - this.min) * (rel + 0.5)  + this.min;
+				acted = true;
+			}
+			if (this.onChange !== null)
+				this.onChange(this._value);
+			acted = true;
+		}
+		return acted;
+	}
+	onPageHide(event)
+	{
+		if (this.hasMouse)
+			this.hasMouse = false;
+	}
+	
+	onClick(event)
+	{
+		let acted = false;
+		if (!this.disabled && this.visible && this.test(event))
+		{
+			let rel;
+			if (this.vertical)
+				rel = (event.offsetY - this.y) / this.height;
+			else
+				rel = (event.offsetX - this.x) / this.width;
+			if (rel >= -0.5 && rel <= 0.5)
+			{
+				this.value = (this.max - this.min) * (rel + 0.5)  + this.min;
+				acted = true;
+			}
+			if (this.onChange !== null)
+				this.onChange(this._value);
+		}
+		return acted;
+	}
+	test(event)
+	{
+		const relX = (event.offsetY - this.y) / this.height;;
+		const relY = (event.offsetX - this.x) / this.width;
+		
+		return (this.visible && (-0.5 <= relX && relX <= 0.5 && -0.5 <= relY && relY <= 0.5));
+	}
+}
 class CommonUIContainer
 {
 	constructor()

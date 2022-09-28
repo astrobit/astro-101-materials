@@ -30,7 +30,12 @@
 // 2022-Sep-26
 // Changes
 // - calculation for Airy disk size was incorrect - fix calculation to use 1/pi instead of 1/2
-
+//
+// 2022-Sep-28
+// Changes
+// - flip order of traversal of image from (x -> y) to (y->x) to optimize memory access in drawStar and drawStarFlux
+// - add saturation effect to drawStarFlux; at flux > 1.2 max, the flux will bleed into pixels to the right, emulating transfer effects
+//
 
 /////////////////////////////////////////////////////////////////////////
 //
@@ -680,9 +685,9 @@ function drawStar(image, x, y, size, color)
 	const dx = xn - x;
 	const dy = yn - y;
 
-	for (xl = 0; xl < twoSizeLcl; xl++)
+	for (yl = 0; yl < twoSizeLcl; yl++)
 	{
-		for (yl = 0; yl < twoSizeLcl; yl++)
+		for (xl = 0; xl < twoSizeLcl; xl++)
 		{
 			const xr = (xl - sizeLcl);
 			const yr = (yl - sizeLcl);
@@ -744,18 +749,32 @@ function drawStarFlux(image, x, y, hwhm, peak_count, max_count, color)
 	const yn = Math.floor(y);
 	const dx = xn - x;
 	const dy = yn - y;
+	const overflow_threshold = 1.2 * max_count; // @@TODO: make this an input parameter
+	let flux_excess = 0;
 
-	for (xl = -twoSizeLcl ; xl < twoSizeLcl; xl++)
+	for (yl = -twoSizeLcl ; yl < twoSizeLcl; yl++)
 	{
-		for (yl = -twoSizeLcl ; yl < twoSizeLcl; yl++)
+		flux_excess = 0; // don't 
+		for (xl = -twoSizeLcl ; xl < twoSizeLcl; xl++)
 		{
 			const xrdx = xl + dx;
 			const yrdy = yl + dy;
 			const r = Math.sqrt(xrdx * xrdx + yrdy * yrdy);
 			const s = -r * r / (stdev * stdev) * 0.5;
 			const b = Math.exp(s);
-			const n = Math.max(0,random_gaussian(peak_count * b,Math.sqrt(peak_count * b))); // shot noise
+			let n = Math.max(0,random_gaussian(peak_count * b,Math.sqrt(peak_count * b))); // shot noise
+			n += flux_excess;
 			const f = Math.min(n / max_count,1.0)
+			flux_excess = (n > overflow_threshold) ? n - overflow_threshold : 0;
+			let starClrLcl = color.copy();
+			starClrLcl.scale(f);
+			image.addAtRelative(xl + xn, yl + yn, starClrLcl)
+		}
+		for (;(xl + xn) < image.width && flux_excess > 0; xl++)
+		{
+			let n = flux_excess;
+			const f = Math.min(n / max_count,1.0)
+			flux_excess = (n > overflow_threshold) ? n - overflow_threshold : 0;
 			let starClrLcl = color.copy();
 			starClrLcl.scale(f);
 			image.addAtRelative(xl + xn, yl + yn, starClrLcl)

@@ -28,11 +28,15 @@ function getNextCluster()
 	{
 		let cluster = clusters.at(g_i);
 		let clusteravgs = cluster.cluster;
-		while (clusteravgs.stars == 0 && g_i < clusters.length)
+		while (clusteravgs !== null && clusteravgs.stars != 0 && g_i < clusters.length)
 		{
 			g_i++;
-			cluster = clusters.at(g_i);
-			clusteravgs = cluster.cluster;
+			clusteravgs = null;
+			if (g_i < clusters.length)
+			{
+				cluster = clusters.at(g_i);
+				clusteravgs = cluster.cluster;
+			}
 		}
 		if (g_i < clusters.length)
 		{

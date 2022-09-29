@@ -308,6 +308,7 @@ function work(){
 		const diff_arcsec = degrees(r1 / Math.PI * lambda / D) * 3600.0;
 		const seeing = g_selectTelescope._space_based ? diff_arcsec : (altitude < 5600 ? 2.0 - altitude / 4200 * 1.5 : 0.5); // very rought method of calculating seeing: 2" at sea level down to 0.5" at Keck (4200 m)
 		const optical_transparency = 0.8;
+		const color = new RGB(255, 255, 255);
 		if (g_selectInstrument.type == "Imager" || g_selectInstrument.type == "Imaging Spectrograph")
 		{
 			const chipsize = g_selectInstrument.pixel_size * 1.0e-6 * g_selectInstrument.resolution_imager;
@@ -369,10 +370,9 @@ function work(){
 					
 					
 					const px_filling = flux * g_exposure * optical_transparency * quatum_efficiency * Acm / g_selectInstrument.gain * filter_transmission * instrument_sensitivity;
-//					const 
-					const color = new RGB(255,255,255);
+					const peak_pixel_flux = px_filling / Math.sqrt(seeing_disk_pixels / Math.PI);
 					
-					drawStarFlux(mapImage, halfWidth + x, halfHeight + y, seeing_disk_pixels, px_filling,g_selectInstrument.full_scale,color);
+					drawStarFlux(mapImage, halfWidth + x, halfHeight + y, seeing_disk_pixels, peak_pixel_flux,g_selectInstrument.full_scale,color);
 //				}
 			}
 		//	console.log(displayCount);

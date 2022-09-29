@@ -1,4 +1,24 @@
 
+let theCanvas = document.getElementById("theCanvas");
+theCanvas.onselectstart = function () { return false; } // prevent selection of text below the canvas when you click on it
+
+let theContext = theCanvas.getContext("2d");
+
+//const minimumControlsHeightTop = 190;
+
+theCanvas.height = window.innerHeight - 120;
+theCanvas.width = window.innerWidth;
+
+const viewingSize = Math.min(theCanvas.height,theCanvas.width) - 50;
+let sliderHorizontal = new Scroller(theCanvas.width / 2, theCanvas.height - 20, 0,1,0.5,0.25,false);
+sliderHorizontal.width = viewingSize - 2.0 * sliderHorizontal.cursorRadius - 20;
+commonUIRegister(sliderHorizontal);
+
+let sliderVertical = new Scroller((theCanvas.width + viewingSize) / 2, viewingSize * 0.5, 0,1,0.5,0.25,true);
+sliderVertical.height = viewingSize - 2.0 * sliderHorizontal.cursorRadius - 20;
+commonUIRegister(sliderVertical);
+
+
 
 function populateTelescopesSelect()
 {
@@ -70,6 +90,18 @@ function OnSelectInstrument()
 		}
 	}
 	OnSelectFilter();
+	
+	sliderHorizontal.min = 0;
+	sliderHorizontal.max = g_selectInstrument.resolution_imager;
+	sliderHorizontal.cursor_width = viewingSize < g_selectInstrument.resolution_imager ? viewingSize : g_selectInstrument.resolution_imager;
+	sliderHorizontal.visible = viewingSize < g_selectInstrument.resolution_imager;
+	sliderHorizontal.value = g_selectInstrument.resolution_imager * 0.5;
+
+	sliderVertical.min = 0;
+	sliderVertical.max = g_selectInstrument.resolution_imager;
+	sliderVertical.cursor_width = viewingSize < g_selectInstrument.resolution_imager ? viewingSize : g_selectInstrument.resolution_imager;
+	sliderVertical.visible = viewingSize < g_selectInstrument.resolution_imager;
+	sliderVertical.value = g_selectInstrument.resolution_imager * 0.5;
 
 }
 
@@ -146,15 +178,6 @@ populateTelescopesSelect();
 OnSelectTelescope(); // make sure everything is initially populated
 
 
-let theCanvas = document.getElementById("theCanvas");
-theCanvas.onselectstart = function () { return false; } // prevent selection of text below the canvas when you click on it
-
-let theContext = theCanvas.getContext("2d");
-
-//const minimumControlsHeightTop = 190;
-
-theCanvas.height = window.innerHeight - 120;
-theCanvas.width = window.innerWidth;
 
 let	g_clusters = newClusters("OpC");
 
@@ -221,38 +244,27 @@ function OnSetExposure()
 					i++;
 				if (i < value.length && value.charAt(i) == 'd')
 				{
-					if (exposure > 0.166666667)
-						exposure = 0.166666667;
-					select.value = exposure + "d";
 					exposure *= 86400.0;
 				}
 				else if (i < value.length && value.charAt(i) == 'h')
 				{
-					if (exposure > 4)
-						exposure = 4;
-					select.value = exposure + "h";
 					exposure *= 3600.0;
 				}
 				else if (i < value.length && value.charAt(i) == 'm')
 				{
-					if (exposure > 240)
-						exposure = 240;
-					select.value = exposure + "m";
 					exposure *= 60.0;
 				}
-				else
-				{
-					if (exposure > 14400)
-						exposure = 14400;
-					select.value = exposure + "s";
-				}
 			}
-			else
-			{
-				if (exposure > 14400)
-					exposure = 14400;
-				select.value = exposure + "s";
-			}
+			if (exposure < 0.1)
+				exposure = 0.1;
+			else if (exposure > 14400)
+				exposure = 14400;
+			if (exposure < 300)				
+				select.value = Math.round(exposure * 100) / 100 + " sec";
+			else if (exposure < 7200)
+				select.value = Math.round(exposure / 60 * 100) / 100 + " min";
+			else 
+				select.value = Math.round(exposure / 3600 * 100) / 100 + " hr";
 			g_exposure = exposure;
 		}
 		else
@@ -270,9 +282,6 @@ let g_dlData = "Star, U, B, V, R, I, J, H, K, sp_type, lm class, sp type qual, d
 let g_reprocessed_Fluxes = false;
 function work(){
 
-// determine which planet is currently selected
-
-
 	// clear the canvas
 	theContext.clearRect(0, 0, theCanvas.width, theCanvas.height);
 	theContext.fillStyle = "#000000";
@@ -280,199 +289,142 @@ function work(){
 
 	if (g_starsCluster !== null && g_starsCluster.ready)
 	{
-		var imageX = theCanvas.width * 0.5;
-		var imageY = theCanvas.height * 0.5;
-		var size = Math.floor(Math.min(theCanvas.width,theCanvas.height) * 0.80);
-		var halfWidth = size * 0.5;
-		var halfHeight = size * 0.5;
+		var halfWidth = viewingSize * 0.5;
+		var halfHeight = viewingSize * 0.5;
 		
-		const mapImage = new ImgData(theContext, imageX - halfWidth, imageY - halfHeight, size, size);
+		const mapImage = new ImgData(theContext, theCanvas.width * 0.5 - halfWidth , 0, viewingSize, viewingSize );
 		const len = g_starsCluster.length;
 		let i;
-/*		if (!g_reprocessed_Fluxes && g_synphotReady)
-		{
-//			for (i = 0; i < len; i++)
-//			{
-//				let star = g_starsCluster.at(i);
-//				star.fluxes = determineFluxes(star,g_starsCluster.dm_avg);
-//			}
-/*			let attempted_fluxes_dl = "Star, U, B, V, R, I, J, H, K, sp_type, lm class, sp type qual, dm, used sp_type, used lum class, Au, Av, Ab, Ar, Ai, Aj, Ah, Ak, A, σA, bA, σbA\n";
-			
-			for (i = 0; i < g_attemptedFluxes.length; i++)
-			{
-				attempted_fluxes_dl += "\"" + g_attemptedFluxes[i].star.main_id +"\", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].fluxes.U + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].fluxes.B + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].fluxes.V + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].fluxes.R + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].fluxes.I + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].fluxes.J + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].fluxes.H + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].fluxes.K + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].star.num_sp_type + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].star.num_luminosity_class + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].star.sp_qual + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].fluxes.dm + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].phot.num_sp_type + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].phot.num_luminosity_class + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].fluxes.A.U + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].fluxes.A.B + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].fluxes.A.V + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].fluxes.A.R + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].fluxes.A.I + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].fluxes.A.J + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].fluxes.A.H + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].fluxes.A.K + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].fluxes.Am + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].fluxes.sigmaAm + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].fluxes.A_intercept + ", "
-				attempted_fluxes_dl += g_attemptedFluxes[i].fluxes.A_sigmaIntercept + ", "
-				attempted_fluxes_dl += "\n";
-				
-			}
-//			download(attempted_fluxes_dl,"attempts.csv","csv");
-//			download(g_astroUnreadableSpType,"sp_types_unreadable.txt");
-			g_reprocessed_Fluxes = true;
-		}*/
-		const lambda = g_selectFilter === null ? 550.0e-9 : g_selectFilter.central_wavelength * 1e-9;
+
+		const lambda = g_selectFilter === null ? (g_selectInstrument.min_wavelength + g_selectInstrument.max_wavelength) * 0.5e-9: g_selectFilter.central_wavelength * 1e-9;
 		const D = g_selectTelescope._diameter;
 		const Acm = D * D * 100.0 * 100.0 * Math.PI;
 		const a = D * 0.5; // m
 		const f = g_selectFocus._focal_length; // m
-		if (g_selectInstrument.type == "Imager")
+		const arcsecRadians = (180.0 * 3600.0 / Math.PI);
+		const radiansArcsec = Math.PI / (180.0 * 3600.0)
+		const altitude = g_selectTelescope._altitude;
+		const r1 = 3.831705970207513; // first zero of Bessel function of 1st kind - location of the first minimum of the Airy disk
+		const diff_arcsec = degrees(r1 / Math.PI * lambda / D) * 3600.0;
+		const seeing = g_selectTelescope._space_based ? diff_arcsec : (altitude < 5600 ? 2.0 - altitude / 4200 * 1.5 : 0.5); // very rought method of calculating seeing: 2" at sea level down to 0.5" at Keck (4200 m)
+		const optical_transparency = 0.8;
+		if (g_selectInstrument.type == "Imager" || g_selectInstrument.type == "Imaging Spectrograph")
 		{
-			const chipsize = g_selectInstrument.pixel_size * 1.0e-6 * g_selectInstrument.resolution;
-			const resolution = g_selectInstrument.resolution;
-			const altitude = g_selectTelescope._altitude;
-			const r1 = 3.831705970207513;//newton_raphson(3.0,fx,fxp,Number.EPSILON * 1000.0,Number.EPSILON * 1000.0,10000);
-			const diff_arcsec = r1 * 0.5 * lambda / D * (180.0 * 3600.0 / Math.PI);
-			const pixel_scale = (chipsize / resolution) / f * (180.0 * 3600.0 / Math.PI);
+			const chipsize = g_selectInstrument.pixel_size * 1.0e-6 * g_selectInstrument.resolution_imager;
+			const resolution = g_selectInstrument.resolution_imager;
+			const pixel_scale = degrees(g_selectInstrument.pixel_size * 1.0e-6 / f) * 3600.0;
 			const fov = pixel_scale * resolution;
-			const seeing = 2.0 - altitude / 4200 * 1.5; // very rought method of calculating seeing: 2" at sea level down to 0.5" at Keck (4200 m)
 			const seeing_disk_pixels = g_selectTelescope._adaptive_optics ? 0.5 : seeing / pixel_scale;
 			let displayCount = 0;
-			const integration_time = 0.01;
-			const optical_transparency = 0.8;
 			const quatum_efficiency = g_selectInstrument.quantum_efficiency;
+			const filt = g_selectFilter !== null ? getFilterUVBRI(g_selectFilter.name) : null;
+			const extinction = g_selectFilter !== null ? extinction_coefficient(g_selectFilter.name) : null;
+			let filter_transmission = 1.0;
+			
+			let instrument_sensitivity = 1.0;
+			if (filt !== null)
+			{
+				filter_transmission = filt.maximum_transmission;
+				let delta_red = filt.central_wavelength - g_selectInstrument.max_wavelength;
+				let red_red = Math.max(Math.min(delta_red / filt.red_spectral_width,0),-1); // if between -1 and 0, some loss; if < -1, no loss, if > 0, full loss
+				let red_blue = Math.min(Math.max(delta_red / filt.blue_spectral_width,0),1) // if between 0 and 1, some loss; if > 1, full loss, if < 0, no loss
+				let red = (-red_red + (1 - red_blue)) * 0.5;
+				let delta_blue = filt.central_wavelength - g_selectInstrument.min_wavelength;
+				let blue_red = Math.max(Math.min(delta_blue / filt.red_spectral_width,0),-1); // if between -1 and 0, some loss; if < -1, full loss, if > 0, no loss
+				let blue_blue = Math.min(Math.max(delta_blue / filt.blue_spectral_width,0),1) // if between 0 and 1, some loss; if > 1, no loss, if < 0, full loss
+				let blue = (blue_blue + (1 + blue_red)) * 0.5;
+				instrument_sensitivity = Math.min(red,blue);
+			}
 			
 			for (i = 0; i < len; i++)
 			{
 				const star = g_starsCluster.at(i);
-				let x = ((star.ra - g_selectedCluster.cluster.ra.average) * 15.0 * 3600.0) * pixel_scale / halfWidth;
-				let y = ((star.dec - g_selectedCluster.cluster.dec.average) * 15.0 * 3600.0) * pixel_scale / halfHeight;
-				if (Math.abs(x) <= 1.0 && Math.abs(y) <= 1.0)
-				{
-/*					if (!g_dl)
-					{
-						g_dlDataFilled = true;
-						g_dlData += "\"" + star.main_id +"\", "
-						g_dlData += star.fluxes.U + ", "
-						g_dlData += star.fluxes.B + ", "
-						g_dlData += star.fluxes.V + ", "
-						g_dlData += star.fluxes.R + ", "
-						g_dlData += star.fluxes.I + ", "
-						g_dlData += star.fluxes.J + ", "
-						g_dlData += star.fluxes.H + ", "
-						g_dlData += star.fluxes.K + ", "
-						g_dlData += star.num_sp_type + ", "
-						g_dlData += star.num_luminosity_class + ", "
-						g_dlData += star.sp_qual + ", "
-						g_dlData += star.fluxes.dm + ", "
-						g_dlData += star.fluxes.phot.num_sp_type + ", "
-						g_dlData += star.fluxes.phot.num_luminosity_class + ", "
-						g_dlData += star.fluxes.A.U + ", "
-						g_dlData += star.fluxes.A.B + ", "
-						g_dlData += star.fluxes.A.V + ", "
-						g_dlData += star.fluxes.A.R + ", "
-						g_dlData += star.fluxes.A.I + ", "
-						g_dlData += star.fluxes.A.J + ", "
-						g_dlData += star.fluxes.A.H + ", "
-						g_dlData += star.fluxes.A.K + ", "
-						g_dlData += star.fluxes.Am + ", "
-						g_dlData += star.fluxes.sigmaAm + ", "
-						g_dlData += star.fluxes.A_intercept + ", "
-						g_dlData += star.fluxes.A_sigmaIntercept + ", "
-						g_dlData += "\n";
-					}*/
-					//console.log("here " + starsm6.at(i).latitude + " " + starsm6.at(i).longitude + " " + projection.x + " " + projection.y);
+				let x = ((star.ra - g_selectedCluster.cluster.ra.average) * 3600.0) / pixel_scale - (sliderHorizontal.value - g_selectInstrument.resolution_imager * 0.5);
+				let y = ((star.dec - g_selectedCluster.cluster.dec.average) * 3600.0) / pixel_scale - (sliderVertical.value - g_selectInstrument.resolution_imager * 0.5);
+				
+//				const xmax = halfWidth;
+//				const ymax = halfHeight;
+				
+//				if (Math.abs(x) <= xmax && Math.abs(y) <= ymax)
+//				{
 					let filter;
-					let mag;
 					let flux = 0;
 					if (g_selectFilter !== null)
 					{
-						if (g_selectFilter.name == "K")
-						{
-							mag = star.fluxes.K + extinction_coefficient("K");
-						}
-						else if (g_selectFilter.name == "H")
-						{
-							mag = star.fluxes.H + extinction_coefficient("H");
-						}
-						else if (g_selectFilter.name == "J")
-						{
-							mag = star.fluxes.J + extinction_coefficient("J");
-						}
-						else if (g_selectFilter.name == "I")
-						{
-							mag = star.fluxes.I + extinction_coefficient("I");
-						}
-						else if (g_selectFilter.name == "R")
-						{
-							mag = star.fluxes.R + extinction_coefficient("R");
-						}
-						else if (g_selectFilter.name == "V")
-						{
-							mag = star.fluxes.V + extinction_coefficient("V");
-						}
-						else if (g_selectFilter.name == "B")
-						{
-							mag = star.fluxes.B + extinction_coefficient("B");
-						}
-						else if (g_selectFilter.name == "U")
-						{
-							mag = star.fluxes.U + extinction_coefficient("U");
-						}
-						const filt = getFilterUVBRI(g_selectFilter.name);
+						let mag = star.fluxes[g_selectFilter.name] + extinction;
 						if (filt !== null)
 							flux = fluxToPhotonFlux(filt.central_wavelength * 1.0E-9,(filt.blue_spectral_width + filt.red_spectral_width) * 1.0E-9,MagtoFlux(g_selectFilter.name,mag));
 					}
 					else
 					{
-						flux = 0;
-						if (star.U !== null)
+						const filters = ["U","B","V","R","I"];
+						let j;
+						for (j = 0; j < filters.length; j++)
 						{
-							const filt = getFilterUVBRI("U");
-							flux += fluxToPhotonFlux(filt.central_wavelength * 1.0E-9,(filt.blue_spectral_width + filt.red_spectral_width) * 1.0E-9,MagtoFlux("U",star.U + extinction_coefficient("U")));
-						} // @@TODO: estimate the magnitude based on spectral type and other relevant magnitudes
-						if (star.B !== null)
-						{
-							flux += fluxToPhotonFlux(UVBRI[1].central_wavelength * 1.0E-9,(UVBRI[1].blue_spectral_width + UVBRI[1].red_spectral_width) * 1.0E-9,MagtoFlux("B",star.B + extinction_coefficient("B")));
-						} // @@TODO: estimate the magnitude based on spectral type and other relevant magnitudes
-						if (star.V !== null)
-						{
-							flux += fluxToPhotonFlux(UVBRI[2].central_wavelength * 1.0E-9,(UVBRI[2].blue_spectral_width + UVBRI[2].red_spectral_width) * 1.0E-9,MagtoFlux("V",star.V + extinction_coefficient("V")));
-						} // @@TODO: estimate the magnitude based on spectral type and other relevant magnitudes
-						if (star.R !== null)
-						{
-							flux += fluxToPhotonFlux(UVBRI[3].central_wavelength * 1.0E-9,(UVBRI[3].blue_spectral_width + UVBRI[3].red_spectral_width) * 1.0E-9,MagtoFlux("R",star.R + extinction_coefficient("R")));
-						} // @@TODO: estimate the magnitude based on spectral type and other relevant magnitudes
-						if (star.I !== null)
-						{
-							flux += fluxToPhotonFlux(UVBRI[4].central_wavelength * 1.0E-9,(UVBRI[4].blue_spectral_width + UVBRI[4].red_spectral_width) * 1.0E-9,MagtoFlux("I",star.I + extinction_coefficient("I")));
-						} // @@TODO: estimate the magnitude based on spectral type and other relevant magnitudes
+							const filt = getFilterUVBRI(filters[j]);
+							const extinctionLcl = extinction_coefficient(filters[j]);
+							flux += fluxToPhotonFlux(filt.central_wavelength * 1.0E-9,(filt.blue_spectral_width + filt.red_spectral_width) * 1.0E-9,MagtoFlux(filters[j],star.fluxes[filters[j]] + extinctionLcl));
+						}
 					}
 					
 					
-					const px_filling = flux * g_exposure * optical_transparency * quatum_efficiency * Acm / g_selectInstrument.gain;
+					const px_filling = flux * g_exposure * optical_transparency * quatum_efficiency * Acm / g_selectInstrument.gain * filter_transmission * instrument_sensitivity;
 //					const 
 					const color = new RGB(255,255,255);
 					
-					drawStarFlux(mapImage, (1.0 - x) * halfWidth, (1.0 - y) * halfHeight, seeing_disk_pixels, px_filling,g_selectInstrument.full_scale,color);
-				}
+					drawStarFlux(mapImage, halfWidth + x, halfHeight + y, seeing_disk_pixels, px_filling,g_selectInstrument.full_scale,color);
+//				}
 			}
+		//	console.log(displayCount);
+			mapImage.draw();
+			// draw telescope information
+			theContext.fillStyle = "#FFFFFF";
+			theContext.font = "20px Arial";
+			drawTextCenter(theContext,g_selectSelectTelescope.name,theCanvas.width - 200,theCanvas.height * 0.5 - 60);
+			theContext.fillStyle = "#FFFF00";
+			drawTextCenter(theContext,"Aperture: " + g_selectTelescope._diameter + " m",theCanvas.width - 200,theCanvas.height * 0.5 - 40);
+			const collecting_area = Math.round(Math.PI * (g_selectTelescope._diameter ** 2));
+			drawTextCenter(theContext,"Collecting Area: " + collecting_area + " m²",theCanvas.width - 200,theCanvas.height * 0.5 - 20);
+			const diff_arcsec_displ = Math.round(diff_arcsec * 1000.0) / 1000.0;
+			drawTextCenter(theContext,"Angular Resolution: " + diff_arcsec_displ + "\"",theCanvas.width - 200,theCanvas.height * 0.5 - 0);
+			const seeing_displ = Math.round(seeing * 10.0) / 10.0;
+			drawTextCenter(theContext,"Seeing: " + seeing_displ + "\"",theCanvas.width - 200,theCanvas.height * 0.5 + 20);
+			if (g_selectSelectTelescope._adaptive_optics)
+				drawTextCenter(theContext,"Adaptive Optics On",theCanvas.width - 200,theCanvas.height * 0.5 + 40);
+			
+			
+			theContext.fillStyle = "#FFFFFF";
+			drawTextCenter(theContext,g_selectInstrument.name,theCanvas.width - 200,theCanvas.height * 0.5 + 80);
+			theContext.fillStyle = "#FFFF00";
+			drawTextCenter(theContext,"Imaging Camera",theCanvas.width - 200,theCanvas.height * 0.5 + 100);
+			theContext.fillStyle = "#FFFF00";
+			const fov_displ = Math.round(fov / 60.0 * 10.0) / 10.0;
+			drawTextCenter(theContext,"Field of View: " + fov_displ + "'",theCanvas.width - 200,theCanvas.height * 0.5 + 120);
+			const pixel_scale_displ = Math.round(pixel_scale * 100.0) / 100.0;
+			drawTextCenter(theContext,"Max. Resolution: " + pixel_scale_displ + "\"",theCanvas.width - 200,theCanvas.height * 0.5 + 140);
 		}
-	//	console.log(displayCount);
-		mapImage.draw();
+		else
+		{
+			// draw telescope information
+			theContext.fillStyle = "#FFFFFF";
+			theContext.font = "20px Arial";
+			drawTextCenter(theContext,g_selectSelectTelescope.name,theCanvas.width - 200,theCanvas.height * 0.5 - 60);
+			theContext.fillStyle = "#FFFF00";
+			drawTextCenter(theContext,"Aperture: " + g_selectTelescope._diameter + " m",theCanvas.width - 200,theCanvas.height * 0.5 - 40);
+			const collecting_area = Math.round(Math.PI * (g_selectTelescope._diameter ** 2));
+			drawTextCenter(theContext,"Collecting Area: " + collecting_area + " m²",theCanvas.width - 200,theCanvas.height * 0.5 - 20);
+			const diff_arcsec_displ = Math.round(diff_arcsec * 1000.0) / 1000.0;
+			drawTextCenter(theContext,"Angular Resolution: " + diff_arcsec_displ + "\"",theCanvas.width - 200,theCanvas.height * 0.5 - 0);
+			const seeing_displ = Math.round(seeing * 10.0) / 10.0;
+			drawTextCenter(theContext,"Seeing: " + seeing_displ + "\"",theCanvas.width - 200,theCanvas.height * 0.5 + 20);
+			
+			
+			theContext.fillStyle = "#FFFFFF";
+			drawTextCenter(theContext,g_selectInstrument.name,theCanvas.width - 200,theCanvas.height * 0.5 + 60);
+			theContext.fillStyle = "#FFFF00";
+			drawTextCenter(theContext,"Spectrometer",theCanvas.width - 200,theCanvas.height * 0.5 + 80);
+		}
+		
 	}
 	else
 	{

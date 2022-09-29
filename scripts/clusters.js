@@ -169,6 +169,8 @@ class _Clusters
 			}
 		}
 		this.failed = false;
+		this._dataPromise = null;
+		this._dataPromiseSupplemental = null;
 		if (this._rawData === null)
 		{
 			const filePath = "https://www.astronaos.com/astronomy/stars/clusters_" + set + ".json";
@@ -279,11 +281,12 @@ class _Clusters
 function newClusters(set)
 {
 	let ret = new _Clusters(set);
-	ret._dataPromise.then(function(value){ret._processResponse(value)},function(error){ret.failed = true; console.log("Clusters request failed with error " + error)});
-	ret._dataPromiseSupplemental.then(function(value){ret._processSupplementalData(value)},function(error){ret.failed = true; console.log("Clusters Supplemental request failed with error " + error)});
+	if (typeof ret._dataPromise !== 'undefined' && ret._dataPromise !== null)
+		ret._dataPromise.then(function(value){ret._processResponse(value)},function(error){ret.failed = true; console.log("Clusters request failed with error " + error)});
+	if (typeof ret._dataPromiseSupplemental !== 'undefined' && ret._dataPromiseSupplemental !== null)
+		ret._dataPromiseSupplemental.then(function(value){ret._processSupplementalData(value)},function(error){ret.failed = true; console.log("Clusters Supplemental request failed with error " + error)});
 	
 	
-	this._rawSupplementalData
 	return ret;
 }
 

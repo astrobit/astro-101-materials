@@ -263,7 +263,7 @@ function newStarSet(set)
 {
 	let ret = new _Stars(set);
 	star_sets.push(ret);
-	if (ret._dataPromise !== null)
+	if (typeof ret._dataPromise != 'undefined' && ret._dataPromise !== null)
 		ret._dataPromise.then(function(value){ret._processResponse(value)},function(error){ret.failed = true; console.log("Stars request failed with error " + error)});
 	return ret;
 }

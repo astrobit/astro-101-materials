@@ -3,10 +3,13 @@ let theCanvas = document.getElementById("theCanvas");
 theCanvas.onselectstart = function () { return false; } // prevent selection of text below the canvas when you click on it
 
 let theContext = theCanvas.getContext("2d");
+theContext.willReadFrequently = true;
 
 //const minimumControlsHeightTop = 190;
+const recttop = document.getElementById("seeing").getBoundingClientRect();
+//const rectbot = document.getElementById("recenter").getBoundingClientRect();
 
-theCanvas.height = window.innerHeight - 120;
+theCanvas.height = window.innerHeight - 60 - recttop.bottom;
 theCanvas.width = window.innerWidth;
 
 const viewingSize = Math.min(theCanvas.height,theCanvas.width) - 50;
@@ -42,11 +45,11 @@ let g_selectTelescope = null;
 let g_selectSelectTelescope = null;
 let g_selectFocus = null;
 let g_selectFilter = null;
-function OnSelectFilter()
+function OnSelectFilter(filter)
 {
 	const select = document.getElementById("selectFilter");
 	const instrument = g_selectInstrument;
-	
+
 	let i;
 	let found = false;
 	if (select.value == "No Filter")
@@ -79,14 +82,35 @@ function OnSelectInstrument()
 	
 	let i;
 	let found = false;
+	let filter = null;
 	for (i = 0; i < telescope.instruments.length && !found; i++)
 	{
 		if (select.value == telescope.instruments[i].name)
 		{
 			g_selectInstrument = telescope.instruments[i].instrument;
 			g_selectFocus = telescope.instruments[i].focus;
+			if (g_selectFilter !== null)
+				filter = g_selectFilter.name;
+			else
+				filter = null;
 			populateFiltersSelect();
 			found = true;
+		}
+	}
+	if (filter !== null)
+	{
+		// reselect the prior filter if available.
+		if (instrument.type == "Imager" && instrument.filters.length > 0)
+		{
+			for (i = 0; i < instrument.filters.length && !found; i++)
+			{
+				if (filter == instrument.filters[i].name)
+				{
+					const selectFilter = document.getElementById("selectFilter");
+					selectFilter.value = filter;
+					found = true;
+				}
+			}
 		}
 	}
 	OnSelectFilter();
@@ -280,6 +304,23 @@ let g_dlDataFilled = false;
 let g_dlData = "Star, U, B, V, R, I, J, H, K, sp_type, lm class, sp type qual, dm, used sp_type, used lum class, Au, Av, Ab, Ar, Ai, Aj, Ah, Ak, A, σA, bA, σbA\n";
 
 let g_reprocessed_Fluxes = false;
+
+function setOutputText(id,value)
+{
+	let elem = document.getElementById(id);
+	if (elem !== null)
+		elem.value = value;
+}
+
+function recenterDisplay()
+{
+	if (g_selectInstrument !== null && ValidateValue(g_selectInstrument.resolution_imager))
+	{
+		sliderHorizontal.value = g_selectInstrument.resolution_imager * 0.5;
+		sliderVertical.value = g_selectInstrument.resolution_imager * 0.5;
+	}
+}
+
 function work(){
 
 	// clear the canvas
@@ -296,6 +337,27 @@ function work(){
 		const len = g_starsCluster.length;
 		let i;
 
+		const clustRAdispl = degreestoHMSDisplayable(g_selectedCluster.cluster.ra.average !== null ? g_selectedCluster.cluster.ra.average : g_selectedCluster.ra);
+		const clustDecdispl = degreestoDMSDisplayable(g_selectedCluster.cluster.dec.average !== null ? g_selectedCluster.cluster.dec.average : g_selectedCluster.dec);
+		setOutputText("cluster ra",clustRAdispl.hr + "h " + clustRAdispl.min + "m " + clustRAdispl.sec + "s");
+		setOutputText("cluster dec",clustDecdispl.deg + "° " + clustDecdispl.min + "' " + clustDecdispl.sec + "\"");
+		let clustSize = g_selectedCluster.cluster.cluster_size;
+		let clustSizeUnits = "°"
+		if (clustSize !== null && clustSize < 1)
+		{
+			clustSize *= 60.0;
+			clustSizeUnits = "'";
+		}
+		if (clustSize !== null && clustSize < 1)
+		{
+			clustSize *= 60.0;
+			clustSizeUnits = "\"";
+		}
+		
+			
+		setOutputText("cluster size",clustSize !== null ? (Math.round(clustSize * 10.0) / 10.0).toString() + clustSizeUnits : "");
+		setOutputText("cluster parallax",g_selectedCluster.cluster.plx.average !== null ? Math.round(g_selectedCluster.cluster.plx.average*10.0)/10.0 + " mas": (g_selectedCluster.plx_value !== null ? g_selectedCluster.plx_value + " mas" : ""));
+			
 		const lambda = g_selectFilter === null ? (g_selectInstrument.min_wavelength + g_selectInstrument.max_wavelength) * 0.5e-9: g_selectFilter.central_wavelength * 1e-9;
 		const D = g_selectTelescope._diameter;
 		const Acm = D * D * 100.0 * 100.0 * Math.PI;
@@ -307,10 +369,24 @@ function work(){
 		const r1 = 3.831705970207513; // first zero of Bessel function of 1st kind - location of the first minimum of the Airy disk
 		const diff_arcsec = degrees(r1 / Math.PI * lambda / D) * 3600.0;
 		const seeing = g_selectTelescope._space_based ? diff_arcsec : (altitude < 5600 ? 2.0 - altitude / 4200 * 1.5 : 0.5); // very rought method of calculating seeing: 2" at sea level down to 0.5" at Keck (4200 m)
+
+		setOutputText("diameter",g_selectTelescope._diameter.toString() + " m");
+		const collecting_area = Math.round(Math.PI * (g_selectTelescope._diameter ** 2));
+		setOutputText("collecting area",collecting_area + " m²");
+		setOutputText("focal length",g_selectFocus._focal_length.toString() + " m");
+		const plate_scale_displ = Math.round(degrees(1.0e-3 / f) * 3600.0 * 1000.0) / 1000.0;
+		setOutputText("plate scale",plate_scale_displ.toString() + " \"/mm");
+		const diff_arcsec_displ = Math.round(diff_arcsec * 1000.0) / 1000.0;
+		setOutputText("angular resolution",diff_arcsec_displ.toString() + "\"");
+		const seeing_displ = Math.round(seeing * 10.0) / 10.0;
+		setOutputText("seeing",seeing_displ.toString() + "\"");
+
 		const optical_transparency = 0.8;
 		const color = new RGB(255, 255, 255);
 		if (g_selectInstrument.type == "Imager" || g_selectInstrument.type == "Imaging Spectrograph")
 		{
+
+
 			const chipsize = g_selectInstrument.pixel_size * 1.0e-6 * g_selectInstrument.resolution_imager;
 			const resolution = g_selectInstrument.resolution_imager;
 			const pixel_scale = degrees(g_selectInstrument.pixel_size * 1.0e-6 / f) * 3600.0;
@@ -322,6 +398,12 @@ function work(){
 			const extinction = g_selectFilter !== null ? extinction_coefficient(g_selectFilter.name) : null;
 			let filter_transmission = 1.0;
 			
+			setOutputText("resolution",g_selectInstrument.resolution_imager.toString() + "×" + g_selectInstrument.resolution_imager.toString());
+			const pixel_scale_displ = Math.round(pixel_scale * 100.0) / 100.0;
+			setOutputText("pixel scale",pixel_scale_displ + "\" / px");
+			const fov_displ = Math.round(fov / 60.0 * 10.0) / 10.0;
+			setOutputText("field of view",fov_displ + "'");
+
 			let instrument_sensitivity = 1.0;
 			if (filt !== null)
 			{
@@ -377,54 +459,7 @@ function work(){
 			}
 		//	console.log(displayCount);
 			mapImage.draw();
-			// draw telescope information
-			theContext.fillStyle = "#FFFFFF";
-			theContext.font = "20px Arial";
-			drawTextCenter(theContext,g_selectSelectTelescope.name,theCanvas.width - 200,theCanvas.height * 0.5 - 60);
-			theContext.fillStyle = "#FFFF00";
-			drawTextCenter(theContext,"Aperture: " + g_selectTelescope._diameter + " m",theCanvas.width - 200,theCanvas.height * 0.5 - 40);
-			const collecting_area = Math.round(Math.PI * (g_selectTelescope._diameter ** 2));
-			drawTextCenter(theContext,"Collecting Area: " + collecting_area + " m²",theCanvas.width - 200,theCanvas.height * 0.5 - 20);
-			const diff_arcsec_displ = Math.round(diff_arcsec * 1000.0) / 1000.0;
-			drawTextCenter(theContext,"Angular Resolution: " + diff_arcsec_displ + "\"",theCanvas.width - 200,theCanvas.height * 0.5 - 0);
-			const seeing_displ = Math.round(seeing * 10.0) / 10.0;
-			drawTextCenter(theContext,"Seeing: " + seeing_displ + "\"",theCanvas.width - 200,theCanvas.height * 0.5 + 20);
-			if (g_selectSelectTelescope._adaptive_optics)
-				drawTextCenter(theContext,"Adaptive Optics On",theCanvas.width - 200,theCanvas.height * 0.5 + 40);
-			
-			
-			theContext.fillStyle = "#FFFFFF";
-			drawTextCenter(theContext,g_selectInstrument.name,theCanvas.width - 200,theCanvas.height * 0.5 + 80);
-			theContext.fillStyle = "#FFFF00";
-			drawTextCenter(theContext,"Imaging Camera",theCanvas.width - 200,theCanvas.height * 0.5 + 100);
-			theContext.fillStyle = "#FFFF00";
-			const fov_displ = Math.round(fov / 60.0 * 10.0) / 10.0;
-			drawTextCenter(theContext,"Field of View: " + fov_displ + "'",theCanvas.width - 200,theCanvas.height * 0.5 + 120);
-			const pixel_scale_displ = Math.round(pixel_scale * 100.0) / 100.0;
-			drawTextCenter(theContext,"Max. Resolution: " + pixel_scale_displ + "\"",theCanvas.width - 200,theCanvas.height * 0.5 + 140);
 		}
-		else
-		{
-			// draw telescope information
-			theContext.fillStyle = "#FFFFFF";
-			theContext.font = "20px Arial";
-			drawTextCenter(theContext,g_selectSelectTelescope.name,theCanvas.width - 200,theCanvas.height * 0.5 - 60);
-			theContext.fillStyle = "#FFFF00";
-			drawTextCenter(theContext,"Aperture: " + g_selectTelescope._diameter + " m",theCanvas.width - 200,theCanvas.height * 0.5 - 40);
-			const collecting_area = Math.round(Math.PI * (g_selectTelescope._diameter ** 2));
-			drawTextCenter(theContext,"Collecting Area: " + collecting_area + " m²",theCanvas.width - 200,theCanvas.height * 0.5 - 20);
-			const diff_arcsec_displ = Math.round(diff_arcsec * 1000.0) / 1000.0;
-			drawTextCenter(theContext,"Angular Resolution: " + diff_arcsec_displ + "\"",theCanvas.width - 200,theCanvas.height * 0.5 - 0);
-			const seeing_displ = Math.round(seeing * 10.0) / 10.0;
-			drawTextCenter(theContext,"Seeing: " + seeing_displ + "\"",theCanvas.width - 200,theCanvas.height * 0.5 + 20);
-			
-			
-			theContext.fillStyle = "#FFFFFF";
-			drawTextCenter(theContext,g_selectInstrument.name,theCanvas.width - 200,theCanvas.height * 0.5 + 60);
-			theContext.fillStyle = "#FFFF00";
-			drawTextCenter(theContext,"Spectrometer",theCanvas.width - 200,theCanvas.height * 0.5 + 80);
-		}
-		
 	}
 	else
 	{

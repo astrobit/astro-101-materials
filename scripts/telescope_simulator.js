@@ -1,4 +1,13 @@
+let g_starsCluster = null;
+let g_selectedCluster = null;
+let	g_clusters = newClusters("OpC");
+let g_clusterSelectList = new Object();
 
+
+function sliderChange(value)
+{
+	draw();
+}
 let theCanvas = document.getElementById("theCanvas");
 theCanvas.onselectstart = function () { return false; } // prevent selection of text below the canvas when you click on it
 
@@ -15,10 +24,12 @@ theCanvas.width = window.innerWidth;
 const viewingSize = Math.min(theCanvas.height,theCanvas.width) - 50;
 let sliderHorizontal = new Scroller(theCanvas.width / 2, theCanvas.height - 20, 0,1,0.5,0.25,false);
 sliderHorizontal.width = viewingSize - 2.0 * sliderHorizontal.cursorRadius - 20;
+sliderHorizontal.onChange = sliderChange;
 commonUIRegister(sliderHorizontal);
 
 let sliderVertical = new Scroller((theCanvas.width + viewingSize) / 2, viewingSize * 0.5, 0,1,0.5,0.25,true);
 sliderVertical.height = viewingSize - 2.0 * sliderHorizontal.cursorRadius - 20;
+sliderVertical.onChange = sliderChange;
 commonUIRegister(sliderVertical);
 
 
@@ -73,6 +84,7 @@ function OnSelectFilter(filter)
 			g_selectFilter = null;
 		
 	}
+	draw();
 }
 
 function OnSelectInstrument()
@@ -100,11 +112,12 @@ function OnSelectInstrument()
 	if (filter !== null)
 	{
 		// reselect the prior filter if available.
-		if (instrument.type == "Imager" && instrument.filters.length > 0)
+		if (g_selectInstrument.type == "Imager" && g_selectInstrument.filters.length > 0)
 		{
-			for (i = 0; i < instrument.filters.length && !found; i++)
+			found = false;
+			for (i = 0; i < g_selectInstrument.filters.length && !found; i++)
 			{
-				if (filter == instrument.filters[i].name)
+				if (filter == g_selectInstrument.filters[i].name)
 				{
 					const selectFilter = document.getElementById("selectFilter");
 					selectFilter.value = filter;
@@ -113,8 +126,6 @@ function OnSelectInstrument()
 			}
 		}
 	}
-	OnSelectFilter();
-	
 	sliderHorizontal.min = 0;
 	sliderHorizontal.max = g_selectInstrument.resolution_imager;
 	sliderHorizontal.cursor_width = viewingSize < g_selectInstrument.resolution_imager ? viewingSize : g_selectInstrument.resolution_imager;
@@ -127,6 +138,9 @@ function OnSelectInstrument()
 	sliderVertical.visible = viewingSize < g_selectInstrument.resolution_imager;
 	sliderVertical.value = g_selectInstrument.resolution_imager * 0.5;
 
+
+	OnSelectFilter();
+	
 }
 
 
@@ -203,9 +217,6 @@ OnSelectTelescope(); // make sure everything is initially populated
 
 
 
-let	g_clusters = newClusters("OpC");
-
-let g_clusterSelectList = new Object();
 
 function waitForClustersReady()
 {
@@ -227,14 +238,21 @@ function waitForClustersReady()
 			}
 		}
 		OnSelectCluster();
+		draw();
 	}
 	else
 		window.setTimeout(waitForClustersReady, 100.0);
 }
 waitForClustersReady();
 
-let g_starsCluster = null;
-let g_selectedCluster = null;
+function waitForStarsReady()
+{
+	if (g_starsCluster !== null && g_starsCluster.ready)
+		draw();
+	else
+		window.setTimeout(waitForStarsReady, 100.0);
+}
+
 function OnSelectCluster()
 {
 	if (g_clusters !== null && g_clusters.ready)
@@ -249,6 +267,9 @@ function OnSelectCluster()
 		else
 			g_starsCluster = null;
 	}
+	draw();
+	window.setTimeout(waitForStarsReady, 100.0);
+	draw();
 }
 
 let g_exposure = 10.0;
@@ -294,6 +315,7 @@ function OnSetExposure()
 		else
 			select.value = g_exposure + "s";
 				
+	draw();
 }
 let select = document.getElementById("exposure");
 select.value = g_exposure + "s";
@@ -318,10 +340,13 @@ function recenterDisplay()
 	{
 		sliderHorizontal.value = g_selectInstrument.resolution_imager * 0.5;
 		sliderVertical.value = g_selectInstrument.resolution_imager * 0.5;
+		draw();
 	}
 }
 
-function work(){
+
+function draw()
+{
 
 	// clear the canvas
 	theContext.clearRect(0, 0, theCanvas.width, theCanvas.height);
@@ -371,15 +396,27 @@ function work(){
 		const seeing = g_selectTelescope._space_based ? diff_arcsec : (altitude < 5600 ? 2.0 - altitude / 4200 * 1.5 : 0.5); // very rought method of calculating seeing: 2" at sea level down to 0.5" at Keck (4200 m)
 
 		setOutputText("diameter",g_selectTelescope._diameter.toString() + " m");
-		const collecting_area = Math.round(Math.PI * (g_selectTelescope._diameter ** 2));
-		setOutputText("collecting area",collecting_area + " m²");
+		let collecting_area = Math.round(Math.PI * (g_selectTelescope._diameter ** 2));
+		let collecting_area_units = "m²"
+		if (collecting_area < 2)
+		{
+			collecting_area = Math.round(Math.PI * (g_selectTelescope._diameter ** 2) * 1.0e4);
+			collecting_area_units = "cm²"
+		}
+		else if (collecting_area < 10)
+			collecting_area = Math.round(Math.PI * (g_selectTelescope._diameter ** 2) * 10.0) / 10.0;
+		setOutputText("collecting area",collecting_area + " " + collecting_area_units);
 		setOutputText("focal length",g_selectFocus._focal_length.toString() + " m");
 		const plate_scale_displ = Math.round(degrees(1.0e-3 / f) * 3600.0 * 1000.0) / 1000.0;
 		setOutputText("plate scale",plate_scale_displ.toString() + " \"/mm");
 		const diff_arcsec_displ = Math.round(diff_arcsec * 1000.0) / 1000.0;
 		setOutputText("angular resolution",diff_arcsec_displ.toString() + "\"");
 		const seeing_displ = Math.round(seeing * 10.0) / 10.0;
-		setOutputText("seeing",seeing_displ.toString() + "\"");
+		setOutputText("adaptive optics",g_selectTelescope._adaptive_optics ? "yes" : "no");
+		if (g_selectTelescope._space_based)
+			setOutputText("seeing","n/a");
+		else
+			setOutputText("seeing",seeing_displ.toString() + "\"");
 
 		const optical_transparency = 0.8;
 		const color = new RGB(255, 255, 255);
@@ -391,7 +428,7 @@ function work(){
 			const resolution = g_selectInstrument.resolution_imager;
 			const pixel_scale = degrees(g_selectInstrument.pixel_size * 1.0e-6 / f) * 3600.0;
 			const fov = pixel_scale * resolution;
-			const seeing_disk_pixels = g_selectTelescope._adaptive_optics ? 0.5 : seeing / pixel_scale;
+			const seeing_disk_pixels = g_selectTelescope._adaptive_optics ? diff_arcsec / pixel_scale : Math.max(seeing,diff_arcsec) / pixel_scale;
 			let displayCount = 0;
 			const quatum_efficiency = g_selectInstrument.quantum_efficiency;
 			const filt = g_selectFilter !== null ? getFilterUVBRI(g_selectFilter.name) : null;
@@ -488,9 +525,7 @@ function work(){
 //		g_dl = true;
 //	}
 	commonUIdraw(theContext);
-	
-	window.setTimeout(work, 1000.0/30.0);
 }
 
-work();
+draw();
 

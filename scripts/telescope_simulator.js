@@ -9,7 +9,7 @@ theContext.willReadFrequently = true;
 const recttop = document.getElementById("seeing").getBoundingClientRect();
 //const rectbot = document.getElementById("recenter").getBoundingClientRect();
 
-theCanvas.height = window.innerHeight - 60 - recttop.bottom;
+theCanvas.height = Math.max(window.innerHeight - 60 - recttop.bottom,400);
 theCanvas.width = window.innerWidth;
 
 const viewingSize = Math.min(theCanvas.height,theCanvas.width) - 50;

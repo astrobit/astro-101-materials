@@ -4,8 +4,14 @@ class Focus
 	{
 		this._name = name;
 		this._focal_length = focal_length;
-		this._field_angle = field_angle;
-		this._plate_scale = plate_scale;
+		if (ValidateValue(field_angle))
+			this._field_angle = field_angle;
+		else
+			this._field_angle = null;			
+		if (ValidateValue(plate_scale))
+			this._plate_scale = plate_scale;
+		else
+			this._plate_scale = degrees(1.0 / (focal_length * 1000.0)) * 3600.0; 
 		this._f_stop = f_stop;
 		this._instruments = instruments;
 	}
@@ -150,6 +156,25 @@ let instrument;
 
 
 foci = new Array();
+instruments = new Array();
+instruments.push(new Imager("FLI Proline PL 1000",300,1000,1024,0.70,0.5,24.0, 4.0, 9, 65536,UVBRI)) /// based on the spec sheet; gain is a guess - I can probably find it somewhere Ill have to look
+foci.push(new Focus("Prime Focus",0.8128,16,null,null,instruments));
+telescopes.push(new Telescope("2\" Refracting Telescope",0.0508, false, 	30.67079, -104.02276, 300*12*2.54/100, false,foci));
+
+foci = new Array();
+instruments = new Array();
+instruments.push(new Imager("FLI Proline PL 1000",300,1000,1024,0.70,0.5,24.0, 4.0, 9, 65536,UVBRI)) /// based on the spec sheet; gain is a guess - I can probably find it somewhere Ill have to look
+foci.push(new Focus("Prime Focus",0.8128,4,null,null,instruments));
+telescopes.push(new Telescope("8\" Newtonian Telescope",0.2032, false, 	30.67079, -104.02276, 300*12*2.54/100, false,foci));
+
+
+foci = new Array();
+instruments = new Array();
+instruments.push(new Imager("FLI Proline PL 1000",300,1000,1024,0.70,0.5,24.0, 4.0, 9, 65536,UVBRI)) /// based on the spec sheet; gain is a guess - I can probably find it somewhere Ill have to look
+foci.push(new Focus("Prime Focus",4.4,4,null,null,instruments));
+telescopes.push(new Telescope("UT 16\" Reflector",0.4064, false, 	30.67079, -104.02276, 600*12*2.54/100, false,foci));
+
+foci = new Array();
 foci.push(new Focus("Prime",2.29,3.0,0,0,null));
 instruments = new Array();
 instruments.push(new Imager("Prime Focus Corrector",400,1000,2048,0.43,209.7,15.0, 1.0, 2, 65536,UVBRI)) /// based on CCD3041 spec sheet; gain and max counts a guess; readout time and readout noise based on 2 kHz sampling and memory of using this POS camera
@@ -182,7 +207,7 @@ foci = new Array();
 // ommitted the George and Cynthia Mitchell Spectrograph (GCMS) / VIRUS-P
 foci.push(new Focus("Prime",10.68,3.93,0,0,null))
 instruments = new Array();
-instruments.push(new Spectrograph("IGRINS",1470,1810,40000,0.8,2.05,1,50000))
+//instruments.push(new Spectrograph("IGRINS",1470,1810,40000,0.8,2.05,1,50000)) // omit until I impllment spectrometers
 instruments.push(new Imager("DIAFI/TK3",300,1000,2048,0.8,41.94,24.0, 0.584, 4.2, 65535,UVBRI))
 instruments.push(new Imager("DIAFI/EV1",300,1000,4096,0.8,55.92,15,0.75,2,65535,UVBRI))
 foci.push(new Focus("Ritchey-Cassegrain f/8.8",23.91,8.8,61.5,8.62,instruments))

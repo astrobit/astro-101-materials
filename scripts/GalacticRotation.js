@@ -4,66 +4,68 @@
 
 
 
-var theCanvas = document.getElementById("theCanvas");
+let theCanvas = document.getElementById("theCanvas");
 theCanvas.onselectstart = function () { return false; } // prevent selection of text below the canvas when you click on it
 theCanvas.width = window.innerWidth - 10;
-var canvasCenterX = theCanvas.width / 2.0; 
+const canvasCenterX = theCanvas.width / 2.0; 
 
-var theContext = theCanvas.getContext("2d");
+let theContext = theCanvas.getContext("2d");
 
-var listGalaxies = new Array();
+let listGalaxies = new Array();
 
 for (const [key, value] of Object.entries(galaxyData)) {
 	if (value.DAT.length > 0 && value.SFB.length > 0)
 		listGalaxies.push(key);
 }
 
-var selectedGalaxy;
+let selectedGalaxy;
 
-var VelMax = 0;
-var LumMax = 0;
-var LumMin = 1000;
-var distanceMpc;
-var radiusMax;
-
-
-
-var index = new Array(3);
-var massFrac = new Array(3);
+let VelMax = 0;
+let LumMax = 0;
+let LumMin = 1000;
+let distanceMpc;
+let radiusMax;
 
 
-var bulgeMassFrac = 0.3;
-var diskMassFrac = 0.3;
-var dmMassFrac = 1.0 - bulgeMassFrac - diskMassFrac;
 
-var diskIndex = 1.0; // Disk
-var bulgeIndex = 1.0; // Bulge
-var dmIndex = 1.0; // DM
-var mass = 3.16e12;
+let index = new Array(3);
+let massFrac = new Array(3);
 
-var massToLight = 4.0; // mass-to-light ratio
+
+let bulgeMassFrac = 0.3;
+let diskMassFrac = 0.3;
+let dmMassFrac = 1.0 - bulgeMassFrac - diskMassFrac;
+
+let diskIndex = 1.0; // Disk
+let bulgeIndex = 1.0; // Bulge
+let dmIndex = 1.0; // DM
+let mass = 3.16e12;
+
+let massToLight = 4.0; // mass-to-light ratio
+let inclination = 0.0;
+let sini = 1.0;
 
 function JaffeMassFrac(r,a)
 {
-	var x = r/a;
+	const x = r/a;
 	return (x / (1.0 + x));
 }
 function HerquistMassFrac(r,a)
 {
-	var x = r/a;
+	const x = r/a;
 	return 0.5 * (x / (1.0 + x)) ** 2;
 }
 function NFWMassFrac(r,a)
 {
-	var x = r/a;
+	const x = r/a;
 	return Math.log(1.0 + x) - (x / (1.0 + x));
 }
-var bulgeModel = "Jaffe";
+const bulgeModel = "Jaffe";
 
 function getBulgeMass(r)
 {
-	var a = bulgeIndex;
-	var ret = 0;
+	const a = bulgeIndex;
+	let ret = 0;
 	if (bulgeModel == "Jaffe")
 	{
 		ret = bulgeMassFrac * mass * JaffeMassFrac(r,a);
@@ -75,11 +77,11 @@ function getBulgeMass(r)
 	return ret;
 }
 
-var diskModel = "exponential";
+const diskModel = "exponential";
 
 function ExponentialDiskMassFrac(r,a)
 {
-	var x = r/a;
+	const x = r/a;
 	return 1.0 - Math.exp(-x) * (1 + x);
 }
 
@@ -91,8 +93,8 @@ function MestelDiskMassFrac(r,a)
 
 function getDiskMass(r)
 {
-	var a = diskIndex;
-	var ret = 0;
+	const a = diskIndex;
+	let ret = 0;
 	if (diskModel == "exponential")
 	{
 		ret = diskMassFrac * mass * ExponentialDiskMassFrac(r,a);
@@ -106,9 +108,8 @@ function getDiskMass(r)
 
 function getHaloMass(r)
 {
-	var a = dmIndex;
-	var ret = 0;
-	ret = dmMassFrac * mass * NFWMassFrac(r,a);
+	const a = dmIndex;
+	const ret = dmMassFrac * mass * NFWMassFrac(r,a);
 	return ret;
 }
 
@@ -123,29 +124,29 @@ function getMass(r)
 
 function getVelocity(r)
 {
-	var massGcgs = getMass(r) * 1.98847e33 * 6.67430e-8;
-	var radiuscgs = r *  3.0856775814913673e21; // kpc to cm
-	var velocity = Math.sqrt(massGcgs / radiuscgs);
-	return velocity * 1e-5; // cm/s -> km/s
+	const massGcgs = getMass(r) * 1.98847e33 * 6.67430e-8;
+	const radiuscgs = r *  3.0856775814913673e21; // kpc to cm
+	const velocity = Math.sqrt(massGcgs / radiuscgs);
+	return velocity * 1e-5 * sini; // cm/s -> km/s
 }
 
 
 function JaffeSurfaceLuminosityFrac(r,a)
 {
 //@@TODO
-	var x = r/a;
+	const x = r/a;
 	return 0;//(x / (1.0 + x));
 }
 function HerquistSurfaceLuminosityFrac(r,a)
 {
 //@@TODO
-	var x = r/a;
+	const x = r/a;
 	return 0;//0.5 * (x / (1.0 + x)) ** 2;
 }
 function getBulgeLuminosity(r)
 {
-	var a = bulgeIndex;
-	var ret = 0;
+	const a = bulgeIndex;
+	let ret = 0;
 	if (bulgeModel == "Jaffe")
 	{
 		ret = bulgeMassFrac * mass / massToLight * JaffeSurfaceLuminosityFrac(r,a);
@@ -160,25 +161,21 @@ function getBulgeLuminosity(r)
 
 function ExponentialDiskSurfaceLuminosityFrac(r,a) // (kpc^-2)
 {
-	var x = r/a;
-	if (x == 0)
-		x = 0.0001;
+	const x = r == 0 ? 0.0001 : r/a;
 	return 1.0 / (Math.PI * (a**2) * x) * Math.exp(-x);
 }
 
 function MestelDiskSurfaceLuminosityFrac(r,a) // (kpc^-2)
 {
-	var x = r/a;
-	if (x == 0)
-		x = 0.0001;
+	const x = r == 0 ? 0.0001 : r/a;
 	return 1.0 / (2.0 * Math.PI * (a**2) * x);
 }
 
 
 function getDiskLuminosity(r)
 {
-	var a = diskIndex;
-	var ret = 0;
+	const a = diskIndex;
+	let ret = 0;
 	if (diskModel == "exponential")
 	{
 		ret = diskMassFrac * mass / massToLight * ExponentialDiskSurfaceLuminosityFrac(r,a);
@@ -197,13 +194,13 @@ function getLuminosity(r)
 
 function getSurfaceBrightness(r)
 {
-	var fluxSolar = getLuminosity(r); // Solar luminosities / kpc^2
-	var d = galaxyData[selectedGalaxy].DAT[0].distance; // Mpc
-	var arcsec = 1.0 / 3600.0 * Math.PI / 180.0; // 1"
-	var x = d * arcsec * 1000.0; // kpc
-	var L = fluxSolar * (x**2); // Solar luminosities
-	var Mv = Math.log10(L) * -2.5 + 4.83 ;
-	var DM = 5 * Math.log10(d) + 25
+	const fluxSolar = getLuminosity(r); // Solar luminosities / kpc^2
+	const d = galaxyData[selectedGalaxy].DAT[0].distance; // Mpc
+	const arcsec = 1.0 / 3600.0 * Math.PI / 180.0; // 1"
+	const x = d * arcsec * 1000.0; // kpc
+	const L = fluxSolar * (x**2); // Solar luminosities
+	const Mv = Math.log10(L) * -2.5 + 4.83 ;
+	const DM = 5 * Math.log10(d) + 25
 	return Mv + DM;
 }
 
@@ -215,11 +212,12 @@ function plot()
 
 	const graphWidth = 400;
 	const graphHeight = 200;
+	
 	//
 	// Draw Velocity information
 	//
 
-	var r;
+	let r;
 	
 	theContext.save();
 	theContext.translate(canvasCenterX - 3* graphWidth / 2 - 100,20 + graphHeight);
@@ -249,21 +247,21 @@ function plot()
 	theContext.font = "10px Arial";
 	for (i = 0; i < 6; i++)
 	{
-		var x = i * graphWidth / 5;
-		var y = 0;
+		const x = i * graphWidth / 5;
+		const y = 0;
 		theContext.beginPath();
 		theContext.moveTo(x,y);
 		theContext.lineTo(x,y+10);
 		theContext.stroke();
-		var radLabel = Math.round(radiusMax / 4 * i * 10.0) / 10.0;
+		const radLabel = Math.round(radiusMax / 4 * i * 10.0) / 10.0;
 		theContext.fillText(radLabel, x,y+20);
 	}
 	theContext.textAlign = "right";
-	var massRel;
+	let massRel;
 	for (massRel = 0; massRel <= 1.25; massRel += 0.25)
 	{
-		var x = 0;
-		var y = -massRel / 1.25 * graphHeight;
+		const x = 0;
+		const y = -massRel / 1.25 * graphHeight;
 		theContext.beginPath();
 		theContext.moveTo(x,y);
 		theContext.lineTo(x - 5,y);
@@ -282,13 +280,13 @@ function plot()
 
 	theContext.strokeStyle = "#FF0000";
 	theContext.beginPath();
-	var first = true;
+	let first = true;
 	for (r = 0.01 * radiusMax; r <= radiusMax; r += (radiusMax * 0.02))
 	{
-		var Mdisk = getDiskMass(r) / mass;
+		const Mdisk = getDiskMass(r) / mass;
 
-		var x = r / radiusMax * graphWidth;
-		var y = -Mdisk * graphHeight / 1.25;
+		const x = r / radiusMax * graphWidth;
+		const y = -Mdisk * graphHeight / 1.25;
 		if (first)
 			theContext.moveTo(x, y);
 		else
@@ -301,10 +299,10 @@ function plot()
 	theContext.beginPath();
 	for (r = 0.01 * radiusMax; r <= radiusMax; r += (radiusMax * 0.02))
 	{
-		var Mbulge = getBulgeMass(r) / mass;
+		const Mbulge = getBulgeMass(r) / mass;
 
-		var x = r / radiusMax * graphWidth;
-		var y = -Mbulge * graphHeight / 1.25;
+		const x = r / radiusMax * graphWidth;
+		const y = -Mbulge * graphHeight / 1.25;
 		if (first)
 			theContext.moveTo(x, y);
 		else
@@ -317,10 +315,10 @@ function plot()
 	theContext.beginPath();
 	for (r = 0.01 * radiusMax; r <= radiusMax; r += (radiusMax * 0.02))
 	{
-		var Mdm = getHaloMass(r) / mass;
+		const Mdm = getHaloMass(r) / mass;
 
-		var x = r / radiusMax * graphWidth;
-		var y = -Mdm * graphHeight / 1.25;
+		const x = r / radiusMax * graphWidth;
+		const y = -Mdm * graphHeight / 1.25;
 		if (first)
 			theContext.moveTo(x, y);
 		else
@@ -333,10 +331,10 @@ function plot()
 	theContext.beginPath();
 	for (r = 0.01 * radiusMax; r <= radiusMax; r += (radiusMax * 0.02))
 	{
-		var mtot = getMass(r) / mass;
+		const mtot = getMass(r) / mass;
 
-		var x = r / radiusMax * graphWidth;
-		var y = -mtot * graphHeight / 1.25;
+		const x = r / radiusMax * graphWidth;
+		const y = -mtot * graphHeight / 1.25;
 		if (first)
 			theContext.moveTo(x, y);
 		else
@@ -372,7 +370,7 @@ function plot()
 	theContext.lineTo(0,0);
 	theContext.lineTo(graphWidth,0);
 	theContext.stroke();
-	var VelRound = 50;
+	let VelRound = 50;
 	if (VelMax < 0.5)
 		VelRound = 0.1;
 	else if (VelMax < 1)
@@ -393,7 +391,7 @@ function plot()
 		VelRound = 100;
 	else if (VelMax > 1000)
 		VelRound = 200;
-	var VelScale = (Math.floor(VelMax / VelRound) + 1.0) * VelRound;
+	const VelScale = (Math.floor(VelMax / VelRound) + 1.0) * VelRound;
 
 
 
@@ -401,21 +399,21 @@ function plot()
 	theContext.font = "10px Arial";
 	for (i = 0; i < 6; i++)
 	{
-		var x = i * graphWidth / 5;
-		var y = 0;
+		const x = i * graphWidth / 5;
+		const y = 0;
 		theContext.beginPath();
 		theContext.moveTo(x,y);
 		theContext.lineTo(x,y+10);
 		theContext.stroke();
-		var radLabel = Math.round(radiusMax / 4 * i * 10.0) / 10.0;
+		const radLabel = Math.round(radiusMax / 4 * i * 10.0) / 10.0;
 		theContext.fillText(radLabel, x,y+20);
 	}
 	theContext.textAlign = "right";
-	var vel;
+	let vel;
 	for (vel = 0; vel <= VelScale; vel += VelRound)
 	{
-		var x = 0;
-		var y = -vel / VelScale * graphHeight;
+		const x = 0;
+		const y = -vel / VelScale * graphHeight;
 		theContext.beginPath();
 		theContext.moveTo(x,y);
 		theContext.lineTo(x - 5,y);
@@ -432,12 +430,12 @@ function plot()
 	//
 	
 	theContext.beginPath();
-	var first = true;
+	first = true;
 	for (r = 0.01 * radiusMax; r <= radiusMax; r += (radiusMax * 0.02))
 	{
 	
-		var x = r / radiusMax * graphWidth;
-		var y = -getVelocity(r) / VelScale * graphHeight;
+		const x = r / radiusMax * graphWidth;
+		const y = -getVelocity(r) / VelScale * graphHeight;
 		if (first)
 			theContext.moveTo(x, y);
 		else
@@ -452,21 +450,21 @@ function plot()
 
 	theContext.fillStyle = "#FF0000";
 	theContext.strokeStyle = "#FF0000";
-	var vsum = 0;
-	var len = galaxyData[selectedGalaxy].DAT.length;
+	const vsum = 0;
+	const len = galaxyData[selectedGalaxy].DAT.length;
 	for (i = 0; i < len; i++) {
-		var jLen = galaxyData[selectedGalaxy].DAT[i].data.length;
+		const jLen = galaxyData[selectedGalaxy].DAT[i].data.length;
 		for (j = 0; j < jLen; j++) {
-			var r = galaxyData[selectedGalaxy].DAT[i].data[j].radius;
-			var x = r / radiusMax * graphWidth;
-			var y = galaxyData[selectedGalaxy].DAT[i].data[j].Vobs / VelScale * -200;
+			const r = galaxyData[selectedGalaxy].DAT[i].data[j].radius;
+			const x = r / radiusMax * graphWidth;
+			const y = galaxyData[selectedGalaxy].DAT[i].data[j].Vobs / VelScale * -200;
 			theContext.fillRect(x - 2, y - 2, 4, 4);
 
 				// draw error bars
-			var vmin = galaxyData[selectedGalaxy].DAT[i].data[j].Vobs - galaxyData[selectedGalaxy].DAT[i].data[j].err;
-			var vmax = galaxyData[selectedGalaxy].DAT[i].data[j].Vobs + galaxyData[selectedGalaxy].DAT[i].data[j].err;
-			var ymin = vmin / VelScale * -graphHeight;
-			var ymax = vmax / VelScale * -graphHeight;
+			const vmin = galaxyData[selectedGalaxy].DAT[i].data[j].Vobs - galaxyData[selectedGalaxy].DAT[i].data[j].err;
+			const vmax = galaxyData[selectedGalaxy].DAT[i].data[j].Vobs + galaxyData[selectedGalaxy].DAT[i].data[j].err;
+			const ymin = vmin / VelScale * -graphHeight;
+			const ymax = vmax / VelScale * -graphHeight;
 
 			theContext.lineWidth = 1.0;
 			theContext.strokeStyle = "#FF0000"
@@ -495,8 +493,8 @@ function plot()
 	theContext.save();
 	theContext.translate(canvasCenterX + graphWidth / 2 + 100,20 + graphHeight);
 	
-	var LumMinPlot = Math.floor(LumMin);
-	var LumMaxPlot = Math.ceil(LumMax);
+	let LumMinPlot = Math.floor(LumMin);
+	let LumMaxPlot = Math.ceil(LumMax);
 
 	theContext.fillStyle = "#7F7F7F";
 	theContext.textAlign = "center";
@@ -522,19 +520,19 @@ function plot()
 	theContext.textAlign = "center";
 	for (i = 0; i < 6; i++)
 	{
-		var x = i * graphWidth / 5;
-		var y = 0;
+		const x = i * graphWidth / 5;
+		const y = 0;
 		theContext.beginPath();
 		theContext.moveTo(x,y);
 		theContext.lineTo(x,y+10);
 		theContext.stroke();
-		var radLabel = Math.round(radiusMax / 4 * i * 10.0) / 10.0;
+		const radLabel = Math.round(radiusMax / 4 * i * 10.0) / 10.0;
 		theContext.fillText(radLabel, x, y + 20);
 	}
-	var mv;
-	var mvstep = 1;
+	let mv;
+	let mvstep = 1;
 	theContext.textAlign = "right";
-	var deltamv = LumMaxPlot - LumMinPlot;
+	let deltamv = LumMaxPlot - LumMinPlot;
 	if (deltamv < 2.0)
 		mvstep = 0.25;
 	else if (deltamv < 4.0)
@@ -551,8 +549,8 @@ function plot()
 
 	for (mv = LumMinPlot; mv <= LumMaxPlot; mv += mvstep)
 	{
-		var x = 0;
-		var y = (mv - LumMaxPlot) / (LumMaxPlot - LumMinPlot) * graphHeight;
+		const x = 0;
+		const y = (mv - LumMaxPlot) / (LumMaxPlot - LumMinPlot) * graphHeight;
 		theContext.beginPath();
 		theContext.moveTo(x,y);
 		theContext.lineTo(x - 5,y);
@@ -574,10 +572,10 @@ function plot()
 	first = true;
 	for (r = 0; r <= radiusMax; r += (radiusMax * 0.02))
 	{
-		var s = getSurfaceBrightness(r);
+		const s = getSurfaceBrightness(r);
 	
-		var x = r / radiusMax * graphWidth;
-		var y = (s - LumMaxPlot) / (LumMaxPlot - LumMinPlot) * graphHeight;
+		const x = r / radiusMax * graphWidth;
+		const y = (s - LumMaxPlot) / (LumMaxPlot - LumMinPlot) * graphHeight;
 		if (first)
 			theContext.moveTo(x, y);
 		else
@@ -591,21 +589,21 @@ function plot()
 	//
 
 	theContext.fillStyle = "#0000FF";
-//	var Lsum = 0;
-	var len = galaxyData[selectedGalaxy].SFB.length;
-	for (i = 0; i < len; i++) {
-		var jLen = galaxyData[selectedGalaxy].SFB[i].length;
+//	const Lsum = 0;
+	const lenGal = galaxyData[selectedGalaxy].SFB.length;
+	for (i = 0; i < lenGal; i++) {
+		const jLen = galaxyData[selectedGalaxy].SFB[i].length;
 		for (j = 0; j < jLen; j++) {
-			var r = galaxyData[selectedGalaxy].SFB[i][j].radius / 3600.0 / 180.0 * Math.PI * distanceMpc * 1000.0;
-			var x = r / radiusMax * graphWidth;
-			var y = (galaxyData[selectedGalaxy].SFB[i][j].surfaceBrightness - LumMaxPlot) / (LumMaxPlot - LumMinPlot) * graphHeight;
+			const r = galaxyData[selectedGalaxy].SFB[i][j].radius / 3600.0 / 180.0 * Math.PI * distanceMpc * 1000.0;
+			const x = r / radiusMax * graphWidth;
+			const y = (galaxyData[selectedGalaxy].SFB[i][j].surfaceBrightness - LumMaxPlot) / (LumMaxPlot - LumMinPlot) * graphHeight;
 			theContext.fillRect(x - 2, y - 2, 4, 4);
 
 			// draw error bars
-			var mumin = galaxyData[selectedGalaxy].SFB[i][j].surfaceBrightness - galaxyData[selectedGalaxy].SFB[i][j].err;
-			var mumax = galaxyData[selectedGalaxy].SFB[i][j].surfaceBrightness + galaxyData[selectedGalaxy].SFB[i][j].err;
-			var ymin = (mumin - LumMaxPlot) / (LumMaxPlot - LumMinPlot) * graphHeight;
-			var ymax = (mumax - LumMaxPlot) / (LumMaxPlot - LumMinPlot) * graphHeight;
+			const mumin = galaxyData[selectedGalaxy].SFB[i][j].surfaceBrightness - galaxyData[selectedGalaxy].SFB[i][j].err;
+			const mumax = galaxyData[selectedGalaxy].SFB[i][j].surfaceBrightness + galaxyData[selectedGalaxy].SFB[i][j].err;
+			const ymin = (mumin - LumMaxPlot) / (LumMaxPlot - LumMinPlot) * graphHeight;
+			const ymax = (mumax - LumMaxPlot) / (LumMaxPlot - LumMinPlot) * graphHeight;
 
 			theContext.strokeStyle = "#0000FF"
 			theContext.beginPath();
@@ -629,28 +627,32 @@ function plot()
 
 function update()
 {
-	var elemBulge = document.getElementById('bulgeDiskRatio');
-	var elemMassLightRatio = document.getElementById('MassLightRatio');
+	const elemBulge = document.getElementById('bulgeDiskRatio');
+	const elemMassLightRatio = document.getElementById('MassLightRatio');
 	massToLight = Number(elemMassLightRatio.value);
-	var InvLightMassRatio = 1.0 / massToLight;
+	const InvLightMassRatio = 1.0 / massToLight;
 	dmMassFrac = 1.0 - InvLightMassRatio;
-	var diskMassFracLcl = Number(elemBulge.value) / Number(elemBulge.max);
+	const diskMassFracLcl = Number(elemBulge.value) / Number(elemBulge.max);
 	bulgeMassFrac = (1.0 - diskMassFracLcl) * InvLightMassRatio;
 	diskMassFrac = diskMassFracLcl * InvLightMassRatio;
 
-	var elemBulgeIndex = document.getElementById('bulgeIndex');
-	var elemDiskIndex = document.getElementById('diskIndex');
-	var elemDMIndex = document.getElementById('DMIndex');
+	const elemBulgeIndex = document.getElementById('bulgeIndex');
+	const elemDiskIndex = document.getElementById('diskIndex');
+	const elemDMIndex = document.getElementById('DMIndex');
 
 	diskIndex = Number(elemDiskIndex.value);// / 100.0 * 3.0 + 1.0;
 	bulgeIndex = Number(elemBulgeIndex.value);// / 100.0 * 3.0 + 1.0;
 	dmIndex = Number(elemDMIndex.value);// / 100.0 * 3.0 + 1.0;
 
-	var elemMass = document.getElementById('totalMass');
+	const elemMass = document.getElementById('totalMass');
 	mass = Math.pow(10,Number(elemMass.value));
 
+	const inclElem = document.getElementById("inclination");
+	inclination = inclElem.value;
+	sini = Math.sin(radians(90.0 - inclination));
 
-	var elemOutput = document.getElementById('tdTotalMass');
+
+	let elemOutput = document.getElementById('tdTotalMass');
 	elemOutput.innerHTML = Number.parseFloat(mass).toExponential(2) + "&nbsp;M<sub>⊙</sub>";
 
 
@@ -675,6 +677,9 @@ function update()
 	elemOutput = document.getElementById('tdGalID');
 	elemOutput.innerHTML = selectedGalaxy;
 
+	elemOutput = document.getElementById('tdInclinationAngle');
+	elemOutput.innerHTML = inclination.toString() + "°";
+
 //	getUserFitParameters();
 	plot();
 	window.setTimeout(update, 30.0);
@@ -684,7 +689,7 @@ function update()
 
 function chooseGalaxy(shouldPlot)
 {
-	var idx = 0
+	let idx = 0
 	do
 	{
 		idx = Math.floor(Math.random() * listGalaxies.length);
@@ -698,13 +703,13 @@ function chooseGalaxy(shouldPlot)
 	LumMinPlot = 1000;
 	radiusMax = 0;
 
-	var distSum = 0;
-	var distCount = 0;
-	var len = galaxyData[selectedGalaxy].DAT.length;
+	let distSum = 0;
+	let distCount = 0;
+	const len = galaxyData[selectedGalaxy].DAT.length;
 	for (i = 0; i < len; i++) {
-		var jLen = galaxyData[selectedGalaxy].DAT[i].data.length;
+		const jLen = galaxyData[selectedGalaxy].DAT[i].data.length;
 		for (j = 0; j < jLen; j++) {
-			var vmax = galaxyData[selectedGalaxy].DAT[i].data[j].Vobs + galaxyData[selectedGalaxy].DAT[i].data[j].err;
+			const vmax = galaxyData[selectedGalaxy].DAT[i].data[j].Vobs + galaxyData[selectedGalaxy].DAT[i].data[j].err;
 			if (vmax > VelMax)
 				VelMax = vmax;
 			if (galaxyData[selectedGalaxy].DAT[i].data[j].radius > radiusMax)
@@ -715,17 +720,17 @@ function chooseGalaxy(shouldPlot)
 	}
 	distanceMpc = (distSum / distCount);
 
-	var len = galaxyData[selectedGalaxy].SFB.length;
-	for (i = 0; i < len; i++) {
+	const lenSFB = galaxyData[selectedGalaxy].SFB.length;
+	for (i = 0; i < lenSFB; i++) {
 		jLen = galaxyData[selectedGalaxy].SFB[i].length;
 		for (j = 0; j < jLen; j++) {
-			var lmax = galaxyData[selectedGalaxy].SFB[i][j].surfaceBrightness + galaxyData[selectedGalaxy].SFB[i][j].err;
-			var lmin = galaxyData[selectedGalaxy].SFB[i][j].surfaceBrightness - galaxyData[selectedGalaxy].SFB[i][j].err;
+			const lmax = galaxyData[selectedGalaxy].SFB[i][j].surfaceBrightness + galaxyData[selectedGalaxy].SFB[i][j].err;
+			const lmin = galaxyData[selectedGalaxy].SFB[i][j].surfaceBrightness - galaxyData[selectedGalaxy].SFB[i][j].err;
 			if (lmax > LumMax)
 				LumMax = lmax;
 			if (lmin < LumMin)
 				LumMin = lmin;
-			var radiuskpc = galaxyData[selectedGalaxy].SFB[i][j].radius / 3600.0 / 180.0 * Math.PI * distanceMpc * 1000.0;
+			const radiuskpc = galaxyData[selectedGalaxy].SFB[i][j].radius / 3600.0 / 180.0 * Math.PI * distanceMpc * 1000.0;
 			if (radiuskpc > radiusMax)
 				radiusMax = radiuskpc;
 		}

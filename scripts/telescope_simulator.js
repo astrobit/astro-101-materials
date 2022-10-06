@@ -19,7 +19,7 @@ const recttop = document.getElementById("seeing").getBoundingClientRect();
 //const rectbot = document.getElementById("recenter").getBoundingClientRect();
 
 theCanvas.height = Math.max(window.innerHeight - 60 - recttop.bottom,400);
-theCanvas.width = window.innerWidth;
+theCanvas.width = window.innerWidth - 40;
 
 const viewingSize = Math.min(theCanvas.height,theCanvas.width) - 50;
 let sliderHorizontal = new Scroller(theCanvas.width / 2, theCanvas.height - 20, 0,1,0.5,0.25,false);

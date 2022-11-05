@@ -40,6 +40,8 @@
 // Additions
 // - _bandEnergy to calculate total energy of photons within a given bandwidth
 // - PhotonFluxToFlux to calcualte an energy flux given a photon flux
+// Changes
+// - fluxToPhotonFlux (now _bandEnergy) was incorrectly calculating average photon energy within the band; corrected calculation
 
 /////////////////////////////////////////////////////////////////////////
 //

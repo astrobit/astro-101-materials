@@ -473,7 +473,7 @@ function draw()
 					{
 						let mag = star.fluxes[g_selectFilter.name] + extinction;
 						if (filt !== null)
-							flux = fluxToPhotonFlux(filt.central_wavelength * 1.0E-9,(filt.blue_spectral_width + filt.red_spectral_width) * 1.0E-9,MagtoFlux(g_selectFilter.name,mag));
+							flux = fluxToPhotonFlux(filt.central_wavelength * 1.0E-7,(filt.blue_spectral_width + filt.red_spectral_width) * 1.0E-7,MagtoFlux(g_selectFilter.name,mag));
 					}
 					else
 					{
@@ -483,7 +483,7 @@ function draw()
 						{
 							const filt = getFilterUVBRI(filters[j]);
 							const extinctionLcl = extinction_coefficient(filters[j]);
-							flux += fluxToPhotonFlux(filt.central_wavelength * 1.0E-9,(filt.blue_spectral_width + filt.red_spectral_width) * 1.0E-9,MagtoFlux(filters[j],star.fluxes[filters[j]] + extinctionLcl));
+							flux += fluxToPhotonFlux(filt.central_wavelength * 1.0E-7,(filt.blue_spectral_width + filt.red_spectral_width) * 1.0E-7,MagtoFlux(filters[j],star.fluxes[filters[j]] + extinctionLcl));
 						}
 					}
 					

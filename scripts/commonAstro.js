@@ -36,6 +36,10 @@
 // - flip order of traversal of image from (x -> y) to (y->x) to optimize memory access in drawStar and drawStarFlux
 // - add saturation effect to drawStarFlux; at flux > 1.2 max, the flux will bleed into pixels to the right, emulating transfer effects
 //
+// 2022-Nov-04
+// Additions
+// - _bandEnergy to calculate total energy of photons within a given bandwidth
+// - PhotonFluxToFlux to calcualte an energy flux given a photon flux
 
 /////////////////////////////////////////////////////////////////////////
 //
@@ -248,21 +252,53 @@ function MagtoFlux(band,mag)
 
 /////////////////////////////////////////////////////////////////////////
 //
+//  function _bandEnergy
+//
+// calculate the average energy of photons within a band
+// input: wavelength (number) - the central wavelength (in cm) of the band
+//        bandwidth (number) - the full width of the band
+// output: (number) - the average energy per photon within the band
+//
+/////////////////////////////////////////////////////////////////////////
+function _bandEnergy(wavelength,bandwidth)
+{
+	return Phys.kPlanck * Phys.kSpeedOfLight * Math.log((wavelength + bandwidth * 0.5) / (wavelength - bandwidth * 0.5)) * (bandwidth);
+}
+
+/////////////////////////////////////////////////////////////////////////
+//
 //  function fluxToPhotonFlux
 //
 // get the photon flux for a given band given an energy flux
 // source: https://lweb.cfa.harvard.edu/~dfabricant/huchra/ay145/mags.html
 // input: wavelength (number) - the central wavelength (in cm) of the band
 //        bandwidth (number) - the full width of the band
+//        flux (number) - the energy flux (in erg/cm²/s) 
 // output: (number) - the flux in photons/s/cm²
 //
 /////////////////////////////////////////////////////////////////////////
 
 function fluxToPhotonFlux(wavelength,bandwidth, flux)
 {
-	const w = Phys.kSpeedOfLight * (1.0 / (wavelength - bandwidth * 0.5) - 1.0 / (wavelength + bandwidth * 0.5));
-	const e = Phys.kPlanck * Phys.kSpeedOfLight / wavelength;
-	return flux / e * w;
+	return flux / _bandEnergy(wavelength,bandwidth);
+}
+
+
+/////////////////////////////////////////////////////////////////////////
+//
+//  function PhotonFluxToFlux
+//
+// get the energy flux for a given band given an photon flux
+// input: wavelength (number) - the central wavelength (in cm) of the band
+//        bandwidth (number) - the full width of the band
+//        photonFlux (number) - the photon flux (in 1/cm²/s) 
+// output: (number) - the flux in erg/s/cm²
+//
+/////////////////////////////////////////////////////////////////////////
+
+function PhotonFluxToFlux(wavelength,bandwidth, photonFlux)
+{
+	return _bandEnergy(wavelength,bandwidth) * photonFlux;
 }
 
 const MonthDays = {

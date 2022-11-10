@@ -138,6 +138,48 @@ function random_gaussian(mean, stdev)
 
 /////////////////////////////////////////////////////////////////////////
 //
+// function random_poisson
+//
+// random Poisson disribution
+//Source: https://www.johndcook.com/blog/2010/06/14/generating-poisson-random-values/
+// Note: this generates a semi-Poisson distribution wherein all data 
+// lies within approximately one standard deviation of the mean.
+// modified to allow a mean and standard deviation
+// input: mean (Number) - the value around which the distribution 
+//							should vary
+//        stdev (Number) - the standard deviation of the distribution
+// output: (Number) a random number that is distributed in a Poisson
+//                  distribution about the mean with the given standard 
+//					deviation
+//
+/////////////////////////////////////////////////////////////////////////
+
+function random_poisson(mean)
+{ 
+	const c = 0.767 - 3.36 / mean;
+	const beta = Math.PI / Math.sqrt(3.0 * mean);
+	const alpha = beta * mean;
+	const k = Math.log(c) - mean * Math.log(beta);
+	let ret = null;
+	while (ret === null)
+	{
+		let u = Math.random();
+		const x = (alpha - Math.log((1.0 / u - 1))) / beta;
+		const n = Math.floor(x + 0.5);
+		if (n >= 0)
+		{
+			const v = Math.random();
+			const y = alpha - beta * x;
+			const lhs = y + Math.log(v) - 2.0 * Math.log(1.0 + Math.exp(y))
+			const rhs = k + n * Math.log(mean) - Math.log(factorial(n));
+			if (lhs <= rhs)
+				ret = n;
+		}
+	}
+	return ret;
+}
+/////////////////////////////////////////////////////////////////////////
+//
 // function error_function
 //
 // Error Function (erf), using the Bürmann series

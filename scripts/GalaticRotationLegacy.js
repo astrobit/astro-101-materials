@@ -11,15 +11,7 @@ let timer = 0;
 
 let index = new Array(3);
 let massFrac = new Array(3);
-// random Gaussian disribution
-//Source: https://stackoverflow.com/questions/25582882/javascript-math-random-normal-distribution-gaussian-bell-curve/36481059#36481059
-// modified to allow a mean and standard deviation
-function randn_bm(mean, stdev) { 
-    let u = 0, v = 0;
-    while(u === 0) u = Math.random(); //Converting [0,1) to (0,1)
-    while(v === 0) v = Math.random();
-    return Math.sqrt( -2.0 * Math.log( u ) ) * Math.cos( 2.0 * Math.PI * v ) * stdev / Math.PI * 0.5 + mean;
-}
+
 
 class datapoint
 {
@@ -364,6 +356,11 @@ function chooseGalaxy(shouldPlot)
 	VelMax = 0;
 	LumMax = 1000;
 	LumMin = -1000;
+	
+	const Ldisk0 = GalMass * GalMassFrac[0] * Math.pow(0.01 / 100.0,GalIndex[0]);
+	const Lbulge0 = GalMass * GalMassFrac[1] * Math.pow(0.01 / 100.0,GalIndex[1]);
+	const Mv0 = Math.log10(Ldisk0 + Lbulge0) * -2.5 + 65;
+	const MvC = Mv0 + 10;
 	for (i = 0; i < 200; i++)
 	{
 		let r = Math.random() * 100.0;
@@ -372,23 +369,33 @@ function chooseGalaxy(shouldPlot)
 		let Mdm = MconstDM * Math.pow(r,3+GalIndex[2]);
 
 		let v = Math.sqrt(6.67e-8 * 2e33 * (Mdisk + Mbulge + Mdm) / (r * 3.086e21)  ) * 1.0e-5;
-		let vscat = randn_bm(v,0.1*v);
+		let vscat = random_gaussian(v,0.0125*v);
 		if (vscat > VelMax)
 			VelMax = vscat;
 		GalVels[i] = new datapoint(r,vscat);
-
-		r = Math.random() * 30.0;
+	}
+	i = 0;
+	do
+	{
+		r = Math.random() * 100.0;
 		let Ldisk = GalMass * GalMassFrac[0] * Math.pow(r / 100.0,GalIndex[0]);
 		let Lbulge = GalMass * GalMassFrac[1] * Math.pow(r / 100.0,GalIndex[1]);
 		let L = Ldisk + Lbulge;
-		let Lscat = randn_bm(L,2.0 * L);
+		let Lscat = -1;
+		while (Lscat <= 0)
+			Lscat = random_gaussian(L,L * 0.125);
+		
 		Mv = Math.log10(Lscat) * -2.5 + 65;
-		if (Mv < LumMax)
-			LumMax = Mv;
-		if (Mv > LumMin)
-			LumMin = Mv;
-		GalLum[i] = new datapoint(r,Mv);
-	}
+		if (Mv > MvC)
+		{
+			if (Mv < LumMax)
+				LumMax = Mv;
+			if (Mv > LumMin)
+				LumMin = Mv;
+			GalLum[i] = new datapoint(r,Mv);
+			i++;
+		}
+	} while (i < 200);
 }
 
 chooseGalaxy();

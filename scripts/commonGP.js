@@ -19,7 +19,10 @@
 // Changes
 // - Clean up comment formatting
 // - modify ValidateValue function to use typeof instead of !== undefined
-
+//
+// 2022-Nov-09
+// Additions
+// - add SIprefix to determine the approriate SI prefix for a value. Note: excludes centi-, hecto-, deci-, and deca-
 
 /////////////////////////////////////////////////////////////////////////
 //
@@ -1454,3 +1457,26 @@ class SphereAngularAverager
 	}
 
 }
+
+/////////////////////////////////////////////////////////////////////////
+//
+//  SIprefix
+//
+// reduces a value to the nearest value with an SI prefix
+// note: excludes centi-, hecto-, deci-, and deca-
+// inputs: value
+// output: (Object):
+//				value: (number) the number of values in the set
+//				prefix: (string) the SI prefix
+//
+/////////////////////////////////////////////////////////////////////////
+
+const _SIprefixes = ["y","z","a","f","p","n","µ", "m", "-", "k", "M", "G", "T", "P", "E", "Z", "Y"];
+function SIprefix(value)
+{
+	const logV = Math.log10(value);
+	const l3 = Math.floor(Math.floor(logV) / 3);
+	const idx = Math.max(Math.min(l3 + 8,16),0);
+	return {value: value * Math.pow(10.0,-l3 * 3), prefix: _SIprefixes[idx]};
+}
+

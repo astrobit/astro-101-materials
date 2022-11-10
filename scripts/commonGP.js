@@ -23,6 +23,7 @@
 // 2022-Nov-09
 // Additions
 // - add SIprefix to determine the approriate SI prefix for a value. Note: excludes centi-, hecto-, deci-, and deca-
+// - add random_poisson function
 
 /////////////////////////////////////////////////////////////////////////
 //

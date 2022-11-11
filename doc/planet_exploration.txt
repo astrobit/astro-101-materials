@@ -1,0 +1,15 @@
+Concepts:
+Observations over time:
+Early era:
+	naked eye observations of brightness, elongation, orbital path (ecliptic), retrograde vs prograde motion
+	
+Galilean era:
+	naked eye observations of phase, color, limited details of planets, moons, rings of Saturn
+	Galileo's Telescope: 26 mm aperture, 1330 mm focal length; 8x, 14x, and eventually 20x magnification
+			angular resolution: ~4"
+	
+Photographic era:
+	Increasingly large telescopes and photography
+	
+
+	

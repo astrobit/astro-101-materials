@@ -1,0 +1,31 @@
+Mv = -19 (Type Ib/c/II)
+Mv = -20 (Type Ia)
+
+Mv = -8.8 / -7.7 (Classical Novae)
+
+const pixel_scale = degrees(g_selectInstrument.pixel_size * 1.0e-6 / f) * 3600.0;
+const fov = pixel_scale * resolution;
+
+integration time per field = ???
+
+
+
+SNR = total flux / sqrt(total flux) = sqrt(collecting area * flux_s * time / hc * wavelength)
+
+flux_s = SNR^2 * wavelenegth / (area * time * hc)
+limiting magnitude for survey = 2.5 log(flux_s / flux_0)
+
+
+circumpolar area = 2 pi (pi - |latitude|)
+invisible area = circumpolar area
+variable area = (4pi - circumpolar area - invisible area) * ( 22/24) (assuming 1h RA before sunrise and 1h after sunset not visible on any given day)
+
+all sky imaging time = (circumpolar area + variable area) / fov^2 * time
+
+imaging distance (per object type; pc) = 10^((m - M)/0.2 + 1)
+
+imaging volume (per object type; pc³)= (circumpolar area + variable area) * (imaging distance)^3
+
+
+frequency = 
+

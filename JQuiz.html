@@ -1,0 +1,138 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>J-Quiz</title>
+    <style>
+        .slidecontainer {
+            width: 100%; /* Width of the outside container */
+        }
+
+
+            /* Mouse-over effects */
+            .slider:hover {
+                opacity: 1; /* Fully shown on mouse-over */
+            }
+
+            .slider {
+                -webkit-appearance: none;
+                width: 100%;
+                height: 16px;
+                border-radius: 8px;
+                background: #d3d3d3;
+                outline: none;
+                opacity: 0.7;
+                -webkit-transition: .2s;
+                transition: opacity .2s;
+            }
+
+                .slider::-webkit-slider-thumb {
+                    -webkit-appearance: none;
+                    appearance: none;
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    background: #4CAF50;
+                    cursor: pointer;
+                }
+
+                .slider::-moz-range-thumb {
+                    width: 20px;
+                    height: 20px;
+                    border-radius: 50%;
+                    background: #4CAF50;
+                    cursor: pointer;
+                }
+        button {
+            width: 100%;
+            height: 120px;
+            text-align: center;
+            background-color: #0000FF;
+            color: #FFFFFF;
+            text-shadow: 4px 4px #00001f;
+            font-size: 32px;
+            border: none;
+        }
+        th {
+            width:16.6%;
+        }
+        tr {
+            height: 120px;
+        }
+        table {
+            width: 80%;
+            text-align: center;
+            background-color: #0000FF;
+            color: #FFFFFF;
+            text-shadow: 4px 4px #00001f;
+            font-size: 32px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .question {
+            display: table-cell;
+            vertical-align: middle;
+        }
+        .questionholder {
+            box-sizing: border-box;
+            padding: 10px;
+            width: 500px;
+            height: 400px;
+            text-align: center;
+            background-color: #0000FF;
+            color: #FFFFFF;
+            text-shadow: 4px 4px #00001f;
+            font-size: 32px;
+            margin-left: auto;
+            margin-right: auto;
+            display: table;
+            vertical-align: middle;
+        }
+    </style>
+</head>
+<body style="font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#000000;text-align:center">
+    <h1 style="font-size:24px;text-align:center;color:#ffffff;">J-Quiz</h1>
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>
+                        Uranus &amp; Neptue
+                    </th>
+                    <th>
+                        Rings &amp; Moons
+                    </th>
+                    <th>
+                        Asteroids
+                    </th>
+                    <th>
+                        Kuiper Belt &amp; Oort Cloud
+                    </th>
+                    <th>
+                        Comets
+                    </th>
+                    <th>
+                        Measurements
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr><td><button id="A1">100</button></td><td><button id="B1">100</button></td><td><button id="C1">100</button></td><td><button id="D1">100</button></td><td><button id="E1">100</button></td><td><button id="F1">100</button></td></tr>
+                <tr><td><button id="A2">200</button></td><td><button id="B2">200</button></td><td><button id="C2">200</button></td><td><button id="D2">200</button></td><td><button id="E2">200</button></td><td><button id="F2">200</button></td></tr>
+                <tr><td><button id="A3">300</button></td><td><button id="B3">300</button></td><td><button id="C3">300</button></td><td><button id="D3">300</button></td><td><button id="E3">300</button></td><td><button id="F3">300</button></td></tr>
+                <tr><td><button id="A4">400</button></td><td><button id="B4">400</button></td><td><button id="C4">400</button></td><td><button id="D4">400</button></td><td><button id="E4">400</button></td><td><button id="F4">400</button></td></tr>
+                <tr><td><button id="A5">500</button></td><td><button id="B5">500</button></td><td><button id="C5">500</button></td><td><button id="D5">500</button></td><td><button id="E5">500</button></td><td><button id="F5">500</button></td></tr>
+            </tbody>
+        </table>
+        <div class="questionholder">
+            <div class="question">What is the airspeed velocity of an unladen swallow in flight?</div>
+        </div>
+    </div>
+        <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
+            <p style="color: gray;font-size:75%">Copyright (c) 2022 Brian W. Mulligan</p>
+        </div>
+        <script type="text/javascript" src="scripts/commonGP.js"></script>
+        <script type="text/javascript" src="scripts/GalaticRotationLegacy.js"></script>
+</body>
+</html>

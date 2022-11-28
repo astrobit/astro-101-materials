@@ -224,18 +224,30 @@ function waitForClustersReady()
 	{
 		let select = document.getElementById("selectCluster");
 		// clear existing options
+		let cluster_list = new Array();
 		
 		let i;
 		for (i = 0; i < g_clusters.length; i++)
 		{
 			const cluster = g_clusters.at(i);
-			if (cluster.cluster.stars > 0 && cluster.cluster.cluster_size < (5.0 / 60.0)) // 5'
+			if (cluster.cluster.stars > 0)//&& cluster.cluster.cluster_size < (5.0 / 60.0)) // 5'
 			{
-				let option = document.createElement("option");
-				option.text = cluster.main_id;
-				g_clusterSelectList[option.text] = cluster.main_id;
-				select.add(option)
+				cluster_list.push(cluster.main_id);
+//				let j;
+//				for (j = 0; j < cluster._ids.length; j++)
+//				{
+//					if (cluster._ids[j] !== cluster.main_id)
+//						cluster_list.push(cluster._ids[j]);
+//				}
 			}
+		}
+		cluster_list.sort();
+		for (i = 0; i < cluster_list.length; i++)
+		{
+			let option = document.createElement("option");
+			option.text = cluster_list[i];
+			g_clusterSelectList[option.text] = cluster_list[i];
+			select.add(option)
 		}
 		OnSelectCluster();
 		draw();

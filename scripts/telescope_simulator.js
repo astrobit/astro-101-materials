@@ -1,7 +1,7 @@
 let g_starsCluster = null;
 let g_selectedCluster = null;
 let	g_clusters = newClusters("OpC");
-let g_clusterSelectList = new Object();
+let g_clusterSelectList = new Object(); // this object stores names of clusters because the option text erases extra spaces in the id
 
 
 function sliderChange(value)
@@ -333,11 +333,11 @@ let select = document.getElementById("exposure");
 select.value = g_exposure + "s";
 
 
-let g_dl = false;
-let g_dlDataFilled = false;
-let g_dlData = "Star, U, B, V, R, I, J, H, K, sp_type, lm class, sp type qual, dm, used sp_type, used lum class, Au, Av, Ab, Ar, Ai, Aj, Ah, Ak, A, σA, bA, σbA\n";
+//let g_dl = false;
+//let g_dlDataFilled = false;
+//let g_dlData = "Star, U, B, V, R, I, J, H, K, sp_type, lm class, sp type qual, dm, used sp_type, used lum class, Au, Av, Ab, Ar, Ai, Aj, Ah, Ak, A, σA, bA, σbA\n";
 
-let g_reprocessed_Fluxes = false;
+//let g_reprocessed_Fluxes = false;
 
 function setOutputText(id,value)
 {

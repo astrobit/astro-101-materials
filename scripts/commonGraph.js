@@ -424,7 +424,7 @@ class GraphAxis
 			if (this._invert)
 			{
 				this._slope = - slope;
-				this._offset = -this._max * slope;
+				this._offset = this._max * slope;
 			}
 			else
 			{
@@ -911,6 +911,16 @@ class GraphAxis
 	set min(value)	
 	{
 		this._min = value;
+		this._calculate_graph_parameters();
+	}
+
+	get invert()
+	{
+		return this._invert;
+	}
+	set invert(value)	
+	{
+		this._invert = value;
 		this._calculate_graph_parameters();
 	}
 

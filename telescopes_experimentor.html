@@ -1,0 +1,113 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="A site geared toward astronomy education to explore how different telescopes and filters result in different images.">
+    <meta name="keywords" content="astronomy, education, stars, telescopes">
+    <meta name="author" content="Brian W. Mulligan">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telescopes</title>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+<!--    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M15ZVRGK6"></script> -->
+<!--    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-0M15ZVRGK6');
+    </script>-->
+</head>
+<body style="font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#000000;">
+    <!--<h1 style="font-size:24px;text-align:center;color:#FFFFFF;">Elongation</h1>-->
+    <div style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center">
+		  <label style="color:white">Star Cluster</label><select name="selectCluster" id="selectCluster" onchange="OnSelectCluster();" style="font-size:20px;height:25px;"></select>
+		  <select name="selectFilter" id="selectFilter" onchange="OnSelectFilter();" style="font-size:20px;height:25px;"></select>
+		<label style="color:white">Exposure Length</label><input type="text" id="exposure" onchange="OnSetExposure()"></input>
+		<label style="color:white">Mirror Diameter</label><input type="text" id="mirror_diameter" onchange="OnSetDiameter()"></input>
+		<label style="color:white">Focal Length</label><input type="text" id="mirror_focal_length" onchange="OnSetFocalLength()"></input>
+		<label style="color:white">Adaptive Optics</label><input type="checkbox" id="adaptive_optics" onchange="OnSetAdaptiveOptics()"></input>
+		<label style="color:white">Elevation</label><input type="text" id="elevation" onchange="OnSetElevation()"></input>
+    </div>
+    <div style="width:100%;text-align:center" id="display data">
+    <div style="width: 150px;display:inline-block;">
+    	<label style="color:white;width:300px;text-align:center;font-weight:bold;font-size:20px">Cluster</label><br/>
+    	<label style="color:white;text-align:left;">RA</label><br/>
+    	<label style="color:white;text-align:left;">Dec</label><br/>
+    	<label style="color:white;text-align:left;">Size</label><br/>
+    	<label style="color:white;text-align:left;">Parallax</label><br/>
+    </div>
+     <div style="width: 150px;display:inline-block;">
+    	<label style="color:white;width:300px;text-align:center;font-weight:bold;font-size:20px"></label><br/>
+    	<output id="cluster ra" style="color:white;text-align:left;"></output><br/>
+    	<output id="cluster dec" style="color:white;text-align:left;"></output><br/>
+    	<output id="cluster size" style="color:white;text-align:left;"></output><br/>
+    	<output id="cluster parallax" style="color:white;text-align:left;"></output><br/>	
+    </div>
+   <div style="width: 150px;display:inline-block;margin-left:30px">
+    	<label style="color:white;width:300px;text-align:center;font-weight:bold;font-size:20px">Telescope</label><br/>
+    	<label style="color:white;text-align:left;">Diameter</label><br/>
+    	<label style="color:white;text-align:left;">Collecting Area</label><br/>
+    	<label style="color:white;text-align:left;">Focal Length</label><br/>
+    	<label style="color:white;text-align:left;">Plate Scale</label><br/>
+    	<label style="color:white;text-align:left;">Angular Resolution</label><br/>
+    	<label style="color:white;text-align:left;">Adaptive Optics</label><br/>
+    	<label style="color:white;text-align:left;">Seeing</label><br/>
+    </div>
+   <div style="width: 150px;display:inline-block;margin-left:15px">
+    	<label style="color:white;width:300px;text-align:center;font-weight:bold;font-size:20px"></label><br/>
+    	<output id="diameter" style="color:white;text-align:left;"></output><br/>
+    	<output id="collecting area" style="color:white;text-align:left;"></output><br/>	
+    	<output id="focal length" style="color:white;text-align:left;"></output><br/>	
+    	<output id="plate scale" style="color:white;text-align:left;"></output><br/>	
+    	<output id="angular resolution" style="color:white;text-align:left;"></output><br/>
+    	<output id="adaptive optics" style="color:white;text-align:left;"></output><br/>
+    	<output id="seeing" style="color:white;text-align:left;"></output><br/>	
+    </div>
+    <div style="width: 150px;display:inline-block;margin-left:20px;">
+    	<label style="color:white;width:300px;text-align:center;font-weight:bold;font-size:20px">Camera</label><br/>
+    	<label style="color:white;text-align:left;">Resolution</label><br/>
+    	<label style="color:white;text-align:left;">Pixel Scale</label><br/>
+    	<label style="color:white;text-align:left;">Field of View</label><br/>
+    </div>
+    <div style="width: 150px;display:inline-block;margin-left:15px;">
+    	<label style="color:white;width:300px;text-align:center;font-weight:bold;font-size:20px"></label><br/>
+		<output id="resolution" style="color:white;text-align:left;"></output><br/>
+		<output id="pixel scale" style="color:white;text-align:left;"></output><br/>	
+    	<output id="field of view" style="color:white;text-align:left;"></output><br/>	
+    </div>
+    </div>
+    <div style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center">
+        <canvas id="theCanvas" width="100%" height="900" onclick="commonUIOnClick(event);" onmousedown="commonUIOnMouseDown(event);" onmouseup="commonUIOnMouseUp(event);" onmousemove="commonUIOnMouseMove(event);">
+            Canvas not supported; please update your browser.
+        </canvas>
+    </div>
+    <div style="text-align:center;">
+    	<button id="recenter" style="font-size:20px;" onclick="recenterDisplay();">Re-Center</button>
+    </div>
+    <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
+        <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
+            <p style="color: gray;font-size:75%">
+                Copyright (c) 2022 - 2023, Brian W. Mulligan
+                <a href="https://www.iubenda.com/privacy-policy/91469080" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe " title="Privacy Policy ">Privacy Policy</a>
+                <script type="text/javascript">(function (w, d) { var loader = function () { var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src = "https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s, tag); }; if (w.addEventListener) { w.addEventListener("load", loader, false); } else if (w.attachEvent) { w.attachEvent("onload", loader); } else { w.onload = loader; } })(window, document);</script>
+            </p>
+        </div>
+    </div>
+<!--    <script type="text/javascript" src="stringsParallax.js"></script>-->
+    <script type="text/javascript" src="scripts/tutorial.js"></script>
+    <script type="text/javascript" src="scripts/ui.js"></script>
+    <script type="text/javascript" src="scripts/LLS.js"></script>
+    <script type="text/javascript" src="scripts/VectorMatrix.js"></script>
+    <script type="text/javascript" src="scripts/commonGP.js"></script>
+    <script type="text/javascript" src="scripts/common.js"></script>
+    <script type="text/javascript" src="scripts/commonAstro.js"></script>
+    <script type="text/javascript" src="scripts/sp_types.js"></script>
+<!--    <script type="text/javascript" src="m6.js"></script>-->
+    <script type="text/javascript" src="scripts/stars2.js"></script>
+    <script type="text/javascript" src="scripts/clusters.js"></script>
+<!--    <script type="text/javascript" src="planets.js"></script>-->
+<!--    <script type="text/javascript" src="Mollweide.js"></script> -->
+    <script type="text/javascript" src="scripts/filters.js"></script>
+    <script type="text/javascript" src="scripts/telescope_experimentor.js"></script>
+</body>
+</html>

@@ -777,45 +777,148 @@ function airyDiskSize(wavelength, aperature)
 // output: none
 //
 /////////////////////////////////////////////////////////////////////////
-
-function drawStarFlux(image, x, y, hwhm, peak_count, max_count, color)
+class Gaussian_Blur_Kernel
 {
-	const stdev = hwhm / Math.sqrt(2.0 * Math.log(2.0));
-	const maxSigma = Math.sqrt(2.0 * Math.log(peak_count));
-	const twoSizeLcl = Math.ceil(maxSigma * stdev);
-	const xn = Math.floor(x);
-	const yn = Math.floor(y);
-	const dx = xn - x;
-	const dy = yn - y;
-	const overflow_threshold = 1.2 * max_count; // @@TODO: make this an input parameter
-	let flux_excess = 0;
-
-	for (yl = -twoSizeLcl ; yl < twoSizeLcl; yl++)
+	resize(size)
 	{
-		flux_excess = 0; // don't 
-		for (xl = -twoSizeLcl ; xl < twoSizeLcl; xl++)
+		const newSize = ValidateValue(size) ? size : 16;
+		if (newSize > this.kernelSize)
 		{
-			const xrdx = xl + dx;
-			const yrdy = yl + dy;
-			const r = Math.sqrt(xrdx * xrdx + yrdy * yrdy);
-			const s = -r * r / (stdev * stdev) * 0.5;
-			const b = Math.exp(s);
-			let n = Math.max(0,random_gaussian(peak_count * b,Math.sqrt(peak_count * b))); // shot noise
-			n += flux_excess;
-			const f = Math.min(n / max_count,1.0)
-			flux_excess = (n > overflow_threshold) ? n - overflow_threshold : 0;
-			let starClrLcl = color.copy();
-			starClrLcl.scale(f);
-			image.addAtRelative(xl + xn, yl + yn, starClrLcl)
+			this.kernel = new Array();
+			this.kernelSize = newSize;
+			let i = 0;
+			let j = 0;
+			for (j = 0; j < this.kernelSize; j++)
+			{
+				let row = new Array();
+				for (i = 0; i < this.kernelSize; i++)
+				{
+					row.push(0);
+				}
+				this.kernel.push(row);
+			}
 		}
-		for (;(xl + xn) < image.width && flux_excess > 0; xl++)
+	}
+	constructor(size)
+	{
+		this.kernelSize = 0;
+		this.lastSize = 0;
+		this.resize(16);
+	}
+	buildKernel(threshold, stdev, dx, dy)
+	{
+		const maxSigma = Math.sqrt(-2.0 * stdev * stdev * Math.log(threshold * stdev * Math.sqrt(2.0 * Math.PI)));
+		const size = Math.ceil(Math.abs(maxSigma * stdev)) + 1;
+		if (this.lastSize != size)
 		{
-			let n = flux_excess;
-			const f = Math.min(n / max_count,1.0)
-			flux_excess = (n > overflow_threshold) ? n - overflow_threshold : 0;
-			let starClrLcl = color.copy();
-			starClrLcl.scale(f);
-			image.addAtRelative(xl + xn, yl + yn, starClrLcl)
+			this.resize((size + 1) * 2);
+			let i = 0;
+			let j = 0;
+			let sum = 0;
+			const start = Math.max((this.kernelSize - size * 2) / 2 - 1,0);
+			const end = Math.min(this.kernelSize - start + 1,this.kernelSize - 1);
+			const n = this.kernelSize / 2;
+			const a = 1.0 / (2.0 * stdev * stdev);
+			for (j = start; j <= end; j++)
+			{
+			// clear unused space
+				for (i = 0; i < start; i++)
+				{
+					this.kernel[j][i] = 0;
+				}
+			// used space calculations
+				for (i = start; i <= end; i++)
+				{
+					const x = i - n + dx;
+					const y = j - n + dy;
+					const r = Math.sqrt(x * x + y * y);
+					
+					const g = Math.exp(-r * r * a);
+					this.kernel[j][i] = g;
+					sum += g;
+				}
+			// clear unused space
+				for (i = end; i < this.kernelSize; i++)
+				{
+					this.kernel[j][i] = 0;
+				}
+			}
+			// clear unused space
+			for (j = 0; j < start; j++)
+			{
+				for (i = 0; i < this.kernelSize; i++)
+				{
+					this.kernel[j][i] = 0;
+				}
+			}
+			for (j = end; j < this.kernelSize; j++)
+			{
+				for (i = 0; i < this.kernelSize; i++)
+				{
+					this.kernel[j][i] = 0;
+				}
+			}
+			// normalize			
+			const norm = 1.0 / sum;
+			for (j = start; j <= end; j++)
+			{
+				for (i = start; i <= end; i++)
+				{
+					this.kernel[j][i] *= norm;;
+				}
+			}
+			this.lastSize = size;
+		}
+	}
+};
+let g_commonAstro_Flux_Kernel = new Gaussian_Blur_Kernel();
+
+function drawStarFlux(image, x, y, hwhm, total_count, max_count, color)
+{
+	const threshhold_basis = 1.0 / 255.0;
+	if (total_count / max_count > threshhold_basis)
+	{
+		if (total_count > max_count)
+		{
+			console.log("here");
+		}
+		const stdev = hwhm / Math.sqrt(2.0 * Math.log(2.0));
+		const threshhold = threshhold_basis * Math.min(max_count / total_count,1.0); // minimum count at which displayable signal;
+		const xn = Math.floor(x);
+		const yn = Math.floor(y);
+		const dx = xn - x;
+		const dy = yn - y;
+		const overflow_threshold = 1.2 * max_count; // @@TODO: make this an input parameter
+		
+		g_commonAstro_Flux_Kernel.buildKernel(threshhold,stdev,dx,dy);
+
+		let i = 0;
+		let j = 0;
+		
+		for (j = 0; j < g_commonAstro_Flux_Kernel.kernelSize; j++)
+		{
+			let flux_excess = 0;
+			const yl = j - g_commonAstro_Flux_Kernel.kernelSize * 0.5;
+			for (i = 0; i < g_commonAstro_Flux_Kernel.kernelSize; i++)
+			{
+				const xl = i - g_commonAstro_Flux_Kernel.kernelSize * 0.5;
+				let n = g_commonAstro_Flux_Kernel.kernel[j][i] * total_count + flux_excess;
+				const f = Math.min(n / max_count,1.0)
+				flux_excess = Math.max(n - overflow_threshold , 0);
+				let starClrLcl = color.copy();
+				starClrLcl.scale(f);
+				image.addAtRelative(xl + xn, yl + yn, starClrLcl)
+			}
+			let xl = g_commonAstro_Flux_Kernel.kernelSize * 0.5;
+			for (;(xl + xn) < image.width && flux_excess > 0; xl++)
+			{
+				let n = flux_excess;
+				const f = Math.min(n / max_count,1.0)
+				flux_excess = Math.max(n - overflow_threshold , 0);
+				let starClrLcl = color.copy();
+				starClrLcl.scale(f);
+				image.addAtRelative(xl + xn, yl + yn, starClrLcl)
+			}
 		}
 	}
 }

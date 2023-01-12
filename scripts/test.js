@@ -82,7 +82,7 @@ class Draw
         this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
         // Clear the canvas.
-        this.gl.clear(gl.COLOR_BUFFER_BIT);
+        this.gl.clear(this.gl.COLOR_BUFFER_BIT);
         // Draw the geometry.
         this.gl.drawArrays(this.gl.POINTS, 0, this._n);
     }

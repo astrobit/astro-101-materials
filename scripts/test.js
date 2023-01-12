@@ -172,6 +172,7 @@ function main()
 {
     if (shadersReady)
     {
+        drawer.centralPosition(1.0, 1.0);
         drawer.loadStars(new Float32Array([
             1.0 + 0.2 / 3600.0, 1.0, 600000.0,
             1.0 - 0.2 / 3600.0, 1.0, 300000.0,

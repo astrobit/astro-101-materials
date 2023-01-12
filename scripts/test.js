@@ -79,11 +79,13 @@ class Draw
     draw()
     {
         // Tell WebGL how to convert from clip space to pixels
+        this.gl.useProgram(this.program);
         this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
         // Clear the canvas.
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
         // Draw the geometry.
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
         this.gl.drawArrays(this.gl.POINTS, 0, this._n);
     }
 }

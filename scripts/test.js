@@ -89,7 +89,7 @@ function main()
         {
             if (shaderProgram == null)
             {
-                shaderProgram = createProgramFromScripts(gl, vertexShader, elemFS.text);
+                shaderProgram = createProgramFromScripts(gl, vertexShader, fragmentShader);
             }
             // Tell it to use our program (pair of shaders)
             gl.useProgram(shaderProgram);

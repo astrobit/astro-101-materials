@@ -69,7 +69,7 @@ class Draw
         this.gl.bufferData(this.gl.ARRAY_BUFFER, starArray, this.gl.STATIC_DRAW);
         // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
         const size = 3;          // 3 components per iteration
-        const type = gl.FLOAT;   // the data is 32bit floats
+        const type = this.gl.FLOAT;   // the data is 32bit floats
         const normalize = false; // don't normalize the data
         const stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
         const offset = 0;        // start at the beginning of the buffer

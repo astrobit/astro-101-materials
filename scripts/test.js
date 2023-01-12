@@ -1,6 +1,4 @@
 "use strict";
-let vertexShader = null;
-let fragmentShader = null;
 
 class Draw
 {
@@ -12,11 +10,11 @@ class Draw
         this.gl = this.canvas.getContext("webgl");
         this.program = null;
     }
-    prepareShaders()
+    prepareShaders(vertexShader, fragmentShader)
     {
         if (this.program == null)
         {
-            this.program = createProgramFromScripts(gl, vertexShader, fragmentShader);
+            this.program = createProgramFromScripts(this.gl, vertexShader, fragmentShader);
         }
         // Tell it to use our program (pair of shaders)
         this.gl.useProgram(this.program);
@@ -84,10 +82,12 @@ class Draw
         this.gl.drawArrays(this.gl.POINTS, 0, this._n);
     }
 }
+let _vertexShader = null;
+let _fragmentShader = null;
 
 
 getFile("scripts/star.vert").then(function (result) {
-                                                            vertexShader = result;
+                                                            _vertexShader = result;
                                                         },
                                                         function (error) {
                                                             console.log("Error loading vertex shader: " + error);
@@ -95,7 +95,7 @@ getFile("scripts/star.vert").then(function (result) {
                                                     );
 
 getFile("scripts/star.frag").then(function (result) {
-                                                            fragmentShader = result;
+                                                            _fragmentShader = result;
                                                         },
                                                         function (error) {
                                                             console.log("Error loading fragment shader: " + error);
@@ -114,7 +114,7 @@ function waitOnShaders()
     else
     {
         shadersReady = true;
-        drawer.prepareShaders()
+        drawer.prepareShaders(_vertexShader, _fragmentShader)
        main();
     }
 }

@@ -35,10 +35,10 @@ class Draw
         this.gl.uniform1f(this._seeingDisk, 10.0);
         this.gl.uniform1f(this._diffractionDisk, 0.2);
 
-        this.gl.enable(gl.BLEND);
-        this.gl.blendFunc(gl.SRC_COLOR, gl.DST_COLOR);
+        this.gl.enable(this.gl.BLEND);
+        this.gl.blendFunc(this.gl.SRC_COLOR, this.gl.DST_COLOR);
 
-        this.positionBuffer = gl.createBuffer();
+        this.positionBuffer = this.gl.createBuffer();
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
     }
 

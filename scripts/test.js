@@ -1,7 +1,90 @@
 "use strict";
-
 let vertexShader = null;
 let fragmentShader = null;
+
+class Draw
+{
+    constructor()
+    {
+        this.canvas = document.getElementById("canvas");
+        this.canvas.width = window.innerWidth
+        this.canvas.height = window.innerHeight - 60;
+        this.gl = this.canvas.getContext("webgl");
+        this.program = null;
+    }
+    prepareShaders()
+    {
+        if (this.program == null)
+        {
+            this.program = createProgramFromScripts(gl, vertexShader, fragmentShader);
+        }
+        // Tell it to use our program (pair of shaders)
+        this.gl.useProgram(this.program);
+
+        // look up where the vertex data needs to go.
+        this.positionAttributeLocation = this.gl.getAttribLocation(this.program, "a_position");
+
+        // lookup uniforms
+        this._centralPosition = this.gl.getUniformLocation(this.program, "u_CentralPosition");
+        this._invPixelScale = this.gl.getUniformLocation(this.program, "u_InvPixelScale");
+        this._imageSize = this.gl.getUniformLocation(this.program, "u_ImageSize");
+        this._seeingDisk = this.gl.getUniformLocation(this.program, "u_SeeingDiskSize");
+        this._diffractionDisk = this.gl.getUniformLocation(this.program, "u_DiffractionLimit");
+
+        this.gl.uniform2fv(this._centralPosition, [0, 0]);
+        this.gl.uniform2fv(this._imageSize, [this.canvas.width, this.canvas.height]);
+        this.gl.uniform1f(this._invPixelScale, 10.0); // 10 pix/"
+        this.gl.uniform1f(this._seeingDisk, 10.0);
+        this.gl.uniform1f(this._diffractionDisk, 0.2);
+
+        this.gl.enable(gl.BLEND);
+        this.gl.blendFunc(gl.SRC_COLOR, gl.DST_COLOR);
+
+        this.positionBuffer = gl.createBuffer();
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
+    }
+
+    centralPosition(ra, dec)
+    {
+        this.gl.uniform2fv(this._centralPosition, [ra, dec]);
+    }
+    // set scaling in terms of arc-sec per pixel
+    set pixelScale(scale)
+    {
+        this.gl.uniform2fv(this._invPixelScale, 1.0 / scale);
+    }
+    set seeingDisk(seeingHWHM)
+    {
+        const stdev = seeingHWHM / Math.sqrt(2.0 * Math.log(2.0));
+        this.gl.uniform2fv(this._seeingDisk, stdev);
+    }
+    set diffractionDisk(seeingHWHM)
+    {
+        const stdev = diffractionDisk * 2.0 / Math.sqrt(2.0 * Math.log(2.0)); // TODO: this is not accurate. this should be using a airy disk size
+        this.gl.uniform2fv(this._diffractionDisk, stdev);
+    }
+
+    loadStars(starArray, n)
+    {
+        this._n = n;
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, starArray, this.gl.STATIC_DRAW);
+        // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
+        const size = 3;          // 3 components per iteration
+        const type = gl.FLOAT;   // the data is 32bit floats
+        const normalize = false; // don't normalize the data
+        const stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
+        const offset = 0;        // start at the beginning of the buffer
+        this.gl.vertexAttribPointer(
+            this.positionAttributeLocation, size, type, normalize, stride, offset);
+    }
+    draw()
+    {
+        // Draw the geometry.
+        this.gl.drawArrays(this.gl.POINTS, 0, this._n);
+    }
+}
+
 
 getFile("scripts/star.vert").then(function (result) {
                                                             vertexShader = result;
@@ -24,13 +107,15 @@ let shadersReady = false;
 let shaderProgram = null;
 function waitOnShaders()
 {
-    if (vertexShader == null || fragmentShader == null) {
+    if (vertexShader == null || fragmentShader == null)
+    {
         window.setTimeout(waitOnShaders, 1000.0 / 30.0);
     }
     else
     {
         shadersReady = true;
-        main();
+        drawer.prepareShaders()
+       main();
     }
 }
 waitOnShaders();
@@ -74,84 +159,19 @@ function createProgramFromScripts(gl, vertex_shader_source, fragment_shader_sour
     return program;
 
 }
+
+
+let drawer = new Draw();
+
 function main()
 {
     if (shadersReady)
     {
-        // Get A WebGL context
-        /** @type {HTMLCanvasElement} */
-        var canvas = document.getElementById("canvas");
-        canvas.width = window.innerWidth
-        canvas.height = window.innerHeight - 60;
+        drawer.loadStars(new Float32Array([
+            1.0 + 0.2 / 3600.0, 1.0, 600000.0,
+            1.0 - 0.2 / 3600.0, 1.0, 300000.0,
+            1.0, 1.0 + 10.0 / 3600.0, 100000.0]), 3);
+        drawer.draw();
 
-        var gl = canvas.getContext("webgl");
-        if (gl)
-        {
-            if (shaderProgram == null)
-            {
-                shaderProgram = createProgramFromScripts(gl, vertexShader, fragmentShader);
-            }
-            // Tell it to use our program (pair of shaders)
-            gl.useProgram(shaderProgram);
-
-            // look up where the vertex data needs to go.
-            let positionAttributeLocation = gl.getAttribLocation(shaderProgram, "a_position");
-            let fluxAttributeLocation = gl.getAttribLocation(shaderProgram, "a_flux");
-
-            // lookup uniforms
-            let centralPosition = gl.getUniformLocation(shaderProgram, "u_CentralPosition");
-            let invPixelScale = gl.getUniformLocation(shaderProgram, "u_InvPixelScale");
-            let imageSize = gl.getUniformLocation(shaderProgram, "u_ImageSize");
-            let seeingDisk = gl.getUniformLocation(shaderProgram, "u_SeeingDiskSize");
-            let diffractionDisk = gl.getUniformLocation(shaderProgram, "u_DiffractionLimit");
-
-            gl.uniform2fv(centralPosition, [1, 1]);
-            gl.uniform2fv(imageSize, [canvas.width, canvas.height]);
-            gl.uniform1f(invPixelScale, 10.0); // 10 pix/"
-            gl.uniform1f(seeingDisk, 10.0);
-            gl.uniform1f(diffractionDisk, 0.2);
-
-
-
-            // Tell WebGL how to convert from clip space to pixels
-            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-            gl.clearColor(0.0, 0.0, 0.0, 1.0);
-            // Clear the canvas.
-            gl.clear(gl.COLOR_BUFFER_BIT);
-
-
-            gl.enable(gl.BLEND);
-            gl.blendFunc(gl.SRC_COLOR, gl.DST_COLOR);
-
-            // Create a buffer.
-            var positionBuffer = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-
-            gl.bufferData(
-                gl.ARRAY_BUFFER,
-                new Float32Array([
-                    1.0 + 0.2 / 3600.0, 1.0, 600000.0,
-                    1.0 - 0.2 / 3600.0, 1.0, 300000.0,
-                    1.0, 1.0 + 10.0 / 3600.0, 100000.0]),
-                gl.STATIC_DRAW);
-
-            // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-            var size = 3;          // 3 components per iteration
-            var type = gl.FLOAT;   // the data is 32bit floats
-            var normalize = false; // don't normalize the data
-            var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-            var offset = 0;        // start at the beginning of the buffer
-            gl.vertexAttribPointer(
-                positionAttributeLocation, size, type, normalize, stride, offset);
-
-            // Turn on the attribute
-            gl.enableVertexAttribArray(positionAttributeLocation);
-
-            // Draw the geometry.
-            var primitiveType = gl.POINTS;
-            var offset = 0;
-            var count = 3;
-            gl.drawArrays(primitiveType, offset, count);
-        }
     }
 }

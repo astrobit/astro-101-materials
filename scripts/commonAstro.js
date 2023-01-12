@@ -762,6 +762,63 @@ function airyDiskSize(wavelength, aperature)
 	return 3.831705970207513 / Math.PI * wavelength / aperature;
 }
 
+
+/////////////////////////////////////////////////////////////////////////
+//
+//  function airyIntensity
+//
+// calculate the relative intensity of an Airy disk
+// useful
+// input: pixels (number) - the radius of the disk in pixels
+// 			n (number) - the order of minimum of the Airy disk to which to extend over the area
+// output: (number) - the normalization constant
+//
+/////////////////////////////////////////////////////////////////////////
+
+function airyIntensity(x)
+{
+	let r = 1.0;
+	const J = bessel(1, x);
+	if (x > 0)
+	{
+		r = J * J * 4.0 / (x * x);
+	}
+	return r;
+}
+
+/////////////////////////////////////////////////////////////////////////
+//
+//  function airyDiscreteNormalization
+//
+// calculate the normalization of an Airy disk projected onto a detector with discrete pixels
+// useful
+// input: pixels (number) - the radius of the disk in pixels
+// 			n (number) - the order of minimum of the Airy disk to which to extend over the area
+// output: (number) - the normalization constant
+//
+/////////////////////////////////////////////////////////////////////////
+
+function airyDiscreteNormalization(pixels, n)
+{
+	const xmax = bessel1_minima(n);
+	let s = 0;
+	if (pixels > 1) {
+		const step = 1.0 / (pixels - 1);
+
+		for (i = -pixels; i < pixels; i++) {
+			for (j = -pixels; j < pixels; j++) {
+				const X = (i + 0.5) * step;
+				const Y = (j + 0.5) * step;
+				const x = Math.sqrt(X * X + Y * Y);
+				s += airy_intensity(x);
+			}
+		}
+	}
+	else {
+		s = airy_intensity(0.0);
+	}
+	return 1.0 / s;
+}
 /////////////////////////////////////////////////////////////////////////
 //
 //  function drawStarFlux

@@ -758,7 +758,6 @@ function bessel(a,x,e)
 		let sign = (m % 2) == 1 ? -1 : 1;
 		let denom = factorial(m) * gamma(m + a + 1);
 		let delta = Math.pow(x * 0.5,2 * m + a) / denom * sign;
-		let delta_deriv = (m + a * 0.5) * Math.pow(x * 0.5,2 * m + a - 1) / denom * sign;
 		ret += delta;
 		fdelta = Math.abs(delta / ret);
 		m++;
@@ -806,6 +805,12 @@ function bessel_D(a,x,e)
 	return ret_deriv;
 }
 
+
+function bessel1_minima(n)
+{
+	const minima = [3.8317, 7.0156, 10.1735, 13.3237, 16.4706]; // really need better values for these
+	const xmax = (n >= 0 && n < 5) ? k_AiryMinima[n] : k_AiryMinima[5];
+}
 
 /////////////////////////////////////////////////////////////////////////
 //

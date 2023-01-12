@@ -1,0 +1,56 @@
+<canvas id="canvas"></canvas>
+<!-- vertex shader -->
+<script id="vertex-shader-2d" type="x-shader/x-vertex">
+        attribute vec3 a_position;
+        attribute float a_flux;
+
+    uniform mat3 u_matrix;
+
+    uniform vec2 u_CentralPosition;
+    uniform float u_InvPixelScale;
+    uniform vec2 u_ImageSize;
+    uniform float u_SeeingDiskSize;
+    uniform float u_DiffractionLimit;
+
+    varying vec4 v_color;
+    varying float v_dl;
+    varying float v_flux;
+
+    void main() {
+    float scale = 3600.0 * u_InvPixelScale;
+    float scaleX = scale / (u_ImageSize.x * 0.5);
+    float scaleY = scale / (u_ImageSize.y * 0.5);
+      // Multiply the position by the matrix.
+    gl_Position = vec4((a_position.x - u_CentralPosition.x) * scaleX,
+                        (a_position.y - u_CentralPosition.y) * scaleY,
+                        0.0,
+                        1.0);
+//    gl_Position = vec4(a_position.xy,0,1);
+      v_dl = max(u_DiffractionLimit,u_SeeingDiskSize) * u_InvPixelScale / (u_ImageSize.x * 0.5);
+      gl_PointSize = 64.0;
+      // Convert from clipspace to colorspace.
+      // Clipspace goes -1.0 to +1.0
+      // Colorspace goes from 0.0 to 1.0
+      v_color = gl_Position * 0.5 + 0.5;
+      v_flux = a_position.z;
+    }
+</script>
+<!-- fragment shader -->
+<script id="fragment-shader-2d" type="x-shader/x-fragment">
+        precision mediump float;
+
+    varying vec4 v_color;
+    const float pi = radians(180.0);
+    varying float v_dl;
+    varying float v_flux;
+
+    void main()
+    {
+        float r = length((gl_PointCoord - 0.5) * 2.0);
+        float l = 1.0 / sqrt(2.0 * pi * v_dl) * exp(-r * r * 0.5 / (v_dl * v_dl));
+        float f = min(v_flux / 65536.0,1.0);
+        gl_FragColor = vec4(f * l,f * l,f * l,1.0);
+    }
+</script>
+<script id="main" type="text/javascript" src="scripts/commonGP.js"></script>
+<script id="main" type="text/javascript" src="scripts/test.js"></script>

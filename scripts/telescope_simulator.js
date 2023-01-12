@@ -405,7 +405,7 @@ function draw()
 		const altitude = g_selectTelescope._altitude;
 		const r1 = 3.831705970207513; // first zero of Bessel function of 1st kind - location of the first minimum of the Airy disk
 		const diff_arcsec = degrees(r1 / Math.PI * lambda / D) * 3600.0;
-		const seeing = g_selectTelescope._space_based ? diff_arcsec : (altitude < 5600 ? 2.0 - altitude / 4200 * 1.5 : 0.5); // very rought method of calculating seeing: 2" at sea level down to 0.5" at Keck (4200 m)
+		const seeing = g_selectTelescope._space_based ? diff_arcsec : (altitude < 5600 ? 1.0 - altitude / 4200 * 0.75 : 0.25); // very rought method of calculating seeing: 2" at sea level down to 0.5" at Keck (4200 m)
 
 		setOutputText("diameter",g_selectTelescope._diameter.toString() + " m");
 		let collecting_area = Math.round(Math.PI * (g_selectTelescope._diameter ** 2));
@@ -423,7 +423,7 @@ function draw()
 		setOutputText("plate scale",plate_scale_displ.toString() + " \"/mm");
 		const diff_arcsec_displ = Math.round(diff_arcsec * 1000.0) / 1000.0;
 		setOutputText("angular resolution",diff_arcsec_displ.toString() + "\"");
-		const seeing_displ = Math.round(seeing * 10.0) / 10.0;
+		const seeing_displ = Math.round(seeing * 2.0 * 10.0) / 10.0;
 		setOutputText("adaptive optics",g_selectTelescope._adaptive_optics ? "yes" : "no");
 		if (g_selectTelescope._space_based)
 			setOutputText("seeing","n/a");
@@ -440,7 +440,8 @@ function draw()
 			const resolution = g_selectInstrument.resolution_imager;
 			const pixel_scale = degrees(g_selectInstrument.pixel_size * 1.0e-6 / f) * 3600.0;
 			const fov = pixel_scale * resolution;
-			const seeing_disk_pixels = g_selectTelescope._adaptive_optics ? diff_arcsec / pixel_scale : Math.max(seeing,diff_arcsec) / pixel_scale;
+			const diff_arcsec_hwhm = diff_arcsec * Math.sqrt(2.0 * Math.log(2.0)) * 4.0;
+			const seeing_disk_pixels = g_adaptive_optics ? diff_arcsec_hwhm / pixel_scale : Math.max(seeing,diff_arcsec_hwhm) / pixel_scale;
 			let displayCount = 0;
 			const quatum_efficiency = g_selectInstrument.quantum_efficiency;
 			const filt = g_selectFilter !== null ? getFilterUVBRI(g_selectFilter.name) : null;
@@ -501,9 +502,9 @@ function draw()
 					
 					
 					const px_filling = flux * g_exposure * optical_transparency * quatum_efficiency * Acm / g_selectInstrument.gain * filter_transmission * instrument_sensitivity;
-					const peak_pixel_flux = px_filling / Math.sqrt(seeing_disk_pixels / Math.PI);
+					//const peak_pixel_flux = px_filling / Math.sqrt(seeing_disk_pixels / Math.PI);
 					
-					drawStarFlux(mapImage, halfWidth + x, halfHeight + y, seeing_disk_pixels, peak_pixel_flux,g_selectInstrument.full_scale,color);
+					drawStarFlux(mapImage, halfWidth + x, halfHeight + y, seeing_disk_pixels, px_filling,g_selectInstrument.full_scale,color);
 //				}
 			}
 		//	console.log(displayCount);

@@ -21,10 +21,12 @@
     <!--<h1 style="font-size:24px;text-align:center;color:#FFFFFF;">Elongation</h1>-->
     <div style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center">
 		  <label style="color:white">Star Cluster</label><select name="selectCluster" id="selectCluster" onchange="OnSelectCluster();" style="font-size:20px;height:25px;"></select>
-		  <select name="selectTelescope" id="selectTelescope" onchange="OnSelectTelescope();" style="font-size:20px;height:25px;"></select>
-		  <select name="selectInstrument" id="selectInstrument" onchange="OnSelectInstrument();" style="font-size:20px;height:25px;"></select>
 		  <select name="selectFilter" id="selectFilter" onchange="OnSelectFilter();" style="font-size:20px;height:25px;"></select>
 		<label style="color:white">Exposure Length</label><input type="text" id="exposure" onchange="OnSetExposure()"></input>
+		<label style="color:white">Mirror Diameter</label><input type="text" id="mirror_diameter" onchange="OnSetDiameter()"></input>
+		<label style="color:white">Focal Length</label><input type="text" id="mirror_focal_length" onchange="OnSetFocalLength()"></input>
+		<label style="color:white">Adaptive Optics</label><input type="checkbox" id="adaptive_optics" onchange="OnSetAdaptiveOptics()"></input>
+		<label style="color:white">Elevation</label><input type="text" id="elevation" onchange="OnSetElevation()"></input>
     </div>
     <div style="width:100%;text-align:center" id="display data">
     <div style="width: 150px;display:inline-block;">
@@ -85,7 +87,7 @@
     <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
         <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
             <p style="color: gray;font-size:75%">
-                Copyright (c) 2020 - 2021, Brian W. Mulligan
+                Copyright (c) 2022 - 2023, Brian W. Mulligan
                 <a href="https://www.iubenda.com/privacy-policy/91469080" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe " title="Privacy Policy ">Privacy Policy</a>
                 <script type="text/javascript">(function (w, d) { var loader = function () { var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src = "https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s, tag); }; if (w.addEventListener) { w.addEventListener("load", loader, false); } else if (w.attachEvent) { w.attachEvent("onload", loader); } else { w.onload = loader; } })(window, document);</script>
             </p>
@@ -106,7 +108,6 @@
 <!--    <script type="text/javascript" src="planets.js"></script>-->
 <!--    <script type="text/javascript" src="Mollweide.js"></script> -->
     <script type="text/javascript" src="scripts/filters.js"></script>
-    <script type="text/javascript" src="scripts/telescopes.js"></script>
-    <script type="text/javascript" src="scripts/telescope_simulator.js"></script>
+    <script type="text/javascript" src="scripts/telescope_experimentor.js"></script>
 </body>
 </html>

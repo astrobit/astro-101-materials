@@ -107,7 +107,7 @@ let shadersReady = false;
 let shaderProgram = null;
 function waitOnShaders()
 {
-    if (vertexShader == null || fragmentShader == null)
+    if (_vertexShader == null || _fragmentShader == null)
     {
         window.setTimeout(waitOnShaders, 1000.0 / 30.0);
     }

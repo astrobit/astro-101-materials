@@ -7,56 +7,56 @@ let selections = new Array();
 let mode = true; // true = normal mode / false = flashcard
 let qmode = true; // true = show question / false = show answer
 let level = 0; //0 = 1st round, 1 = 2nd round, 2 = 3rd round
-let timerlength = 10; // seconds
+let timerlength = 30; // seconds
 let currquestion = null;
 
 let set = {
-	title: "ASTR 1304 Exam 4 Review",
-	categories: ["Uranus & Neptune", "Rings & Moons", "Asteroids", "Kuiper Belt & The Oort Cloud", "Comets", "Measurements"],
+	title: "ASTR 1403 Exam 1 Review",
+	categories: ["Coordinates", "Time", "Angles in Astronomy", "Light", "More Light", "Potpurri"],
 	questions: 
 	[
 		[
 			[
-				{q:"Uranus and Neptune both share this feature with Jupiter and Saturn, even if not as visible",a:"rings",complete:false},
-				{q:"This planet is known for it's extreme seasons due to it's large axial tilt",a:"Uranus",complete:false},
-				{q:"This stormy feature on Neptune was observed by Voyager 2, but is likely long gone",a:"The Great Dark Spot",complete:false},
-				{q:"Uranus and Neptune have clouds consiting of these molecules, also found in the clouds on Jupiter and Saturn",a:"Ammonia, Ammonium Hydrosulfate, and Water",complete:false},
-				{q:"Just above the core of Uranus and Neptune can be found the mantle, consisting of these substances",a:"Ammonia, Methane, and Water Ices",complete:false}
+				{q:"Basically just pointing - the coordinate system that works best when someone is right next to you",a:"altitude and azimuth",complete:false},
+				{q:"The angle of the an object with respect to the meridian",a:"Hour Angle",complete:false},
+				{q:"The best coordinate system for someone across the country",a:"Right ascension & declination",complete:false},
+				{q:"An angle northward from the equator",a:"Declination",complete:false},
+				{q:"The best coordinate system for describing the position of a planet",a:"Ecliptic",complete:false}
 			],
 			[
-				{q:"This moon is remarkable for it's thick methane atmosphere and hydrocarbon lakes",a:"Titan",complete:false},
-				{q:"Around this planet you would find the most volcanically active moon in the solar system",a:"Jupiter",complete:false},
-				{q:"This moon is notable for evidence of tectonic activity, revealed by reddish-brown features called lineae",a:"Europa",complete:false},
-				{q:"These types of moons have a ravioli-like appearance, such as this moon of Saturn",a:"Shepherd Moons",complete:false},
-				{q:"Nearly all major moons seem to have this, which supplies geysers on some moons",a:"Subsurface Oceans",complete:false}
+				{q:"The time between two vernal equinoxes",a:"Year",complete:false},
+				{q:"23 hours and 56 minutes ",a:"Sidereal Day",complete:false},
+				{q:"The Islamic calendar is this form - following only the Moon",a:"Lunar Calendar",complete:false},
+				{q:"The time it takes the Earth to rotate with respect to the stars",a:"Sidereal Day",complete:false},
+				{q:"This calendar is the one presently in use through most of the world, started in 1582",a:"Gregorian Calendar",complete:false}
 			],
 			[
-				{q:"The main-belt asteroids can be found between these two planets",a:"Mars and Jupiter",complete:false},
-				{q:"The ages of meteorites have been measured using this method, finding an average age of about 4.5 billion years.",a:"Radiometric Dating",complete:false},
-				{q:"This average distance between asteroids in the main belt is about 50 times the size of Earth, or about 30% larger than the average distance betwen the Earth and the Moon.",a:"500,000 km",complete:false},
-				{q:"This term is used to describe asteroids that share a similar orbit around the Sun.",a:"Families",complete:false},
-				{q:"M-Type asteroids are thought to be the remnant of this part of a larger body",a:"Iron Core",complete:false}
+				{q:"1/60 of a degree ",a:"Arc-minute",complete:false},
+				{q:"The angular position shift caused by a shift in perspective (parallax)",a:"Parallax",complete:false},
+				{q:"1/60 of a arc-minute.",a:"Arc-second",complete:false},
+				{q:"The distance between the Earth and the Sun.",a:"Astronomical Unit",complete:false},
+				{q:"The distance of an object with a parallax of 1\"",a:"Parsec",complete:false}
 			],
 			[
-				{q:"This object is the largest known body within the Kuiper belt", q: "Pluto",complete:false},
-				{q:"This moon is thought to be a captured Kuiper Belt object",a:"Triton",complete:false},
-				{q:"These companions seem to be quite common to Kuiper Belt Objects, unlike the smaller planets in the inner solar system.",a:"Moons",complete:false},
-				{q:"Craters on parts of Pluto show evidence of this phenomenon, only otherwise directly observed on Earth.",a:"Frost or Snow",complete:false},
-				{q:"Dwarf planets in the Kuiper Belt probably all have mantles consisting of this substance.",a:"Ices",complete:false}
+				{q:"The technical term for apparent brightness", q: "Flux",complete:false},
+				{q:"The technical term for intrinsic brightness",a:"Luminosity",complete:false},
+				{q:"This can be measured by a telescope and camera.",a:"Flux",complete:false},
+				{q:"This quantity can be found if both distance and flux are known.",a:"Luminosity",complete:false},
+				{q:"In general, flux is luminosity divided by this.",a:"Area",complete:false}
 			],
 			[
-				{q:"This well known comet returns every 75 years; it will return in 2061", q: "Halley",complete:false},
-				{q:"This substance, extremely common on Earth, can readily be found on comets and their coma and tail.",a:"Water",complete:false},
-				{q:"This type of comet may originate in the Oort cloud",a:"One-and-Done",complete:false},
-				{q:"This component of a comet is contorlled by the Sun's magnetic field",a:"Ion Tail",complete:false},
-				{q:"This scary sounding molecule can be found in the coma and tail of comets",a:"Formeldehyde",complete:false}
+				{q:"Used to describe how bright a star appears to the eye", q: "Apparent Magnitude",complete:false},
+				{q:"B - V, for example.",a:"Color Index",complete:false},
+				{q:"Used to describe the intrinsic brightness of a star ",a:"Absolute Magnitude",complete:false},
+				{q:"This filter is equivalent to green",a:"V",complete:false},
+				{q:"A star with a B - V of 0 will appear to be this color",a:"Blue-white",complete:false}
 			],
 			[
-				{q:"The synodic variety of this can be observed directly, the sidereal one needs a little bit of calculation", q: "Orbital Period",complete:false},
-				{q:"By measuring the angular size of an object, and knowing it's distance, we can find this property of an object",a:"Radius or Diameter",complete:false},
-				{q:"Only by observing an orbiting partner or moon can we find this for a planet or other body",a:"Mass",complete:false},
-				{q:"The orbital distance of any object is found using this mathematical method",a:"Trigonometry",complete:false},
-				{q:"To determine the composition of an object, we need to measure one of these",a:"Spectrum",complete:false}
+				{q:"The distance to the nearest star if the Sun shrank down to the size of a marble", q: "60 mi (Temple, TX)",complete:false},
+				{q:"The zero reference for declination",a:"The equator",complete:false},
+				{q:"Solar Time",a:"Time measured with respect to the Sun",complete:false},
+				{q:"An I filter is used for this type of light",a:"Infrared",complete:false},
+				{q:"North",a:"The zero reference for azimuth",complete:false}
 			]
 		]
 	]

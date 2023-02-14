@@ -808,8 +808,13 @@ function bessel_D(a,x,e)
 
 function bessel1_minima(n)
 {
-	const minima = [3.8317, 7.0156, 10.1735, 13.3237, 16.4706]; // really need better values for these
-	const xmax = (n >= 0 && n < 5) ? k_AiryMinima[n] : k_AiryMinima[5];
+	const k_AiryMinima = [3.831705970207512, 7.015586669815618, 10.17346813506272, 13.32369193631422, 16.47063005087763, 19.6158585104682, 22.7600843805927, 25.9036720876183, 29.0468285349168]; 
+	return (n >= 0 && n <= 8) ? k_AiryMinima[n] : ((n > 0) ? k_AiryMinima[8] : k_AiryMinima[0]);
+}
+
+function bessel1_maxima(n)
+{
+	return (n == 0) ? 0.0 : (bessel1_minima(n - 1) + bessel1_minima(n)) * 0.5;
 }
 
 /////////////////////////////////////////////////////////////////////////

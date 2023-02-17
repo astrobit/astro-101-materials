@@ -759,7 +759,7 @@ function drawStar(image, x, y, size, color)
 
 function airyDiskSize(wavelength, aperature)
 {
-	return 3.831705970207513 / Math.PI * wavelength / aperature;
+	return bessel1_minima(0) / Math.PI * wavelength / aperature;
 }
 
 
@@ -798,55 +798,45 @@ function airyIntensity(x)
 //
 /////////////////////////////////////////////////////////////////////////
 
-function airyDiscreteNormalization(pixels, n)
+function airyDiscreteNormalization(pixels, n, subsampling)
 {
 	const bmax = bessel1_minima(n);
-	let s = 0;
+	const ss = (typeof(subsampling) !== 'undefined' && subsampling !== null && subsampling > 1) ? subsampling : 1;
+	const ss2 = ss * 0.5;
+	const invss = 1.0 / ss;
+	const ssoffset = 0.5 * invss;
+	
+	let s = 1;
 	if (pixels > 1)
 	{
 		const step = 1.0 / (pixels - 0.5);
 		const halfstep = 0.5 * step;
+		let i;
 		for (i = 0; i < pixels; i++) 
 		{
+			let j;
 			for (j = 0; j < pixels; j++)
 			{
-				if (i > 0 || j > 0)
+				let ssi;
+				for (ssi = 0; ssi < ss; ssi++)
 				{
-					const X = i * step;
-					const Y = j * step;
-					let rmin;
-					let rmax;
-					if (y > x)
+					let ssj;
+					for (ssj = 0; ssj < ss; ssj++)
 					{
-						const xmax = X + halfstep;
-						const xmin = X - halfstep;
-						const ymax = Y / X * xmax;
-						const ymin = Y / X * xmin;
-						rmin = Math.sqrt(xmin * xmin + ymin * ymin) * bmax;
-						rmax = Math.sqrt(xmax * xmax + ymax * ymax) * bmax;
-
+						const x = (i + ssi * invss + ssoffset - 0.5) * step;
+						const y = (j + ssj * invss + ssoffset - 0.5) * step;
+						const r = Math.sqrt(x * x + y * y) * bmax;
+						if (r > 0)
+						{
+							// identify maximum brightness between rmin and rmax
+							// determine if 
+							s += airyIntensity(r);
+						}
 					}
-					else
-					{
-						const ymax = Y + halfstep;
-						const ymin = Y - halfstep;
-						const xmax = X / Y * ymax;
-						const xmin = X / Y * ymin;
-						rmin = Math.sqrt(xmin * xmin + ymin * ymin) * bmax;
-						rmax = Math.sqrt(xmax * xmax + ymax * ymax) * bmax;
-					}
-					// identify maximum brightness between rmin and rmax
-					// determine if 
-					s += airyIntensity(x);
 				}
 			}
 		}
 		s *= 4; // since we only summed over one quadrant
-		s += 1; // for the central pixel
-	}
-	else 
-	{
-		s = 1;// airyIntensity(0.0);
 	}
 	return 1.0 / s;
 }

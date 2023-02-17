@@ -1,56 +1,88 @@
 <canvas id="canvas"></canvas>
 <!-- vertex shader -->
 <script id="vertex-shader-2d" type="x-shader/x-vertex">
-        attribute vec3 a_position;
-        attribute float a_flux;
+	attribute vec3 av_position;
 
-    uniform mat3 u_matrix;
 
-    uniform vec2 u_CentralPosition;
-    uniform float u_InvPixelScale;
-    uniform vec2 u_ImageSize;
-    uniform float u_SeeingDiskSize;
-    uniform float u_DiffractionLimit;
+	uniform float	uvf_PointSize;
+	uniform vec2	uvv_PositionScaling;
+	uniform float	uvf_Pxy;
+	uniform float	uvf_mPy;
+	uniform float	uvf_mPz;
+ 	
+    varying vec4	vv_color;
+    varying float	vf_flux;
 
-    varying vec4 v_color;
-    varying float v_dl;
-    varying float v_flux;
+	void main()
+	{
+		float rx = radians(av_position.x * 15.0);
+		float ry = radians(av_position.y);
+		float cosAlpha = cos(rx);
+		float sinAlpha = sin(rx);
+		float cosDec = cos(ry);
+		float sinDec = sin(ry);
+		float ax = cosAlpha * cosDec;
+		float ay = sinAlpha * cosDec;
+		float az = sinDec;
 
-    void main() {
-    float scale = 3600.0 * u_InvPixelScale;
-    float scaleX = scale / (u_ImageSize.x * 0.5);
-    float scaleY = scale / (u_ImageSize.y * 0.5);
-      // Multiply the position by the matrix.
-    gl_Position = vec4((a_position.x - u_CentralPosition.x) * scaleX,
-                        (a_position.y - u_CentralPosition.y) * scaleY,
-                        0.0,
-                        1.0);
-//    gl_Position = vec4(a_position.xy,0,1);
-      v_dl = max(u_DiffractionLimit,u_SeeingDiskSize) * u_InvPixelScale / (u_ImageSize.x * 0.5);
-      gl_PointSize = 64.0;
+		gl_Position = vec4(vec2(uvf_mPz * ax +  uvf_Pxy * az, uvf_mPy * ax -  uvf_Pxy * ay) * uvv_PositionScaling, 0.0,1.0);
+		gl_PointSize = uvf_PointSize;
       // Convert from clipspace to colorspace.
       // Clipspace goes -1.0 to +1.0
       // Colorspace goes from 0.0 to 1.0
-      v_color = gl_Position * 0.5 + 0.5;
-      v_flux = a_position.z;
+		vv_color = vec4(1.0,1.0,1.0,1.0);
+		vf_flux = av_position.z;
     }
 </script>
 <!-- fragment shader -->
 <script id="fragment-shader-2d" type="x-shader/x-fragment">
-        precision mediump float;
+	precision mediump float;
 
-    varying vec4 v_color;
-    const float pi = radians(180.0);
-    varying float v_dl;
-    varying float v_flux;
-
-    void main()
-    {
-        float r = length((gl_PointCoord - 0.5) * 2.0);
-        float l = 1.0 / sqrt(2.0 * pi * v_dl) * exp(-r * r * 0.5 / (v_dl * v_dl));
-        float f = min(v_flux / 65536.0,1.0);
-        gl_FragColor = vec4(f * l,f * l,f * l,1.0);
-    }
+	varying vec4	vv_color;
+	varying float	vf_flux;
+	uniform float	uff_BesselMax;
+	uniform float	uff_Normalization;
+	
+	float bessel1(float x)
+	{
+		float hx = 0.5 * x;
+		float hx2 = hx * hx;
+		float z = hx;
+		float r = hx;
+		float f = 1.0;
+		float i = 1.0;
+		for (int m = 1; m < 60; m++)//@@TODO may need to increase m max for large x; haven't tested limits yet
+		{	
+			z *= hx2;
+			float fm = float(m);
+			f *= -1.0 * (fm * (fm + 1.0));
+			r += z / f;
+		}
+		return r;
+	}
+	void main()
+	{
+		float R = length(gl_PointCoord - 0.5) * 2.0;
+//		float R = length(gl_PointCoord - 0.5);
+		float r = R * uff_BesselMax;
+//		float r = R * 10.17346813506272;
+		float f = 1.0;
+		if (r > 0.0)
+		{
+			float br = bessel1(r);
+			f = 4.0 * br * br / (r * r);
+		}    
+		//		float F = clamp(f * v_flux * u_FluxScaling * u_BesselNormalization, 0.0,1.0);
+		float F = clamp(f * vf_flux * uff_Normalization, 0.0,1.0);
+//		float F = clamp(f * 65535.0 * uff_Normalization, 0.0,1.0);
+//		float F = clamp(f, 0.0,1.0);
+//		float F = clamp(1.0 - R, 0.0,1.0);
+//		gl_FragColor = vec4(gl_PointCoord.s,gl_PointCoord.t,0.0,1.0);
+		gl_FragColor = vec4(F,0.0,0.0,1.0);
+//		gl_FragColor = vec4(vv_color.xyz * F,1.0);
+//		gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+	}
 </script>
 <script id="main" type="text/javascript" src="scripts/commonGP.js"></script>
+<script id="main" type="text/javascript" src="scripts/commonAstro.js"></script>
 <script id="main" type="text/javascript" src="scripts/test.js"></script>

@@ -1,11 +1,13 @@
 <canvas id="canvas"></canvas>
 <!-- vertex shader -->
 <script id="vertex-shader-2d" type="x-shader/x-vertex">
-	attribute vec3 av_position;
-
+	attribute vec2 	av_position;
+	attribute float af_flux;
+//	attribute vec2	av_texCoord;
 
 	uniform float	uvf_PointSize;
 	uniform vec2	uvv_PositionScaling;
+	uniform vec2	uvv_SampleOffset;
 	uniform float	uvf_Pxy;
 	uniform float	uvf_mPy;
 	uniform float	uvf_mPz;
@@ -15,8 +17,8 @@
 
 	void main()
 	{
-		float rx = radians(av_position.x * 15.0);
-		float ry = radians(av_position.y);
+		float rx = radians(av_position.x * 15.0 + uvv_SampleOffset.x);
+		float ry = radians(av_position.y + uvv_SampleOffset.y);
 		float cosAlpha = cos(rx);
 		float sinAlpha = sin(rx);
 		float cosDec = cos(ry);
@@ -31,56 +33,50 @@
       // Clipspace goes -1.0 to +1.0
       // Colorspace goes from 0.0 to 1.0
 		vv_color = vec4(1.0,1.0,1.0,1.0);
-		vf_flux = av_position.z;
+		vf_flux = af_flux;
     }
 </script>
 <!-- fragment shader -->
 <script id="fragment-shader-2d" type="x-shader/x-fragment">
 	precision mediump float;
 
-	varying vec4	vv_color;
-	varying float	vf_flux;
-	uniform float	uff_BesselMax;
-	uniform float	uff_Normalization;
-	
-	float bessel1(float x)
-	{
-		float hx = 0.5 * x;
-		float hx2 = hx * hx;
-		float z = hx;
-		float r = hx;
-		float f = 1.0;
-		float i = 1.0;
-		for (int m = 1; m < 60; m++)//@@TODO may need to increase m max for large x; haven't tested limits yet
-		{	
-			z *= hx2;
-			float fm = float(m);
-			f *= -1.0 * (fm * (fm + 1.0));
-			r += z / f;
-		}
-		return r;
-	}
+	varying vec4		vv_color;
+	varying float		vf_flux;
+//	uniform float		uff_BesselMax;
+//	uniform float		uff_Normalization;
+//	uniform float		ufvf_Airy[512];
+//	uniform float		uff_Stride;
+//	uniform int			ufi_Stride;
+	uniform float		uff_FluxScaling;
+	uniform sampler2D	ufs_Sampler;
+	uniform float		uff_Sampling_Correction;
 	void main()
 	{
-		float R = length(gl_PointCoord - 0.5) * 2.0;
+//		vec2 UV = (gl_PointCoord * 2.0 - 0.5) * uff_Stride;
+		
+//		float R = length(gl_PointCoord - 0.5) * 2.0;
 //		float R = length(gl_PointCoord - 0.5);
-		float r = R * uff_BesselMax;
+//		float r = R * uff_BesselMax;
+//		vec4 c = texture2d(ufs_Sampler, vec2(R,0.0) );
+//		vec4 c = texture2D(ufs_Sampler, vec2(R,0.0) );
 //		float r = R * 10.17346813506272;
-		float f = 1.0;
+/*		float f = 1.0;
 		if (r > 0.0)
 		{
 			float br = bessel1(r);
 			f = 4.0 * br * br / (r * r);
 		}    
 		//		float F = clamp(f * v_flux * u_FluxScaling * u_BesselNormalization, 0.0,1.0);
-		float F = clamp(f * vf_flux * uff_Normalization, 0.0,1.0);
+		float F = clamp(f * vf_flux * uff_Normalization, 0.0,1.0);*/
 //		float F = clamp(f * 65535.0 * uff_Normalization, 0.0,1.0);
 //		float F = clamp(f, 0.0,1.0);
 //		float F = clamp(1.0 - R, 0.0,1.0);
 //		gl_FragColor = vec4(gl_PointCoord.s,gl_PointCoord.t,0.0,1.0);
-		gl_FragColor = vec4(F,0.0,0.0,1.0);
-//		gl_FragColor = vec4(vv_color.xyz * F,1.0);
 //		gl_FragColor = vec4(1.0,0.0,0.0,1.0);
+//		gl_FragColor = vec4(vv_color.xyz * c.xyz,1.0);
+//		gl_FragColor = vec4(c.xyz,1.0);
+		vec4 tex = clamp(texture2D(ufs_Sampler, gl_PointCoord) * vf_flux * uff_FluxScaling * uff_Sampling_Correction,0.0,1.0);
+		gl_FragColor = vec4(vv_color.xyz * tex.xyz,1.0);
 	}
 </script>
 <script id="main" type="text/javascript" src="scripts/commonGP.js"></script>

@@ -135,22 +135,25 @@ class DrawStars
 {
     constructor()
     {
-        this.canvas = document.getElementById("canvas");
-        this.canvas.width = window.innerWidth
-        this.canvas.height = window.innerHeight - 60;
-        this.gl = this.canvas.getContext("webgl",{antialias: false});
-        this.program = null;
-        this.starList = new Array();
-        this.colorStars = false;
-        this.saturationFlux = 65535.0;
-        this.maxFlux = 0;
-        this.resetStarList();
+		this.canvas = document.getElementById("canvas");
+		this.canvas.width = window.innerWidth
+		this.canvas.height = window.innerHeight - 60;
+		this.gl = this.canvas.getContext("webgl2",{antialias: false});
+		const ext = this.gl.getExtension("EXT_color_buffer_float");
+		this.program = null;
+		this.starList = new Array();
+		this.colorStars = false;
+		this.saturationFlux = 65535.0;
+		this.maxFlux = 0;
+		this.resetStarList();
 		this._centralPosition = [0.0, 0.0];
 		this._pixelSize = 1.0;
 		this._focalLength = 1.0;
 		this._pixelScale = Math.atan(this._pixelSize / this._focalLength); 
-    	this._difractionDiskSize = 1.0;
- 
+		this._difractionDiskSize = 1.0;
+
+
+
     }
     
     _createShader(type, source)
@@ -201,28 +204,42 @@ class DrawStars
             this.positionAttributeLocation = this.gl.getAttribLocation(this.program, "av_position");
 //            this.fluxAttributeLocation = this.gl.getAttribLocation(this.program, "a_flux");
 //            this.colorAttributeLocation = this.gl.getAttribLocation(this.program, "a_color");
+			this.fluxesBufferLocation = this.gl.getAttribLocation(this.program, "af_flux");
 
-
+			this.gl.activeTexture(this.gl.TEXTURE0);
+			this._texture = this.gl.createTexture();
+			this.gl.bindTexture(this.gl.TEXTURE_2D, this._texture);
  
             // lookup uniforms
             this.uvv_PositionScaling = this.gl.getUniformLocation(this.program, "uvv_PositionScaling");
             this.uvf_Pxy = this.gl.getUniformLocation(this.program, "uvf_Pxy");
             this.uvf_mPy = this.gl.getUniformLocation(this.program, "uvf_mPy");
             this.uvf_mPz = this.gl.getUniformLocation(this.program, "uvf_mPz");
-//            this._FluxScaling = this.gl.getUniformLocation(this.program, "u_FluxScaling");
+			this.uvv_SampleOffset = this.gl.getUniformLocation(this.program, "uvv_SampleOffset");
             this.uvf_PointSize = this.gl.getUniformLocation(this.program, "uvf_PointSize");
             
-            this.uff_Normalization = this.gl.getUniformLocation(this.program,"uff_Normalization");
-			this.uff_BesselMax = this.gl.getUniformLocation(this.program,"uff_BesselMax");
+            this.uff_FluxScaling = this.gl.getUniformLocation(this.program,"uff_FluxScaling");
+			this.ufs_Sampler = this.gl.getUniformLocation(this.program,"ufs_Sampler");
+			this.uff_Sampling_Correction = this.gl.getUniformLocation(this.program,"uff_Sampling_Correction");
+			
+			
 
+			this.gl.uniform1i(this.ufs_Sampler, 0);
 			this.gl.uniform2fv(this.uvv_PositionScaling, new Float32Array([1.0, 1.0]));
 			this.gl.uniform1f(this.uvf_Pxy, 1.0);
 			this.gl.uniform1f(this.uvf_mPy, 0.0);
 			this.gl.uniform1f(this.uvf_mPz, 0.0);
 			this.gl.uniform1f(this.uvf_PointSize, 1.0);
 
-			this.gl.uniform1f(this.uff_BesselMax, 3.83);
-			this.gl.uniform1f(this.uff_normalization, 1.0)
+//			this.gl.uniform1f(this.uff_BesselMax, 3.83);
+//			this.gl.uniform1f(this.uff_normalization, 1.0)
+			this.gl.uniform1f(this.uff_FluxScaling,1.0 / 65535.0);
+			this.gl.uniform1f(this.uff_Sampling_Correction, 1.0);
+
+    	// generate textures
+    	
+	    	let arrsize = this.gl.getParameter(this.gl.MAX_FRAGMENT_UNIFORM_VECTORS);
+ 
 
             this.gl.enable(this.gl.BLEND);
             this.gl.blendFunc(this.gl.ONE, this.gl.ONE);
@@ -252,7 +269,7 @@ class DrawStars
     set seeingDisk(seeingHWHM)
     {
     	this._seeingHWHM = seeingHWHM;
-        this._seeingStDev = seeingHWHM / Math.sqrt(2.0 * Math.log(2.0));
+        this._seeingStDev = radians(seeingHWHM / Math.sqrt(2.0 * Math.log(2.0)) / 3600.0);
     }
     set focalLength(f) // resolution limit in arcsec
     {
@@ -274,28 +291,13 @@ class DrawStars
 
     draw(exposure_length)
     {
-        this._prepStarArrays();
-//        const iterPerSec = 8; // # of iterations per second; used to simulate seeing
-        const iterPerSec = 1; // # of iterations per second; used to simulate seeing
+        const iterPerSec = 32; // # of iterations per second; used to simulate seeing
         const sampling = 1.0 / iterPerSec; 
         const passes = Math.ceil(exposure_length / sampling);
+        this._prepStarArrays();
+//        const iterPerSec = 8; // # of iterations per second; used to simulate seeing
 
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, this.starCoords, this.gl.STATIC_DRAW);
-
-
-        // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
-        let size = 3;          // 2 components per iteration
-        const type = this.gl.FLOAT;   // the data is 32bit floats
-        const normalize = false; // don't normalize the data
-        const stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
-        const offset = 0;        // start at the beginning of the buffer
-        this.gl.vertexAttribPointer(this.positionAttributeLocation, size, type, normalize, stride, offset);
-/*        size = 1;
-        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.fluxBuffer);
-        this.gl.bufferData(this.gl.ARRAY_BUFFER, this.starFluxes, this.gl.STATIC_DRAW);
-        this.gl.vertexAttribPointer(this.fluxAttributeLocation, size, type, normalize, stride, offset);
-        if (this.colorStars)
+/*        if (this.colorStars)
         {
             size = 3;
             this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
@@ -322,7 +324,11 @@ class DrawStars
         this.gl.uniform1f(this.uvf_mPy, mPy);
         this.gl.uniform1f(this.uvf_mPz, mPz);
         this.gl.uniform1f(this.uvf_PointSize, this.pointSize);
+//        this.gl.uniform1f(this.uff_Sampling_Correction,sampling);
+        this.gl.uniform1f(this.uff_Sampling_Correction,1.0);
         
+			this.gl.uniform1f(this.uff_FluxScaling,exposure_length / 65535.0);
+
 
         this.gl.uniform1f(this.uff_BesselMax, this.airyMax);
         this.gl.uniform1f(this.uff_Normalization, this.besselNormalization / this.saturationFlux * sampling); 
@@ -332,26 +338,37 @@ class DrawStars
         // Clear the canvas.
         this.gl.clear(this.gl.COLOR_BUFFER_BIT);
         // Draw the geometry.
-        this.gl.enableVertexAttribArray(this.positionAttributeLocation);
-        //this.gl.enableVertexAttribArray(this.fluxAttributeLocation);
-        if (this.colorStars )
-            this.gl.enableVertexAttribArray(this.colorAttributeLocation);
+		this.gl.enableVertexAttribArray(this.positionAttributeLocation);
         this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.positionBuffer);
-        const numStars = this.starsCount;
+        this.gl.vertexAttribPointer(this.positionAttributeLocation, 2, this.gl.FLOAT, false, 0, 0);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, this.starCoords, this.gl.STATIC_DRAW);
+
+		this.gl.enableVertexAttribArray(this.fluxesBufferLocation);
+        this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.fluxBuffer);
+        this.gl.vertexAttribPointer(this.fluxesBufferLocation, 1, this.gl.FLOAT, false, 0, 0);
+        this.gl.bufferData(this.gl.ARRAY_BUFFER, this.starFluxes, this.gl.STATIC_DRAW);
+
+		this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+		this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+		this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
+		this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
+//		if (this.colorStars )
+//			this.gl.enableVertexAttribArray(this.colorAttributeLocation);
+		const numStars = this.starsCount;
         let i;
-//        const arcsecToDeg = 1.0 / 3600.0;
+//		const arcsecToDeg = 1.0 / 3600.0;
 
-        for (i = 0; i < passes; i++)
-        {
-//            const r = random_gaussian(0.0, this._seeingStDev);
-//            const theta = Math.random() * Math.PI;
-//            const dec_shift = r * Math.sin(theta);
-//            const ra_shift = r * Math.cos(theta) / 15.0; // s 
+//		for (i = 0; i < passes; i++)
+//		{
+//			const r = random_gaussian(0.0, this._seeingStDev);
+//			const theta = Math.random() * 2.0 * Math.PI;
+//			const dec_shift = r * Math.sin(theta);
+//			const ra_shift = r * Math.cos(theta);
 
-//            this.gl.uniform2fv(this._seeingShift, new Float32Array([ra_shift * arcsecToDeg, dec_shift * arcsecToDeg]));
+			this.gl.uniform2fv(this.uvv_SampleOffset, new Float32Array([0.0,0.0]));
 
-            this.gl.drawArrays(this.gl.POINTS, 0, numStars);
-        }
+			this.gl.drawArrays(this.gl.POINTS, 0, numStars);
+//		}
 
     }
     resetStarList()
@@ -360,13 +377,14 @@ class DrawStars
         this.numStars = 0;
         this.starsCount = 0;
         this.starCoordsInternal = new Array();
+        this.starFluxesInternal = new Array();
         this.starColorsInternal = new Array();
     }
     addStar(ra, dec, flux) // flux in total counts/sec
     {
         this.starCoordsInternal.push(ra);
         this.starCoordsInternal.push(dec);
-        this.starCoordsInternal.push(flux);
+        this.starFluxesInternal.push(flux);
         if (flux > this.maxFlux)
         	this.maxFlux = flux;
         this.starsCount++;
@@ -379,7 +397,7 @@ class DrawStars
         {
             this.numStars = this.starsCount;
             this.starCoords = new Float32Array(this.starCoordsInternal);
-//            this.starFluxes = new Float32Array(this.starFluxesInternal);
+            this.starFluxes = new Float32Array(this.starFluxesInternal);
             this.starColors = new Float32Array(this.starColorsInternal);
 			const nflux = this.maxFlux / this.saturationFlux;
 			let airy_size = 1;
@@ -396,10 +414,87 @@ class DrawStars
 			}
 			this.airyMax = bessel1_maxima(airy_size);
 			const size = this.airyMax / bessel1_minima(0) * this._difractionDiskSize / this._pixelScale; // extended size
-			this.pointSize = Math.max(Math.min(Math.floor(Math.ceil(size * 2.0) * 0.5) * 2.0 + 1.0, 63.0), 1.0); // size in pixels
+			this.pointSize = Math.max(Math.min(Math.floor(Math.ceil(size * 2.0) * 0.5) * 2.0 + 1.0, 63.0), 3.0); // size in pixels
+			this.airyMax = this.pointSize * bessel1_minima(0) * this._pixelScale / this._difractionDiskSize;
 		    this.besselNormalization = airyDiscreteNormalization(Math.ceil(this.pointSize * 0.5), airy_size);
 			
         }
+    	const n = (this.pointSize - 1) * 0.5;
+   		let dsize = this.pointSize * this.pointSize;
+   		if (dsize < 1)
+   			dsize = 1;
+    	let data = new Uint8Array(dsize * 4); 
+   		let dataf = new Array(dsize);
+   		let idx;
+   		for (idx = 0; idx < dsize; idx++)
+   			dataf[idx] = 0.0;
+   			
+    	if (dsize > 1)
+    	{
+			let p;
+			let sum = 0.0;
+//			const b1min8 = bessel1_minima(8);
+			const b1max8 = bessel1_maxima(8);
+			let s;
+			const invn = 1.0 / n;
+			let v;
+			let u;
+			let pass;
+			for (pass = 0; pass < 32; pass++)
+			{
+		        const r = random_gaussian(0.0, this._seeingStDev) / this._pixelScale;
+		        const theta = Math.random() * 2.0 * Math.PI;
+		        const dec_shift = r * Math.sin(theta);
+		        const ra_shift = r * Math.cos(theta);
+				idx = 0;
+				for (v = -n; v <= n; v++)
+				{
+					for (u = -n; u <= n; u++)
+					{
+						const U = (u + ra_shift) * invn;
+						const V = (v + dec_shift) * invn ;
+						const R = Math.sqrt(U * U + V * V);
+						let f = 1.0;
+						if (R > 0)
+						{
+							let r = this.airyMax * R;
+							if (r < b1max8)
+							{
+								const br = bessel(1,r);
+								f = 4.0 * br * br / (r * r);
+							}
+							else
+								f = 0.0;
+						}
+						dataf[idx] += f;
+						idx++;
+						sum += f;
+					}
+				}
+			}
+			const norm = 1.0 / sum;
+			for (p = 0; p < dataf.length; p++)
+			{
+				const x = dataf[p] * norm * 255.0;
+				dataf[p] *= norm;
+				data[p * 4 + 0] = x;
+				data[p * 4 + 1] = x;
+				data[p * 4 + 2] = x;
+				data[p * 4 + 3] = 255	;
+			}
+		}
+		else
+		{
+			data[0] = 255;
+			data[1] = 255;
+			data[2] = 255;
+			data[3] = 255;
+		}
+		this.gl.bindTexture(this.gl.TEXTURE_2D, this._texture);
+		this.gl.texImage2D(this.gl.TEXTURE_2D,0,this.gl.RGBA,this.pointSize,this.pointSize,0,this.gl.RGBA,this.gl.UNSIGNED_BYTE,data);
+//		this.gl.uniform1fv(this.ufvf_Airy,data);
+//		this.gl.uniform1f(this.uff_Stride,this.pointSize);
+//		this.gl.uniform1i(this.ufi_Stride,this.pointSize);
 		
     }
 }
@@ -595,9 +690,9 @@ function main()
 {
     if (shadersReady)
     {
-    	let diameter = 6.0; // mn
-    	let pixelSize = 24.6e-6; // m
-    	let focalLength = 6.0; //m
+    	let diameter = 0.0508;//6.0; // mn
+    	let pixelSize = 24.0e-6; // m
+    	let focalLength = 0.8128 * 16.0;//6.0; //m
     	let wavelength = 550.0e-9; // m
     	
         drawer.centralPosition(1.0, 1.0);
@@ -605,13 +700,13 @@ function main()
         drawer.pixelSize = pixelSize; // 24.6 micron/pix
         drawer.focalLength = focalLength; // 1m
         drawer.diffractionDiskSize = airyDiskSize(wavelength,diameter);// / Math.PI * wavelength / diameter;
-      drawer.addStar(1.0, 1.0, 65535.0);
+      drawer.addStar(1.0, 1.0, 65535.0 * 1.0);
       
-          drawer.addStar(1.0 + degrees(drawer._pixelScale) * 15, 1.0, 65535.0 * 8.0);
+ //         drawer.addStar(1.0 + degrees(drawer._pixelScale) * 15, 1.0, 65535.0 * 128.0);
   //      drawer.addStar(1.0 - 0.2 / 3600.0, 1.0, 3000000.0);
   //      drawer.addStar(1.0, 1.0 + 10.0 / 3600.0, 1000000.0);
         
-        drawer.draw(1.0); // 100 s exposure
+        drawer.draw(100.0); // 100 s exposure
 
     }
 }

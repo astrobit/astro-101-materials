@@ -136,8 +136,6 @@ class DrawStars
     constructor()
     {
 		this.canvas = document.getElementById("canvas");
-		this.canvas.width = window.innerWidth
-		this.canvas.height = window.innerHeight - 60;
 		this.gl = this.canvas.getContext("webgl2",{antialias: false});
 		const ext = this.gl.getExtension("EXT_color_buffer_float");
 		this.program = null;
@@ -212,9 +210,12 @@ class DrawStars
  
             // lookup uniforms
             this.uvv_PositionScaling = this.gl.getUniformLocation(this.program, "uvv_PositionScaling");
-            this.uvf_Pxy = this.gl.getUniformLocation(this.program, "uvf_Pxy");
-            this.uvf_mPy = this.gl.getUniformLocation(this.program, "uvf_mPy");
-            this.uvf_mPz = this.gl.getUniformLocation(this.program, "uvf_mPz");
+            this.uvf_mVxx = this.gl.getUniformLocation(this.program, "uvf_mVxx");
+            this.uvf_mVxy = this.gl.getUniformLocation(this.program, "uvf_mVxy");
+            this.uvf_mVxz = this.gl.getUniformLocation(this.program, "uvf_mVxz");
+            this.uvf_mVyx = this.gl.getUniformLocation(this.program, "uvf_mVyx");
+            this.uvf_mVyy = this.gl.getUniformLocation(this.program, "uvf_mVyy");
+            this.uvf_mVyz = this.gl.getUniformLocation(this.program, "uvf_mVyz");
 			this.uvv_SampleOffset = this.gl.getUniformLocation(this.program, "uvv_SampleOffset");
             this.uvf_PointSize = this.gl.getUniformLocation(this.program, "uvf_PointSize");
             
@@ -288,51 +289,57 @@ class DrawStars
 	{
 		return this._difractionDiskSize;
 	}
+	set imageResolution(res)
+	{
+		this.CCDres = res;
+	}
+	get imageResolution()
+	{
+		return this.CCDres;
+	}
 
     draw(exposure_length)
     {
-        const iterPerSec = 32; // # of iterations per second; used to simulate seeing
-        const sampling = 1.0 / iterPerSec; 
-        const passes = Math.ceil(exposure_length / sampling);
         this._prepStarArrays();
-//        const iterPerSec = 8; // # of iterations per second; used to simulate seeing
-
-/*        if (this.colorStars)
-        {
-            size = 3;
-            this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
-            this.gl.bufferData(this.gl.ARRAY_BUFFER, this.starColors, this.gl.STATIC_DRAW);
-            this.gl.vertexAttribPointer(this.colorAttributeLocation, size, type, normalize, stride, offset);
-        }
-        */
         // Tell WebGL how to convert from clip space to pixels
         this.gl.useProgram(this.program);
         
         
+		const rAlpha = radians(this._centralPosition[0] * 15.0);
 		const rDec = radians(this._centralPosition[1]);
 		const cosDec = Math.cos(rDec);
-		const Pxy = cosDec;
-		const mPy = -cosDec * Math.sin(radians(this._centralPosition[0] * 15.0));
-		const mPz = -Math.sin(rDec);
+		const sinDec = Math.sin(rDec);
+		const cosAlpha = Math.cos(rAlpha);
+		const sinAlpha = Math.sin(rAlpha);
+		const mVxx = -sinDec;
+		const mVxy = cosDec;
+		const mVxz = 0.0;
+		const mVyx = -cosAlpha*sinDec;
+		const mVyy = -sinAlpha*sinDec;
+		const mVyz = cosDec;
 
 
-        const scale = this._pixelSize / this._focalLength;
-        const scaleX = scale * 2.0 / this.gl.canvas.width;
-        const scaleY = scale * 2.0 / this.gl.canvas.height;
-        this.gl.uniform2fv(this.uvv_PositionScaling, new Float32Array([scaleX, scaleY]));
-        this.gl.uniform1f(this.uvf_Pxy, Pxy);
-        this.gl.uniform1f(this.uvf_mPy, mPy);
-        this.gl.uniform1f(this.uvf_mPz, mPz);
-        this.gl.uniform1f(this.uvf_PointSize, this.pointSize);
-//        this.gl.uniform1f(this.uff_Sampling_Correction,sampling);
-        this.gl.uniform1f(this.uff_Sampling_Correction,1.0);
+		this.canvas.width = Math.min(window.innerWidth,this.CCDres)
+		this.canvas.height = Math.min(window.innerHeight - 60,this.CCDres);
+		const imWidth = Math.min(this.gl.canvas.width, this.CCDres);
+		const imHeight = Math.min(this.gl.canvas.height, this.CCDres);
+//		const halfRes = this.CCDres >> 1;
+
+		const scale = this._focalLength / this._pixelSize;
+		const scaleX = scale * 2.0 / this.gl.canvas.width;
+		const scaleY = scale * 2.0 / this.gl.canvas.height;
+		this.gl.uniform2fv(this.uvv_PositionScaling, new Float32Array([scaleX, scaleY]));
+		this.gl.uniform1f(this.uvf_mVxx, mVxx);
+		this.gl.uniform1f(this.uvf_mVxy, mVxy);
+		this.gl.uniform1f(this.uvf_mVxz, mVxz);
+		this.gl.uniform1f(this.uvf_mVyx, mVyx);
+		this.gl.uniform1f(this.uvf_mVyy, mVyy);
+		this.gl.uniform1f(this.uvf_mVyz, mVyz);
+		this.gl.uniform1f(this.uvf_PointSize, this.pointSize);
         
-			this.gl.uniform1f(this.uff_FluxScaling,exposure_length / 65535.0);
+		this.gl.uniform1f(this.uff_FluxScaling,exposure_length / 65535.0);
 
-
-        this.gl.uniform1f(this.uff_BesselMax, this.airyMax);
-        this.gl.uniform1f(this.uff_Normalization, this.besselNormalization / this.saturationFlux * sampling); 
-
+		
         this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
         // Clear the canvas.
@@ -356,20 +363,8 @@ class DrawStars
 //			this.gl.enableVertexAttribArray(this.colorAttributeLocation);
 		const numStars = this.starsCount;
         let i;
-//		const arcsecToDeg = 1.0 / 3600.0;
 
-//		for (i = 0; i < passes; i++)
-//		{
-//			const r = random_gaussian(0.0, this._seeingStDev);
-//			const theta = Math.random() * 2.0 * Math.PI;
-//			const dec_shift = r * Math.sin(theta);
-//			const ra_shift = r * Math.cos(theta);
-
-			this.gl.uniform2fv(this.uvv_SampleOffset, new Float32Array([0.0,0.0]));
-
-			this.gl.drawArrays(this.gl.POINTS, 0, numStars);
-//		}
-
+		this.gl.drawArrays(this.gl.POINTS, 0, numStars);
     }
     resetStarList()
     {
@@ -412,29 +407,26 @@ class DrawStars
 				cflux = f * nflux;
 				airy_size = m;
 			}
-			this.airyMax = bessel1_maxima(airy_size);
-			const size = this.airyMax / bessel1_minima(0) * this._difractionDiskSize / this._pixelScale; // extended size
+			this.airyMaxDesired = bessel1_maxima(airy_size);
+			const size = this.airyMaxDesired / bessel1_minima(0) * this._difractionDiskSize / this._pixelScale; // extended size
 			this.pointSize = Math.max(Math.min(Math.floor(Math.ceil(size * 2.0) * 0.5) * 2.0 + 1.0, 63.0), 3.0); // size in pixels
 			this.airyMax = this.pointSize * bessel1_minima(0) * this._pixelScale / this._difractionDiskSize;
-		    this.besselNormalization = airyDiscreteNormalization(Math.ceil(this.pointSize * 0.5), airy_size);
-			
-        }
-    	const n = (this.pointSize - 1) * 0.5;
+		}	
+		const n = (this.pointSize - 1) * 0.5;
    		let dsize = this.pointSize * this.pointSize;
    		if (dsize < 1)
    			dsize = 1;
-    	let data = new Uint8Array(dsize * 4); 
+		let data = new Uint8Array(dsize * 4); 
    		let dataf = new Array(dsize);
    		let idx;
    		for (idx = 0; idx < dsize; idx++)
    			dataf[idx] = 0.0;
    			
-    	if (dsize > 1)
-    	{
+		if (dsize > 1)
+		{
 			let p;
 			let sum = 0.0;
-//			const b1min8 = bessel1_minima(8);
-			const b1max8 = bessel1_maxima(8);
+			const b1min8 = bessel1_minima(8);
 			let s;
 			const invn = 1.0 / n;
 			let v;
@@ -442,10 +434,10 @@ class DrawStars
 			let pass;
 			for (pass = 0; pass < 32; pass++)
 			{
-		        const r = random_gaussian(0.0, this._seeingStDev) / this._pixelScale;
-		        const theta = Math.random() * 2.0 * Math.PI;
-		        const dec_shift = r * Math.sin(theta);
-		        const ra_shift = r * Math.cos(theta);
+			    const r = random_gaussian(0.0, this._seeingStDev) / this._pixelScale;
+			    const theta = Math.random() * 2.0 * Math.PI;
+			    const dec_shift = r * Math.sin(theta);
+			    const ra_shift = r * Math.cos(theta);
 				idx = 0;
 				for (v = -n; v <= n; v++)
 				{
@@ -458,7 +450,7 @@ class DrawStars
 						if (R > 0)
 						{
 							let r = this.airyMax * R;
-							if (r < b1max8)
+							if (r < b1min8) // if r is too large, don't calculate the bessel funcgtion; just assume it is 0.
 							{
 								const br = bessel(1,r);
 								f = 4.0 * br * br / (r * r);
@@ -492,183 +484,13 @@ class DrawStars
 		}
 		this.gl.bindTexture(this.gl.TEXTURE_2D, this._texture);
 		this.gl.texImage2D(this.gl.TEXTURE_2D,0,this.gl.RGBA,this.pointSize,this.pointSize,0,this.gl.RGBA,this.gl.UNSIGNED_BYTE,data);
-//		this.gl.uniform1fv(this.ufvf_Airy,data);
-//		this.gl.uniform1f(this.uff_Stride,this.pointSize);
-//		this.gl.uniform1i(this.ufi_Stride,this.pointSize);
-		
     }
 }
 let _vertexShader = document.getElementById("vertex-shader-2d").text;
 let _fragmentShader = document.getElementById("fragment-shader-2d").text;
 
 
-function bessel1(x)
-{
-	const hx = 0.5 * x;
-	const hx2 = hx * hx;
-	let z = hx;
-	let r = hx;
-	let f = 1;
-	let m;
-	let i = 1;
-	for (m = 1; m < 60; m++)
-	{	
-		z *= hx2;
-		f *= -1 * (m * (m + 1));
-		r += z / f * i;
-	}
-	return r;
-//    return hx * (0.25 + hx * (-1.0 / 6.0 + hx * (1.0 / 48.0 + hx * (-1.0 / 720.0 + hx * (1.0 / 17280.0 + hx * (-1.0 / 604800.0 + hx * (1.0 / 29030400.0 + hx * (-1.0 / 1828915200.0))))))));
-}
-/*
-function besseltest()
-{	let r;
-	for (r = 0; r < 15; r += 0.05)
-	{
-		if (r > 0.0)
-		{
-			let br = bessel1(r);
-		    let l = 4.0 * br * br / (r * r);
-			console.log(r + " " + l);
-		}
-	}
-}
-besseltest();*/
-/*function besselnormtest()
-{
-	let p = 1;
-	for (p = 1; p < 32; p++)
-	{
-		console.log(p + " " + airyDiscreteNormalization(p,8,1));
-	}
-}
-besselnormtest();
-
-function besselftest(a,x,e)
-{
-	let m = 0;
-	let ret = 0;
-	let fdelta = 1;
-	let epsilon = e;
-	if (e === undefined || e == null)
-	{
-		epsilon = Number.EPSILON;
-	}
-	do
-	{
-		let sign = (m % 2) == 1 ? -1 : 1;
-		let denom = factorial(m) * gamma(m + a + 1);
-		let delta = Math.pow(x * 0.5,2 * m + a) / denom * sign;
-		ret += delta;
-		fdelta = Math.abs(delta / ret);
-		m++;
-	} while (fdelta > epsilon);
-	console.log("btest:" + x + " " + m + " " + fdelta);
-	return ret;
-}
-function besselCheck()
-{
-	let m = 0; 
-	for (m = 0; m < 9; m++)
-	{
-		const r = bessel1_maxima(m);
-		const br = bessel(1,r);
-		const f = r == 0 ? 1.0 : 4.0 * br * br / (r * r);
-		console.log("bmax: " + r + " " + m + " " + f);
-
-		const br2 = bessel1(r);
-		const f2 = r == 0 ? 1.0 : 4.0 * br2 * br2 / (r * r);
-		console.log("bmax2: " + r + " " + m + " " + f2);
-	}
-}
-besselCheck();*/
-/*
-function shaderTest()
-{
-	let m;
-	const rflux = 6000000000.0;
-	const nflux = rflux / 65535.0;
-	let airy_size = 1;
-	let cflux = nflux;
-	for (m = 1; m < 9 && cflux > 0.1; m++)
-	{
-		const r = bessel1_maxima(m);
-		const br = bessel1(r);
-		const f = 4.0 * br * br / (r * r);
-		
-	    cflux = f * nflux;
-		airy_size = m;
-	}
-	console.log("airy size = " + airy_size);
-    const  u_AiryMax = bessel1_minima(airy_size);
-    console.log("airy max = " + u_AiryMax);
-    const centralSize = bessel1_minima(1);
-    const pixScale = 0.1;
-    const size = pixScale * u_AiryMax / bessel1_minima(0); // extended size in arc-sec
-    const sizePix = Math.max(Math.min(Math.floor(Math.ceil(size / pixScale * 2.0) * 0.5) * 2.0 + 1.0, 63.0), 1.0); // size in pixels
-    console.log("size = " + sizePix);
-    const u_BesselNormalization = airyDiscreteNormalization(Math.ceil(sizePix * 0.5), airy_size);
-    console.log("normalization = " + u_BesselNormalization);
-    const sampling = 1.0;
-	const u_normalization = u_BesselNormalization / 65535.0 * sampling;
-
-
-    let focalLength = 11000; // 11 m
-    let pixelSize = 24.6e-3; // 24.6 microns
-    let FOV = degrees(pixelSize / focalLength) * 512;
-    const uvv_CentralPosition = {x:0.0, y:0.0};
-	const uvv_PositionScaling = {x:focalLength / pixelSize * 2.0 / canvas.width, y:focalLength / pixelSize * 2.0 / canvas.height}; 
-	const rDec = radians(uvv_CentralPosition.y);
-	const cosDec = Math.cos(rDec);
-    const uvf_Pxy = cosDec;
-    const uvf_mPy = -cosDec * Math.sin(radians(uvv_CentralPosition.x));
-    const uvf_mPz = -Math.sin(rDec);
-    
-     
-    let i;
-    for (i = 0; i < sizePix; i++)
-    {
-        const x = (i + 0.5) / sizePix;
-        const y = 0.5;
-        const r = testShader(x, y, rflux);
-        console.log(r);
-    }
-    
-    let j;
-    for (j = 0; j < 4; j++)
-    {
-    	let dec = j / 3 * FOV;
-    	console.log("dec = " + dec);
-		for (i = 0; i < 4; i++)
-		{
-			let ra = i / 3 * FOV / 15.0; //deg to hours
-			let res = testVtxShader(ra,dec,0.0);
-			console.log(res.x + " " + res.y);
-		} 
-	}
-}
-shaderTest();
-
-*/
-//getFile("scripts/star.vert").then(function (result) {
-//                                                            _vertexShader = result;
-//                                                        },
-//                                                        function (error) {
- //                                                           console.log("Error loading vertex shader: " + error);
-//                                                        }
-//                                                    );
-//
-//getFile("scripts/star.frag").then(function (result) {
-//                                                            _fragmentShader = result;
-//                                                        },
-//                                                        function (error) {
-//                                                            console.log("Error loading fragment shader: " + error);
-//                                                        }
-//                                                    );
-
-
-
-
+let first = true;
 let shadersReady = false;
 let drawer = new DrawStars();
 function waitOnShaders()
@@ -690,23 +512,31 @@ function main()
 {
     if (shadersReady)
     {
-    	let diameter = 0.0508;//6.0; // mn
-    	let pixelSize = 24.0e-6; // m
-    	let focalLength = 0.8128 * 16.0;//6.0; //m
-    	let wavelength = 550.0e-9; // m
-    	
-        drawer.centralPosition(1.0, 1.0);
-        drawer.seeingDisk = 2.0; //"
-        drawer.pixelSize = pixelSize; // 24.6 micron/pix
-        drawer.focalLength = focalLength; // 1m
-        drawer.diffractionDiskSize = airyDiskSize(wavelength,diameter);// / Math.PI * wavelength / diameter;
-      drawer.addStar(1.0, 1.0, 65535.0 * 1.0);
-      
- //         drawer.addStar(1.0 + degrees(drawer._pixelScale) * 15, 1.0, 65535.0 * 128.0);
-  //      drawer.addStar(1.0 - 0.2 / 3600.0, 1.0, 3000000.0);
-  //      drawer.addStar(1.0, 1.0 + 10.0 / 3600.0, 1000000.0);
-        
-        drawer.draw(100.0); // 100 s exposure
+		let diameter = 0.0508;//6.0; // mn
+		let pixelSize = 24.0e-6; // m
+		let focalLength = 0.8128 * 16.0;//6.0; //m
+		let wavelength = 550.0e-9; // m
+
+		drawer.imageResolution = 1024;
+		drawer.centralPosition(0.0, 0.0);
+		drawer.seeingDisk = 2.0; //"
+		drawer.pixelSize = pixelSize; // 24.6 micron/pix
+		drawer.focalLength = focalLength; // 1m
+		drawer.diffractionDiskSize = airyDiskSize(wavelength,diameter);// / Math.PI * wavelength / diameter;
+		if (first)
+		{
+			drawer.addStar(0.0 + degrees(drawer._pixelScale) / 15.0 *  0, 0.0 + degrees(drawer._pixelScale) * 0, 65535.0 * 1.0);
+	//		drawer.addStar(0.0 + degrees(drawer._pixelScale) / 15.0 * 30, 0.0 + degrees(drawer._pixelScale) * 30, 65535.0 * 0.25);
+			drawer.addStar(0.0 + degrees(drawer._pixelScale) / 15.0 *  0, 0.0 + degrees(drawer._pixelScale) * 30, 65535.0 * 2.0);
+			drawer.addStar(0.0 + degrees(drawer._pixelScale) / 15.0 * 30, 0.0 + degrees(drawer._pixelScale) * 0, 65535.0 * 4.0);
+			first = false;
+		}
+//		drawer.addStar(1.0 + degrees(drawer._pixelScale) * 15 * 5, 1.0, 65535.0 * 2.0);
+//		drawer.addStar(1.0 - 0.2 / 3600.0, 1.0, 3000000.0);
+//		drawer.addStar(1.0, 1.0 + 10.0 / 3600.0, 1000000.0);
+
+		drawer.draw(10.0); // 100 s exposure
 
     }
+       window.setTimeout(main, 1000.0);
 }

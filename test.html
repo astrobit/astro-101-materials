@@ -3,7 +3,6 @@
 <script id="vertex-shader-2d" type="x-shader/x-vertex">
 	attribute vec2 	av_position;
 	attribute float af_flux;
-//	attribute vec2	av_texCoord;
 
 	uniform float	uvf_PointSize;
 	uniform vec2	uvv_PositionScaling;
@@ -40,42 +39,14 @@
 <script id="fragment-shader-2d" type="x-shader/x-fragment">
 	precision mediump float;
 
-	varying vec4		vv_color;
-	varying float		vf_flux;
-//	uniform float		uff_BesselMax;
-//	uniform float		uff_Normalization;
-//	uniform float		ufvf_Airy[512];
-//	uniform float		uff_Stride;
-//	uniform int			ufi_Stride;
-	uniform float		uff_FluxScaling;
-	uniform sampler2D	ufs_Sampler;
-	uniform float		uff_Sampling_Correction;
+	varying vec4		vv_color; // star color
+	varying float		vf_flux; // star flux (counts / sec)
+	uniform float		uff_FluxScaling; // exposure times maximum value
+	uniform sampler2D	ufs_Sampler; // texture to use
 	void main()
 	{
-//		vec2 UV = (gl_PointCoord * 2.0 - 0.5) * uff_Stride;
-		
-//		float R = length(gl_PointCoord - 0.5) * 2.0;
-//		float R = length(gl_PointCoord - 0.5);
-//		float r = R * uff_BesselMax;
-//		vec4 c = texture2d(ufs_Sampler, vec2(R,0.0) );
-//		vec4 c = texture2D(ufs_Sampler, vec2(R,0.0) );
-//		float r = R * 10.17346813506272;
-/*		float f = 1.0;
-		if (r > 0.0)
-		{
-			float br = bessel1(r);
-			f = 4.0 * br * br / (r * r);
-		}    
-		//		float F = clamp(f * v_flux * u_FluxScaling * u_BesselNormalization, 0.0,1.0);
-		float F = clamp(f * vf_flux * uff_Normalization, 0.0,1.0);*/
-//		float F = clamp(f * 65535.0 * uff_Normalization, 0.0,1.0);
-//		float F = clamp(f, 0.0,1.0);
-//		float F = clamp(1.0 - R, 0.0,1.0);
-//		gl_FragColor = vec4(gl_PointCoord.s,gl_PointCoord.t,0.0,1.0);
-//		gl_FragColor = vec4(1.0,0.0,0.0,1.0);
-//		gl_FragColor = vec4(vv_color.xyz * c.xyz,1.0);
-//		gl_FragColor = vec4(c.xyz,1.0);
-		vec4 tex = clamp(texture2D(ufs_Sampler, gl_PointCoord) * vf_flux * uff_FluxScaling * uff_Sampling_Correction,0.0,1.0);
+
+		vec4 tex = clamp(texture2D(ufs_Sampler, gl_PointCoord) * vf_flux * uff_FluxScaling,0.0,1.0);
 		gl_FragColor = vec4(vv_color.xyz * tex.xyz,1.0);
 	}
 </script>

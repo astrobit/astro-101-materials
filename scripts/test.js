@@ -10,126 +10,6 @@ class DrawStarInfo
         this.color = color;
     }
 }
-class vec4
-{
-	constructor(_x,_y,_z,_w)
-	{
-		this.x = ValidateValue(_x) ? _x : 0.0;
-		this.y = ValidateValue(_y) ? _y : 0.0;
-		this.z = ValidateValue(_z) ? _z : 0.0;
-		this.w = ValidateValue(_w) ? _w : 0.0;
-	}
-}
-class vec3
-{
-	constructor(_x,_y,_z)
-	{
-		this.x = ValidateValue(_x) ? _x : 0.0;
-		this.y = ValidateValue(_y) ? _y : 0.0;
-		this.z = ValidateValue(_z) ? _z : 0.0;
-	}
-}
-class vec2
-{
-	constructor(_x,_y)
-	{
-		this.x = ValidateValue(_x) ? _x : 0.0;
-		this.y = ValidateValue(_y) ? _y : 0.0;
-	}
-}
-function clamp(v,min,max)
-{
-	return Math.max(Math.min(v,max),min);
-}
-
-let av_position = new Array();
-
-let	uvf_PointSize = 0.0;
-let	uvv_PositionScaling = new vec2(1.0,1.0);
-let	uvf_Pxy = 1.0;
-let	uvf_mPy = 0.0;
-let	uvf_mPz = 0.0;
-
-let	vv_color = new vec4(1.0,1.0,1.0,1.0);
-let	vf_flux = 0.0;
-
-let gl_Position = new vec4();
-let gl_PointSize = 1.0;
-
-
-///////////////////////////////////////////////////////
-// vertex shader
-///////////////////////////////////////////////////////
-
-function testVtxShader(i)
-{
-	const rx = radians(av_position[i].x * 15.0);
-	const ry = radians(av_position[i].y);
-	const cosAlpha = Math.cos(rx);
-	const sinAlpha = Math.sin(rx);
-	const cosDec = Math.cos(ry);
-	const sinDec = Math.sin(ry);
-	const ax = cosAlpha * cosDec;
-	const ay = sinAlpha * cosDec;
-	const az = sinDec;
-
-	gl_Position.x = (uvf_mPz * ax +  uvf_Pxy * az) * uvv_PositionScaling.x;
-	gl_Position.y = (uvf_mPy * ax -  uvf_Pxy * ay) * uvv_PositionScaling.y;
-	gl_Position.z = 0.0;
-	gl_Position.w = 1.0;
-	gl_PointSize = uvf_PointSize;
-	// Convert from clipspace to colorspace.
-	// Clipspace goes -1.0 to +1.0
-	// Colorspace goes from 0.0 to 1.0
-	vv_color = new vec4(1.0,1.0,1.0,1.0);
-	vf_flux = av_position.z;
-}
-
-///////////////////////////////////////////////////////
-// fragment shader
-////////////////////////////////////////////////////////
-
-let	uff_BesselMax = 3.2;
-let	uff_Normalization = 1.0;
-
-function FRGbessel1(x)
-{
-	const hx = 0.5 * x;
-	const hx2 = hx * hx;
-	let z = hx;
-	let r = hx;
-	let f = 1.0;
-	let m;
-	for (m = 1; m < 60; m++)//@@TODO may need to increase m max for large x; haven't tested limits yet
-	{	
-		z *= hx2;
-		let fm = float(m);
-		f *= -1.0 * (fm * (fm + 1.0));
-		r += z / f;
-	}
-	return r;
-}
-let gl_PointCoord = new vec2();
-let gl_FragColor = new vec4();
-function testVtxShader()
-{
-	const px = (gl_PointCoord.x - 0.5) * 2.0 * uff_BesselMax;
-	const py = (gl_PointCoord.y - 0.5) * 2.0 * uff_BesselMax;
-	const r = Math.sqrt(px * px + py * py);
-	let f = 1.0;
-	if (r > 0.0)
-	{
-		let br = bessel1(r);
-		f = 4.0 * br * br / (r * r);
-	}    
-	//		float F = clamp(f * v_flux * u_FluxScaling * u_BesselNormalization, 0.0,1.0);
-	let F = clamp(f * vf_flux * uff_Normalization, 0.0,1.0);
-	gl_FragColor.x = vv_color.x * F;
-	gl_FragColor.y = vv_color.y * F;
-	gl_FragColor.z = vv_color.z * F;
-	gl_FragColor.w = 1.0;
-}
-	
 
 class DrawStars
 {
@@ -200,8 +80,6 @@ class DrawStars
 
             // look up where the vertex data needs to go.
             this.positionAttributeLocation = this.gl.getAttribLocation(this.program, "av_position");
-//            this.fluxAttributeLocation = this.gl.getAttribLocation(this.program, "a_flux");
-//            this.colorAttributeLocation = this.gl.getAttribLocation(this.program, "a_color");
 			this.fluxesBufferLocation = this.gl.getAttribLocation(this.program, "af_flux");
 
 			this.gl.activeTexture(this.gl.TEXTURE0);
@@ -216,31 +94,28 @@ class DrawStars
             this.uvf_mVyx = this.gl.getUniformLocation(this.program, "uvf_mVyx");
             this.uvf_mVyy = this.gl.getUniformLocation(this.program, "uvf_mVyy");
             this.uvf_mVyz = this.gl.getUniformLocation(this.program, "uvf_mVyz");
-			this.uvv_SampleOffset = this.gl.getUniformLocation(this.program, "uvv_SampleOffset");
             this.uvf_PointSize = this.gl.getUniformLocation(this.program, "uvf_PointSize");
             
             this.uff_FluxScaling = this.gl.getUniformLocation(this.program,"uff_FluxScaling");
 			this.ufs_Sampler = this.gl.getUniformLocation(this.program,"ufs_Sampler");
-			this.uff_Sampling_Correction = this.gl.getUniformLocation(this.program,"uff_Sampling_Correction");
 			
 			
 
-			this.gl.uniform1i(this.ufs_Sampler, 0);
 			this.gl.uniform2fv(this.uvv_PositionScaling, new Float32Array([1.0, 1.0]));
-			this.gl.uniform1f(this.uvf_Pxy, 1.0);
-			this.gl.uniform1f(this.uvf_mPy, 0.0);
-			this.gl.uniform1f(this.uvf_mPz, 0.0);
+			this.gl.uniform1f(this.uvf_mVxx, 0.0);
+			this.gl.uniform1f(this.uvf_mVxy, 1.0);
+			this.gl.uniform1f(this.uvf_mVxz, 0.0);
+			this.gl.uniform1f(this.uvf_mVyx, 0.0);
+			this.gl.uniform1f(this.uvf_mVyy, 0.0);
+			this.gl.uniform1f(this.uvf_mVyz, 1.0);
 			this.gl.uniform1f(this.uvf_PointSize, 1.0);
 
-//			this.gl.uniform1f(this.uff_BesselMax, 3.83);
-//			this.gl.uniform1f(this.uff_normalization, 1.0)
 			this.gl.uniform1f(this.uff_FluxScaling,1.0 / 65535.0);
-			this.gl.uniform1f(this.uff_Sampling_Correction, 1.0);
+			this.gl.uniform1i(this.ufs_Sampler, 0);
 
     	// generate textures
     	
 	    	let arrsize = this.gl.getParameter(this.gl.MAX_FRAGMENT_UNIFORM_VECTORS);
- 
 
             this.gl.enable(this.gl.BLEND);
             this.gl.blendFunc(this.gl.ONE, this.gl.ONE);

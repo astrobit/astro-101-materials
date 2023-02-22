@@ -12,9 +12,9 @@
 	uniform float	uvf_mVyx;
 	uniform float	uvf_mVyy;
 	uniform float	uvf_mVyz;
- 	
-    varying vec4	vv_color;
-    varying float	vf_flux;
+
+	varying vec4	vv_color;
+	varying float	vf_flux;
 
 	void main()
 	{
@@ -33,7 +33,7 @@
 
 		vv_color = vec4(1.0,1.0,1.0,1.0);
 		vf_flux = af_flux;
-    }
+	}
 </script>
 <!-- fragment shader -->
 <script id="fragment-shader-2d" type="x-shader/x-fragment">
@@ -45,7 +45,6 @@
 	uniform sampler2D	ufs_Sampler; // texture to use
 	void main()
 	{
-
 		vec4 tex = clamp(texture2D(ufs_Sampler, gl_PointCoord) * vf_flux * uff_FluxScaling,0.0,1.0);
 		gl_FragColor = vec4(vv_color.xyz * tex.xyz,1.0);
 	}

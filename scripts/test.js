@@ -29,6 +29,8 @@ class DrawStars
 		this._focalLength = 1.0;
 		this._pixelScale = Math.atan(this._pixelSize / this._focalLength); 
 		this._difractionDiskSize = 1.0;
+		
+//		this._starStyle = 'Airy'; // options: Gaussian, Airy, Point
 
 
 
@@ -81,6 +83,7 @@ class DrawStars
             // look up where the vertex data needs to go.
             this.positionAttributeLocation = this.gl.getAttribLocation(this.program, "av_position");
 			this.fluxesBufferLocation = this.gl.getAttribLocation(this.program, "af_flux");
+			this.colorBufferLocation = this.gl.getAttribLocation(this.program, "av_color");
 
 			this.gl.activeTexture(this.gl.TEXTURE0);
 			this._texture = this.gl.createTexture();
@@ -95,6 +98,7 @@ class DrawStars
             this.uvf_mVyy = this.gl.getUniformLocation(this.program, "uvf_mVyy");
             this.uvf_mVyz = this.gl.getUniformLocation(this.program, "uvf_mVyz");
             this.uvf_PointSize = this.gl.getUniformLocation(this.program, "uvf_PointSize");
+            this.uvb_EnableColor = this.gl.getUniformLocation(this.program, "uvb_EnableColor");
             
             this.uff_FluxScaling = this.gl.getUniformLocation(this.program,"uff_FluxScaling");
 			this.ufs_Sampler = this.gl.getUniformLocation(this.program,"ufs_Sampler");
@@ -112,6 +116,7 @@ class DrawStars
 
 			this.gl.uniform1f(this.uff_FluxScaling,1.0 / 65535.0);
 			this.gl.uniform1i(this.ufs_Sampler, 0);
+			this.gl.uniform1i(this.uvb_EnableColor,0);
 
     	// generate textures
     	
@@ -172,6 +177,14 @@ class DrawStars
 	{
 		return this.CCDres;
 	}
+	set colorizeStars(flag)
+	{
+		this.colorEnable = flag;
+	}
+	get coloriszeStars()
+	{
+		return this.colorEnable;
+	}
 
     draw(exposure_length)
     {
@@ -214,7 +227,7 @@ class DrawStars
         
 		this.gl.uniform1f(this.uff_FluxScaling,exposure_length / 65535.0);
 
-		
+		this.gl.uniform1i(this.uvb_EnableColor,this.colorEnable);
         this.gl.viewport(0, 0, this.gl.canvas.width, this.gl.canvas.height);
         this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
         // Clear the canvas.
@@ -230,6 +243,14 @@ class DrawStars
         this.gl.vertexAttribPointer(this.fluxesBufferLocation, 1, this.gl.FLOAT, false, 0, 0);
         this.gl.bufferData(this.gl.ARRAY_BUFFER, this.starFluxes, this.gl.STATIC_DRAW);
 
+		if (this.colorEnable)
+		{
+			this.gl.enableVertexAttribArray(this.colorBufferLocation);
+		    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.colorBuffer);
+		    this.gl.vertexAttribPointer(this.colorBufferLocation, 3, this.gl.FLOAT, false, 0, 0);
+		    this.gl.bufferData(this.gl.ARRAY_BUFFER, this.starColors, this.gl.STATIC_DRAW);
+		}
+		
 		this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
 		this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
 		this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
@@ -250,16 +271,21 @@ class DrawStars
         this.starFluxesInternal = new Array();
         this.starColorsInternal = new Array();
     }
-    addStar(ra, dec, flux) // flux in total counts/sec
+    addStar(ra, dec, flux,colorRGB) // flux in total counts/sec
     {
         this.starCoordsInternal.push(ra);
         this.starCoordsInternal.push(dec);
         this.starFluxesInternal.push(flux);
         if (flux > this.maxFlux)
         	this.maxFlux = flux;
+        if (typeof colorRGB != 'undefined' && colorRGB !== null && colorRGB instanceof RGB)
+        {
+        	const inv255 = 1.0 / 255.0;
+		    this.starColorsInternal.push(colorRGB.r * inv255);
+		    this.starColorsInternal.push(colorRGB.g * inv255);
+		    this.starColorsInternal.push(colorRGB.b * inv255);
+		}
         this.starsCount++;
-        //@@TODO: colors
-        //this.starColorsInternal.push(color.r,color.g,color.b);
     }
     _prepStarArrays()
     {
@@ -307,12 +333,13 @@ class DrawStars
 			let v;
 			let u;
 			let pass;
-			for (pass = 0; pass < 32; pass++)
+			const maxpass = (this._seeingStDev > 0.0) ? 32 : 1; 
+			for (pass = 0; pass < maxpass; pass++)
 			{
-			    const r = random_gaussian(0.0, this._seeingStDev) / this._pixelScale;
-			    const theta = Math.random() * 2.0 * Math.PI;
-			    const dec_shift = r * Math.sin(theta);
-			    const ra_shift = r * Math.cos(theta);
+			    const r = (this._seeingStDev > 0.0) ? random_gaussian(0.0, this._seeingStDev) / this._pixelScale : 0.0;
+			    const theta = (this._seeingStDev > 0.0> 0.0) ? Math.random() * 2.0 * Math.PI : 0.0;
+			    const dec_shift = (this._seeingStDev > 0.0) ? r * Math.sin(theta) : 0.0;
+			    const ra_shift = (this._seeingStDev > 0.0) ? r * Math.cos(theta) : 0.0;
 				idx = 0;
 				for (v = -n; v <= n; v++)
 				{
@@ -365,6 +392,7 @@ let _vertexShader = document.getElementById("vertex-shader-2d").text;
 let _fragmentShader = document.getElementById("fragment-shader-2d").text;
 
 
+
 let first = true;
 let shadersReady = false;
 let drawer = new DrawStars();
@@ -381,7 +409,24 @@ function waitOnShaders()
        main();
     }
 }
-waitOnShaders();
+function getShaders()
+{
+	let _dataPromiseVtx = getFile("https://www.astronaos.com/astronomy/shaders/telescope.vert");
+	if (typeof _dataPromiseVtx != 'undefined' && _dataPromiseVtx !== null)
+		_dataPromiseVtx.then(function(value){_vertexShader = value},function(error){console.log("Vertex shader request failed with error " + error)});
+	
+	let _dataPromiseFrag = getFile("https://www.astronaos.com/astronomy/shaders/star.frag");
+	if (typeof _dataPromiseFrag != 'undefined' && _dataPromiseFrag !== null)
+		_dataPromiseFrag.then(function(value){_fragmentShader = value},function(error){console.log("Fragment shader request failed with error " + error)});
+	window.setTimeout(waitOnShaders, 100.0);
+}
+
+if (typeof _vertexShader == 'undefined' || _vertexShader == null)
+{ 
+	getShaders();
+}
+else
+	waitOnShaders();
 
 function main()
 {
@@ -394,16 +439,17 @@ function main()
 
 		drawer.imageResolution = 1024;
 		drawer.centralPosition(0.0, 0.0);
-		drawer.seeingDisk = 2.0; //"
+		drawer.seeingDisk = 0.0;//2.0; //"
 		drawer.pixelSize = pixelSize; // 24.6 micron/pix
 		drawer.focalLength = focalLength; // 1m
 		drawer.diffractionDiskSize = airyDiskSize(wavelength,diameter);// / Math.PI * wavelength / diameter;
 		if (first)
 		{
-			drawer.addStar(0.0 + degrees(drawer._pixelScale) / 15.0 *  0, 0.0 + degrees(drawer._pixelScale) * 0, 65535.0 * 1.0);
+			drawer.addStar(0.0 + degrees(drawer._pixelScale) / 15.0 *  0, 0.0 + degrees(drawer._pixelScale) * 0, 65535.0 * 1.0,new RGB(255,0,0));
 	//		drawer.addStar(0.0 + degrees(drawer._pixelScale) / 15.0 * 30, 0.0 + degrees(drawer._pixelScale) * 30, 65535.0 * 0.25);
-			drawer.addStar(0.0 + degrees(drawer._pixelScale) / 15.0 *  0, 0.0 + degrees(drawer._pixelScale) * 30, 65535.0 * 2.0);
-			drawer.addStar(0.0 + degrees(drawer._pixelScale) / 15.0 * 30, 0.0 + degrees(drawer._pixelScale) * 0, 65535.0 * 4.0);
+			drawer.addStar(0.0 + degrees(drawer._pixelScale) / 15.0 *  0, 0.0 + degrees(drawer._pixelScale) * 30, 65535.0 * 2.0,new RGB(255,0,255));
+			drawer.addStar(0.0 + degrees(drawer._pixelScale) / 15.0 * 30, 0.0 + degrees(drawer._pixelScale) * 0, 65535.0 * 4.0,new RGB(0,0,255));
+			drawer.colorizeStars = true;
 			first = false;
 		}
 //		drawer.addStar(1.0 + degrees(drawer._pixelScale) * 15 * 5, 1.0, 65535.0 * 2.0);

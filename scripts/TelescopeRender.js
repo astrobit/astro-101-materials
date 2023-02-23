@@ -418,8 +418,8 @@ function newTelescopeRenderer(canvas)
 
 	let drawer = new TelescopeRender(canvas);
 
-	let _vertexShader = document.getElementById("vertex-shader-2d").text;
-	let _fragmentShader = document.getElementById("fragment-shader-2d").text;
+	let _vertexShader = null;//document.getElementById("vertex-shader-2d").text;
+	let _fragmentShader = null;//document.getElementById("fragment-shader-2d").text;
 
 
 

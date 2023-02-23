@@ -1,5 +1,6 @@
 attribute vec2 	av_position;
 attribute float af_flux;
+attribute vec3	av_color;
 
 uniform float	uvf_PointSize;
 uniform vec2	uvv_PositionScaling;
@@ -9,6 +10,7 @@ uniform float	uvf_mVxz;
 uniform float	uvf_mVyx;
 uniform float	uvf_mVyy;
 uniform float	uvf_mVyz;
+uniform bool	uvb_EnableColor;
 
 varying vec4	vv_color;
 varying float	vf_flux;
@@ -28,6 +30,9 @@ void main()
 	gl_Position = vec4(vec2(uvf_mVxx * ax +  uvf_mVxy * ay + uvf_mVxz * az, uvf_mVyx * ax +  uvf_mVyy * ay +  uvf_mVyz * az) * uvv_PositionScaling, 0.0,1.0);
 	gl_PointSize = uvf_PointSize;
 
-	vv_color = vec4(1.0,1.0,1.0,1.0);
+	if (uvb_EnableColor)
+		vv_color = vec4(av_color.rgb,1.0);
+	else
+		vv_color = vec4(1.0,1.0,1.0,1.0);
 	vf_flux = af_flux;
 }

@@ -17,11 +17,29 @@ class TelescopeRender
 		this._pixelScale = Math.atan(this._pixelSize / this._focalLength); 
 		this._difractionDiskSize = 1.0;
 		this._ready = false;
+		this._maxWidth = 1024;
+		this._maxHeight = 1024;
 //		this._starStyle = 'Airy'; // options: Gaussian, Airy, Point
 
 
 
     }
+	set maxWidth(w)
+	{
+		this._maxWidth = w;
+	}
+	get maxWidth()
+	{
+		return this._maxWidth;
+	}
+	set maxHeight(h)
+	{
+		this._maxHeight = h;
+	}
+	get maxHeight()
+	{
+		return this._maxHeight;
+	}
     
     _createShader(type, source)
     {
@@ -192,16 +210,22 @@ class TelescopeRender
 		const sinDec = Math.sin(rDec);
 		const cosAlpha = Math.cos(rAlpha);
 		const sinAlpha = Math.sin(rAlpha);
-		const mVxx = -sinDec;
-		const mVxy = cosDec;
+//		const mVxx = -sinDec;
+//		const mVxy = cosDec;
+//		const mVxz = 0.0;
+//		const mVyx = -cosAlpha*sinDec;
+//		const mVyy = -sinAlpha*sinDec;
+//		const mVyz = cosDec;
+
+		const mVxx = -sinAlpha;
+		const mVxy = cosAlpha;
 		const mVxz = 0.0;
-		const mVyx = -cosAlpha*sinDec;
-		const mVyy = -sinAlpha*sinDec;
+		const mVyx = -cosAlpha * sinDec;
+		const mVyy = -sinAlpha * sinDec;
 		const mVyz = cosDec;
 
-
-		this.canvas.width = Math.min(window.innerWidth,this.CCDres)
-		this.canvas.height = Math.min(window.innerHeight - 60,this.CCDres);
+		this.canvas.width = Math.min(this._maxWidth,this.CCDres)
+		this.canvas.height = Math.min(this._maxHeight,this.CCDres);
 		const imWidth = Math.min(this.gl.canvas.width, this.CCDres);
 		const imHeight = Math.min(this.gl.canvas.height, this.CCDres);
 //		const halfRes = this.CCDres >> 1;
@@ -278,6 +302,12 @@ class TelescopeRender
 		    this.starColorsInternal.push(colorRGB.g * inv255);
 		    this.starColorsInternal.push(colorRGB.b * inv255);
 		}
+		else
+        {
+		    this.starColorsInternal.push(1.0);
+		    this.starColorsInternal.push(1.0);
+		    this.starColorsInternal.push(1.0);
+		}
         this.starsCount++;
     }
     _prepStarArrays()
@@ -288,7 +318,7 @@ class TelescopeRender
             this.starCoords = new Float32Array(this.starCoordsInternal);
             this.starFluxes = new Float32Array(this.starFluxesInternal);
             this.starColors = new Float32Array(this.starColorsInternal);
-			const nflux = this.maxFlux / this.saturationFlux;
+			const nflux = Math.max(this.maxFlux / this.saturationFlux,1.0);
 			let airy_size = 1;
 			let cflux = nflux;
 			let m;
@@ -388,8 +418,8 @@ function newTelescopeRenderer(canvas)
 
 	let drawer = new TelescopeRender(canvas);
 
-	let _vertexShader = null;//document.getElementById("vertex-shader-2d").text;
-	let _fragmentShader = null;//document.getElementById("fragment-shader-2d").text;
+	let _vertexShader = document.getElementById("vertex-shader-2d").text;
+	let _fragmentShader = document.getElementById("fragment-shader-2d").text;
 
 
 
@@ -407,11 +437,11 @@ function newTelescopeRenderer(canvas)
 
 	function getShaders()
 	{
-		let _dataPromiseVtx = getFile("https://www.astronaos.com/astronomy/shaders/telescope.vert");
+		let _dataPromiseVtx = getFile("shaders/telescope.vert");
 		if (typeof _dataPromiseVtx != 'undefined' && _dataPromiseVtx !== null)
 			_dataPromiseVtx.then(function(value){_vertexShader = value},function(error){console.log("Vertex shader request failed with error " + error)});
 		
-		let _dataPromiseFrag = getFile("https://www.astronaos.com/astronomy/shaders/star.frag");
+		let _dataPromiseFrag = getFile("shaders/star.frag");
 		if (typeof _dataPromiseFrag != 'undefined' && _dataPromiseFrag !== null)
 			_dataPromiseFrag.then(function(value){_fragmentShader = value},function(error){console.log("Fragment shader request failed with error " + error)});
 		window.setTimeout(waitOnShaders, 100.0);

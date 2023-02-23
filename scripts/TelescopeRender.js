@@ -1,13 +1,12 @@
 
 class TelescopeRender
 {
-    constructor()
+    constructor(canvas)
     {
-		this.canvas = document.getElementById("canvas");
+		this.canvas = canvas;//document.getElementById("canvas");
 		this.gl = this.canvas.getContext("webgl2",{antialias: false});
-		const ext = this.gl.getExtension("EXT_color_buffer_float");
+//		const ext = this.gl.getExtension("EXT_color_buffer_float");
 		this.program = null;
-		this.starList = new Array();
 		this.colorStars = false;
 		this.saturationFlux = 65535.0;
 		this.maxFlux = 0;
@@ -384,10 +383,10 @@ class TelescopeRender
 }
 
 
-function newTelescopeRenderer()
+function newTelescopeRenderer(canvas)
 {
 
-	let drawer = new TelescopeRender();
+	let drawer = new TelescopeRender(canvas);
 
 	let _vertexShader = null;//document.getElementById("vertex-shader-2d").text;
 	let _fragmentShader = null;//document.getElementById("fragment-shader-2d").text;

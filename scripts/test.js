@@ -1,6 +1,6 @@
 "use strict";
 
-let drawer = newTelescopeRenderer();
+let drawer = newTelescopeRenderer(document.getElementById("canvas"));
 let first = true;
 
 function main()

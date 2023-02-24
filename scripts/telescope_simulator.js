@@ -341,8 +341,8 @@ function fillStarList()
 //		let displayCount = 0;
 		const lambda = g_selectFilter === null ? (g_selectInstrument.min_wavelength + g_selectInstrument.max_wavelength) * 0.5e-9: g_selectFilter.central_wavelength * 1e-9;
 		const D = g_selectTelescope._diameter;
-		const Acm = D * D * 100.0 * 100.0 * Math.PI;
 		const a = D * 0.5; // m
+		const Acm = a * a * 100.0 * 100.0 * Math.PI;
 		const f = g_selectFocus._focal_length; // m
 
 		const optical_transparency = 0.8;
@@ -352,6 +352,8 @@ function fillStarList()
 		let filter_transmission = 1.0;
 
 		let instrument_sensitivity = 1.0;
+		let flux_m0;
+		const filters = ["U","B","V","R","I"];
 		if (filt !== null)
 		{
 			filter_transmission = filt.maximum_transmission;
@@ -364,35 +366,43 @@ function fillStarList()
 			let blue_blue = Math.min(Math.max(delta_blue / filt.blue_spectral_width,0),1) // if between 0 and 1, some loss; if > 1, no loss, if < 0, full loss
 			let blue = (blue_blue + (1 + blue_red)) * 0.5;
 			instrument_sensitivity = Math.min(red,blue);
+			flux_m0 = fluxToPhotonFlux(filt.central_wavelength * 1.0E-7,(filt.blue_spectral_width + filt.red_spectral_width) * 1.0E-7,MagtoFlux(g_selectFilter.name,extinction_coefficient(g_selectFilter.name))); 
 		}
-
-
+		else
+		{
+			let j;
+			flux_m0 = {};
+			for (j = 0; j < filters.length; j++)
+			{
+				const filt = getFilterUVBRI(filters[j]);
+				flux_m0[filters[j]] = fluxToPhotonFlux(filt.central_wavelength * 1.0E-7,(filt.blue_spectral_width + filt.red_spectral_width) * 1.0E-7,MagtoFlux(filters[j],extinction_coefficient(filters[j])));
+			}
+		}
 		const flux_scaling = optical_transparency * quatum_efficiency * Acm / g_selectInstrument.gain * filter_transmission * instrument_sensitivity;
+
+
+
 		const len = g_starsCluster.length;
 		for (i = 0; i < len; i++)
 		{
 			const star = g_starsCluster.at(i);
-
-			let filter;
-			let flux = 0;
-			if (g_selectFilter !== null)
+			let flux = 0.0;
+			if (filt !== null)
 			{
-				let mag = star.fluxes[g_selectFilter.name] + extinction;
-				if (filt !== null)
-					flux = fluxToPhotonFlux(filt.central_wavelength * 1.0E-7,(filt.blue_spectral_width + filt.red_spectral_width) * 1.0E-7,MagtoFlux(g_selectFilter.name,mag));
+				flux = flux_m0 * Math.pow(10.0,-star.fluxes[g_selectFilter.name] * 0.4);
 			}
 			else
 			{
-				const filters = ["U","B","V","R","I"];
-				let j;
 				for (j = 0; j < filters.length; j++)
 				{
-					const filt = getFilterUVBRI(filters[j]);
-					const extinctionLcl = extinction_coefficient(filters[j]);
-					flux += fluxToPhotonFlux(filt.central_wavelength * 1.0E-7,(filt.blue_spectral_width + filt.red_spectral_width) * 1.0E-7,MagtoFlux(filters[j],star.fluxes[filters[j]] + extinctionLcl));
+					flux += flux_m0[filters[j]] * Math.pow(10.0,-star.fluxes[filters[j]] * 0.4);
 				}
 			}
+
+			let filter;
 			const eff_flux = flux * flux_scaling;
+			if (g_selectFilter !== null && star.fluxes[g_selectFilter.name] < 8.5)
+				console.log(star.fluxes[g_selectFilter.name] + " " + flux + " " + eff_flux + " " + flux_scaling);
 			if (!isNaN(eff_flux))
 				drawer.addStar(star.ra / 15.0,star.dec,eff_flux);
 		}

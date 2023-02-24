@@ -74,8 +74,8 @@
     	<output id="field of view" style="color:white;text-align:left;"></output><br/>	
     </div>
     </div>
-    <div style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center">
-        <canvas id="theCanvas" width="100%" height="900" onclick="commonUIOnClick(event);" onmousedown="commonUIOnMouseDown(event);" onmouseup="commonUIOnMouseUp(event);" onmousemove="commonUIOnMouseMove(event);" onselectstart="function () { return false; }">
+    <div id="canvasdiv" style="width:100%; margin-left:auto; margin-right:auto;text-align:center; overflow: scroll; height:100%">
+        <canvas id="theCanvas" onclick="commonUIOnClick(event);" onmousedown="commonUIOnMouseDown(event);" onmouseup="commonUIOnMouseUp(event);" onmousemove="commonUIOnMouseMove(event);" onselectstart="function () { return false; }">
             Canvas not supported; please update your browser.
         </canvas>
     </div>

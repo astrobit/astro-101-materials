@@ -492,8 +492,8 @@ function draw()
 			const fov_displ = Math.round(fov / 60.0 * 10.0) / 10.0;
 			setOutputText("field of view",fov_displ + "'");
 
-			drawer.maxWidth = window.innerWidth - 40;
-			drawer.maxWidth = Math.max(window.innerHeight - 60 - recttop.bottom,400);
+			drawer.maxWidth = resolution;//window.innerWidth - 40;
+			drawer.maxHeight = resolution;//Math.max(window.innerHeight - 60 - recttop.bottom,400);
 			
 			drawer.imageResolution = g_selectInstrument.resolution_imager;
 			drawer.centralPosition(g_selectedCluster.cluster.ra.average / 15.0, g_selectedCluster.cluster.dec.average);
@@ -502,6 +502,8 @@ function draw()
 			drawer.focalLength = f; // 1m
 			drawer.diffractionDiskSize = diff_radians;// / Math.PI * wavelength / diameter;
 			drawer.draw(g_exposure); // 100 s exposure
+			let canvasDiv = document.getElementById("canvasdiv")
+			canvasDiv.scrollLeft= Math.max((g_selectInstrument.resolution_imager - window.innerWidth)* 0.5,0);
 
 		}
 	}

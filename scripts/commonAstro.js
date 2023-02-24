@@ -264,7 +264,7 @@ function MagtoFlux(band,mag)
 /////////////////////////////////////////////////////////////////////////
 function _bandEnergy(wavelength,bandwidth)
 {
-	return Phys.kPlanck * Phys.kSpeedOfLight * Math.log((wavelength + bandwidth * 0.5) / (wavelength - bandwidth * 0.5)) * (bandwidth);
+	return Phys.kPlanck * Math.log((wavelength + bandwidth * 0.5) / (wavelength - bandwidth * 0.5));
 }
 
 /////////////////////////////////////////////////////////////////////////

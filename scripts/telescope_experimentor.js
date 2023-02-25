@@ -3,16 +3,12 @@ let g_selectedCluster = null;
 let	g_clusters = newClusters("OpC");
 let g_clusterSelectList = new Object(); // this object stores names of clusters because the option text erases extra spaces in the id
 
+let g_starListReady = false;
 
-function sliderChange(value)
-{
-	draw();
-}
 let theCanvas = document.getElementById("theCanvas");
-theCanvas.onselectstart = function () { return false; } // prevent selection of text below the canvas when you click on it
 
-let theContext = theCanvas.getContext("2d");
-theContext.willReadFrequently = true;
+//let theContext = theCanvas.getContext("2d");
+//theContext.willReadFrequently = true;
 
 //const minimumControlsHeightTop = 190;
 const recttop = document.getElementById("seeing").getBoundingClientRect();
@@ -20,18 +16,6 @@ const recttop = document.getElementById("seeing").getBoundingClientRect();
 
 theCanvas.height = Math.max(window.innerHeight - 60 - recttop.bottom,400);
 theCanvas.width = window.innerWidth - 40;
-
-const viewingSize = Math.min(theCanvas.height,theCanvas.width) - 50;
-let sliderHorizontal = new Scroller(theCanvas.width / 2, theCanvas.height - 20, 0,1,0.5,0.25,false);
-sliderHorizontal.width = viewingSize - 2.0 * sliderHorizontal.cursorRadius - 20;
-sliderHorizontal.onChange = sliderChange;
-commonUIRegister(sliderHorizontal);
-
-let sliderVertical = new Scroller((theCanvas.width + viewingSize) / 2, viewingSize * 0.5, 0,1,0.5,0.25,true);
-sliderVertical.height = viewingSize - 2.0 * sliderHorizontal.cursorRadius - 20;
-sliderVertical.onChange = sliderChange;
-commonUIRegister(sliderVertical);
-
 
 let g_selectFilter = null;
 function OnSelectFilter(filter)
@@ -43,17 +27,21 @@ function OnSelectFilter(filter)
 	if (select.value == "No Filter")
 	{
 		g_selectFilter = null;
+		g_starListReady = false;
+		fillStarList();
 	}
 	else
 	{
-			for (i = 0; i < UVBRI.length && !found; i++)
+		for (i = 0; i < UVBRI.length && !found; i++)
+		{
+			if (select.value == UVBRI[i].name)
 			{
-				if (select.value == UVBRI[i].name)
-				{
-					g_selectFilter = UVBRI[i];
-					found = true;
-				}
+				g_selectFilter = UVBRI[i];
+				found = true;
 			}
+		}
+		g_starListReady = false;
+		fillStarList();
 	}
 	draw();
 }
@@ -124,7 +112,6 @@ function waitForClustersReady()
 				select.value = option.text;
 		}
 		OnSelectCluster();
-		draw();
 	}
 	else
 		window.setTimeout(waitForClustersReady, 100.0);
@@ -134,7 +121,11 @@ waitForClustersReady();
 function waitForStarsReady()
 {
 	if (g_starsCluster !== null && g_starsCluster.ready)
+	{
+		g_starListReady = false;
+		fillStarList();
 		draw();
+	}
 	else
 		window.setTimeout(waitForStarsReady, 100.0);
 }
@@ -155,51 +146,50 @@ function OnSelectCluster()
 	}
 	draw();
 	window.setTimeout(waitForStarsReady, 100.0);
-	draw();
 }
 
 let g_exposure = 10.0;
 function OnSetExposure()
 {
-		let select = document.getElementById("exposure");
-		let value = select.value.trim();
-		let i = 0;
-		while (i < value.length && ((value.charCodeAt(i) >= 0x30 && value.charCodeAt(i) <= 0x39) || value.charCodeAt(i) == 0x2e))
-			i++;
-		let exposure = Number(value.substring(0,i));
-		if (!isNaN(exposure) && exposure > 0)
+	let select = document.getElementById("exposure");
+	let value = select.value.trim();
+	let i = 0;
+	while (i < value.length && ((value.charCodeAt(i) >= 0x30 && value.charCodeAt(i) <= 0x39) || value.charCodeAt(i) == 0x2e))
+		i++;
+	let exposure = Number(value.substring(0,i));
+	if (!isNaN(exposure) && exposure > 0)
+	{
+		if (i < value.length)
 		{
-			if (i < value.length)
+			while (i < value.length && value.charCodeAt(i) == 0x20)
+				i++;
+			if (i < value.length && value.charAt(i) == 'd')
 			{
-				while (i < value.length && value.charCodeAt(i) == 0x20)
-					i++;
-				if (i < value.length && value.charAt(i) == 'd')
-				{
-					exposure *= 86400.0;
-				}
-				else if (i < value.length && value.charAt(i) == 'h')
-				{
-					exposure *= 3600.0;
-				}
-				else if (i < value.length && value.charAt(i) == 'm')
-				{
-					exposure *= 60.0;
-				}
+				exposure *= 86400.0;
 			}
-			if (exposure < 0.1)
-				exposure = 0.1;
-			else if (exposure > 14400)
-				exposure = 14400;
-			if (exposure < 300)				
-				select.value = Math.round(exposure * 100) / 100 + " sec";
-			else if (exposure < 7200)
-				select.value = Math.round(exposure / 60 * 100) / 100 + " min";
-			else 
-				select.value = Math.round(exposure / 3600 * 100) / 100 + " hr";
-			g_exposure = exposure;
+			else if (i < value.length && value.charAt(i) == 'h')
+			{
+				exposure *= 3600.0;
+			}
+			else if (i < value.length && value.charAt(i) == 'm')
+			{
+				exposure *= 60.0;
+			}
 		}
-		else
-			select.value = g_exposure + " s";
+		if (exposure < 0.1)
+			exposure = 0.1;
+		else if (exposure > 14400)
+			exposure = 14400;
+		if (exposure < 300)				
+			select.value = Math.round(exposure * 100) / 100 + " sec";
+		else if (exposure < 7200)
+			select.value = Math.round(exposure / 60 * 100) / 100 + " min";
+		else 
+			select.value = Math.round(exposure / 3600 * 100) / 100 + " hr";
+		g_exposure = exposure;
+	}
+	else
+		select.value = g_exposure + " s";
 				
 	draw();
 }
@@ -233,18 +223,6 @@ let g_camera_gain = 2;
 let g_camera_full_scale = 65536;
 
 
-sliderHorizontal.min = 0;
-sliderHorizontal.max = g_camera_resolution;
-sliderHorizontal.cursor_width = viewingSize < g_camera_resolution ? viewingSize : g_camera_resolution;
-sliderHorizontal.visible = viewingSize < g_camera_resolution;
-sliderHorizontal.value = g_camera_resolution * 0.5;
-
-sliderVertical.min = 0;
-sliderVertical.max = g_camera_resolution;
-sliderVertical.cursor_width = viewingSize < g_camera_resolution ? viewingSize : g_camera_resolution;
-sliderVertical.visible = viewingSize < g_camera_resolution;
-sliderVertical.value = g_camera_resolution * 0.5;
-
 function OnSetDiameter()
 {
 	let select = document.getElementById("mirror_diameter");
@@ -254,6 +232,8 @@ function OnSetDiameter()
 	select.value = g_diameter;
 	select = document.getElementById("mirror_focal_length");
 	select.value = g_focal_length;
+	g_starListReady = false;
+	fillStarList();
 	draw();
 }
 
@@ -263,6 +243,8 @@ function OnSetFocalLength()
 	let value = select.value.trim();
 	g_focal_length = Math.min(Math.max(Number(value),0.5 * g_diameter),500 * g_diameter);
 	select.value = g_focal_length;
+	g_starListReady = false;
+	fillStarList();
 	draw();
 }
 
@@ -272,6 +254,8 @@ function OnSetElevation()
 	let value = select.value.trim();
 	g_elevation = Math.min(Math.max(Number(value),-100),8848.9); // 8848.9 = Mt. Everest
 	select.value = g_elevation;
+	g_starListReady = false;
+	fillStarList();
 	draw();
 }
 
@@ -279,6 +263,8 @@ function OnSetAdaptiveOptics()
 {
 	let select = document.getElementById("adaptive_optics");
 	g_adaptive_optics = select.checked;
+	g_starListReady = false;
+	fillStarList();
 	draw();
 }
 
@@ -296,13 +282,77 @@ function setOutputText(id,value)
 }
 
 
-function recenterDisplay()
+let drawer = newTelescopeRenderer(theCanvas);
+
+function fillStarList()
 {
-	if (ValidateValue(g_camera_resolution))
+	if (g_starsCluster !== null && g_starsCluster.ready)
 	{
-		sliderHorizontal.value = g_camera_resolution * 0.5;
-		sliderVertical.value = g_camera_resolution * 0.5;
-		draw();
+		drawer.resetStarList();
+//		const pixel_scale = degrees(g_selectInstrument.pixel_size * 1.0e-6 / f) * 3600.0;
+//		const diff_arcsec_hwhm = diff_arcsec * Math.sqrt(2.0 * Math.log(2.0)) * 4.0;
+//		const seeing_disk_pixels = g_selectTelescope._adaptive_optics ? diff_arcsec_hwhm / pixel_scale : Math.max(seeing,diff_arcsec_hwhm) / pixel_scale;
+//		let displayCount = 0;
+		const lambda = g_selectFilter === null ? 550.0e-9 : g_selectFilter.central_wavelength * 1e-9;
+		const D = g_diameter;
+		const a = D * 0.5; // m
+		const Acm = a * a * 100.0 * 100.0 * Math.PI;
+		const f = g_focal_length; // m
+
+		const optical_transparency = 0.8;
+		const quatum_efficiency = g_quantum_efficiency;
+		const filt = g_selectFilter !== null ? getFilterUVBRI(g_selectFilter.name) : null;
+		const extinction = g_selectFilter !== null ? extinction_coefficient(g_selectFilter.name) : null;
+		let filter_transmission = 1.0;
+
+		let instrument_sensitivity = 1.0;
+		let flux_m0;
+		const filters = ["U","B","V","R","I"];
+		if (filt !== null)
+		{
+			filter_transmission = filt.maximum_transmission;
+			instrument_sensitivity = 1.0;//
+			flux_m0 = fluxToPhotonFlux(filt.central_wavelength * 1.0E-7,(filt.blue_spectral_width + filt.red_spectral_width) * 1.0E-7,MagtoFlux(g_selectFilter.name,extinction_coefficient(g_selectFilter.name))); 
+		}
+		else
+		{
+			let j;
+			flux_m0 = {};
+			for (j = 0; j < filters.length; j++)
+			{
+				const filt = getFilterUVBRI(filters[j]);
+				flux_m0[filters[j]] = fluxToPhotonFlux(filt.central_wavelength * 1.0E-7,(filt.blue_spectral_width + filt.red_spectral_width) * 1.0E-7,MagtoFlux(filters[j],extinction_coefficient(filters[j])));
+			}
+		}
+		const flux_scaling = optical_transparency * quatum_efficiency * Acm / g_camera_gain * filter_transmission * instrument_sensitivity;
+
+
+
+		const len = g_starsCluster.length;
+		for (i = 0; i < len; i++)
+		{
+			const star = g_starsCluster.at(i);
+			let flux = 0.0;
+			if (filt !== null)
+			{
+				flux = flux_m0 * Math.pow(10.0,-star.fluxes[g_selectFilter.name] * 0.4);
+			}
+			else
+			{
+				for (j = 0; j < filters.length; j++)
+				{
+					flux += flux_m0[filters[j]] * Math.pow(10.0,-star.fluxes[filters[j]] * 0.4);
+				}
+			}
+
+			let filter;
+			const eff_flux = flux * flux_scaling;
+//			if (g_selectFilter !== null && star.fluxes[g_selectFilter.name] < 8.5)
+//				console.log(star.fluxes[g_selectFilter.name] + " " + flux + " " + eff_flux + " " + flux_scaling);
+			if (!isNaN(eff_flux))
+				drawer.addStar(star.ra / 15.0,star.dec,eff_flux);
+		}
+		g_starListReady = true;
 	}
 }
 
@@ -310,16 +360,14 @@ function draw()
 {
 
 	// clear the canvas
-	theContext.clearRect(0, 0, theCanvas.width, theCanvas.height);
-	theContext.fillStyle = "#000000";
-	theContext.fillRect(0,0,theCanvas.width,theCanvas.height);
 
 	if (g_starsCluster !== null && g_starsCluster.ready)
 	{
-		var halfWidth = viewingSize * 0.5;
-		var halfHeight = viewingSize * 0.5;
-		
-		const mapImage = new ImgData(theContext, theCanvas.width * 0.5 - halfWidth , 0, viewingSize, viewingSize );
+		if (!g_starListReady)
+		{
+			fillStarList();
+		}
+
 		const len = g_starsCluster.length;
 		let i;
 
@@ -353,8 +401,9 @@ function draw()
 		const radiansArcsec = Math.PI / (180.0 * 3600.0)
 		const altitude = g_elevation;
 		const r1 = 3.831705970207513; // first zero of Bessel function of 1st kind - location of the first minimum of the Airy disk
-		const diff_arcsec = degrees(r1 / Math.PI * lambda / D) * 3600.0;
-		const seeing = g_space_based ? diff_arcsec : (altitude < 5600 ? 1.0 - altitude / 4200 * 0.75 : 0.25); // very rought method of calculating seeing: 2" at sea level down to 0.5" at Keck (4200 m)
+		const diff_radians = airyDiskSize(lambda, D);
+		const diff_arcsec = degrees(diff_radians) * 3600.0;
+		const seeing = (g_space_based || g_adaptive_optics) ? 0.0 : (altitude < 5600 ? 1.0 - altitude / 4200 * 0.75 : 0.25); // very rought method of calculating seeing: 2" at sea level down to 0.5" at Keck (4200 m)
 
 		setOutputText("diameter",g_diameter.toString() + " m");
 		let collecting_area = Math.round(Math.PI * (g_diameter ** 2));
@@ -380,18 +429,10 @@ function draw()
 			setOutputText("seeing",seeing_displ.toString() + "\"");
 
 		const optical_transparency = 0.8;
-		const color = new RGB(255, 255, 255);
 		const chipsize = g_pixel_size * 1.0e-6 * g_camera_resolution;
 		const resolution = g_camera_resolution;
 		const pixel_scale = degrees(g_pixel_size * 1.0e-6 / f) * 3600.0;
 		const fov = pixel_scale * resolution;
-		const diff_arcsec_hwhm = diff_arcsec * Math.sqrt(2.0 * Math.log(2.0)) * 4.0;
-		const seeing_disk_pixels = g_adaptive_optics ? diff_arcsec_hwhm / pixel_scale : Math.max(seeing,diff_arcsec_hwhm) / pixel_scale;
-		let displayCount = 0;
-		const quatum_efficiency = g_quantum_efficiency;
-		const filt = g_selectFilter !== null ? getFilterUVBRI(g_selectFilter.name) : null;
-		const extinction = g_selectFilter !== null ? extinction_coefficient(g_selectFilter.name) : null;
-		let filter_transmission = 1.0;
 		
 		setOutputText("resolution",g_camera_resolution.toString() + "×" + g_camera_resolution.toString());
 		const pixel_scale_displ = Math.round(pixel_scale * 100.0) / 100.0;
@@ -399,90 +440,21 @@ function draw()
 		const fov_displ = Math.round(fov / 60.0 * 10.0) / 10.0;
 		setOutputText("field of view",fov_displ + "'");
 
-		let instrument_sensitivity = 1.0;
-		if (filt !== null)
-		{
-			filter_transmission = filt.maximum_transmission;
-			let delta_red = filt.central_wavelength - g_camera_max_wavelength;
-			let red_red = Math.max(Math.min(delta_red / filt.red_spectral_width,0),-1); // if between -1 and 0, some loss; if < -1, no loss, if > 0, full loss
-			let red_blue = Math.min(Math.max(delta_red / filt.blue_spectral_width,0),1) // if between 0 and 1, some loss; if > 1, full loss, if < 0, no loss
-			let red = (-red_red + (1 - red_blue)) * 0.5;
-			let delta_blue = filt.central_wavelength - g_camera_min_wavelength;
-			let blue_red = Math.max(Math.min(delta_blue / filt.red_spectral_width,0),-1); // if between -1 and 0, some loss; if < -1, full loss, if > 0, no loss
-			let blue_blue = Math.min(Math.max(delta_blue / filt.blue_spectral_width,0),1) // if between 0 and 1, some loss; if > 1, no loss, if < 0, full loss
-			let blue = (blue_blue + (1 + blue_red)) * 0.5;
-			instrument_sensitivity = Math.min(red,blue);
-		}
+		drawer.maxWidth = resolution;//window.innerWidth - 40;
+		drawer.maxHeight = resolution;//Math.max(window.innerHeight - 60 - recttop.bottom,400);
 		
-		for (i = 0; i < len; i++)
-		{
-			const star = g_starsCluster.at(i);
-			let x = ((star.ra - g_selectedCluster.cluster.ra.average) * 3600.0) / pixel_scale - (sliderHorizontal.value - g_camera_resolution * 0.5);
-			let y = ((star.dec - g_selectedCluster.cluster.dec.average) * 3600.0) / pixel_scale - (sliderVertical.value - g_camera_resolution * 0.5);
-			
-//				const xmax = halfWidth;
-//				const ymax = halfHeight;
-			
-//				if (Math.abs(x) <= xmax && Math.abs(y) <= ymax)
-//				{
-				let filter;
-				let flux = 0;
-				if (g_selectFilter !== null)
-				{
-					let mag = star.fluxes[g_selectFilter.name] + extinction;
-					if (filt !== null)
-						flux = fluxToPhotonFlux(filt.central_wavelength * 1.0E-7,(filt.blue_spectral_width + filt.red_spectral_width) * 1.0E-7,MagtoFlux(g_selectFilter.name,mag));
-				}
-				else
-				{
-					const filters = ["U","B","V","R","I"];
-					let j;
-					for (j = 0; j < filters.length; j++)
-					{
-						const filt = getFilterUVBRI(filters[j]);
-						const extinctionLcl = extinction_coefficient(filters[j]);
-						flux += fluxToPhotonFlux(filt.central_wavelength * 1.0E-7,(filt.blue_spectral_width + filt.red_spectral_width) * 1.0E-7,MagtoFlux(filters[j],star.fluxes[filters[j]] + extinctionLcl));
-					}
-				}
-				
-				
-				const px_filling = flux * g_exposure * optical_transparency * quatum_efficiency * Acm / g_camera_gain * filter_transmission * instrument_sensitivity;
-				//const peak_pixel_flux = px_filling / Math.sqrt(seeing_disk_pixels / Math.PI);
-				
-				drawStarFlux(mapImage, halfWidth + x, halfHeight + y, seeing_disk_pixels, px_filling,g_camera_full_scale,color);
-//				}
-		}
-	//	console.log(displayCount);
-		mapImage.draw();
-	}
-	else
-	{
-		if (g_clusters.ready)
-		{
-			theContext.save();
-			theContext.textAlign = "center";
-			theContext.fillStyle = "#FFFFFF";
-			theContext.font = "20px Arial";
-			theContext.fillText("Standby .. Slewing Telescope",theCanvas.width * 0.5,theCanvas.height * 0.5);
-			theContext.restore();
-		}
-		else
-		{
-			theContext.save();
-			theContext.textAlign = "center";
-			theContext.fillStyle = "#FFFFFF";
-			theContext.font = "20px Arial";
-			theContext.fillText("Standby .. Opening Dome",theCanvas.width * 0.5,theCanvas.height * 0.5);
-			theContext.restore();
-		}
-	}
-//	if (!g_dl && g_dlDataFilled)
-//	{
-//		download(g_dlData,"data.csv","csv");
-//		g_dl = true;
-//	}
-	commonUIdraw(theContext);
-}
+		drawer.imageResolution = g_camera_resolution;
+		drawer.centralPosition(g_selectedCluster.cluster.ra.average / 15.0, g_selectedCluster.cluster.dec.average);
+		drawer.seeingDisk = seeing;//2.0; //"
+		drawer.pixelSize = g_pixel_size * 1.0e-6; // m
+		drawer.focalLength = f; // 1m
+		drawer.diffractionDiskSize = diff_radians;// / Math.PI * wavelength / diameter;
+		drawer.draw(g_exposure); // 100 s exposure
+		let canvasDiv = document.getElementById("canvasdiv")
+		canvasDiv.scrollLeft= Math.max((g_camera_resolution - window.innerWidth)* 0.5,0);
 
+	}
+
+}
 draw();
 

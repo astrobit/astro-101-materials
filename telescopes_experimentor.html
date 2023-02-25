@@ -76,15 +76,12 @@
     	<output id="field of view" style="color:white;text-align:left;"></output><br/>	
     </div>
     </div>
-    <div style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center">
-        <canvas id="theCanvas" width="100%" height="900" onclick="commonUIOnClick(event);" onmousedown="commonUIOnMouseDown(event);" onmouseup="commonUIOnMouseUp(event);" onmousemove="commonUIOnMouseMove(event);">
+    <div id="canvasdiv" style="margin-left:auto; margin-right:auto;text-align:center">
+        <canvas id="theCanvas" style="overflow: scroll; width:100%; height=100%" onclick="commonUIOnClick(event);" onmousedown="commonUIOnMouseDown(event);" onmouseup="commonUIOnMouseUp(event);" onmousemove="commonUIOnMouseMove(event);" onselectstart="function () { return false; }">
             Canvas not supported; please update your browser.
         </canvas>
     </div>
-    <div style="text-align:center;">
-    	<button id="recenter" style="font-size:20px;" onclick="recenterDisplay();">Re-Center</button>
-    </div>
-    <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
+   <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
         <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
             <p style="color: gray;font-size:75%">
                 Copyright (c) 2022 - 2023, Brian W. Mulligan
@@ -94,6 +91,60 @@
         </div>
     </div>
 <!--    <script type="text/javascript" src="stringsParallax.js"></script>-->
+<script id="vertex-shader-2d" type="x-shader/x-vertex">
+	attribute vec2 	av_position;
+	attribute float af_flux;
+	attribute vec3	av_color;
+
+	uniform float	uvf_PointSize;
+	uniform vec2	uvv_PositionScaling;
+	uniform float	uvf_mVxx;
+	uniform float	uvf_mVxy;
+	uniform float	uvf_mVxz;
+	uniform float	uvf_mVyx;
+	uniform float	uvf_mVyy;
+	uniform float	uvf_mVyz;
+	uniform bool	uvb_EnableColor;
+
+	varying vec4	vv_color;
+	varying float	vf_flux;
+
+	void main()
+	{
+		float rx = radians(av_position.x * 15.0);
+		float ry = radians(av_position.y);
+		float cosAlpha = cos(rx);
+		float sinAlpha = sin(rx);
+		float cosDec = cos(ry);
+		float sinDec = sin(ry);
+		float ax = cosAlpha * cosDec;
+		float ay = sinAlpha * cosDec;
+		float az = sinDec;
+
+		gl_Position = vec4(vec2(uvf_mVxx * ax +  uvf_mVxy * ay + uvf_mVxz * az, uvf_mVyx * ax +  uvf_mVyy * ay +  uvf_mVyz * az) * uvv_PositionScaling, 0.0,1.0);
+		gl_PointSize = uvf_PointSize;
+
+		if (uvb_EnableColor)
+			vv_color = vec4(av_color.rgb,1.0);
+		else
+			vv_color = vec4(1.0,1.0,1.0,1.0);
+		vf_flux = af_flux;
+	}
+</script>
+<!-- fragment shader -->
+<script id="fragment-shader-2d" type="x-shader/x-fragment">
+	precision mediump float;
+
+	varying vec4		vv_color; // star color
+	varying float		vf_flux; // star flux (counts / sec)
+	uniform float		uff_FluxScaling; // exposure times maximum value
+	uniform sampler2D	ufs_Sampler; // texture to use
+	void main()
+	{
+		vec4 tex = clamp(texture2D(ufs_Sampler, gl_PointCoord) * vf_flux * uff_FluxScaling,0.0,1.0);
+		gl_FragColor = vec4(vv_color.rgb * tex.xyz,1.0);
+	}
+</script>
     <script type="text/javascript" src="scripts/tutorial.js"></script>
     <script type="text/javascript" src="scripts/ui.js"></script>
     <script type="text/javascript" src="scripts/LLS.js"></script>
@@ -101,6 +152,7 @@
     <script type="text/javascript" src="scripts/commonGP.js"></script>
     <script type="text/javascript" src="scripts/common.js"></script>
     <script type="text/javascript" src="scripts/commonAstro.js"></script>
+    <script type="text/javascript" src="scripts/TelescopeRender.js"></script>
     <script type="text/javascript" src="scripts/sp_types.js"></script>
 <!--    <script type="text/javascript" src="m6.js"></script>-->
     <script type="text/javascript" src="scripts/stars2.js"></script>

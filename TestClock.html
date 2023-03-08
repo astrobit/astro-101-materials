@@ -45,7 +45,8 @@
 		let g_On = true;
 		function updateTime()
 		{
-			const minutes_ref = (Math.floor(Date.now() / 60000) - 360) % 1440;
+			let date = new Date();
+			const minutes_ref = (Math.floor(Date.now() / 60000) - date.getTimezoneOffset()) % 1440;
 //			const minutes_ref = g_test;
 //			g_test += 5;
 //			g_test = g_test % 1440;	

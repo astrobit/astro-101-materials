@@ -1,0 +1,112 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>J-Quiz</title>
+    <style>
+        .clock {
+            width: 80%;
+            text-align: center;
+            background-color: #000000;
+            color: #FFFFFF;
+            text-shadow: 4px 4px #00001f;
+            font-size: 128px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .endtime {
+            width: 80%;
+            text-align: center;
+            background-color: #000000;
+            color: #FF7F00;
+            text-shadow: 4px 4px #00001f;
+            font-size: 64px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+
+    </style>
+</head>
+<body id="body" style="font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#000000;text-align:center">
+	<input id="endinput" type="time" onchange="updateEnd();">
+	<p id="clock" class="clock"> 00:00 </p>
+	<p id="endtime" class="endtime"> End Time: 10:25 </p>
+	<script type="text/javascript" >
+		let g_EndTimeMin = 10 * 60 + 25;
+		function updateEnd()
+		{
+			let elem = document.getElementById("endinput");
+			let bits = elem.value.split(":");
+			g_EndTimeMin = Number(bits[0]) * 60 + Number(bits[1]);
+		}
+//		let g_test = 600;
+		let g_TimeStep = 500.0;
+		let g_On = true;
+		function updateTime()
+		{
+			const minutes_ref = (Math.floor(Date.now() / 60000) - 360) % 1440;
+//			const minutes_ref = g_test;
+//			g_test += 5;
+//			g_test = g_test % 1440;	
+			const minutes_cur = minutes_ref % 60;
+			let hours_cur = Math.floor(minutes_ref / 60) % 24;
+			const am_pm = (hours_cur > 12);
+			if (hours_cur == 0)
+				hours_cur = 12;
+			if (hours_cur > 12)
+				hours_cur -= 12;
+			let minutes_display = (minutes_cur < 10) ? "0" + minutes_cur.toFixed(0) : minutes_cur.toFixed(0);
+			let elem = document.getElementById("clock");
+			elem.innerHTML = hours_cur.toFixed(0) + ":" + minutes_display + (am_pm ? " pm" : " am");
+
+			let minutes_end = g_EndTimeMin % 60;
+			let hours_end = Math.floor(g_EndTimeMin / 60) % 24;
+			const am_pm_end = (hours_end > 12);
+			if (hours_end == 0)
+				hours_end = 12;
+			if (hours_end > 12)
+				hours_end -= 12;
+			let minutes_end_display = (minutes_end < 10) ? "0" + minutes_end.toFixed(0) : minutes_end.toFixed(0);
+
+			let elem_end = document.getElementById("endtime");
+			elem_end.innerHTML = "End Time: " + hours_end.toFixed(0) + ":" + minutes_end_display + (am_pm_end ? " pm" : " am");
+			
+			if ((g_EndTimeMin - minutes_ref) < 0)
+			{
+				let elem_body = document.getElementById("body");
+				g_TimeStep = 100;
+				g_On = g_On ? false : true;
+				if (g_On)
+					elem_body.style = "font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#FF0000;text-align:center";
+				else
+					elem_body.style = "font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#FFFF00;text-align:center";
+			}
+			else if ((g_EndTimeMin - minutes_ref) < 1)
+			{
+				let elem_body = document.getElementById("body");
+				elem_body.style = "font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#FF0000;text-align:center";
+			}
+			else if ((g_EndTimeMin - minutes_ref) < 5)
+			{
+				let elem_body = document.getElementById("body");
+				elem_body.style = "font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#FFFF00;text-align:center";
+			}
+			else if ((g_EndTimeMin - minutes_ref) < 15)
+			{
+				let elem_body = document.getElementById("body");
+				elem_body.style = "font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#7F7F00;text-align:center";
+			}
+			else
+			{
+				let elem_body = document.getElementById("body");
+				elem_body.style = "font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#000000;text-align:center";
+			}
+
+			window.setTimeout(updateTime, g_TimeStep);
+			
+		}
+		updateTime();
+	</script>
+</body>
+</html>

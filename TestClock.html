@@ -73,7 +73,7 @@
 			let elem_end = document.getElementById("endtime");
 			elem_end.innerHTML = "End Time: " + hours_end.toFixed(0) + ":" + minutes_end_display + (am_pm_end ? " pm" : " am");
 			
-			if ((g_EndTimeMin - minutes_ref) < 0)
+			if ((g_EndTimeMin - minutes_ref) <= 0)
 			{
 				let elem_body = document.getElementById("body");
 				g_TimeStep = 100;
@@ -83,17 +83,17 @@
 				else
 					elem_body.style = "font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#FFFF00;text-align:center";
 			}
-			else if ((g_EndTimeMin - minutes_ref) < 1)
+			else if ((g_EndTimeMin - minutes_ref) <= 1)
 			{
 				let elem_body = document.getElementById("body");
 				elem_body.style = "font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#FF0000;text-align:center";
 			}
-			else if ((g_EndTimeMin - minutes_ref) < 5)
+			else if ((g_EndTimeMin - minutes_ref) <= 5)
 			{
 				let elem_body = document.getElementById("body");
 				elem_body.style = "font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#FFFF00;text-align:center";
 			}
-			else if ((g_EndTimeMin - minutes_ref) < 15)
+			else if ((g_EndTimeMin - minutes_ref) <= 15)
 			{
 				let elem_body = document.getElementById("body");
 				elem_body.style = "font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#7F7F00;text-align:center";

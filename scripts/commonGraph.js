@@ -878,6 +878,19 @@ class GraphAxis
 		context.restore();
 	}
 	
+	invertCalculate(value)
+	{
+		let ret;
+		if (this._log)
+		{
+			ret = Math.pow(2.0,(value - this._offset) / this._slope);
+		}
+		else
+		{
+			ret = (value - this._offset) / this._slope;
+		}
+		return ret;
+	}
 	calculate(value)
 	{
 		let ret;
@@ -1199,6 +1212,21 @@ class GraphDataSet
 		return this.LinearLeastSquare(true);
 	}	
 }
+class GraphIntercept
+{
+	constructor(id,horizontalAxisID, verticalAxisID, valueNumeric, valueDisplay,color, labelFont)
+	{
+		this._id = id;
+		this._horizontalAxisID = horizontalAxisID;
+		this._verticalAxisID = verticalAxisID;
+		this._color = color;
+		this._labelFont = labelFont;
+		this._valueNumeric = valueNumeric;
+		this._valueDisplay = valueDisplay;
+		this.disable = false;
+	}
+}
+
 class Graph
 {
 	constructor (id,height,width,color)
@@ -1211,6 +1239,7 @@ class Graph
 		this._axisVertical = new Array();
 		this._data = new Array();
 		this._trends = new Array();
+		this._intercepts = new Array();
 		this._colorMax = 6;
 		this._paletteSelect = 0;
 		this._paletteMax = 6;
@@ -1307,6 +1336,19 @@ class Graph
 //			}
 //			else
 				this._trends.push(trend);
+		}
+	}
+	addIntercept(intercept)
+	{
+		if (intercept instanceof GraphIntercept)
+		{
+//			let currAxis = this.findDataByID(data.id);
+//			if (currAxis !== null)
+//			{
+//				console.log("new GraphDataSet " + data.id + " added to Graph " + this._id + ", but data with that ID already exists.");
+//			}
+//			else
+				this._intercepts.push(intercept);
 		}
 	}
 	_colorSelect(color)
@@ -1527,6 +1569,39 @@ class Graph
 				context.stroke();
 		context.restore();
 	}
+	getXvalue(context,axis,x)
+	{
+		let i;
+		let axisHorizontalSpace = 0;
+		let xOffsetGraph = 0;
+
+		for (i = 0; i < 2 && i < this._axisVertical.length; i++)
+		{
+			const neededSpace = this._axisVertical[i].requiredSpace(context);
+			axisHorizontalSpace += neededSpace;
+			if (i == 0)
+				xOffsetGraph = neededSpace;
+		}
+		const graphWidth = this.width - axisHorizontalSpace - 4;
+		return axis.invertCalculate((x - xOffsetGraph) / graphWidth);
+	}
+	getYvalue(context,axis,y)
+	{
+		let i;
+		let axisVerticalSpace = 0;
+		let yOffsetGraph = 0;
+		// first find out how big the axis titles and labels are
+		for (i = 0; i < 2 && i < this._axisHorizontal.length; i++)
+		{
+			const neededSpace = this._axisHorizontal[i].requiredSpace(context);
+			axisVerticalSpace += neededSpace;
+			if (i == 0)
+				yOffsetGraph = neededSpace;
+			
+		}
+		const graphHeight = this.height - axisVerticalSpace - 4;
+		return axis.invertCalculate((graphHeight - y) / graphHeight);
+	}
 	
 	draw (context,x,y)
 	{
@@ -1728,6 +1803,74 @@ class Graph
 								context.lineTo(gx1,-gy1);
 								context.stroke();
 							}
+						}
+						else
+						{
+							if (currHorizontalAxis === null)
+								console.log("Unable to identify axis " + currData._horizontalAxisID);
+							if (currVerticalAxis === null)
+								console.log("Unable to identify axis " + currData._verticalAxisID);
+						}
+					}
+				}
+				colorSelect = 0;
+				for (i = 0; i < this._intercepts.length; i++)
+				{
+					const currData = this._intercepts[i];
+					if (!currData.disable)
+					{
+						const currHorizontalAxis = (currData._horizontalAxisID !== undefined && currData._horizontalAxisID !== null) ? this.findAxisByID(currData._horizontalAxisID) : null;
+						const currVerticalAxis = (currData._verticalAxisID !== undefined && currData._verticalAxisID !== null) ? this.findAxisByID(currData._verticalAxisID) : null;
+						if (currData._color !== undefined && currData._color !== null)
+						{
+							context.strokeStyle = currData._color;
+							context.fillStyle = currData._color;
+						}
+						else
+						{
+							const clr = this._colorSelect(colorSelect);
+							context.strokeStyle = clr;
+							context.fillStyle = clr;
+							colorSelect++;
+						}
+						if (currData._labelFont !== undefined && currData._labelFont !== null)
+							context.font = currData._labelFont;
+						else
+							context.font = "20px Arial";
+						if (currHorizontalAxis !== null)
+						{
+							const x0 = currHorizontalAxis.calculate(currData._valueNumeric) * graphWidth;
+							const y0 = 0;
+							const y1 = graphHeight;
+							
+							context.beginPath();
+							context.moveTo(x0,-y0);
+							context.lineTo(x0,-y1);
+							context.stroke();
+							const width = context.measureText(currData._valueDisplay).width + 10;
+							if (x0 > width)
+							{
+								context.textAlign = "right";
+								context.fillText(currData._valueDisplay,x0 - 10,-25)
+							}
+							else
+							{
+								context.textAlign = "left";
+								context.fillText(currData._valueDisplay,x0 + 10,-25)
+							}
+						}
+						else if (currVerticalAxis !== null)
+						{
+							const y0 = currVerticalAxis.calculate(currData._valueNumeric) * graphWidth;
+							const x0 = 0;
+							const x1 = graphHeight;
+							
+							context.beginPath();
+							context.moveTo(x0,-y0);
+							context.lineTo(x1,-y0);
+							context.stroke();
+							context.textAlign = "left";
+							context.fillText(currData._valueDisplay,10,-y0 - 10)
 						}
 						else
 						{

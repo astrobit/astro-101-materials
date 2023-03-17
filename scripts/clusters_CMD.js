@@ -89,6 +89,14 @@ function OnSelectCluster()
 	draw();
 }
 
+let g_MouseX = null;
+let g_MouseY = null;
+function OnMouseOver(event)
+{
+	g_MouseX = event.offsetX;
+	g_MouseY = event.offsetY;
+	draw();
+}
 
 function draw()
 {
@@ -147,10 +155,18 @@ function draw()
 			let _axisVertical = new GraphAxis("yaxis",(g_selectedCluster.cluster.plx.count > 0) ? "MV" : "V",_min_y,_max_y);
 			_axisVertical.invert = true;
 			let _graph = new Graph("CMD",viewingSize,viewingSize,"#ffffff");
+			
+			
 			_graph.addHorizontalAxis(_axisHorizontal);
 			_graph.addVerticalAxis(_axisVertical);
 			_graph.addDataSet(_measurements);
+
+			const mouseX = _graph.getXvalue(theContext,_axisHorizontal,g_MouseX - viewX);
+			const mouseY = _graph.getYvalue(theContext,_axisVertical,g_MouseY - viewY);
+			_graph.addIntercept(new GraphIntercept("mousex","xaxis",null,mouseX,mouseX.toFixed(2),"#FF0000"));
+			_graph.addIntercept(new GraphIntercept("mousey",null, "yaxis",mouseY,mouseY.toFixed(2),"#FF0000"));
 			_graph.draw(theContext,viewX,viewY);
+			
 		}
 	}
 	else

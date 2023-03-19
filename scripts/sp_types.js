@@ -275,6 +275,9 @@ function getSpectrum(spectral_type)
 function calculateFluxes(star,phot,dm)
 {
 	let ret = null;
+
+//	return null; // @@DEBUG
+
 	if (typeof star == 'object' && star !== null && typeof phot == 'object' && phot !== null)
 	{
 		const starF = new Object();
@@ -376,7 +379,7 @@ function calculateFluxes(star,phot,dm)
 }
 
 
-let g_attemptedFluxes = new Array();
+//let g_attemptedFluxes = new Array();
 
 /////////////////////////////////////////////////////////////////////////
 //
@@ -419,7 +422,7 @@ function determineFluxes(star,suggested_dm)
 					{
 						let fluxes = calculateFluxes(star,phots[i],dm);
 						let flux_attempt = {type:"short",phot: phots[i], fluxes: fluxes, star: star};
-						g_attemptedFluxes.push(flux_attempt);
+//						g_attemptedFluxes.push(flux_attempt);
 						if (fluxes.A.K >= 0 && fluxes.Am > 0 && fluxes.A.K < min_ak)
 						{
 							min_sigma_a_idx = i;
@@ -459,7 +462,7 @@ function determineFluxes(star,suggested_dm)
 			{
 				let fluxes = calculateFluxes(star,g_synphot[i],dm);
 				let flux_attempt = {type:"long",phot: g_synphot[i], fluxes: fluxes, star: star};
-				g_attemptedFluxes.push(flux_attempt);
+//				g_attemptedFluxes.push(flux_attempt);
 				if (fluxes.A.K >= 0 && fluxes.Am > 0 && fluxes.A.K < min_ak)
 				{
 					min_sigma_a_idx = i;

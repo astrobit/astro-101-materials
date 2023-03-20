@@ -21,7 +21,22 @@ const viewingSize = Math.min(theCanvas.height,theCanvas.width) - 50;
 const viewX = (theCanvas.width - viewingSize) * 0.5;
 const viewY = (theCanvas.height - viewingSize) * 0.5;
 
-
+function readify_name(name)
+{
+	let ret = name;
+	if (name.startsWith("Cl"))
+	{
+		ret = name.substr(2).trim();
+	}
+	else if (name.startsWith("NAME"))
+	{
+		ret = name.substr(4).trim();
+	}
+	else if (name.startsWith("HIDDEN NAME")) {
+		ret = name.substr(11).trim();
+	}
+	return ret;
+}
 
 function waitForClustersReady()
 {
@@ -32,26 +47,20 @@ function waitForClustersReady()
 		let cluster_list = new Array();
 		
 		let i;
-		for (i = 0; i < g_clusters.length; i++)
+		for (i = 0; i < g_clusters._ids.length; i++)
 		{
-			const cluster = g_clusters.at(i);
+			const cluster = g_clusters.at(g_clusters._ids[i].idx);
 			if (cluster.cluster.stars > 0)//&& cluster.cluster.cluster_size < (5.0 / 60.0)) // 5'
 			{
-				cluster_list.push(cluster.main_id);
-//				let j;
-//				for (j = 0; j < cluster._ids.length; j++)
-//				{
-//					if (cluster._ids[j] !== cluster.main_id)
-//						cluster_list.push(cluster._ids[j]);
-//				}
+				cluster_list.push({ idx: g_clusters._ids[i].idx, id: readify_name(g_clusters._ids[i].id) });
 			}
 		}
-		cluster_list.sort();
+		cluster_list.sort(function (a, b) { return a.id.localeCompare(b.id) });
 		for (i = 0; i < cluster_list.length; i++)
 		{
 			let option = document.createElement("option");
-			option.text = cluster_list[i];
-			g_clusterSelectList[option.text] = cluster_list[i];
+			option.text = cluster_list[i].id;
+			g_clusterSelectList[option.text] = cluster_list[i].idx;
 			select.add(option)
 		}
 		OnSelectCluster();
@@ -75,7 +84,7 @@ function OnSelectCluster()
 	if (g_clusters !== null && g_clusters.ready)
 	{
 		let select = document.getElementById("selectCluster");
-		let cluster = g_clusters.findClusterByID(g_clusterSelectList[select.value]);
+		let cluster = g_clusters.at(g_clusterSelectList[select.value]);
 		g_selectedCluster = cluster;
 		if (cluster !== null)
 		{

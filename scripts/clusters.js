@@ -46,6 +46,7 @@ class _Clusters
 				cluster_curr.cluster = null;
 			}
 		}
+		this._dataSupplemental = null; // free data
 		this._ready = true;
 	}
 
@@ -91,7 +92,7 @@ class _Clusters
 			let j;
 			this._ids.push({id: this._data[i].main_id, idx: i});
 			for (j = 0; j < names.length; j++)
-				this._ids.push({id: names[j], idx: i});
+				this._ids.push({ id: names[j], idx: i });
 			this._data[i].star_set = new String();		
 			let lastChar = null;
 			for (j = 0; j < this._data[i].main_id.length; j++)

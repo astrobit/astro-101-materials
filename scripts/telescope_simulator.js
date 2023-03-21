@@ -264,7 +264,7 @@ function OnSelectCluster()
 	if (g_clusters !== null && g_clusters.ready)
 	{
 		let select = document.getElementById("selectCluster");
-		let cluster = g_clusters.findClusterByID(g_clusterSelectList[select.value]);
+		let cluster = g_clusters.at(g_clusterSelectList[select.value]);
 		g_selectedCluster = cluster;
 		if (cluster !== null)
 		{

@@ -197,6 +197,22 @@ OnSelectTelescope(); // make sure everything is initially populated
 
 
 
+function readify_name(name)
+{
+	let ret = name;
+	if (name.startsWith("Cl"))
+	{
+		ret = name.substr(2).trim();
+	}
+	else if (name.startsWith("NAME"))
+	{
+		ret = name.substr(4).trim();
+	}
+	else if (name.startsWith("HIDDEN NAME")) {
+		ret = name.substr(11).trim();
+	}
+	return ret;
+}
 
 function waitForClustersReady()
 {
@@ -207,26 +223,20 @@ function waitForClustersReady()
 		let cluster_list = new Array();
 		
 		let i;
-		for (i = 0; i < g_clusters.length; i++)
+		for (i = 0; i < g_clusters._ids.length; i++)
 		{
-			const cluster = g_clusters.at(i);
+			const cluster = g_clusters.at(g_clusters._ids[i].idx);
 			if (cluster.cluster.stars > 0)//&& cluster.cluster.cluster_size < (5.0 / 60.0)) // 5'
 			{
-				cluster_list.push(cluster.main_id);
-//				let j;
-//				for (j = 0; j < cluster._ids.length; j++)
-//				{
-//					if (cluster._ids[j] !== cluster.main_id)
-//						cluster_list.push(cluster._ids[j]);
-//				}
+				cluster_list.push({ idx: g_clusters._ids[i].idx, id: readify_name(g_clusters._ids[i].id) });
 			}
 		}
-		cluster_list.sort();
+		cluster_list.sort(function (a, b) { return a.id.localeCompare(b.id) });
 		for (i = 0; i < cluster_list.length; i++)
 		{
 			let option = document.createElement("option");
-			option.text = cluster_list[i];
-			g_clusterSelectList[option.text] = cluster_list[i];
+			option.text = cluster_list[i].id;
+			g_clusterSelectList[option.text] = cluster_list[i].idx;
 			select.add(option)
 		}
 		OnSelectCluster();
@@ -235,6 +245,7 @@ function waitForClustersReady()
 		window.setTimeout(waitForClustersReady, 100.0);
 }
 waitForClustersReady();
+
 
 function waitForStarsReady()
 {
@@ -335,10 +346,6 @@ function fillStarList()
 	if (g_starsCluster !== null && g_starsCluster.ready)
 	{
 		drawer.resetStarList();
-//		const pixel_scale = degrees(g_selectInstrument.pixel_size * 1.0e-6 / f) * 3600.0;
-//		const diff_arcsec_hwhm = diff_arcsec * Math.sqrt(2.0 * Math.log(2.0)) * 4.0;
-//		const seeing_disk_pixels = g_selectTelescope._adaptive_optics ? diff_arcsec_hwhm / pixel_scale : Math.max(seeing,diff_arcsec_hwhm) / pixel_scale;
-//		let displayCount = 0;
 		const lambda = g_selectFilter === null ? (g_selectInstrument.min_wavelength + g_selectInstrument.max_wavelength) * 0.5e-9: g_selectFilter.central_wavelength * 1e-9;
 		const D = g_selectTelescope._diameter;
 		const a = D * 0.5; // m
@@ -401,8 +408,8 @@ function fillStarList()
 
 			let filter;
 			const eff_flux = flux * flux_scaling;
-			if (g_selectFilter !== null && star.fluxes[g_selectFilter.name] < 8.5)
-				console.log(star.fluxes[g_selectFilter.name] + " " + flux + " " + eff_flux + " " + flux_scaling);
+//			if (g_selectFilter !== null && star.fluxes[g_selectFilter.name] < 8.5)
+//				console.log(star.fluxes[g_selectFilter.name] + " " + flux + " " + eff_flux + " " + flux_scaling);
 			if (!isNaN(eff_flux))
 				drawer.addStar(star.ra / 15.0,star.dec,eff_flux);
 		}
@@ -446,8 +453,8 @@ function draw()
 			
 		const lambda = g_selectFilter === null ? (g_selectInstrument.min_wavelength + g_selectInstrument.max_wavelength) * 0.5e-9: g_selectFilter.central_wavelength * 1e-9;
 		const D = g_selectTelescope._diameter;
-		const Acm = D * D * 100.0 * 100.0 * Math.PI;
 		const a = D * 0.5; // m
+		const Acm = a * a * 100.0 * 100.0 * Math.PI;
 		const f = g_selectFocus._focal_length; // m
 		const arcsecRadians = (180.0 * 3600.0 / Math.PI);
 		const radiansArcsec = Math.PI / (180.0 * 3600.0)
@@ -488,13 +495,6 @@ function draw()
 			const resolution = g_selectInstrument.resolution_imager;
 			const pixel_scale = degrees(g_selectInstrument.pixel_size * 1.0e-6 / f) * 3600.0;
 			const fov = pixel_scale * resolution;
-			const diff_arcsec_hwhm = diff_arcsec * Math.sqrt(2.0 * Math.log(2.0)) * 4.0;
-			const seeing_disk_pixels = g_selectTelescope._adaptive_optics ? diff_arcsec_hwhm / pixel_scale : Math.max(seeing,diff_arcsec_hwhm) / pixel_scale;
-			let displayCount = 0;
-			const quatum_efficiency = g_selectInstrument.quantum_efficiency;
-			const filt = g_selectFilter !== null ? getFilterUVBRI(g_selectFilter.name) : null;
-			const extinction = g_selectFilter !== null ? extinction_coefficient(g_selectFilter.name) : null;
-			let filter_transmission = 1.0;
 			
 			setOutputText("resolution",g_selectInstrument.resolution_imager.toString() + "×" + g_selectInstrument.resolution_imager.toString());
 			const pixel_scale_displ = Math.round(pixel_scale * 100.0) / 100.0;
@@ -517,33 +517,6 @@ function draw()
 
 		}
 	}
-	else
-	{
-/*		if (g_clusters.ready)
-		{
-			theContext.save();
-			theContext.textAlign = "center";
-			theContext.fillStyle = "#FFFFFF";
-			theContext.font = "20px Arial";
-			theContext.fillText("Standby .. Slewing Telescope",theCanvas.width * 0.5,theCanvas.height * 0.5);
-			theContext.restore();
-		}
-		else
-		{
-			theContext.save();
-			theContext.textAlign = "center";
-			theContext.fillStyle = "#FFFFFF";
-			theContext.font = "20px Arial";
-			theContext.fillText("Standby .. Opening Dome",theCanvas.width * 0.5,theCanvas.height * 0.5);
-			theContext.restore();
-		}*/
-	}
-//	if (!g_dl && g_dlDataFilled)
-//	{
-//		download(g_dlData,"data.csv","csv");
-//		g_dl = true;
-//	}
-//	commonUIdraw(theContext);
 }
 
 draw();

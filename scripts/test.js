@@ -18,3 +18,4 @@ function waiter()
 		window.setTimeout(waiter, 1000.0);
 	}		
 }
+waiter();

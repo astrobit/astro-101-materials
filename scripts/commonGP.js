@@ -691,6 +691,61 @@ function getFile(url)
 
 /////////////////////////////////////////////////////////////////////////
 //
+//  function getFile
+//
+// confirm that a variable is identified, non-null, and numeric
+// input: url - the URL from which to fetch; note the fetch will be 
+//					accomplished using a GET
+// output: (Promise) - a promise that provides the text of the response 
+// 						or error
+//
+/////////////////////////////////////////////////////////////////////////
+function getFileBinary(url)
+{
+	let ret = null;
+	if (typeof fetch !== 'undefined')
+	{
+		// use the fetch API if available
+//		ret = new Promise(function(fSuccess,fError){fetch(url, { mode: 'no-cors'}).then(
+		ret = new Promise(function(fSuccess,fError){fetch(url).then(
+			function(result)
+			{
+				fSuccess(result.blob());
+			},
+			function(error)
+			{
+				console.log("getFile fetch error " + error);
+				fError(error);
+			})
+		});
+	}
+	else 
+	{
+		ret = new Promise(function(fSuccess,fError){
+			let request = new XMLHttpRequest();
+			request.onreadystatechange = function() {
+			//	console.log(this.readyState + " " + this.status);
+				if (this.readyState == 4)
+				{
+					if (this.status == 200)
+					{
+						fSuccess(request);
+					}
+					else
+					{
+				console.log("getFile AJAX error " + request.statusText);
+						fError(request.statusText);
+					}
+				}
+			}
+			request.open("GET", url, true);
+			request.send();
+		});			
+	}
+	return ret;
+}
+/////////////////////////////////////////////////////////////////////////
+//
 //  function gamma
 //
 // calculate the gamma function Γ(n) = (n - 1)!

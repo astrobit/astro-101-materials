@@ -23,7 +23,7 @@ class FITS
 			let bQuit = false;
 			let iOffset = 0;
 			this.head = new Object(); //new Array();
-			this.head.keyList = new Array();
+			this.head.fieldList = new Array();
 			let lastKey = null;
 			// read the FITS header
 			// this routine will read each 80 byte segment and either drop it into a general list, or if the keyword has an associated value it will retrieve the value

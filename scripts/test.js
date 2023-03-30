@@ -211,6 +211,7 @@ function requestFITS(source)
 	if (typeof _dataPromise != 'undefined' && _dataPromise !== null)
 		_dataPromise.then(function(value){value.arrayBuffer().then(function(valueBlobArray){ret.readBlobArray(valueBlobArray)},function(error){console.log("blob arrray request failed with error " + error)});},function(error){console.log("request failed with error " + error)});
 
+	return ret;
 }
 
 let g_testFits = requestFITS("https://www.astronaos.com/astronomy/images/real_data/chandra_114.fits");

@@ -77,7 +77,7 @@ function waiter()
 		let size = 1;
 		for (let i = 0; i < head.NAXIS.value; i++)
 		{
-			const key = "NAXIS" + i;
+			const key = "NAXIS" + (i + 1);
 			size *= head[key].value;
 		}
 		let data = null;

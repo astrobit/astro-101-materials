@@ -45,7 +45,7 @@ function waiter()
 				else// if (keyval
 				{
 					const alphaOmega = "09";
-					if (commentFixed.charCodeAt(0) >= alphaOmega.charCodeAt(0) && commentFixed.charCodeAt(0) <= alphaOmega.charCodeAt(1)) // seemingly numeric data
+					if ((commentFixed.charCodeAt(0) >= alphaOmega.charCodeAt(0) && commentFixed.charCodeAt(0) <= alphaOmega.charCodeAt(1)) || commentFixed.charAt(0) == "-") // seemingly numeric data
 					{
 						head[slkey] = {value: +commentFixed, comment: commentItself};
 					}

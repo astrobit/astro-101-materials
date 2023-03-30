@@ -73,7 +73,7 @@ class FITS
 					}// store the key in case there is a CONTIN?UE
 					lastKey = slkey;
 				}
-				else if (key.slice(0,8).trim() == "CONTINUE" && lastKey !== null && this.head[lastKey] instanceof String)
+				else if (field.slice(0,8).trim() == "CONTINUE" && lastKey !== null && this.head[lastKey] instanceof String)
 				{
 					const keyval = field.slice(9).trim(); // get the value
 					const stringEndPlace = keyval.charAt(0) == "'" ? keyval.indexOf("'",1) : -1; // if the value is a string (starts with '), find the end of the string

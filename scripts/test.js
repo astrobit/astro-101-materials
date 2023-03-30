@@ -32,7 +32,8 @@ function waiter()
 			{
 				const slkey = key.slice(0,8).trim();
 				const keyval = key.slice(9).trim();
-				const commentPlace = keyval.indexOf("/",1);
+				const stringEndPlace = keyval.indexOf("'",1);
+				const commentPlace = keyval.indexOf("/",stringEndPlace == -1 ? 0 : stringEndPlace);
 				const commentFixed = (commentPlace != -1) ? keyval.slice(0,commentPlace).trim() : keyval;
 				const commentItself = (commentPlace != -1) ? keyval.slice(commentPlace + 1).trim() : "";
 				

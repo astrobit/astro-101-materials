@@ -30,7 +30,7 @@ function waiter()
 			bQuit = (sl == "END") || (iOffset + 80 > view.length);
 			if (key.charAt(8) == "=")
 			{
-				const slkey = key.slice(0,8);
+				const slkey = key.slice(0,8).trim();
 				const keyval = key.slice(9).trim();
 				const commentPlace = keyval.indexOf("/",1);
 				const commentFixed = (commentPlace != -1) ? keyval.slice(0,commentPlace).trim() : keyval;

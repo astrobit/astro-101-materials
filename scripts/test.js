@@ -37,10 +37,9 @@ function waiter()
 				const commentFixed = (commentPlace != -1) ? keyval.slice(0,commentPlace).trim() : keyval;
 				const commentItself = (commentPlace != -1) ? keyval.slice(commentPlace + 1).trim() : "";
 				
-				if (commentFixed.charAt(0) == "'") // is a string
+				if (stringEndPlace != -1) // is a string
 				{
-					const strend = commentFixed.indexOf("'",1);
-					const keyString = commentFixed.slice(1,strend).trim();
+					const keyString = commentFixed.slice(1,stringEndPlace).trim();
 					head[slkey] = {value: keyString, comment: commentItself};
 				}
 				else// if (keyval

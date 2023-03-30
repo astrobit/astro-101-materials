@@ -91,7 +91,7 @@ function waiter()
 		// determine architecture endianness
 		let testArray = new ArrayBuffer(8);
 		let testArrayView64 = new BigInt64Array(testArray);
-		testArrayView32[0] = 0x0a0b0c0d0e0f0102;
+		testArrayView64[0] = 0x0a0b0c0d0e0f0102;
 		let testArrayView8 = new Int8Array(testArray);
 		const bBigEndianArch = (testArrayView8[0] = 0x0a);
 		let dataSegment = blobArray.slice(iOffset);

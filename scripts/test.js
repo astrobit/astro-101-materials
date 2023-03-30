@@ -89,7 +89,7 @@ class FITS
 			// add BSCALE and BZERO keywords if they don't exist
 			if (!("BSCALE" in this.head))
 				this.head.BSCALE = {value: 1.0, comment:"added by fiteES6.js"};
-			if (!("BZERO" in head))
+			if (!("BZERO" in this.head))
 				this.head.BZERO = {value: 0.0, comment:"added by fiteES6.js"};
 			// determine how large the image data is
 			let size = 1;

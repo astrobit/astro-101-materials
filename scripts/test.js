@@ -59,6 +59,12 @@ function waiter()
 			}
 			else if (key.slice(0,8).trim() == "CONTINUE" && lastKey !== null)
 			{
+				const keyval = key.slice(9).trim();
+				const stringEndPlace = keyval.charAt(0) == "'" ? keyval.indexOf("'",1) : -1;
+				const commentPlace = keyval.indexOf("/",stringEndPlace == -1 ? 0 : stringEndPlace);
+				const commentFixed = (commentPlace != -1) ? keyval.slice(0,commentPlace).trim() : keyval;
+				const commentItself = (commentPlace != -1) ? keyval.slice(commentPlace + 1).trim() : "";
+
 				const keyString = commentFixed.slice(1,stringEndPlace).trim();
 				const adjString = head[lastKey].value.slice(0,-1) + keyString;
 				head[lastKey].value = adjString;

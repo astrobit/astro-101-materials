@@ -17,7 +17,7 @@ function waiter()
 		let head = new Array();
 		while (!bQuit)
 		{
-			const key = blobArray.slice(iOffset,iOffset + 80).join();
+			const key = blobArray.Int8Array.slice(iOffset,iOffset + 80).join();
 			head.push(key);
 			iOffset += 80;
 			bQuit = (key.slice(3) == "END")

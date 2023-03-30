@@ -18,7 +18,11 @@ function waiter()
 		let head = new Array();
 		while (!bQuit)
 		{
-			const key = view.slice(iOffset,iOffset + 80).join();
+			let key = new String();
+			for (let i = 0; i < 80; i++)
+			{
+				key += String.fromCharCode(view[i + iOffset]);
+			}
 			head.push(key);
 			iOffset += 80;
 			bQuit = (key.slice(3) == "END") || (iOffset + 80 > view.length);

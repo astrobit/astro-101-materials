@@ -12,15 +12,16 @@ function waiter()
 {
 	if (blobArray != null)
 	{
+		const view = new Int32Array(blobArray);
 		let bQuit = false;
 		let iOffset = 0;
 		let head = new Array();
 		while (!bQuit)
 		{
-			const key = blobArray.Int8Array.slice(iOffset,iOffset + 80).join();
+			const key = view.Int8Array.slice(iOffset,iOffset + 80).join();
 			head.push(key);
 			iOffset += 80;
-			bQuit = (key.slice(3) == "END")
+			bQuit = (key.slice(3) == "END") || (iOffset + 80 > view.length);
 		}
 		console.log("array ready");
 	}

@@ -75,42 +75,42 @@ function waiter()
 		if (!("BZERO" in head))
 			head.BZERO = {value: 0.0, comment:"added by fiteES6.js"};
 		let size = 1;
-		for (let i = 0; i < head.NAXIS; i++)
+		for (let i = 0; i < head.NAXIS.value; i++)
 		{
 			const key = "NAXIS" + i;
 			size *= head[key].value;
 		}
 		let data = null;
 		let dataView = null;
-		if (head.BITPIX == 8)
-		{
-			data = new Uint8Array(size);
-			dataView = new Uint8Array(blobArray.slice(iOffset));
-		}
-		else if (head.BITPIX == 16)
+		if (head.BITPIX.value == 16)
 		{
 			data = new Int16Array(size);
 			dataView = new Int16Array(blobArray.slice(iOffset));
 		}
-		else if (head.BITPIX == 32)
+		else if (head.BITPIX.value == 32)
 		{
 			data = new Int32Array(size);
 			dataView = new Int32Array(blobArray.slice(iOffset));
 		}
-		else if (head.BITPIX == 64)
+		else if (head.BITPIX.value == 64)
 		{
 			data = new BigInt64Array(size);
 			dataView = new BigInt64Array(blobArray.slice(iOffset));
 		}
-		else if (head.BITPIX == -32)
+		else if (head.BITPIX.value == -32)
 		{
 			data = new Float32Array(size);
 			dataView = new Float32Array(blobArray.slice(iOffset));
 		}
-		else if (head.BITPIX == -64)
+		else if (head.BITPIX.value == -64)
 		{
 			data = new Float64Array(size);
 			dataView = new Float64Array(blobArray.slice(iOffset));
+		}
+		else //if (head.BITPIX.value == 8)
+		{
+			data = new Uint8Array(size);
+			dataView = new Uint8Array(blobArray.slice(iOffset));
 		}
 		for (let i = 0;i < size && i < dataView.length; i++)
 		{

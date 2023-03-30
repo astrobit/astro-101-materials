@@ -75,7 +75,7 @@ function waiter()
 		if (!("BZERO" in head))
 			head.BZERO = {value: 0.0, comment:"added by fiteES6.js"};
 		let size = 1;
-		for (i = 0; i < head.NAXIS; i++)
+		for (let i = 0; i < head.NAXIS; i++)
 		{
 			const key = "NAXIS" + i;
 			size *= head[key].value;

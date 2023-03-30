@@ -32,15 +32,27 @@ function waiter()
 			{
 				const slkey = key.slice(0,8);
 				const keyval = key.slice(9).trim();
-				if (keyval.charAt(0) == "'") // is a string
+				const commentPlace = keyval.indexOf("/",1);
+				const commentFixed = (commentPlace != -1) ? keyval.slice(0,commentPlace).trim() : keyval;
+				const commentItself = (commentPlace != -1) ? keyval.slice(commentPlace).trim() : "";
+				
+				if (commentFixed.charAt(0) == "'") // is a string
 				{
-					const strend = keyval.indexOf("'",1);
-					const keyString = keyval.slice(1,strend).trim();
-					head[slkey] = keyString;
+					const strend = commentFixed.indexOf("'",1);
+					const keyString = commentFixed.slice(1,strend).trim();
+					head[slkey] = {value: keyString, comment: commentItself};
 				}
 				else// if (keyval
 				{
-					head[slkey] = Number(keyval);
+					const alphaOmega = "09";
+					if (commentFixed.charCodeAt(0) >= alphaOmega.charCodeAt(0) && commentFixed.charCodeAt(0) <= alphaOmega.charCodeAt(1)) // seemingly numeric data
+					{
+						head[slkey] = {value: +commentFixed, comment: commentItself};
+					}
+					else
+					{
+						head[slkey] = {value: commentFixed, comment: commentItself};
+					}
 				}
 			}
 		}

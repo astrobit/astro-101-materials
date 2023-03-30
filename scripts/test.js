@@ -8,6 +8,12 @@ if (typeof _dataPromise != 'undefined' && _dataPromise !== null)
 	_dataPromise.then(function(value){blobResult = value},function(error){console.log("request failed with error " + error)});
 
 
+function byteSwap(array,i,j)
+{
+	const swap = array[i];
+	array[i] = array[j];
+	array[j] = swap;
+}
 function waiter()
 {
 	if (blobArray != null)
@@ -82,35 +88,95 @@ function waiter()
 		}
 		let data = null;
 		let dataView = null;
+		// determine architecture endianness
+		let testArray = new ArrayBuffer(8);
+		let testArrayView64 = new BigInt64Array(testArray);
+		testArrayView32[0] = 0x0a0b0c0d0e0f0102;
+		let testArrayView8 = new Int8Array(testArray);
+		const bBigEndianArch = (testArrayView8[0] = 0x0a);
+		let dataSegment = blobArray.slice(iOffset);
+		
 		if (head.BITPIX.value == 16)
 		{
 			data = new Int16Array(size);
-			dataView = new Int16Array(blobArray.slice(iOffset));
+			
+			if (!bBigEndianArch)
+			{
+				let dataView8 = new Int8Array(dataSegment);
+				for (let i = 0; i < dataView8.length; i+=2)
+				{
+					byteSwap(dataView8,i,i+1);
+				}
+			}
+
+			dataView = new Int16Array(dataSegment);
 		}
 		else if (head.BITPIX.value == 32)
 		{
 			data = new Int32Array(size);
-			dataView = new Int32Array(blobArray.slice(iOffset));
+
+			if (!bBigEndianArch)
+			{
+				let dataView8 = new Int8Array(dataSegment);
+				for (let i = 0; i < dataView8.length; i+=4)
+				{
+					byteSwap(dataView8,i,i + 3);
+					byteSwap(dataView8,i + 1,i + 2);
+				}
+			}
+
+			dataView = new Int32Array(dataSegment);
 		}
 		else if (head.BITPIX.value == 64)
 		{
 			data = new BigInt64Array(size);
-			dataView = new BigInt64Array(blobArray.slice(iOffset));
+			if (!bBigEndianArch)
+			{
+				let dataView8 = new Int8Array(dataSegment);
+				for (let i = 0; i < dataView8.length; i+=8)
+				{
+					byteSwap(dataView8,i    ,i + 7);
+					byteSwap(dataView8,i + 1,i + 6);
+					byteSwap(dataView8,i + 2,i + 5);
+					byteSwap(dataView8,i + 3,i + 4);
+				}
+			}
+			dataView = new BigInt64Array(dataSegment);
 		}
 		else if (head.BITPIX.value == -32)
 		{
 			data = new Float32Array(size);
-			dataView = new Float32Array(blobArray.slice(iOffset));
+			if (!bBigEndianArch)
+			{
+				let dataView8 = new Int8Array(dataSegment);
+				for (let i = 0; i < dataView8.length; i+=4)
+				{
+					byteSwap(dataView8,i,i + 3);
+					byteSwap(dataView8,i + 1,i + 2);
+				}
+			}
+			dataView = new Float32Array(dataSegment);
 		}
 		else if (head.BITPIX.value == -64)
 		{
 			data = new Float64Array(size);
-			dataView = new Float64Array(blobArray.slice(iOffset));
+			if (!bBigEndianArch)
+			{
+				let dataView8 = new Int8Array(dataSegment);
+				for (let i = 0; i < dataView8.length; i+=8)
+				{
+					byteSwap(dataView8,i    ,i + 7);
+					byteSwap(dataView8,i + 1,i + 6);
+					byteSwap(dataView8,i + 2,i + 5);
+					byteSwap(dataView8,i + 3,i + 4);
+				}
+			}
+			dataView = new Float64Array(dataSegment);
 		}
 		else //if (head.BITPIX.value == 8)
 		{
 			data = new Uint8Array(size);
-			dataView = new Uint8Array(blobArray.slice(iOffset));
+			dataView = new Uint8Array(dataSegment);
 		}
 		for (let i = 0;i < size && i < dataView.length; i++)
 		{

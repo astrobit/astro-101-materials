@@ -34,7 +34,7 @@ function waiter()
 				const keyval = key.slice(9).trim();
 				const commentPlace = keyval.indexOf("/",1);
 				const commentFixed = (commentPlace != -1) ? keyval.slice(0,commentPlace).trim() : keyval;
-				const commentItself = (commentPlace != -1) ? keyval.slice(commentPlace).trim() : "";
+				const commentItself = (commentPlace != -1) ? keyval.slice(commentPlace + 1).trim() : "";
 				
 				if (commentFixed.charAt(0) == "'") // is a string
 				{

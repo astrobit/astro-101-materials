@@ -8,6 +8,7 @@ function waiter()
 	{
 		console.log("array ready");
 		console.log(g_testFits.data[272 + 349 * 512]);
+		console.log(g_testFits.data[349 + 272 * 512]);
 	}
 	else
 	{

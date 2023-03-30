@@ -57,11 +57,11 @@ function waiter()
 				}
 				lastKey = slkey;
 			}
-			else if (key.slice(0,8).trim() == "CONTINUE")
+			else if (key.slice(0,8).trim() == "CONTINUE" && lastKey !== null)
 			{
 				const keyString = commentFixed.slice(1,stringEndPlace).trim();
-				const adjString = head[slkey].value.slice(0,-1) + keyString;
-				head[slkey].value = adjString;
+				const adjString = head[lastKey].value.slice(0,-1) + keyString;
+				head[lastKey].value = adjString;
 			}
 		}
 //		var bBigEnd = ("BYTEORDR" in head) ? ;    // FITS is defined as big endian

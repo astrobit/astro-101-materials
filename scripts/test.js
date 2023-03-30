@@ -114,7 +114,7 @@ function waiter()
 		}
 		for (let i = 0;i < size && i < dataView.length; i++)
 		{
-			data[i] = dataView(i);
+			data[i] = dataView[i];
 		}
 		
 //		var bBigEnd = ("BYTEORDR" in head) ? ;    // FITS is defined as big endian

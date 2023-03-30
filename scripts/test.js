@@ -17,6 +17,7 @@ function waiter()
 		let iOffset = 0;
 		let head = new Object(); //new Array();
 		head.keyList = new Array();
+		let lastKey = null;
 		while (!bQuit)
 		{
 			let key = new String();
@@ -45,7 +46,7 @@ function waiter()
 				else// if (keyval
 				{
 					const alphaOmega = "09";
-					if ((commentFixed.charCodeAt(0) >= alphaOmega.charCodeAt(0) && commentFixed.charCodeAt(0) <= alphaOmega.charCodeAt(1)) || commentFixed.charAt(0) == "-") // seemingly numeric data
+					if ((commentFixed.charCodeAt(0) >= alphaOmega.charCodeAt(0) && commentFixed.charCodeAt(0) <= alphaOmega.charCodeAt(1)) || commentFixed.charAt(0) == "-" || commentFixed.charAt(0) == "+") // seemingly numeric data
 					{
 						head[slkey] = {value: +commentFixed, comment: commentItself};
 					}
@@ -54,8 +55,24 @@ function waiter()
 						head[slkey] = {value: commentFixed, comment: commentItself};
 					}
 				}
+				lastKey = slkey;
+			}
+			else if (key.slice(0,8).trim() == "CONTINUE")
+			{
+				const keyString = commentFixed.slice(1,stringEndPlace).trim();
+				const adjString = head[slkey].value.slice(0,-1) + keyString;
+				head[slkey].value = adjString;
 			}
 		}
+//		var bBigEnd = ("BYTEORDR" in head) ? ;    // FITS is defined as big endian
+
+		// BITPIX
+		// 8-bit (unsigned) integer bytes
+		// 16-bit (signed) integers
+		// 32-bit (signed) integers
+		// 32-bit single precision floating point real numbers
+		// 64-bit double precision floating point real numbers
+		
 		console.log("array ready");
 	}
 	else if (blobResult != null)

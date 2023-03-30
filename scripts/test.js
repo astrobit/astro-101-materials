@@ -25,7 +25,8 @@ function waiter()
 			}
 			head.push(key);
 			iOffset += 80;
-			bQuit = (key.slice(3) == "END") || (iOffset + 80 > view.length);
+			const sl = key.slice(0,3);
+			bQuit = (sl == "END") || (iOffset + 80 > view.length);
 		}
 		console.log("array ready");
 	}

@@ -1,6 +1,6 @@
 "use strict";
 
-function byteSwap(array,i,j)
+function __FITS_byteSwap(array,i,j)
 {
 	const swap = array[i];
 	array[i] = array[j];
@@ -118,7 +118,7 @@ class FITS
 					let dataView8 = new Int8Array(dataSegment);
 					for (let i = 0; i < dataView8.length; i+=2)
 					{
-						byteSwap(dataView8,i,i+1);
+						__FITS_byteSwap(dataView8,i,i+1);
 					}
 				}
 
@@ -133,8 +133,8 @@ class FITS
 					let dataView8 = new Int8Array(dataSegment);
 					for (let i = 0; i < dataView8.length; i+=4)
 					{
-						byteSwap(dataView8,i,i + 3);
-						byteSwap(dataView8,i + 1,i + 2);
+						__FITS_byteSwap(dataView8,i,i + 3);
+						__FITS_byteSwap(dataView8,i + 1,i + 2);
 					}
 				}
 
@@ -148,10 +148,10 @@ class FITS
 					let dataView8 = new Int8Array(dataSegment);
 					for (let i = 0; i < dataView8.length; i+=8)
 					{
-						byteSwap(dataView8,i    ,i + 7);
-						byteSwap(dataView8,i + 1,i + 6);
-						byteSwap(dataView8,i + 2,i + 5);
-						byteSwap(dataView8,i + 3,i + 4);
+						__FITS_byteSwap(dataView8,i    ,i + 7);
+						__FITS_byteSwap(dataView8,i + 1,i + 6);
+						__FITS_byteSwap(dataView8,i + 2,i + 5);
+						__FITS_byteSwap(dataView8,i + 3,i + 4);
 					}
 				}
 				dataView = new BigInt64Array(dataSegment);
@@ -164,8 +164,8 @@ class FITS
 					let dataView8 = new Int8Array(dataSegment);
 					for (let i = 0; i < dataView8.length; i+=4)
 					{
-						byteSwap(dataView8,i,i + 3);
-						byteSwap(dataView8,i + 1,i + 2);
+						__FITS_byteSwap(dataView8,i,i + 3);
+						__FITS_byteSwap(dataView8,i + 1,i + 2);
 					}
 				}
 				dataView = new Float32Array(dataSegment);
@@ -178,10 +178,10 @@ class FITS
 					let dataView8 = new Int8Array(dataSegment);
 					for (let i = 0; i < dataView8.length; i+=8)
 					{
-						byteSwap(dataView8,i    ,i + 7);
-						byteSwap(dataView8,i + 1,i + 6);
-						byteSwap(dataView8,i + 2,i + 5);
-						byteSwap(dataView8,i + 3,i + 4);
+						__FITS_byteSwap(dataView8,i    ,i + 7);
+						__FITS_byteSwap(dataView8,i + 1,i + 6);
+						__FITS_byteSwap(dataView8,i + 2,i + 5);
+						__FITS_byteSwap(dataView8,i + 3,i + 4);
 					}
 				}
 				dataView = new Float64Array(dataSegment);

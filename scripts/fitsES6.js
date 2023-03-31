@@ -461,7 +461,7 @@ class FITS
 		{
 			const x = (i % this.width);
 			const y = Math.floor(i / this.width);
-			const imageDataRow = this.height - row - 1;
+			const imageDataRow = this.height - y - 1;
 			const imageDataPos = (imageDataRow + x) * 4;
 			const val = stretchfunction((procfunction(this.data[i] + shift) - lower) * slope);
 			const pval = Math.floor(255 * (invert ? (1.0 - val) : val));

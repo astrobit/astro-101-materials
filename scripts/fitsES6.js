@@ -256,8 +256,221 @@ class FITS
 				this.data[i] = dataView[i];
 			}
 			// all done, signal ready
+			this._prepareTransform();
+			this._prepareImage();
 			this.ready = true;
 		}
+	}
+	
+	_prepareTransform()
+	{
+		// see if the image is rotated
+		if (this.head.NAXIS.value >= 2)
+		{
+			// determine which axis is which; most likely we will find either axis 1 = RA and axis 2 = dec, or vice versa
+			const ctype1_data = this.head.CTYPE1.value.substr(0,4);
+			const ctype2_data = this.head.CTYPE2.value.substr(0,4);
+			this.ra_axis = (ctype1_data == "RA--") ? 1 : ((ctype2_data == "RA--") ? 2 : 0)
+			this.dec_axis = (ctype1_data == "DEC-") ? 1 : ((ctype2_data == "DEC-") ? 2 : 0)
+			this.proj_type = this.head.CTYPE1.value.substr(5,3);
+
+			if (this.ra_axis == 0 || this.dec_axis == 0)
+			{
+				// find each axis
+				for (let i = 0; i < this.head.NAXIS.value; i++)
+				{
+					const key = "CTYPE" + i;
+					const axis = this.head[key].value.substr(0,4);
+					if (axis == "RA--")
+					{
+						this.ra_axis = i;
+						this.proj_type = this.head[key].value.substr(4,3);
+					}
+					else if (axis == "DEC-")
+					{
+						this.dec_axis = i;
+						this.proj_type = this.head[key].value.substr(4,3);
+					}
+				}
+			}
+			this.thetap = ("LONPOLE" in this.head) ? radians(this.head.LONPOLE.value) : 0.0;
+			const costhetap = Math.cos(this.thetap);
+			const sinthetap = Math.sin(this.thetap);
+			this.alphap = radians(this.head["CRVAL" + this.ra_axis].value);
+			this.decp = radians(this.head["CRVAL" + this.dec_axis].value);
+			const cosalphap = Math.cos(this.alphap);
+			const sinalphap = Math.sin(this.alphap);
+			const cosdecp = Math.cos(this.decp);
+			const sindecp = Math.sin(this.decp);
+			
+			
+			this.trx = null;
+			if (this.proj_type == "TAN")  // 
+			{
+				this.trx = new Object();
+				this.trx.r11 = -sinalphap * sinthetap - cosalphap * costhetap * sindecp;
+				this.trx.r12 = cosalphap * sinthetap - sinalphap * costhetap * sindecp;
+				this.trx.r13 = costhetap * cosdecp;
+				this.trx.r21 = sinalphap * costhetap - cosalphap * sinthetap * sindecp;
+				this.trx.r22 = -cosalphap * costhetap - sinalphap * sinthetap * sindecp;
+				this.trx.r23 = sinthetap * cosdecp;
+				this.trx.r31 = cosalphap * cosdecp;
+				this.trx.r32 = sinalphap * cosdecp;
+				this.trx.r33 = sindecp;
+			}	
+		}
+	}
+	_prepareImage()
+	{
+		this.min_nonzero = null
+		this.max_nonzero = null
+		
+		this.min = null;
+		this.max = null;
+		this.mean = null;
+		this.median = null;
+		let dataCopy = new Array();
+		this.histogram = new Object();
+		
+		let summer = 0;
+		// find the mean, median, min, and max values
+		for (let i = 0; i < this.data.length; i++)
+		{
+			dataCopy.push(this.data[i]);
+			summer += this.data[i];
+			if (this.max == null || this.data[i] > this.max)
+				this.max = this.data[i];
+			if (this.min == null || this.data[i] < this.min)
+				this.min = this.data[i];
+			if (this.data[i] != 0)
+			{
+				if (this.max_nonzero == null || this.data[i] > this.max_nonzero)
+					this.max_nonzero = this.data[i];
+				if (this.min_nonzero == null || this.data[i] < this.min_nonzero)
+					this.min_nonzero = this.data[i];
+			}
+			const datastring = this.data[i].toString();
+			if (datastring in this.histogram)
+				this.histogram[datastring]++
+			else
+				this.histogram[datastring] = 0;
+			
+		}
+		this.mean = summer / this.data.length;
+		dataCopy.sort();
+		this.median = dataCopy[(this.data.length >> 1)];
+		if ((this.data.length & 0x1) == 0x00) // even number, average to find the median
+		{
+			this.median *= 0.5;
+			this.median += dataCopy[(this.data.length >> 1) - 1] * 0.5;
+		}
+		
+	}
+	
+	radec(x,y)
+	{
+		let ret = null;
+		if (ValidateValue(x) && ValidateValue(y) && this.head.NAXIS.value >= 2 && this.proj_type == "TAN")  // 
+		{
+			const qx = radians(this.head["CDELT" + this.ra_axis].value) * (x - this.head["CRPIX" + this.ra_axis].value);
+			const qy = radians(this.head["CDELT" + this.dec_axis].value) * (y - this.head["CRPIX" + this.dec_axis].value);
+			
+			const phi = Math.atan2(qx,-qy);
+			const phideg = degrees(phi);
+			const cosphi = Math.cos(phi);
+			const sinphi = Math.sin(phi);
+			const theta = Math.atan(1.0 / Math.sqrt(qx * qx + qy * qy));
+			const thetadeg = degrees(theta);
+			const costheta = Math.cos(theta);
+			const sintheta = Math.sin(theta);
+			
+			const lp = cosphi * costheta;
+			const mp = sinphi * costheta;
+			const np = sintheta;
+			
+			const l = lp * this.trx.r11 + mp * this.trx.r21 + np * this.trx.r31;
+			const m = lp * this.trx.r12 + mp * this.trx.r22 + np * this.trx.r32;
+			const n = lp * this.trx.r13 + mp * this.trx.r23 + np * this.trx.r33;
+			
+			const alpha = degrees(Math.atan2(m,l));
+			const dec = degrees(Math.asin(n));
+			
+			ret = {ra: alpha, dec:dec, phi: phideg, theta: thetadeg, qx: degrees(qx), qy:degrees(qy), x: x, y: y};
+		}
+		return ret;
+	}
+	get width()
+	{
+		return (NAXIS1 in this.head) ? this.head.NAXIS1.value : null;
+	}
+	get height()
+	{
+		return (NAXIS2 in this.head) ? this.head.NAXIS2.value : null;
+	}
+	createImage(context,stretch,invert,colorizer)
+	{
+		let imageData = context.createImageData(this.width, this.height);
+		const logs = (stretch == "log" || stretch == "loglog" || stretch == "sqrtlog");
+			
+			
+		let stretchfunction = function(x) {return x;};
+		let procfunction = function(x) {return x;};
+		let shift = 0;
+		let lower = this.min;
+		let slope = 1;
+		if (!logs)
+		{
+			if (stretch == "sqrt")
+				stretchfunction = function(x) {return Math.sqrt(x);}
+			else if (stretch == "cuberoot")
+				stretchfunction = function(x) {return Math.cbrt(x);}
+			slope = 1.0 / (this.max - this.min);
+		}
+		else
+		{
+			shift = this.min < 1 ? (-this.min + 1) : 0.0; // note: if all values are less than 1 and are small, this can cause significant data loss
+			if (stretch == "sqrtlog")
+			{
+				procfunction = function(x) {return Math.sqrt(Math.log(x));}
+			}
+			else if (stretch == "loglog")
+			{
+				procfunction = function(x) {return Math.log(Math.log(x));}
+			}
+			else
+			{
+				procfunction = function(x) {return Math.log(x);}
+			}
+			lower = procfunction(this.min + shift);
+			slope = 1.0 / (procfunction(this.max + shift) - lower);
+		}
+		let colorFunction = SAOImageColorTypeGeneral;
+		if (ValidateString(colorizer))
+		{
+			if (colorizer == "heat" || colorizer == "blackbody")
+				colorFunction = SAOImageColorTypeBlackbody;
+			else if (colorizer == "A" || colorizer == "a")
+				colorFunction = SAOImageColorTypeA;
+			else if (colorizer == "B" || colorizer == "B")
+				colorFunction = SAOImageColorTypeB;
+			
+		}
+		 
+		for (let i = 0; i < this.data.length; i++)
+		{
+			const x = (i % this.width);
+			const y = Math.floor(i / this.width);
+			const imageDataRow = this.height - row - 1;
+			const imageDataPos = (imageDataRow + x) * 4;
+			const val = stretchfunction((procfunction(this.data[i] + shift) - lower) * slope);
+			const pval = Math.floor(255 * (invert ? (1.0 - val) : val));
+			const color = colorFunction(pval);
+			imageData.data[imageDataPos + 0] = color.r;
+			imageData.data[imageDataPos + 1] = color.g;
+			imageData.data[imageDataPos + 2] = color.b;
+			imageData.data[imageDataPos + 3] = 255;
+		}
+		return imageData;
 	}
 }
 

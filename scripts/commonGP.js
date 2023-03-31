@@ -24,6 +24,10 @@
 // Additions
 // - add SIprefix to determine the approriate SI prefix for a value. Note: excludes centi-, hecto-, deci-, and deca-
 // - add random_poisson function
+//
+// 2023-Mar-31
+// Changes
+// - don't check for null in ValidateXXX functions - the check is redundant
 
 /////////////////////////////////////////////////////////////////////////
 //
@@ -594,12 +598,12 @@ function shuffle(array) {
 // confirm that a variable is identified, non-null, and numeric
 // input: value - the variable to test
 // output: (boolean) - true if the variable is identified, non-null, and 
-//						a number, false otherwise
+//						a number, false otherwise; value may be NaN
 //
 /////////////////////////////////////////////////////////////////////////
 function ValidateValue(value)
 {
-	return (typeof value == 'number' && value !== null)
+	return (typeof value == 'number')
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -614,7 +618,7 @@ function ValidateValue(value)
 /////////////////////////////////////////////////////////////////////////
 function ValidateString(value)
 {
-	return (typeof value == 'string' && value !== null)
+	return (typeof value == 'string')
 }
 
 
@@ -630,7 +634,7 @@ function ValidateString(value)
 /////////////////////////////////////////////////////////////////////////
 function ValidateBoolean(value)
 {
-	return (typeof value == 'boolean' && value !== null)
+	return (typeof value == 'boolean')
 }
 
 /////////////////////////////////////////////////////////////////////////

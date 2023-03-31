@@ -42,6 +42,10 @@
 // - PhotonFluxToFlux to calcualte an energy flux given a photon flux
 // Changes
 // - fluxToPhotonFlux (now _bandEnergy) was incorrectly calculating average photon energy within the band; corrected calculation
+//
+// 2023-Mar-31
+// Additions
+// - SAOImageColorTypeBlackbody, SAOImageColorTypeA, SAOImageColorTypeB, SAOImageColorGeneral and SAOImageColor to complement fitsES6
 
 /////////////////////////////////////////////////////////////////////////
 //
@@ -215,7 +219,120 @@ function UBVRItoRGB(U,B,V,R,I,brightMag,dimMag)
 		cG *= bright;
 		cB *= bright;
 	}
-	return new RGB(Math.round(cR), Math.round(cG), Math.round(cB));//, bright:bright};
+	return new RGB(Math.round(cR), Math.round(cGSAOImageColor), Math.round(cB));//, bright:bright};
+}
+/////////////////////////////////////////////////////////////////////////
+//
+//  function SAOImageColorTypeBlackbody
+//
+// SAO Blackbody/ Heat color conversion method
+// source: flux.js: Copyright (c) 2010 Stuart Lowe http://lcogt.net/; Licensed under the MPL http://www.mozilla.org/MPL/MPL-1.1.txt
+// modified by Brian W. Mulligan, 29 Mar 2023
+// input: v (number) - the value (0 -- 255) to transform to a color
+// output: (RGB) - an RGB object containing the "blackbody" color of the object
+//
+/////////////////////////////////////////////////////////////////////////
+function SAOImageColorTypeBlackbody(v)
+{
+	return new RGB(
+		((v<=127.5) ? v*2 : 255),
+		((v>63.75) ? ((v<191.25) ? (v-63.75)*2 : 255) : 0),
+		((v>127.5) ? (v-127.5)*2 : 0)
+	);
+}
+/////////////////////////////////////////////////////////////////////////
+//
+//  function SAOImageColorTypeA
+//
+// SAO "A" type color conversion method
+// source: flux.js: Copyright (c) 2010 Stuart Lowe http://lcogt.net/; Licensed under the MPL http://www.mozilla.org/MPL/MPL-1.1.txt
+// modified by Brian W. Mulligan, 29 Mar 2023
+// input: v (number) - the value (0 -- 255) to transform to a color
+// output: (RGB) - an RGB object containing the "A" color of the object
+//
+/////////////////////////////////////////////////////////////////////////
+function SAOImageColorTypeA(v)
+{
+	return new RGB(
+ 			((v<=127.5) ? v*2 : 255),
+ 			((v>63.75) ? ((v<191.25) ? (v-63.75)*2 : 255) : 0),
+ 			((v>127.5) ? (v-127.5)*2 : 0)
+ 		);
+}
+/////////////////////////////////////////////////////////////////////////
+//
+//  function SAOImageColorTypeB
+//
+// SAO "A" type color conversion method
+// source: flux.js: Copyright (c) 2010 Stuart Lowe http://lcogt.net/; Licensed under the MPL http://www.mozilla.org/MPL/MPL-1.1.txt
+// modified by Brian W. Mulligan, 29 Mar 2023
+// input: v (number) - the value (0 -- 255) to transform to a color
+// output: (RGB) - an RGB object containing the "A" color of the object
+//
+/////////////////////////////////////////////////////////////////////////
+function SAOImageColorTypeB(v)
+{
+	return new RGB(
+ 			((v<=127.5) ? v*2 : 255),
+ 			((v>63.75) ? ((v<191.25) ? (v-63.75)*2 : 255) : 0),
+ 			((v>127.5) ? (v-127.5)*2 : 0)
+ 		);
+}
+/////////////////////////////////////////////////////////////////////////
+//
+//  function SAOImageColorTypeGeneral
+//
+// SAO greyscale type color conversion method
+// source: flux.js: Copyright (c) 2010 Stuart Lowe http://lcogt.net/; Licensed under the MPL http://www.mozilla.org/MPL/MPL-1.1.txt
+// modified by Brian W. Mulligan, 29 Mar 2023
+// input: v (number) - the value (0 -- 255) to transform to a color
+// output: (RGB) - an RGB object containing the grayscale color of the object
+//
+/////////////////////////////////////////////////////////////////////////
+
+function SAOImageColorTypeGeneral(v)
+{
+	return new RGB(v,v,v);
+}
+
+
+/////////////////////////////////////////////////////////////////////////
+//
+//  function SAOImageColor
+//
+// color scales defined by SAOImage
+// source: flux.js: Copyright (c) 2010 Stuart Lowe http://lcogt.net/; Licensed under the MPL http://www.mozilla.org/MPL/MPL-1.1.txt
+// modified by Brian W. Mulligan, 29 Mar 2023
+// input: v (number) - the signed value to transform to a color
+//        type (string) - the method to use: "blackbody", "heat", "A", or "B"
+// output: (RGB) - an RGB object containing the color of the object
+//
+/////////////////////////////////////////////////////////////////////////
+function SAOImageColor(v,type)
+{
+	let ret = null;
+	if (type instanceof String)
+	{
+		if(type.charAt(0) =="b" || type.charAt(0) == "h") // blackbody or heat
+		{
+			ret = SAOImageColorTypeBlackbody(v);
+			
+		}
+		else if (type.charAt(0) == "A")
+		{
+			ret = SAOImageColorTypeA(v);
+		 }
+		else if (type.charAt(0) == "B")
+		{
+			ret = SAOImageColorTypeB(v);
+		}
+		else
+			ret = SAOImageColorTypeGeneral(v);
+	}
+	else
+		ret = SAOImageColorTypeGeneral(v);
+	
+	return ret;	
 }
 
 /////////////////////////////////////////////////////////////////////////

@@ -407,6 +407,7 @@ class FITS
 	{
 		return (NAXIS2 in this.head) ? this.head.NAXIS2.value : null;
 	}
+	
 	createImage(context,stretch,invert,colorizer)
 	{
 		let imageData = context.createImageData(this.width, this.height);

@@ -265,7 +265,7 @@ class FITS
 	_prepareTransform()
 	{
 		// see if the image is rotated
-		if (this.head.NAXIS.value >= 2)
+		if ("NAXIS" in this.head && this.head.NAXIS.value >= 2)
 		{
 			// determine which axis is which; most likely we will find either axis 1 = RA and axis 2 = dec, or vice versa
 			const ctype1_data = this.head.CTYPE1.value.substr(0,4);
@@ -277,7 +277,7 @@ class FITS
 			if (this.ra_axis == 0 || this.dec_axis == 0)
 			{
 				// find each axis
-				for (let i = 0; i < this.head.NAXIS.value; i++)
+				for (let i = 1; i <= this.head.NAXIS.value; i++)
 				{
 					const key = "CTYPE" + i;
 					const axis = this.head[key].value.substr(0,4);
@@ -401,11 +401,11 @@ class FITS
 	}
 	get width()
 	{
-		return (NAXIS1 in this.head) ? this.head.NAXIS1.value : null;
+		return ("NAXIS1" in this.head) ? this.head.NAXIS1.value : null;
 	}
 	get height()
 	{
-		return (NAXIS2 in this.head) ? this.head.NAXIS2.value : null;
+		return ("NAXIS2" in this.head) ? this.head.NAXIS2.value : null;
 	}
 	
 	createImage(context,stretch,invert,colorizer)

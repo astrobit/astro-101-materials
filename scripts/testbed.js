@@ -327,20 +327,34 @@ theCanvas.onmouseup = function(event)
 function draw()
 {
 	theContext.clearRect(0, 0, theCanvas.width, theCanvas.height);
-	theContext.putImageData(g_fitsImage, 0, 0);
-	
-	if (g_ClickCenter.x !== null && g_ClickCenter.y !== null && g_ClickCenter.r > 0)
+	if (g_testFits != null && g_testFits.ready && g_fitsImage != null)
 	{
-		theContext.strokeStyle = "#FF0000"
-		theContext.beginPath();
-		theContext.arc(g_ClickCenter.x, g_ClickCenter.y, g_ClickCenter.r, 0, 2 * Math.PI);
-		theContext.stroke();		
+		theContext.putImageData(g_fitsImage, 0, 0);
+		
+		if (g_ClickCenter.x !== null && g_ClickCenter.y !== null && g_ClickCenter.r > 0)
+		{
+			theContext.strokeStyle = "#FF0000"
+			theContext.beginPath();
+			theContext.arc(g_ClickCenter.x, g_ClickCenter.y, g_ClickCenter.r, 0, 2 * Math.PI);
+			theContext.stroke();		
+		}
+	}
+	else
+	{
+		theCanvas.height = 50;
+		theCanvas.width = 100;
+		theContext.clearRect(0, 0, theCanvas.width, theCanvas.height);
+		theContext.fillStyle = "#FFFF00"
+		theContext.font = "20px Arial";
+		theContext.fillText("Standby...", 10, 40);	
 	}
 }
 
 function updateImage()
 {
-	g_fitsImage = g_testFits.createImage(theContext,g_scaling,g_invert,g_color);
+	g_fitsImage= null;
+	if (g_testFits != null && g_testFits.ready)
+		g_fitsImage = g_testFits.createImage(theContext,g_scaling,g_invert,(g_color == "general") ? null : g_color);
 	draw();
 }
 function waiter()

@@ -113,14 +113,19 @@ function waiter()
 		theCanvas.width = g_testFits.width;
 		console.log("creating image");
 		g_fitsImage = g_testFits.createImage(theContext,"sqrt",true,null);
-		setOutputText("obs_date",g_testFits.head["DATE-OBS"].value);
-		setOutputText("obs_mjd",g_testFits.head["MJD-OBS"].value);
-		setOutputText("target",g_testFits.head.OBJECT.value);
-		setOutputText("observer",g_testFits.head.OBSERVER.value);
-		setOutputText("telescope",g_testFits.head.TELESCOP.value);
-		setOutputText("instrument",g_testFits.head.INSTRUME.value);
-		setOutputText("exptime",g_testFits.head.EXPTIME.value + " s");
-		setOutputText("filter",("FILTER" in g_testFits.head) ? g_testFits.head.FILTER.value : "None");
+		setOutputText("obs_date",("DATE-OBS" in g_testFits.head) ? g_testFits.head["DATE-OBS"].date.toDateString() : "");
+		let mjd = ("MJD-OBS" in g_testFits.head) ? g_testFits.head["MJD-OBS"].value : null;
+		if (mjd == null && ("DATE-OBS" in g_testFits.head))
+			mjd = (g_testFits.head["DATE-OBS"].date.getTime() / 86400000.0 + 40587.00000).toFixed(5);
+		else
+			mjd = "";
+		setOutputText("obs_mjd",mjd);
+		setOutputText("target",("OBJECT" in g_testFits.head) ? g_testFits.head.OBJECT.value : "---");
+		setOutputText("observer",("OBSERVER" in g_testFits.head) ? g_testFits.head.OBSERVER.value : "---");
+		setOutputText("telescope",("TELESCOP" in g_testFits.head) ? g_testFits.head.TELESCOP.value : "---");
+		setOutputText("instrument",("INSTRUME" in g_testFits.head) ? g_testFits.head.INSTRUME.value : "---");
+		setOutputText("exptime",("EXPTIME" in g_testFits.head) ? g_testFits.head.EXPTIME.value + " s" : "---");
+		setOutputText("filter",("FILTER" in g_testFits.head) ? g_testFits.head.FILTER.value : "---");
 
 
 		draw();

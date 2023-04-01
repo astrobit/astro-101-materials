@@ -427,8 +427,8 @@ function draw()
 		if (g_point["reference"].x !== null && g_point["reference"].y !== null &&
 			g_point["radius"].x !== null && g_point["radius"].y !== null)
 		{
-			const dx = (g_point["reference"].x - g_point["measure"].x);
-			const dy = (g_point["reference"].y - g_point["measure"].y);
+			const dx = (g_point["reference"].x - g_point["radius"].x);
+			const dy = (g_point["reference"].y - g_point["radius"].y);
 			let r = Math.sqrt(dx * dx + dy * dy);
 			theContext.strokeStyle = "#FF0000"
 			theContext.beginPath();

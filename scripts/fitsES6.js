@@ -408,6 +408,16 @@ class FITS
 		return ("NAXIS2" in this.head) ? this.head.NAXIS2.value : null;
 	}
 	
+	counts(x,y)
+	{
+		let ret = 0;
+		if (ValidateValue(x) && ValidateValue(y) && this.head.NAXIS.value >= 2)  // 
+		{
+			ret = this.data[x + y * this.head.NAXIS1.value];
+		}
+		return ret;
+	}
+	
 	createImage(context,stretch,invert,colorizer)
 	{
 		let imageData = context.createImageData(this.width, this.height);

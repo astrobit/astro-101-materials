@@ -366,7 +366,7 @@ function waiter()
 		theCanvas.width = g_testFits.width;
 //		console.log("creating image");
 		setOutputText("obs_date",("DATE-OBS" in g_testFits.head) ? g_testFits.head["DATE-OBS"].date.toDateString() : "");
-		let mjd = ("MJD-OBS" in g_testFits.head) ? g_testFits.head["MJD-OBS"].value : null;
+		let mjd = ("MJD_OBS" in g_testFits.head) ? g_testFits.head.MJD_OBS.value : null;
 		if (mjd == null && ("DATE-OBS" in g_testFits.head))
 			mjd = (g_testFits.head["DATE-OBS"].date.getTime() / 86400000.0 + 40587.00000).toFixed(5);
 		else

@@ -18,7 +18,7 @@ function waiter()
 		theCanvas.height = g_testFits.height;
 		theCanvas.width = g_testFits.width;
 		console.log("creating image");
-		let fitsImage = g_testFits.createImage(theContext,"linear",true,null);
+		let fitsImage = g_testFits.createImage(theContext,"sqrt",true,null);
 
 		console.log("drawing");
 		theContext.clearRect(0, 0, theCanvas.width, theCanvas.height);

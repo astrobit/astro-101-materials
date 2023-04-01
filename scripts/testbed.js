@@ -270,9 +270,9 @@ function clearMeasures()
 	g_point["radius"] = {x:null, y:null};
 	g_point["measure"] = {x:null, y:null};
 }
-function updateMeasure()
+function updateMeasure(extRequestDraw)
 {
-	let drawRequest = false;
+	let drawRequest = extRequestDraw;
 	if (g_point["reference"].x !== null && g_point["reference"].y !== null &&
 		g_point["radius"].x !== null && g_point["radius"].y !== null)
 	{
@@ -340,10 +340,12 @@ theCanvas.onmousemove = function(event)
 		event.offsetY >= 0 && event.offsetY <= theCanvas.height &&
 		g_testFits.ready)
 	{
+		let requestDraw = false;
 		if (g_mouseDown && g_controlMode != "free")
 		{
 			g_point[g_controlMode].x = event.offsetX;
 			g_point[g_controlMode].y = event.offsetY;
+			requestDraw = true;
 		}
 		const counts = g_testFits.counts(event.offsetX,g_testFits.height - event.offsetY);
 		const radec = g_testFits.radec(event.offsetX,g_testFits.height - event.offsetY);
@@ -357,7 +359,7 @@ theCanvas.onmousemove = function(event)
 		setOutputText("y",radec.y);
 		setOutputText("counts",counts);
 		
-		updateMeasure();
+		updateMeasure(requestDraw);
 	}
 }
 theCanvas.onmousedown = function(event)
@@ -380,6 +382,11 @@ theCanvas.onmouseup = function(event)
 	if (g_testFits.ready && g_mouseDown)
 	{
 		g_mouseDown = false;
+		if (g_controlMode != "free")
+		{
+			g_point[g_controlMode].x = event.offsetX;
+			g_point[g_controlMode].y = event.offsetY;
+		}
 		updateMeasure();
 	}
 }

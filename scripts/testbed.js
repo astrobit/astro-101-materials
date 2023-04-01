@@ -75,7 +75,7 @@ theCanvas.onmousedown = function(event)
 		g_testFits.ready)
 	{
 		g_ClickCenter.x = event.offsetX;
-		g_ClickCenter.y = event.offsetX;
+		g_ClickCenter.y = event.offsetY;
 		g_ClickCenter.r = 0
 		g_ClickCenter.down = true;
 		draw();

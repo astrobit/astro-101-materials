@@ -24,7 +24,6 @@ theCanvas.onmousemove = function(event)
 		event.offsetY >= 0 && event.offsetY <= theCanvas.height &&
 		g_testFits.ready)
 	{
-		y = ;
 		const counts = g_testFits.counts(event.offsetX,g_testFits.height - event.offsetY);
 		const radec = g_testFits.radec(event.offsetX,g_testFits.height - event.offsetY);
 		

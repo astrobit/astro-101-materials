@@ -146,6 +146,8 @@ class FITS
 					this.head[lastKey].value = adjString; // save the adjusted string as the new value
 				}
 			}
+			while (view[iOffset] == 0x20) // bypass empty space that may appear after the END keyword
+				iOffset++;
 			// add BSCALE and BZERO keywords if they don't exist
 			if (!("BSCALE" in this.head))
 				this.head.BSCALE = {value: 1.0, comment:"added by fiteES6.js"};

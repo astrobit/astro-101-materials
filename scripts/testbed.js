@@ -214,7 +214,7 @@ const images_list = [
 ]
 
 
-let g_testFits = requestFITS("https://www.astronaos.com/astronomy/images/real_data/chandra_114.fits");
+let g_testFits = null;//requestFITS("https://www.astronaos.com/astronomy/images/real_data/chandra_114.fits");
 let g_ClickCenter = {x: null, y:null, r:null, down:false};
 let g_fitsImage = null;
 

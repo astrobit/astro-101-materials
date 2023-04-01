@@ -20,8 +20,12 @@
 <body style="font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#000000;">
     <!--<h1 style="font-size:24px;text-align:center;color:#FFFFFF;">Elongation</h1>-->
     <div>
+		  <label style="color:white">Image</label>
+		  <select name="image" id="image" onchange="OnSelectImage();" style="font-size:16px;height:20px;"></select>
+	</div>
+    <div>
    <div style="width: 150px;display:inline-block;margin-left:30px">
-    	<label style="color:white;text-align:left;">Obserrvation Date</label><br/>
+    	<label style="color:white;text-align:left;">Obs. Date</label><br/>
     	<label style="color:white;text-align:left;">MJD</label><br/>
     </div>
    <div style="width: 150px;display:inline-block;margin-left:15px">
@@ -79,6 +83,27 @@
     	<output id="radius" style="color:white;text-align:left;"></output><br/>	
     </div>
     </div>
+    <div>
+		  <label style="color:white">Brightness Scaling</label>
+		  <select name="scaling" id="scaling" onchange="OnSelectScaling();" style="font-size:16px;height:20px;">
+		   <option value="sqrt">Square Root</option>
+		   <option value="linear">Linear</option>
+		   <option value="cuberoot">Cube Root</option>
+		   <option value="log">Log</option>
+		   <option value="sqrtlog">Square Root Log</option>
+		   <option value="loglog">Log Log</option>
+		   </select>
+		   <label style="color:white">Invert</label>
+    		<input type="checkbox" id="invert" name="invert" checked="true" onchange="OnSelectInvert();">
+		   <label style="color:white">Colorizing</label>
+		  <select name="coloizing" id="coloizing" onchange="OnSelectColorizing();" style="font-size:16px;height:20px;">
+		   <option value="grayscale">Grayscale</option>
+		   <option value="heat">Blackbody</option>
+		   <option value="A">A</option>
+		   <option value="B">B</option>
+		   </select>
+    </div>
+    		
     <div style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center">
         <canvas id="theCanvas" width="100%" height="900" onclick="commonUIOnClick(event);">
             Canvas not supported; please update your browser.

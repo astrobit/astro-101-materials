@@ -113,6 +113,15 @@ function waiter()
 		theCanvas.width = g_testFits.width;
 		console.log("creating image");
 		g_fitsImage = g_testFits.createImage(theContext,"sqrt",true,null);
+		setOutputText("obs_date",g_testFits.head["DATE-OBS"].value);
+		setOutputText("obs_mjd",g_testFits.head["MJD-OBS"].value);
+		setOutputText("target",g_testFits.head.OBJECT.value);
+		setOutputText("observer",g_testFits.head.OBSERVER.value);
+		setOutputText("telescope",g_testFits.head.TELESCOP.value);
+		setOutputText("instrument",g_testFits.head.INSTRUME.value);
+		setOutputText("exptime",g_testFits.head.EXPTIME.value + " s");
+		setOutputText("filter",("FILTER" in g_testFits.head) ? g_testFits.head.FILTER.value : "None");
+
 
 		draw();
 	}

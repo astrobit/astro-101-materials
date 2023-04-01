@@ -300,7 +300,7 @@ theCanvas.onmousemove = function(event)
 			g_point["radius"].x !== null && g_point["radius"].y !== null)
 		{
 			const radeccircCntr = g_testFits.radec(g_point["reference"].x,g_testFits.height - g_point["reference"].y);
-			cosnt dx = (g_point["reference"].x - g_point["radius"].x);
+			const dx = (g_point["reference"].x - g_point["radius"].x);
 			const dy = (g_point["reference"].y - g_point["radius"].y);
 			let r = Math.sqrt(dx * dx + dy * dy);
 			const radeccircX = g_testFits.radec(g_point["reference"].x + r,g_testFits.height - g_point["reference"].y);

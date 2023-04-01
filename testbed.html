@@ -19,6 +19,24 @@
 </head>
 <body style="font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#000000;">
     <!--<h1 style="font-size:24px;text-align:center;color:#FFFFFF;">Elongation</h1>-->
+    <div>
+   <div style="width: 150px;display:inline-block;margin-left:30px">
+    	<label style="color:white;width:300px;text-align:center;font-weight:bold;font-size:20px">Telescope</label><br/>
+    	<label style="color:white;text-align:left;">x</label><br/>
+    	<label style="color:white;text-align:left;">y</label><br/>
+    	<label style="color:white;text-align:left;">RA</label><br/>
+    	<label style="color:white;text-align:left;">Dec</label><br/>
+    	<label style="color:white;text-align:left;">Counts</label><br/>
+    </div>
+   <div style="width: 150px;display:inline-block;margin-left:15px">
+    	<label style="color:white;width:300px;text-align:center;font-weight:bold;font-size:20px"></label><br/>
+    	<output id="x" style="color:white;text-align:left;"></output><br/>
+    	<output id="y" style="color:white;text-align:left;"></output><br/>	
+    	<output id="ra" style="color:white;text-align:left;"></output><br/>	
+    	<output id="dec" style="color:white;text-align:left;"></output><br/>	
+    	<output id="counts" style="color:white;text-align:left;"></output><br/>	
+    </div>
+    </div>
     <div style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center">
         <canvas id="theCanvas" width="100%" height="900" onclick="commonUIOnClick(event);">
             Canvas not supported; please update your browser.

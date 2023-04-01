@@ -215,7 +215,6 @@ const images_list = [
 
 
 let g_testFits = null;//requestFITS("https://www.astronaos.com/astronomy/images/real_data/chandra_114.fits");
-let g_ClickCenter = {x: null, y:null, r:null, down:false};
 let g_fitsImage = null;
 
 
@@ -271,15 +270,77 @@ function clearMeasures()
 	g_point["radius"] = {x:null, y:null};
 	g_point["measure"] = {x:null, y:null};
 }
-
+function updateMeasure()
+{
+	let drawRequest = false;
+	if (g_point["reference"].x !== null && g_point["reference"].y !== null &&
+		g_point["radius"].x !== null && g_point["radius"].y !== null)
+	{
+		const radeccircCntr = g_testFits.radec(g_point["reference"].x,g_testFits.height - g_point["reference"].y);
+		const dx = (g_point["reference"].x - g_point["radius"].x);
+		const dy = (g_point["reference"].y - g_point["radius"].y);
+		let r = Math.sqrt(dx * dx + dy * dy);
+		const radeccircX = g_testFits.radec(g_point["reference"].x + r,g_testFits.height - g_point["reference"].y);
+		const radeccircY = g_testFits.radec(g_point["reference"].x,g_testFits.height - g_point["reference"].y - r);
+		let ang = Math.abs(radeccircCntr.dec - radeccircY.dec);
+		let angUnit = "°";
+		if (ang < 1.0)
+		{
+			ang *= 60.0;
+			angUnit = "'";
+			if (ang < 1.0)
+			{
+				ang *= 60.0;
+				angUnit = "\"";
+				if (ang < 1.0)
+				{
+					ang *= 1000.0;
+					angUnit = "mas";
+				}
+			}
+		}
+		setOutputText("radius",ang.toFixed(2) + angUnit);
+		drawRequest = true;
+	}
+	if (g_point["reference"].x !== null && g_point["reference"].y !== null &&
+		g_point["measure"].x !== null && g_point["measure"].y !== null)
+	{
+		const radeccircCntr = g_testFits.radec(g_point["reference"].x,g_testFits.height - g_point["reference"].y);
+		const dx = (g_point["reference"].x - g_point["measure"].x);
+		const dy = (g_point["reference"].y - g_point["measure"].y);
+		let r = Math.sqrt(dx * dx + dy * dy);
+		const radeccircX = g_testFits.radec(g_point["reference"].x + r,g_testFits.height - g_point["reference"].y);
+		const radeccircY = g_testFits.radec(g_point["reference"].x,g_testFits.height - g_point["reference"].y - r);
+		let ang = Math.abs(radeccircCntr.dec - radeccircY.dec);
+		let angUnit = "°";
+		if (ang < 1.0)
+		{
+			ang *= 60.0;
+			angUnit = "'";
+			if (ang < 1.0)
+			{
+				ang *= 60.0;
+				angUnit = "\"";
+				if (ang < 1.0)
+				{
+					ang *= 1000.0;
+					angUnit = "mas";
+				}
+			}
+		}
+		setOutputText("measure",ang.toFixed(2) + angUnit);
+		drawRequest = true;
+	}
+	if (drawRequest)
+		draw();
+}
 theCanvas.onmousemove = function(event)
 {
 	if (event.offsetX >= 0 && event.offsetX <= theCanvas.width &&
 		event.offsetY >= 0 && event.offsetY <= theCanvas.height &&
 		g_testFits.ready)
 	{
-		if (g_mouseDown)
-		if (g_controlMode != "free")
+		if (g_mouseDown && g_controlMode != "free")
 		{
 			g_point[g_controlMode].x = event.offsetX;
 			g_point[g_controlMode].y = event.offsetY;
@@ -295,66 +356,8 @@ theCanvas.onmousemove = function(event)
 		setOutputText("x",radec.x);
 		setOutputText("y",radec.y);
 		setOutputText("counts",counts);
-		let drawRequest = false;
-		if (g_point["reference"].x !== null && g_point["reference"].y !== null &&
-			g_point["radius"].x !== null && g_point["radius"].y !== null)
-		{
-			const radeccircCntr = g_testFits.radec(g_point["reference"].x,g_testFits.height - g_point["reference"].y);
-			const dx = (g_point["reference"].x - g_point["radius"].x);
-			const dy = (g_point["reference"].y - g_point["radius"].y);
-			let r = Math.sqrt(dx * dx + dy * dy);
-			const radeccircX = g_testFits.radec(g_point["reference"].x + r,g_testFits.height - g_point["reference"].y);
-			const radeccircY = g_testFits.radec(g_point["reference"].x,g_testFits.height - g_point["reference"].y - r);
-			let ang = Math.abs(radeccircCntr.dec - radeccircY.dec);
-			let angUnit = "°";
-			if (ang < 1.0)
-			{
-				ang *= 60.0;
-				angUnit = "'";
-				if (ang < 1.0)
-				{
-					ang *= 60.0;
-					angUnit = "\"";
-					if (ang < 1.0)
-					{
-						ang *= 1000.0;
-						angUnit = "mas";
-					}
-				}
-			}
-			setOutputText("radius",ang.toFixed(2) + angUnit);
-			drawRequest = true;
-		}
-		if (g_point["reference"].x !== null && g_point["reference"].y !== null &&
-			g_point["measure"].x !== null && g_point["measure"].y !== null)
-		{
-			const radeccircCntr = g_testFits.radec(g_point["reference"].x,g_testFits.height - g_point["reference"].y);
-			const dx = (g_point["reference"].x - g_point["measure"].x);
-			const dy = (g_point["reference"].y - g_point["measure"].y);
-			let r = Math.sqrt(dx * dx + dy * dy);
-			const radeccircX = g_testFits.radec(g_point["reference"].x + r,g_testFits.height - g_point["reference"].y);
-			const radeccircY = g_testFits.radec(g_point["reference"].x,g_testFits.height - g_point["reference"].y - r);
-			let ang = Math.abs(radeccircCntr.dec - radeccircY.dec);
-			let angUnit = "°";
-			if (ang < 1.0)
-			{
-				ang *= 60.0;
-				angUnit = "'";
-				if (ang < 1.0)
-				{
-					ang *= 60.0;
-					angUnit = "\"";
-					if (ang < 1.0)
-					{
-						ang *= 1000.0;
-						angUnit = "mas";
-					}
-				}
-			}
-			setOutputText("measure",ang.toFixed(2) + angUnit);
-			drawRequest = true;
-		}
-		draw();
+		
+		updateMeasure();
 	}
 }
 theCanvas.onmousedown = function(event)
@@ -369,15 +372,15 @@ theCanvas.onmousedown = function(event)
 			g_point[g_controlMode].x = event.offsetX;
 			g_point[g_controlMode].y = event.offsetY;
 		}
-		draw();
+		updateMeasure();
 	}
 }
 theCanvas.onmouseup = function(event)
 {
-	if (g_testFits.ready && g_ClickCenter.down)
+	if (g_testFits.ready && g_mouseDown)
 	{
-		g_ClickCenter.down = false;
-		draw();
+		g_mouseDown = false;
+		updateMeasure();
 	}
 }
 

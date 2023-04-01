@@ -97,7 +97,7 @@ function draw()
 	
 	if (g_ClickCenter.x !== null && g_ClickCenter.y !== null && g_ClickCenter.r > 0)
 	{
-		theContext.strokeStyle = "FF0000"
+		theContext.strokeStyle = "#FF0000"
 		theContext.beginPath();
 		theContext.arc(g_ClickCenter.x, g_ClickCenter.y, g_ClickCenter.r, 0, 2 * Math.PI);
 		theContext.stroke();		

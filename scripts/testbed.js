@@ -251,6 +251,26 @@ function setOutputText(id,value)
 		elem.value = value;
 }
 
+let g_controlMode = "free";
+function setMode(mode)
+{
+	let elem = document.getElementById(g_controlMode);
+	elem.style = "";
+	
+	g_controlMode = mode;
+	elem = document.getElementById(g_controlMode);
+	elem.style = "background-color:#007f00;color:white;";
+}
+
+let g_point = {reference: {x:null, y:null}, radius:{x:null, y:null}, measure: {x:null, y:null}};
+
+let g_mouseDown = false;
+function clearMeasures()
+{
+	g_point["reference"] = {x:null, y:null};
+	g_point["radius"] = {x:null, y:null};
+	g_point["measure"] = {x:null, y:null};
+}
 
 theCanvas.onmousemove = function(event)
 {
@@ -258,11 +278,11 @@ theCanvas.onmousemove = function(event)
 		event.offsetY >= 0 && event.offsetY <= theCanvas.height &&
 		g_testFits.ready)
 	{
-		if (g_ClickCenter.down)
+		if (g_mouseDown)
+		if (g_controlMode != "free")
 		{
-			const dx = event.offsetX - g_ClickCenter.x;
-			const dy = event.offsetY - g_ClickCenter.y;
-			g_ClickCenter.r = Math.sqrt(dx * dx + dy * dy);
+			g_point[g_controlMode].x = event.offsetX;
+			g_point[g_controlMode].y = event.offsetY;
 		}
 		const counts = g_testFits.counts(event.offsetX,g_testFits.height - event.offsetY);
 		const radec = g_testFits.radec(event.offsetX,g_testFits.height - event.offsetY);
@@ -275,11 +295,16 @@ theCanvas.onmousemove = function(event)
 		setOutputText("x",radec.x);
 		setOutputText("y",radec.y);
 		setOutputText("counts",counts);
-		if (g_ClickCenter.x !== null && g_ClickCenter.y !== null)
+		let drawRequest = false;
+		if (g_point["reference"].x !== null && g_point["reference"].y !== null &&
+			g_point["radius"].x !== null && g_point["radius"].y !== null)
 		{
-			const radeccircCntr = g_testFits.radec(g_ClickCenter.x,g_testFits.height - g_ClickCenter.y);
-			const radeccircX = g_testFits.radec(g_ClickCenter.x + g_ClickCenter.r,g_testFits.height - g_ClickCenter.y);
-			const radeccircY = g_testFits.radec(g_ClickCenter.x,g_testFits.height - g_ClickCenter.y - g_ClickCenter.r);
+			const radeccircCntr = g_testFits.radec(g_point["reference"].x,g_testFits.height - g_point["reference"].y);
+			cosnt dx = (g_point["reference"].x - g_point["radius"].x);
+			const dy = (g_point["reference"].y - g_point["radius"].y);
+			let r = Math.sqrt(dx * dx + dy * dy);
+			const radeccircX = g_testFits.radec(g_point["reference"].x + r,g_testFits.height - g_point["reference"].y);
+			const radeccircY = g_testFits.radec(g_point["reference"].x,g_testFits.height - g_point["reference"].y - r);
 			let ang = Math.abs(radeccircCntr.dec - radeccircY.dec);
 			let angUnit = "°";
 			if (ang < 1.0)
@@ -298,8 +323,38 @@ theCanvas.onmousemove = function(event)
 				}
 			}
 			setOutputText("radius",ang.toFixed(2) + angUnit);
-			draw();
+			drawRequest = true;
 		}
+		if (g_point["reference"].x !== null && g_point["reference"].y !== null &&
+			g_point["measure"].x !== null && g_point["measure"].y !== null)
+		{
+			const radeccircCntr = g_testFits.radec(g_point["reference"].x,g_testFits.height - g_point["reference"].y);
+			const dx = (g_point["reference"].x - g_point["measure"].x);
+			const dy = (g_point["reference"].y - g_point["measure"].y);
+			let r = Math.sqrt(dx * dx + dy * dy);
+			const radeccircX = g_testFits.radec(g_point["reference"].x + r,g_testFits.height - g_point["reference"].y);
+			const radeccircY = g_testFits.radec(g_point["reference"].x,g_testFits.height - g_point["reference"].y - r);
+			let ang = Math.abs(radeccircCntr.dec - radeccircY.dec);
+			let angUnit = "°";
+			if (ang < 1.0)
+			{
+				ang *= 60.0;
+				angUnit = "'";
+				if (ang < 1.0)
+				{
+					ang *= 60.0;
+					angUnit = "\"";
+					if (ang < 1.0)
+					{
+						ang *= 1000.0;
+						angUnit = "mas";
+					}
+				}
+			}
+			setOutputText("measure",ang.toFixed(2) + angUnit);
+			drawRequest = true;
+		}
+		draw();
 	}
 }
 theCanvas.onmousedown = function(event)
@@ -308,10 +363,12 @@ theCanvas.onmousedown = function(event)
 		event.offsetY >= 0 && event.offsetY <= theCanvas.height &&
 		g_testFits.ready)
 	{
-		g_ClickCenter.x = event.offsetX;
-		g_ClickCenter.y = event.offsetY;
-		g_ClickCenter.r = 0
-		g_ClickCenter.down = true;
+		g_mouseDown = true;
+		if (g_controlMode != "free")
+		{
+			g_point[g_controlMode].x = event.offsetX;
+			g_point[g_controlMode].y = event.offsetY;
+		}
 		draw();
 	}
 }
@@ -330,12 +387,49 @@ function draw()
 	if (g_testFits != null && g_testFits.ready && g_fitsImage != null)
 	{
 		theContext.putImageData(g_fitsImage, 0, 0);
-		
-		if (g_ClickCenter.x !== null && g_ClickCenter.y !== null && g_ClickCenter.r > 0)
+		if (g_point["reference"].x !== null && g_point["reference"].y !== null &&
+			g_point["measure"].x !== null && g_point["measure"].y !== null)
+		{
+			theContext.strokeStyle = "#FF00FF"
+			theContext.beginPath();
+			theContext.moveTo(g_point["reference"].x,g_point["reference"].y);
+			theContext.lineTo(g_point["measure"].x,g_point["measure"].y);
+			theContext.stroke();		
+		}
+		if (g_point["reference"].x !== null && g_point["reference"].y !== null)
 		{
 			theContext.strokeStyle = "#FF0000"
 			theContext.beginPath();
-			theContext.arc(g_ClickCenter.x, g_ClickCenter.y, g_ClickCenter.r, 0, 2 * Math.PI);
+			theContext.moveTo(g_point["reference"].x - 5,g_point["reference"].y);
+			theContext.lineTo(g_point["reference"].x + 5,g_point["reference"].y);
+			theContext.stroke();		
+			theContext.beginPath();
+			theContext.moveTo(g_point["reference"].x,g_point["reference"].y - 5);
+			theContext.lineTo(g_point["reference"].x,g_point["reference"].y + 5);
+			theContext.stroke();		
+		}
+		if (g_point["measure"].x !== null && g_point["measure"].y !== null)
+		{
+			theContext.strokeStyle = "#0000FF"
+			theContext.beginPath();
+			theContext.moveTo(g_point["measure"].x - 5,g_point["measure"].y);
+			theContext.lineTo(g_point["measure"].x + 5,g_point["measure"].y);
+			theContext.stroke();		
+			theContext.beginPath();
+			theContext.moveTo(g_point["measure"].x,g_point["measure"].y - 5);
+			theContext.lineTo(g_point["measure"].x,g_point["measure"].y + 5);
+			theContext.stroke();		
+		}
+		
+		if (g_point["reference"].x !== null && g_point["reference"].y !== null &&
+			g_point["radius"].x !== null && g_point["radius"].y !== null)
+		{
+			const dx = (g_point["reference"].x - g_point["measure"].x);
+			const dy = (g_point["reference"].y - g_point["measure"].y);
+			let r = Math.sqrt(dx * dx + dy * dy);
+			theContext.strokeStyle = "#FF0000"
+			theContext.beginPath();
+			theContext.arc(g_point["reference"].x, g_point["reference"].y,r, 0, 2 * Math.PI);
 			theContext.stroke();		
 		}
 	}

@@ -77,10 +77,12 @@
    <div style="width: 150px;display:inline-block;margin-left:30px">
     	<label style="color:white;text-align:left;">Counts</label><br/>
     	<label style="color:white;text-align:left;">Circle Radius</label><br/>
+    	<label style="color:white;text-align:left;">Measure</label><br/>
     </div>
    <div style="width: 150px;display:inline-block;margin-left:15px">
     	<output id="counts" style="color:white;text-align:left;"></output><br/>	
     	<output id="radius" style="color:white;text-align:left;"></output><br/>	
+    	<output id="measure" style="color:white;text-align:left;"></output><br/>	
     </div>
     </div>
     <div>
@@ -103,7 +105,14 @@
 		   <option value="B">B</option>
 		   </select>
     </div>
-    		
+    <div>
+    	<label style="color:white">Control Mode</label>
+    	<input type="button" id="free" value="Free" onclick="setMode(\"free\");"></input>
+    	<input type="button" id="reference" value="Set Reference" onclick="setMode(\"reference\");"></input>
+    	<input type="button" id="radius" value="Set Radius" onclick="setMode(\"radius\");"></input>
+    	<input type="button" id="measure" value="Set Measure" onclick="setMode(\"measure\");"></input>
+    	<input type="button" value="Clear" onclick="clearMeasures();"></input>
+    </div>
     <div style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center">
         <canvas id="theCanvas" width="100%" height="900" onclick="commonUIOnClick(event);">
             Canvas not supported; please update your browser.

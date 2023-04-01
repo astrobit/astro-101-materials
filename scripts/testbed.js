@@ -33,7 +33,7 @@ theCanvas.onmousemove = function(event)
 		const counts = g_testFits.counts(event.offsetX,g_testFits.height - event.offsetY);
 		const radec = g_testFits.radec(event.offsetX,g_testFits.height - event.offsetY);
 		
-		const RAdispl = degreestoHMSDisplayable(radec.ra / 15.0);
+		const RAdispl = degreestoHMSDisplayable(radec.ra);
 		const Decdispl = degreestoDMSDisplayable(radec.dec);
 
 		setOutputText("ra",RAdispl.hr + "h " + RAdispl.min + "m " + RAdispl.sec + "s");

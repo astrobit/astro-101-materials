@@ -115,7 +115,8 @@ class FITS
 						this.head[slkey] = {value: keyString, comment: commentItself}; // place the value and any comments as a key in the head
 						if (slkey == "DATE" || slkey == "DATE-OBS" || slkey == "DATE-END") // if the data is a date, interpret the date
 						{
-							this.head[slkey].date = Date.parse(keyString);
+							this.head[slkey].date = new Date();
+							this.head[slkey].date.setTime(Date.parse(keyString));
 						}
 					}
 					else// if (keyval

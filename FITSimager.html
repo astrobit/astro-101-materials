@@ -1,0 +1,147 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="Display selected astronomical FITS files.">
+    <meta name="keywords" content="astronomy, education">
+    <meta name="author" content="Brian W. Mulligan">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FITS Imager</title>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+<!--    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M15ZVRGK6"></script> -->
+<!--    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-0M15ZVRGK6');
+    </script>-->
+</head>
+<body style="font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#000000;">
+    <!--<h1 style="font-size:24px;text-align:center;color:#FFFFFF;">Elongation</h1>-->
+    <div>
+		  <label style="color:white">Image</label>
+		  <select name="image" id="image" onchange="onSelectImage();" style="font-size:16px;height:20px;"></select>
+	</div>
+    <div>
+   <div style="width: 150px;display:inline-block;margin-left:30px">
+    	<label style="color:white;text-align:left;">Obs. Date</label><br/>
+    	<label style="color:white;text-align:left;">MJD</label><br/>
+    </div>
+   <div style="width: 150px;display:inline-block;margin-left:15px">
+    	<output id="obs_date" style="color:white;text-align:left;"></output><br/>
+    	<output id="obs_mjd" style="color:white;text-align:left;"></output><br/>	
+    </div>
+   <div style="width: 150px;display:inline-block;margin-left:30px">
+    	<label style="color:white;text-align:left;">Target</label><br/>
+    	<label style="color:white;text-align:left;">Observer</label><br/>
+    </div>
+   <div style="width: 150px;display:inline-block;margin-left:15px">
+    	<output id="target" style="color:white;text-align:left;"></output><br/>	
+    	<output id="observer" style="color:white;text-align:left;"></output><br/>	
+    </div>
+   <div style="width: 150px;display:inline-block;margin-left:30px">
+    	<label style="color:white;text-align:left;">Telescope</label><br/>
+    	<label style="color:white;text-align:left;">Instrument</label><br/>
+    </div>
+   <div style="width: 150px;display:inline-block;margin-left:15px">
+    	<output id="telescope" style="color:white;text-align:left;"></output><br/>	
+    	<output id="instrument" style="color:white;text-align:left;"></output><br/>	
+    </div>
+   <div style="width: 150px;display:inline-block;margin-left:30px">
+    	<label style="color:white;text-align:left;">Exp. Time</label><br/>
+    	<label style="color:white;text-align:left;">Filter</label><br/>
+    </div>
+   <div style="width: 150px;display:inline-block;margin-left:15px">
+    	<output id="exptime" style="color:white;text-align:left;"></output><br/>	
+    	<output id="filter" style="color:white;text-align:left;"></output><br/>	
+    </div>
+    </div>
+    <div>
+   <div style="width: 150px;display:inline-block;margin-left:30px">
+    	<label style="color:white;text-align:left;">x</label><br/>
+    	<label style="color:white;text-align:left;">y</label><br/>
+    </div>
+   <div style="width: 150px;display:inline-block;margin-left:15px">
+    	<output id="x" style="color:white;text-align:left;"></output><br/>
+    	<output id="y" style="color:white;text-align:left;"></output><br/>	
+    </div>
+   <div style="width: 150px;display:inline-block;margin-left:30px">
+    	<label style="color:white;text-align:left;">RA</label><br/>
+    	<label style="color:white;text-align:left;">Dec</label><br/>
+    </div>
+   <div style="width: 150px;display:inline-block;margin-left:15px">
+    	<output id="ra" style="color:white;text-align:left;"></output><br/>	
+    	<output id="dec" style="color:white;text-align:left;"></output><br/>	
+    </div>
+   <div style="width: 150px;display:inline-block;margin-left:30px">
+    	<label style="color:white;text-align:left;">Counts</label><br/>
+    	<label style="color:white;text-align:left;">Circle Radius</label><br/>
+    	<label style="color:white;text-align:left;">Measure</label><br/>
+    </div>
+   <div style="width: 150px;display:inline-block;margin-left:15px">
+    	<output id="counts" style="color:white;text-align:left;"></output><br/>	
+    	<output id="radiusDispl" style="color:white;text-align:left;"></output><br/>	
+    	<output id="measureDispl" style="color:white;text-align:left;"></output><br/>	
+    </div>
+    </div>
+    <div>
+		  <label style="color:white">Brightness Scaling</label>
+		  <select name="scaling" id="scaling" onchange="OnSelectScaling();" style="font-size:16px;height:20px;">
+		   <option value="sqrt">Square Root</option>
+		   <option value="linear">Linear</option>
+		   <option value="cuberoot">Cube Root</option>
+		   <option value="log">Log</option>
+		   <option value="sqrtlog">Square Root Log</option>
+		   <option value="loglog">Log Log</option>
+		   </select>
+		   <label style="color:white">Invert</label>
+    		<input type="checkbox" id="invert" name="invert" checked="true" onchange="OnSelectInvert();">
+		   <label style="color:white">Colorizing</label>
+		  <select name="coloizing" id="coloizing" onchange="OnSelectColorizing();" style="font-size:16px;height:20px;">
+		   <option value="grayscale">Grayscale</option>
+		   <option value="heat">Blackbody</option>
+		   <option value="A">A</option>
+		   <option value="B">B</option>
+		   </select>
+    </div>
+    <div>
+    	<label style="color:white">Control Mode</label>
+    	<input type="button" id="free" value="Free" style="background-color:#0007F00" onclick="setMode('free');"></input>
+    	<input type="button" id="reference" value="Set Reference" onclick="setMode('reference');"></input>
+    	<input type="button" id="radius" value="Set Radius" onclick="setMode('radius');"></input>
+    	<input type="button" id="measure" value="Set Measure" onclick="setMode('measure');"></input>
+    	<input type="button" value="Clear" onclick="clearMeasures();"></input>
+    </div>
+    <div style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center">
+        <canvas id="theCanvas" width="100%" height="900" onclick="commonUIOnClick(event);">
+            Canvas not supported; please update your browser.
+        </canvas>
+    </div>
+    <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
+        <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
+            <p style="color: gray;font-size:75%">
+                Copyright (c) 2020 - 2023, Brian W. Mulligan
+                <a href="https://www.iubenda.com/privacy-policy/91469080" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe " title="Privacy Policy ">Privacy Policy</a>
+                <script type="text/javascript">(function (w, d) { var loader = function () { var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src = "https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s, tag); }; if (w.addEventListener) { w.addEventListener("load", loader, false); } else if (w.attachEvent) { w.attachEvent("onload", loader); } else { w.onload = loader; } })(window, document);</script>
+            </p>
+        </div>
+    </div>
+<!--    <script type="text/javascript" src="stringsParallax.js"></script>-->
+    <script type="text/javascript" src="scripts/tutorial.js"></script>
+    <script type="text/javascript" src="scripts/ui.js"></script>
+    <script type="text/javascript" src="scripts/VectorMatrix.js"></script>
+    <script type="text/javascript" src="scripts/commonGraph.js"></script>
+    <script type="text/javascript" src="scripts/commonGP.js"></script>
+    <script type="text/javascript" src="scripts/common.js"></script>
+    <script type="text/javascript" src="scripts/commonAstro.js"></script>
+    <script type="text/javascript" src="scripts/fitsES6.js"></script>
+<!--    <script type="text/javascript" src="m6.js"></script>-->
+<!--    <script type="text/javascript" src="scripts/stars2.js"></script>
+    <script type="text/javascript" src="scripts/constellation2.js"></script>
+    <script type="text/javascript" src="scripts/Mollweide.js"></script>
+    <script type="text/javascript" src="scripts/SkyMap2.js"></script>
+	<script type="text/javascript" src="scripts/planets.js"></script>-->
+    <script type="text/javascript" src="scripts/fitsImager.js"></script>
+</body>
+</html>

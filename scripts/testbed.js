@@ -311,7 +311,7 @@ function updateMeasure(extRequestDraw)
 		setOutputText("radius",ang.toFixed(2) + angUnit);
 		drawRequest = true;
 	}
-	if (radecRef !== null && radecRadius !== null)
+	if (radecRef !== null && radecMeasure !== null)
 	{
 		const cosRAmeas = Math.cos(radecMeasure.raRadians);
 		const sinRAmeas = Math.sin(radecMeasure.raRadians);

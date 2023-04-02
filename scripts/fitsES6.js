@@ -395,10 +395,10 @@ class FITS
 			const m = lp * this.trx.r12 + mp * this.trx.r22 + np * this.trx.r32;
 			const n = lp * this.trx.r13 + mp * this.trx.r23 + np * this.trx.r33;
 			
-			const alpha = degrees(Math.atan2(m,l) + 2.0 * Math.PI); // add 2 pi to ensure that ra is positive
-			const dec = degrees(Math.asin(n));
+			const alpha = (Math.atan2(m,l) + 2.0 * Math.PI) % (2.0 * Math.PI); // add 2 pi to ensure that ra is positive
+			const dec = Math.asin(n);
 			
-			ret = {ra: alpha % 360.0, dec:dec, phi: phideg, theta: thetadeg, qx: degrees(qx), qy:degrees(qy), x: x, y: y};
+			ret = {ra: degrees(alpha) , raRadians: alpha, dec: degrees(dec), decRadians: dec, phi: phideg, phiRadians: phi, theta: thetadeg, thetaRadians: theta, qx: degrees(qx), qy:degrees(qy), x: x, y: y};
 		}
 		return ret;
 	}

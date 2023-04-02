@@ -283,9 +283,7 @@ function updateMeasure(extRequestDraw)
 		const dx = g_point["reference"].x - g_point["radius"].x;
 		const dy = g_point["reference"].y - g_point["radius"].y;
 		g_radius = Math.sqrt(dx * dx + dy * dy);
-	}
-	else
-		g_radius = null;
+	} // only update the radius if in radius mode
 	
 	const radecRadius = (g_point["reference"].x !== null && g_point["reference"].y !== null && g_radius !== null) ? g_testFits.radec(g_point["reference"].x,g_testFits.height - g_point["reference"].y - g_radius) : null;
 	const radecMeasure = (g_point["measure"].x !== null && g_point["measure"].y !== null) ? g_testFits.radec(g_point["measure"].x,g_testFits.height - g_point["measure"].y) : null;
@@ -407,6 +405,11 @@ theCanvas.onmouseup = function(event)
 			g_point[g_controlMode].x = event.offsetX;
 			g_point[g_controlMode].y = event.offsetY;
 			updateMeasure(true);
+			if (g_controlMode == "radius")
+			{
+				g_point["radius"].x = null;
+				g_point["radius"].y = null;
+			}
 		}
 	}
 }

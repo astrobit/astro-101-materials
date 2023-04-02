@@ -273,16 +273,25 @@ function clearMeasures()
 function updateMeasure(extRequestDraw)
 {
 	let drawRequest = extRequestDraw;
-	if (g_point["reference"].x !== null && g_point["reference"].y !== null &&
-		g_point["radius"].x !== null && g_point["radius"].y !== null)
+	const radecRef = (g_point["reference"].x !== null && g_point["reference"].y !== null) ? g_testFits.radec(g_point["reference"].x,g_testFits.height - g_point["reference"].y) : null;
+	const radecRadius = (g_point["radius"].x !== null && g_point["radius"].y !== null) ? g_testFits.radec(g_point["radius"].x,g_testFits.height - g_point["radius"].y) : null;
+	const radecMeasure = (g_point["measure"].x !== null && g_point["measure"].y !== null) ? g_testFits.radec(g_point["measure"].x,g_testFits.height - g_point["measure"].y) : null;
+
+	const cosRAref = (radecRef !== null) ? Math.cos(radecRef.raRadians) : null;
+	const sinRAref = (radecRef !== null) ? Math.sin(radecRef.raRadians) : null;
+	const cosDecref = (radecRef !== null) ?  Math.cos(radecRef.decRadians) : null;
+	const sinDecref = (radecRef !== null) ?  Math.sin(radecRef.decRadians) : null;
+
+
+	if (radecRef !== null && radecRadius !== null)
 	{
-		const radeccircCntr = g_testFits.radec(g_point["reference"].x,g_testFits.height - g_point["reference"].y);
-		const dx = (g_point["reference"].x - g_point["radius"].x);
-		const dy = (g_point["reference"].y - g_point["radius"].y);
-		let r = Math.sqrt(dx * dx + dy * dy);
-		const radeccircX = g_testFits.radec(g_point["reference"].x + r,g_testFits.height - g_point["reference"].y);
-		const radeccircY = g_testFits.radec(g_point["reference"].x,g_testFits.height - g_point["reference"].y - r);
-		let ang = Math.abs(radeccircCntr.dec - radeccircY.dec);
+		const cosRArad = Math.cos(radecRadius.raRadians);
+		const sinRArad = Math.sin(radecRadius.raRadians);
+		const cosDecrad = Math.cos(radecRadius.decRadians);
+		const sinDecrad = Math.sin(radecRadius.decRadians);
+		
+		let cosAng = cosRArad * cosDecrad * cosRAref * cosDecref + sinRArad * cosDecrad * sinRAref * cosDecref + sinDecrad * sinDecref;
+		let ang = degrees(Math.acos(cosAng));
 		let angUnit = "°";
 		if (ang < 1.0)
 		{
@@ -302,16 +311,15 @@ function updateMeasure(extRequestDraw)
 		setOutputText("radius",ang.toFixed(2) + angUnit);
 		drawRequest = true;
 	}
-	if (g_point["reference"].x !== null && g_point["reference"].y !== null &&
-		g_point["measure"].x !== null && g_point["measure"].y !== null)
+	if (radecRef !== null && radecRadius !== null)
 	{
-		const radeccircCntr = g_testFits.radec(g_point["reference"].x,g_testFits.height - g_point["reference"].y);
-		const dx = (g_point["reference"].x - g_point["measure"].x);
-		const dy = (g_point["reference"].y - g_point["measure"].y);
-		let r = Math.sqrt(dx * dx + dy * dy);
-		const radeccircX = g_testFits.radec(g_point["reference"].x + r,g_testFits.height - g_point["reference"].y);
-		const radeccircY = g_testFits.radec(g_point["reference"].x,g_testFits.height - g_point["reference"].y - r);
-		let ang = Math.abs(radeccircCntr.dec - radeccircY.dec);
+		const cosRAmeas = Math.cos(radecMeasure.raRadians);
+		const sinRAmeas = Math.sin(radecMeasure.raRadians);
+		const cosDecmeas = Math.cos(radecMeasure.decRadians);
+		const sinDecmeas = Math.sin(radecMeasure.decRadians);
+		
+		let cosAng = cosRAmeas * cosDecmeas * cosRAref * cosDecref + sinRAmeas * cosDecmeas * sinRAref * cosDecref + sinDecmeas * sinDecref;
+		let ang = degrees(Math.acos(cosAng));
 		let angUnit = "°";
 		if (ang < 1.0)
 		{

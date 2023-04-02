@@ -262,19 +262,32 @@ function setMode(mode)
 }
 
 let g_point = {reference: {x:null, y:null}, radius:{x:null, y:null}, measure: {x:null, y:null}};
-
+let g_radius = null;
 let g_mouseDown = false;
 function clearMeasures()
 {
 	g_point["reference"] = {x:null, y:null};
 	g_point["radius"] = {x:null, y:null};
 	g_point["measure"] = {x:null, y:null};
+	g_radius = null;
+	
+	draw();
 }
 function updateMeasure(extRequestDraw)
 {
 	let drawRequest = extRequestDraw;
 	const radecRef = (g_point["reference"].x !== null && g_point["reference"].y !== null) ? g_testFits.radec(g_point["reference"].x,g_testFits.height - g_point["reference"].y) : null;
-	const radecRadius = (g_point["radius"].x !== null && g_point["radius"].y !== null) ? g_testFits.radec(g_point["radius"].x,g_testFits.height - g_point["radius"].y) : null;
+	if (g_point["reference"].x !== null && g_point["reference"].y !== null &&
+		g_point["radius"].x !== null && g_point["radius"].y !== null)
+	{
+		const dx = g_point["reference"].x - g_point["radius"].x;
+		const dy = g_point["reference"].y - g_point["radius"].y;
+		g_radius = Math.sqrt(dx * dx + dy * dy);
+	}
+	else
+		g_radius = null;
+	
+	const radecRadius = (g_point["reference"].x !== null && g_point["reference"].y !== null && g_radius !== null) ? g_testFits.radec(g_point["reference"].x,g_testFits.height - g_point["reference"].y - g_radius) : null;
 	const radecMeasure = (g_point["measure"].x !== null && g_point["measure"].y !== null) ? g_testFits.radec(g_point["measure"].x,g_testFits.height - g_point["measure"].y) : null;
 
 	const cosRAref = (radecRef !== null) ? Math.cos(radecRef.raRadians) : null;
@@ -308,7 +321,7 @@ function updateMeasure(extRequestDraw)
 				}
 			}
 		}
-		setOutputText("radius",ang.toFixed(2) + angUnit);
+		setOutputText("radiusDispl",ang.toFixed(2) + angUnit);
 		drawRequest = true;
 	}
 	if (radecRef !== null && radecMeasure !== null)
@@ -336,7 +349,7 @@ function updateMeasure(extRequestDraw)
 				}
 			}
 		}
-		setOutputText("measure",ang.toFixed(2) + angUnit);
+		setOutputText("measureDispl",ang.toFixed(2) + angUnit);
 		drawRequest = true;
 	}
 	if (drawRequest)
@@ -353,7 +366,7 @@ theCanvas.onmousemove = function(event)
 		{
 			g_point[g_controlMode].x = event.offsetX;
 			g_point[g_controlMode].y = event.offsetY;
-			requestDraw = true;
+			updateMeasure(true);
 		}
 		const counts = g_testFits.counts(event.offsetX,g_testFits.height - event.offsetY);
 		const radec = g_testFits.radec(event.offsetX,g_testFits.height - event.offsetY);
@@ -367,7 +380,6 @@ theCanvas.onmousemove = function(event)
 		setOutputText("y",radec.y);
 		setOutputText("counts",counts);
 		
-		updateMeasure(requestDraw);
 	}
 }
 theCanvas.onmousedown = function(event)
@@ -381,8 +393,8 @@ theCanvas.onmousedown = function(event)
 		{
 			g_point[g_controlMode].x = event.offsetX;
 			g_point[g_controlMode].y = event.offsetY;
+			updateMeasure(true);
 		}
-		updateMeasure();
 	}
 }
 theCanvas.onmouseup = function(event)
@@ -394,8 +406,8 @@ theCanvas.onmouseup = function(event)
 		{
 			g_point[g_controlMode].x = event.offsetX;
 			g_point[g_controlMode].y = event.offsetY;
+			updateMeasure(true);
 		}
-		updateMeasure();
 	}
 }
 
@@ -440,14 +452,11 @@ function draw()
 		}
 		
 		if (g_point["reference"].x !== null && g_point["reference"].y !== null &&
-			g_point["radius"].x !== null && g_point["radius"].y !== null)
+			g_radius !== null)
 		{
-			const dx = (g_point["reference"].x - g_point["radius"].x);
-			const dy = (g_point["reference"].y - g_point["radius"].y);
-			let r = Math.sqrt(dx * dx + dy * dy);
 			theContext.strokeStyle = "#FF0000"
 			theContext.beginPath();
-			theContext.arc(g_point["reference"].x, g_point["reference"].y,r, 0, 2 * Math.PI);
+			theContext.arc(g_point["reference"].x, g_point["reference"].y,g_radius, 0, 2 * Math.PI);
 			theContext.stroke();		
 		}
 	}

@@ -248,7 +248,7 @@ function updateMeasure(extRequestDraw)
 	const cosDecref = (radecRef !== null) ?  Math.cos(radecRef.decRadians) : null;
 	const sinDecref = (radecRef !== null) ?  Math.sin(radecRef.decRadians) : null;
 
-	if (radecRadius !== null)
+	if (radecRef !== null)
 	{
 		const RAdispl = degreestoHMSDisplayable(radecRef.ra);
 		const Decdispl = degreestoDMSDisplayable(radecRef.dec);

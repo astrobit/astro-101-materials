@@ -5,7 +5,8 @@ theCanvas.height = window.innerHeight - 60;
 theCanvas.width = window.innerWidth;
 let CanvasDiv = document.getElementById("canvasDiv");
 let clearBtn = document.getElementById("clear");
-CanvasDiv.height = window.innerHeight - 60 - clearBtn.style.bottom;
+let rect = clearBtn.getBoundingClientRect();
+CanvasDiv.height = window.innerHeight - 60 - rect.bottom;
 
 
 

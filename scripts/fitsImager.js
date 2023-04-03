@@ -6,10 +6,13 @@ theCanvas.width = window.innerWidth;
 let CanvasDiv = document.getElementById("canvasDiv");
 let clearBtn = document.getElementById("clear");
 let rect = clearBtn.getBoundingClientRect();
-CanvasDiv.height = window.innerHeight - 60 - rect.bottom;
-if (CanvasDiv.height < 0)
-	CanvasDiv.height = 200;
-CanvasDiv.style.height = CanvasDiv.height.toFixed(0) + "px";
+let divHeight = window.innerHeight - 60 - rect.bottom;
+if (divHeight < 0)
+	divHeight = 200;
+
+CanvasDiv.height = divHeight.toFixed(0) + "px";
+CanvasDiv.style.height = divHeight.toFixed(0) + "px";
+CanvasDiv.style["max-height"] = divHeight.toFixed(0) + "px";
 
 
 let theContext = theCanvas.getContext("2d");

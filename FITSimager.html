@@ -131,9 +131,9 @@
     	<input type="button" id="reference" value="Set Reference" onclick="setMode('reference');"></input>
     	<input type="button" id="radius" value="Set Radius" onclick="setMode('radius');"></input>
     	<input type="button" id="measure" value="Set Measure" onclick="setMode('measure');"></input>
-    	<input type="button" value="Clear" onclick="clearMeasures();"></input>
+    	<input type="button" id="clear" value="Clear" onclick="clearMeasures();"></input>
     </div>
-    <div style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center;overflow:auto">
+    <div id="canvasDiv" style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center;overflow:auto">
         <canvas id="theCanvas" width="100%" height="900" onclick="commonUIOnClick(event);">
             Canvas not supported; please update your browser.
         </canvas>

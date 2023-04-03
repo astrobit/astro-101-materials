@@ -9,7 +9,7 @@ let rect = clearBtn.getBoundingClientRect();
 CanvasDiv.height = window.innerHeight - 60 - rect.bottom;
 if (CanvasDiv.height < 0)
 	CanvasDiv.height = 200;
-CanvasDiv.style.height = CanvasDiv.height;
+CanvasDiv.style.height = CanvasDiv.height.toFixed(0) + "px";
 
 
 let theContext = theCanvas.getContext("2d");

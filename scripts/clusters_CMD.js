@@ -136,6 +136,8 @@ function draw()
 				{
 					if (star.dm !== null)
 						y -= star.dm;
+					else if (star.plx_value !== null)
+						y -= 5.0 * Math.log10(star.plx_value) - 10.0;
 					else
 						y += 5.0 * Math.log10(g_selectedCluster.cluster.plx.average) - 10.0; // plx_value in mas
 				}

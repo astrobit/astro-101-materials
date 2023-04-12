@@ -130,10 +130,11 @@ function draw()
 			for (i = 0; i < len; i++)
 			{
 				const star = g_starsCluster.at(i);
-				let x = star.fluxes["B"] - star.fluxes["V"];
-				let y = star.fluxes["V"];
-				if (g_selectedCluster.cluster.plx.count > 0)
+				const x = star.fluxes.B - star.fluxes.V;
+				let y = null;
+				if (g_selectedCluster.cluster.plx.count > 0 && (star.plx_value == null || Math.abs(1.0 - star.plx_value/g_selectedCluster.cluster.plx.average) < 0.05 ))
 				{
+					y = star.fluxes.V;
 					if (star.dm !== null)
 						y -= star.dm;
 					else if (star.plx_value !== null)
@@ -156,10 +157,10 @@ function draw()
 						max_y = data.y;
 				}			
 			}
-			const _min_x = Math.floor(min_x * 10.0) / 10.0;
-			const _max_x = Math.ceil(max_x * 10.0) / 10.0;
-			const _min_y = Math.floor(min_y * 10.0) / 10.0;
-			const _max_y = Math.ceil(max_y * 10.0) / 10.0;
+			const _min_x = -0.5;//Math.floor(min_x * 10.0) / 10.0;
+			const _max_x = 12.0;//Math.ceil(max_x * 10.0) / 10.0;
+			const _min_y = -6;//Math.floor(min_y * 10.0) / 10.0;
+			const _max_y = 40;//Math.ceil(max_y * 10.0) / 10.0;
 		
 
 			let _axisHorizontal = new GraphAxis("xaxis","B - V",_min_x,_max_x);

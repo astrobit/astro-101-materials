@@ -132,7 +132,7 @@ function draw()
 				const star = g_starsCluster.at(i);
 				const x = star.fluxes.B - star.fluxes.V;
 				let y = null;
-				if (g_selectedCluster.cluster.plx.count > 0 && (star.plx_value == null || Math.abs(1.0 - star.plx_value/g_selectedCluster.cluster.plx.average) < 0.05 ))
+				if (g_selectedCluster.cluster.plx.count > 0 && (star.plx_value == null || Math.abs((g_selectedCluster.cluster.plx.average - star.plx_value)/g_selectedCluster.cluster.plx.stdevs) < 2.0 ))
 				{
 					y = star.fluxes.V;
 					if (star.dm !== null)

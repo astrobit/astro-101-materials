@@ -219,7 +219,7 @@ function UBVRItoRGB(U,B,V,R,I,brightMag,dimMag)
 		cG *= bright;
 		cB *= bright;
 	}
-	return new RGB(Math.round(cR), Math.round(cGSAOImageColor), Math.round(cB));//, bright:bright};
+	return new RGB(Math.round(cR), Math.round(cG), Math.round(cB));//, bright:bright};
 }
 /////////////////////////////////////////////////////////////////////////
 //

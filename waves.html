@@ -19,11 +19,107 @@
 </head>
 <body style="font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#000000;">
     <!--<h1 style="font-size:24px;text-align:center;color:#FFFFFF;">Elongation</h1>-->
-    <div style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center">
-        <canvas id="theCanvas" width="100%" height="900" onclick="commonUIOnClick(event);">
-            Canvas not supported; please update your browser.
-        </canvas>
-    </div>
+<div style="max-width:200;margin:auto">
+	<div style="margin-right:20px;;text-align:center">
+		<input id="waves" name="pattern" value="waves" checked="true" type="radio"><label for="waves" style="color:white">Waves</label>
+		<input id="pulse" name="pattern" value="pulse" type="radio"><label for="pulse"style="color:white">Pulse</label> 
+	</div>
+</div>
+<br style="clear:both;"/>
+<div style="max-width:200;margin:auto">
+	<div style="margin-right:20px;;text-align:center">
+		<input id="leftright" name="direction" value="leftright" checked="true" type="radio"><label for="leftright" style="color:white">Left &amp; Right</label>
+		<input id="rightright" name="direction" value="leftleft" type="radio"><label for="reflection"style="color:white">Both Right</label>
+		<input id="reflection" name="direction" value="reflection" type="radio"><label for="reflection"style="color:white">Reflection</label>
+	</div>
+</div>
+<br style="clear:both;"/>
+<div style="max-width:200;margin:auto">
+	<div style="margin-right:20px;;text-align:center">
+		<input id="pauseplay" type="button" value="Pause">
+		<input id="step" type="button" value="Step" disabled="true">
+	</div>
+</div>
+<br style="clear:both;"/>
+<table style="text-align:center;margin:auto;"	>
+	<tr>
+		<td id="frequency1block">
+		<input id="frequency1" type="range" min="0.05" max="2" value="0.5" step="0.05" style="display:block;margin:auto;">
+		<label for="frequency1" id="labelfrequency1" style="color:white;display:block">
+			Frequency
+		</label>
+		<output id="outputfrequency1" for="frequency1" style="color:white;display:block"></output>
+		</td>
+		<td id="velocity1block">
+		<input id="velocity1" type="range" min="1" max="100" value="50" step="1" style="display:block;margin:auto;"> 
+		<label for="velocity1" id="labelvelocity1" style="color:white;display:block">
+			Velocity
+		</label>
+		<output id="outputvelocity1" for="velocity1" style="color:white;display:block"></output>
+		</td>
+		<td id="amplitude1block">
+		<input id="amplitude1" type="range" min="1" max="100" value="50" step="1" style="display:block;margin:auto;">
+		<label for="amplitude1" id="labelamplitude1" style="color:white;display:block">
+			Amplitude
+		</label>
+		<output id="outputamplitude1" for="amplitude1" style="color:white;display:block"></output>
+		</td>
+		<td id="phaseLength1block">
+		<input id="phaseLength1" type="range" min="0" max="359" value="0" step="1" style="display:block;margin:auto;">
+		<label for="phaseLength1" id="labelphaseLength1" style="color:white;display:block">
+			Phase
+		</label>
+		<output id="outputphaseLength1" for="phaseLength1" style="color:white;display:block"></output>
+		</td>
+	</tr>
+</table>
+<br style="clear:both;"/>
+    
+<div style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center">
+    <label for="canvas1" style="display:block; color:white">Wave 1</label>
+    <canvas id="canvas1" width="100%" height="200">
+        Canvas not supported; please update your browser.
+    </canvas>
+</div>
+<table style="text-align:center;margin:auto;"	>
+	<tr>
+		<td id="frequency2block">
+		<input id="frequency2" type="range" min="0.05" max="2" value="0.5" step="0.05" style="display:block;margin:auto;">
+		<label for="frequency2" id="labelfrequency2" style="color:white;display:block">
+			Frequency
+		</label>
+		<output id="outputfrequency2" for="frequency2" style="color:white;display:block"></output>
+		</td>
+		<td id="amplitude2block">
+		<input id="amplitude2" type="range" min="1" max="100" value="50" step="1" style="display:block;margin:auto;">
+		<label for="amplitude2" id="labelamplitude2" style="color:white;display:block">
+			Amplitude
+		</label>
+		<output id="outputamplitude2" for="amplitude2" style="color:white;display:block"></output>
+		</td>
+		<td id="phaseLength2block">
+		<input id="phaseLength2" type="range" min="0" max="359" value="0" step="1" style="display:block;margin:auto;">
+		<label for="phaseLength2" id="labelphaseLength2" style="color:white;display:block">
+			Phase
+		</label>
+		<output id="outputphaseLength2" for="phaseLength2" style="color:white;display:block"></output>
+		</td>
+	</tr>
+</table>
+<br style="clear:both;"/>
+<div style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center">
+    <label for="canvas2" style="display:block; color:white">Wave 2</label>
+    <canvas id="canvas2" width="100%" height="200">
+        Canvas not supported; please update your browser.
+    </canvas>
+</div>
+<div style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center">
+    <label for="canvas3" style="display:block; color:white">Wave Addition</label>
+    <canvas id="canvas3" width="100%" height="400">
+        Canvas not supported; please update your browser.
+    </canvas>
+</div>
+
     <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
         <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
             <p style="color: gray;font-size:75%">

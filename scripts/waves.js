@@ -1,197 +1,35 @@
 
 
+let canvas1 = document.getElementById("canvas1");
+let canvas2 = document.getElementById("canvas2");
+let canvas3 = document.getElementById("canvas3");
 
+let context1 = canvas1.getContext("2d");
+let context2 = canvas2.getContext("2d");
+let context3 = canvas3.getContext("2d");
 
-let theCanvas = document.getElementById("theCanvas");
-let theContext = theCanvas.getContext("2d");
-
-theCanvas.onselectstart = function () { return false; }
-theCanvas.onmousedown = commonUIOnMouseDown;
-theCanvas.onmouseup = commonUIOnMouseUp;
-theCanvas.onclick = commonUIOnClick;
-theCanvas.onmousemove = commonUIOnMouseMove;
-theCanvas.onmouseleave = commonUIOnMouseLeave;
-
-function onResize()
+//canvas1.addEventListener("resize",onResize,false);
+class Wave
 {
-	theCanvas.height = window.innerHeight - 60;
-	theCanvas.width = window.innerWidth;
-}
-
-theCanvas.onresize = onResize;
-onResize();
-
-
-theContext.fillTextCenter = function (text,x,y)
-{
-	const align = this.textAlign;
-	this.textAlign = "center";
-	this.fillText(text,x,y);
-	this.textAlign = align;
-}
-theContext.fillTextRight = function (text,x,y)
-{
-	const align = this.textAlign;
-	this.textAlign = "right";
-	this.fillText(text,x,y);
-	this.textAlign = align;
-}
-
-
-class wave_data
-{
-	calculate_parameters()
+	constructor(direction,pulse_period)
 	{
-		this._period = 1.0 / this._frequency;
+		this.phase = 0;
+		this._frequency = 0.5;
+		this.amplitude = 25;
+		this.direction = ValidateValue(direction) ? direction : 1;
+		this._velocity = 25;
 		this._wavelength = this._velocity / this._frequency;
-		this._angular_frequency = 2.0 * Math.PI * this._frequency;
-		this._wavenumber = 1.0 / this._wavelength;
-		this._angular_wavenumber = 2.0 * Math.PI / this._wavelength;
-	}
-	constructor(velocity,frequency,amplitude,phase)
-	{
-		this._direction = 1;
-		if (velocity < 0)
-			this._direction = -1;
-		this._velocity = Math.abs(velocity);
-		this._frequency = frequency;
-		this.calculate_parameters();
-		this._amplitude = amplitude;
-		if (typeof phase !== 'undefined' && phase !== null)
-			this._phase = phase % (2.0 * Math.PI);
-		else
-			this._phase = 0;
-	}
-	get direction()
-	{
-		return this._direction;
-	}
-	get velocity()
-	{
-		return this._velocity;
-	}
-	get frequency()
-	{
-		return this._frequency;
-	}
-	get period()
-	{
-		return this._period;
+		this.pulse_period = pulse_period;
+		this.twopi = Math.PI * 2.0;
 	}
 	get wavelength()
 	{
 		return this._wavelength;
-	}
-	get angular_frequency()
-	{
-		return this._angular_frequency;
-	}
-	get wavenumber()
-	{
-		return this._wavenumber;
-	}
-	get angular_wavenumber()
-	{
-		return this._angular_wavenumber;
-	}
-	get amplitude()
-	{
-		return this._amplitude;
-	}
-	get phase()
-	{
-		return this._phase;
-	}
-	set direction(value)
-	{
-		if (value < 0)
-			this._direction = -1;
-		else
-			this._direction = 1;
-	}
-	set velocity(value)
-	{
-		this._direction = 1;
-		if (value < 0)
-			this._direction = -1;
-		this._velocity = Math.abs(value);
-		this.calculate_parameters();
-	}
-	set frequency(value)
-	{
-		this._frequency = value;
-		this.calculate_parameters();
-	}
-	set period(vaule)
-	{
-		this._frequency = 1.0 / value;
-		this.calculate_parameters();
 	}
 	set wavelength(value)
 	{
-		this._frequency = this.velocity / value;
-		this.calculate_parameters();
-	}
-	set angular_frequency(value)
-	{
-		this._frequency = value / (2.0 * Math.PI);
-		this.calculate_parameters();
-	}
-	set wavenumber(value)
-	{
-		this._frequency = this.velocity * value;
-		this.calculate_parameters();
-	}
-	set angular_wavenumber(value)
-	{
-		this._frequency = this.velocity * value / (2.0 * Math.PI);
-		this.calculate_parameters();
-	}
-	set amplitude(value)
-	{
-		this._amplitude = value;
-	}
-	set phase(value)
-	{
-		this._phase = value % (2.0 * Math.PI);
-	}
-
-	y(x,t)
-	{
-		return this._amplitude * Math.sin(t * this._angular_frequency - this._direction * x * this._angular_wavenumber + this._phase);
-	}
-}
-
-class wave_pulse
-{
-	calculate_parameters()
-	{
-		this._period = 1.0 / this._frequency;
-		this._wavelength = this._velocity / this._frequency;
-		this._angular_frequency = 2.0 * Math.PI * this._frequency;
-		this._wavenumber = 1.0 / this._wavelength;
-		this._angular_wavenumber = 2.0 * Math.PI / this._wavelength;
-		
-		this._pulse_period = 1.0 / this._pulse_frequency;
-	}
-	constructor(velocity,frequency,amplitude,pulse_frequency)
-	{
-		this._direction = 1;
-		if (velocity < 0)
-			this._direction = -1;
-		this._velocity = Math.abs(velocity);
-		this._frequency = frequency;
-		this._pulse_frequency = pulse_frequency;
-		this.calculate_parameters();
-		this._amplitude = amplitude;
-	}
-	get direction()
-	{
-		return this._direction;
-	}
-	get velocity()
-	{
-		return this._velocity;
+		this._frequency = this._velocity / value;
+		this._wavelength = value;
 	}
 	get frequency()
 	{
@@ -199,575 +37,452 @@ class wave_pulse
 	}
 	get period()
 	{
-		return this._period;
-	}
-	get wavelength()
-	{
-		return this._wavelength;
+		return 1.0 / this._frequency;
 	}
 	get angular_frequency()
 	{
-		return this._angular_frequency;
+		return this._frequency * this.twopi;
 	}
 	get wavenumber()
 	{
-		return this._wavenumber;
+		return 1.0 / this._wavelength;
 	}
 	get angular_wavenumber()
 	{
-		return this._angular_wavenumber;
+		return this.twopi / this._wavelength;
 	}
-	get amplitude()
+	get velocity()
 	{
-		return this._amplitude;
-	}
-	get pulse_frequency()
-	{
-		return this._pulse_frequency;
+		return this._velocity;
 	}
 	get pulse_period()
 	{
 		return this._pulse_period;
 	}
-	set direction(value)
+	get pulse_frequency()
 	{
-		if (value < 0)
-			this._direction = -1;
-		else
-			this._direction = 1;
+		return 1.0 / this._pulse_period;
+	}
+
+	set frequency(value)
+	{
+		if (ValidateValue(value))
+		{
+			this._wavelength = this._velocity / value;
+			this._frequency = value;
+		}
 	}
 	set velocity(value)
 	{
-		this._direction = 1;
-		if (value < 0)
-			this._direction = -1;
-		this._velocity = Math.abs(value);
-		this.calculate_parameters();
+		if (ValidateValue(value))
+		{
+			this._velocity = value;
+			this._wavelength = this._velocity / this._frequency;
+		}
 	}
-	set frequency(value)
+	set period(value)
 	{
-		this._frequency = value;
-		this.calculate_parameters();
-	}
-	set period(vaule)
-	{
-		this._frequency = 1.0 / value;
-		this.calculate_parameters();
-	}
-	set wavelength(value)
-	{
-		this._frequency = this.velocity / value;
-		this.calculate_parameters();
+		if (ValidateValue(value))
+			this.frequency = 1.0 / value;
 	}
 	set angular_frequency(value)
 	{
-		this._frequency = value / (2.0 * Math.PI);
-		this.calculate_parameters();
+		if (ValidateValue(value))
+			this.frequency = value / this.twopi;
 	}
 	set wavenumber(value)
 	{
-		this._frequency = this.velocity * value;
-		this.calculate_parameters();
+		if (ValidateValue(value))
+			this.wavelength = 1.0 / value;
 	}
 	set angular_wavenumber(value)
 	{
-		this._frequency = this.velocity * value / (2.0 * Math.PI);
-		this.calculate_parameters();
+		if (ValidateValue(value))
+			this.wavelength = this.twopi / value;
 	}
-	set amplitude(value)
+	
+	get leftGoing()
 	{
-		this._amplitude = value;
+		return this.direction == 1;
 	}
-	y(x,t)
+	get rightGoing()
 	{
-		let ret;
-		const vT = this._pulse_period * this._velocity;
-		let xeff = x % vT;
-		let pulse_x;
-		if (this._direction < 0)
+		return this.direction == -1;
+	}
+	set leftGoing(value)
+	{
+		if (ValidateBoolean(value))
 		{
-			pulse_x = vT - (this._velocity * t) % vT
+			this.direction = value ? 1 : -1;
 		}
-		else
+	}
+	set rightGoing(value)
+	{
+		if (ValidateBoolean(value))
 		{
-			pulse_x = (this._velocity * t) % vT
+			this.direction = value ? -1 : 1;
 		}
-		let delx = pulse_x - xeff;
-		if (delx < 0)
-			delx = vT + delx;
-		if ((delx >= 0 && delx < this._wavelength) ||
-			(xeff > (vT - this._wavelength + pulse_x)))
-			ret = this._amplitude * Math.sin(delx * this._angular_wavenumber);
-		else
-			ret = 0;
-		return ret;
+	}
 
-	}
+
 	set pulse_frequency(value)
 	{
-		this._pulse_frequency = value;
-		this.calculate_parameters();
+		if (ValidateValue(value))
+			this._pulse_period = 1.0 / value;
+		else
+			this._pulse_period = null;
 	}
 	set pulse_period(value)
 	{
-		this._pulse_frequency = 1.0 / value;
-		this.calculate_parameters();
+		if (ValidateValue(value))
+			this._pulse_period = value;
+		else
+			this._pulse_period = null;
+	}
+	
+	y(x,t)
+	{
+		let ret;
+		const angular_frequency = this.angular_frequency;
+		const angular_wavenumber = this.angular_wavenumber;
+		if (ValidateValue(this._pulse_period))
+		{
+			const tx = (((-x / (this.direction * this._velocity) + t) / this._pulse_period) % 1.0 + 1.0) % 1.0;
+			if (tx > 0.9)
+				ret = this.amplitude * Math.sin((tx - 0.9) * 10.0 * this.twopi);
+			else
+				ret = 0;
+		}
+		else
+			ret = this.amplitude * Math.sin(t * angular_frequency - this.direction * x * angular_wavenumber + this.phase);
+		return ret;
+	}
+
+}
+
+
+let g_waves = [new Wave(1),new Wave(-1)];
+
+//let g_pulse_frequency = g_velocity[0] / canvas1.width;
+
+let g_sliderFrequency = [document.getElementById("frequency1"),document.getElementById("frequency2")];
+let g_sliderVelocity = [document.getElementById("velocity1")];//,document.getElementById("velocity2")];
+let g_sliderAmplitude = [document.getElementById("amplitude1"),document.getElementById("amplitude2")];
+let g_sliderPhaseLength = [document.getElementById("phaseLength1"),document.getElementById("phaseLength2")];
+let g_sliderLabelFrequency = [document.getElementById("labelfrequency1"),document.getElementById("labelfrequency2")];
+let g_sliderLabelVelocity = [document.getElementById("labelvelocity1")];//,document.getElementById("velocity2")];
+let g_sliderLabelAmplitude = [document.getElementById("labelamplitude1"),document.getElementById("labelamplitude2")];
+let g_sliderLabelPhaseLength = [document.getElementById("labelphaseLength1"),document.getElementById("labelphaseLength2")];
+let g_outputFrequency = [document.getElementById("outputfrequency1"),document.getElementById("outputfrequency2")];
+let g_outputVelocity = [document.getElementById("outputvelocity1")];//,document.getElementById("velocity2")];
+let g_outputAmplitude = [document.getElementById("outputamplitude1"),document.getElementById("outputamplitude2")];
+let g_outputPhaseLength = [document.getElementById("outputphaseLength1"),document.getElementById("outputphaseLength2")];
+
+let g_blockFrequency = [document.getElementById("frequency1block"),document.getElementById("frequency2block")];
+let g_blockVelocity = [document.getElementById("velocity1block")];//,document.getElementById("frequency1block")];
+let g_blockAmplitude = [document.getElementById("amplitude1block"),document.getElementById("amplitude2block")];
+let g_blockPhaseLength = [document.getElementById("phaseLength1block"),document.getElementById("phaseLength2block")];
+
+let g_reflectionLength = window.innerWidth;
+
+// initialize outputs
+g_outputFrequency[0].value = g_sliderFrequency[0].value + " Hz";
+g_outputFrequency[1].value = g_sliderFrequency[1].value + " Hz";
+g_outputAmplitude[0].value = g_sliderAmplitude[0].value + " px";
+g_outputAmplitude[1].value = g_sliderAmplitude[1].value + " px";
+g_outputPhaseLength[0].value = g_sliderPhaseLength[0].value + "°";
+g_outputPhaseLength[1].value = g_sliderPhaseLength[1].value + "°";
+g_outputVelocity[0].value = g_sliderVelocity[0].value + " px/s";
+
+
+function updatePhaseLengthOutput()
+{
+	if (g_radioMode[2].checked) // reflection mode
+		g_outputPhaseLength[0].value = g_reflectionLength.toFixed(1) + " px";
+	else
+	{
+		g_outputPhaseLength[0].value = g_sliderPhaseLength[0].value + "°";
+		g_outputPhaseLength[1].value = g_sliderPhaseLength[1].value + "°";
+	}
+}
+function onReflectionLengthChange(which)
+{
+	if (!g_radioMode[2].checked)
+	{
+		const value = Number(g_sliderPhaseLength[which].value);
+		g_waves[which].phase = radians(value);
+		updatePhaseLengthOutput();
 	}
 }
 
+g_sliderPhaseLength[0].addEventListener("input",function(){onReflectionLengthChange(0)},false);
+g_sliderPhaseLength[1].addEventListener("input",function(){onReflectionLengthChange(1)},false);
 
-g_reflectionLength = theCanvas.width;
-function onReflectionLengthChange(value)
+function onFrequencyChange(which)
 {
-	g_reflectionLength = theCanvas.width - (1.0 - value) * wave_right.wavelength;
+	if (g_radioPattern[1].checked)
+		g_waves[which].pulse_frequency = Number(g_sliderFrequency[which].value);
+		
+	g_waves[which].frequency = Number(g_sliderFrequency[which].value);
+	g_outputFrequency[which].value = g_sliderFrequency[which].value + " Hz";
 }
+g_sliderFrequency[0].addEventListener("input",function(){onFrequencyChange(0)},false);
+g_sliderFrequency[1].addEventListener("input",function(){onFrequencyChange(1)},false);
 
-let sliderReflectionLength = new Slider(theCanvas.width * 0.5,390,0.0001,1.0,1.0);
-sliderReflectionLength.width = 800;
-sliderReflectionLength.label = "Reflection Length";
-sliderReflectionLength.labelStyle = "#00FFFF";
-sliderReflectionLength.labelFont = "16px Ariel"
-sliderReflectionLength.onChange = onReflectionLengthChange;
-sliderReflectionLength.visible = false;
-sliderReflectionLength.disabled = true;
-commonUIRegister(sliderReflectionLength);
-
-
-let velocity = 25	; // pixels / sec
-let frequency = 0.5;
-let wavelength = velocity / frequency;
-let amplitude = 25;
-
-let wave_right = new wave_data(velocity,frequency,amplitude,0);
-let wave_left = new wave_data(-velocity,frequency,amplitude,0);
-
-let pulse_frequency = velocity / theCanvas.width;
-
-let pulse_wave_right = new wave_pulse(velocity,frequency,amplitude,pulse_frequency);
-let pulse_wave_left = new wave_pulse(-velocity,frequency,amplitude,pulse_frequency);
-
-
-
-
-function freqWaveRightOnChange(value)
+function onVelocityChange(which)
 {
-	wave_right.frequency = value;
-	pulse_wave_right.frequency = value;
+	g_waves[0].velocity = Number(g_sliderVelocity[which].value);
+	g_waves[1].velocity = Number(g_sliderVelocity[which].value);
+	g_outputVelocity[0].value = g_sliderVelocity[which].value + " px/s";
 }
-function velocityWaveRightOnChange(value)
-{
-	wave_right.velocity = value;
-	pulse_wave_right.velocity = value;
-}
-function amplitudeWaveRightOnChange(value)
-{
-	wave_right.amplitude = value;
-	pulse_wave_right.amplitude = value;
-}
-function phaseWaveRightOnChange(value)
-{
-	wave_right.phase = value * Math.PI / 180.0;
-	pulse_wave_right.phase = value * Math.PI / 180.0;
-}
-function pulseFreqWaveRightOnChange(value)
-{
-	pulse_wave_right.pulse_frequency = value * pulse_frequency;
-}
+g_sliderVelocity[0].addEventListener("input",function(){onVelocityChange(0)},false);
+//g_sliderVelocity[1].addEventListener("input",function(){onVelocityChange(1)},false);
 
-let sliderPulseFreqA = new Slider(theCanvas.width * 0.5 + 375,150,0.01,10,1.0);
-sliderPulseFreqA.label = "Pulse Frequency";
-sliderPulseFreqA.labelStyle = "#00FF00";
-sliderPulseFreqA.labelFont = "16px Ariel"
-sliderPulseFreqA.onChange = pulseFreqWaveRightOnChange;
-sliderPulseFreqA.visible = false;
-sliderPulseFreqA.disabled = true;
-commonUIRegister(sliderPulseFreqA);
-
-let sliderFreqA = new Slider(theCanvas.width * 0.5 - 375,150,0.5,2,0.5);
-sliderFreqA.label = "Frequency";
-sliderFreqA.labelStyle = "#00FF00";
-sliderFreqA.labelFont = "16px Ariel"
-sliderFreqA.onChange = freqWaveRightOnChange;
-commonUIRegister(sliderFreqA);
-let sliderVelocityA = new Slider(theCanvas.width * 0.5 - 125,150,1,1000,25);
-sliderVelocityA.label = "Velocity";
-sliderVelocityA.labelStyle = "#00FF00";140
-sliderVelocityA.labelFont = "16px Ariel"
-sliderVelocityA.onChange = velocityWaveRightOnChange;
-commonUIRegister(sliderVelocityA);
-let sliderAmplitudeA = new Slider(theCanvas.width * 0.5 + 125,150,0,50,25);
-sliderAmplitudeA.label = "Amplitude";
-sliderAmplitudeA.labelStyle = "#00FF00";
-sliderAmplitudeA.labelFont = "16px Ariel"
-sliderAmplitudeA.onChange = amplitudeWaveRightOnChange;
-commonUIRegister(sliderAmplitudeA);
-let sliderPhaseA = new Slider(theCanvas.width * 0.5 + 375,150,0,359,0);
-sliderPhaseA.label = "Phase";
-sliderPhaseA.labelStyle = "#00FF00";
-sliderPhaseA.labelFont = "16px Ariel"
-sliderPhaseA.onChange = phaseWaveRightOnChange;
-commonUIRegister(sliderPhaseA);
+function onAmplitudeChange(which)
+{
+	g_waves[which].amplitude = Number(g_sliderAmplitude[which].value);
+	g_outputAmplitude[which].value = g_sliderAmplitude[which].value + " px";
+}
+g_sliderAmplitude[0].addEventListener("input",function(){onAmplitudeChange(0)},false);
+g_sliderAmplitude[1].addEventListener("input",function(){onAmplitudeChange(1)},false);
 
 
-function freqWaveLeftOnChange(value)
-{
-	wave_left.frequency = value;
-	pulse_wave_left.frequency = value;
-}
-function velocityWaveLeftOnChange(value)
-{
-	wave_left.velocity = -value;
-	pulse_wave_left.velocity = -value;
-}
-function amplitudeWaveLeftOnChange(value)
-{
-	wave_left.amplitude = value;
-	pulse_wave_left.amplitude = value;
-}
-function phaseWaveLeftOnChange(value)
-{
-	wave_left.phase = value * Math.PI / 180.0;
-	pulse_wave_left.phase = value * Math.PI / 180.0;
-}
-function pulseFreqWaveLeftOnChange(value)
-{
-	pulse_wave_left.pulse_frequency = value * pulse_frequency;
-}
+let g_radioMode = [document.getElementById("leftright"),document.getElementById("rightright"),document.getElementById("reflection")];
 
-
-let sliderPulseFreqB = new Slider(theCanvas.width * 0.5 + 375,390,0.01,10,1.0);
-sliderPulseFreqB.label = "Pulse Frequency";
-sliderPulseFreqB.labelStyle = "#0000FF";
-sliderPulseFreqB.labelFont = "16px Ariel"
-sliderPulseFreqB.onChange = pulseFreqWaveLeftOnChange;
-sliderPulseFreqB.visible = false;
-sliderPulseFreqB.disabled = true;
-commonUIRegister(sliderPulseFreqB);
-
-let sliderFreqB = new Slider(theCanvas.width * 0.5 - 375,390,0.5,2,0.5);
-sliderFreqB.label = "Frequency";
-sliderFreqB.labelStyle = "#0000FF";
-sliderFreqB.labelFont = "16px Ariel"
-sliderFreqB.onChange = freqWaveLeftOnChange;
-commonUIRegister(sliderFreqB);
-let sliderVelocityB = new Slider(theCanvas.width * 0.5 - 125,390,1,1000,25);
-sliderVelocityB.label = "Velocity";
-sliderVelocityB.labelStyle = "#0000FF";
-sliderVelocityB.labelFont = "16px Ariel"
-sliderVelocityB.onChange = velocityWaveLeftOnChange;
-commonUIRegister(sliderVelocityB);
-let sliderAmplitudeB = new Slider(theCanvas.width * 0.5 + 125,390,0,50,25);
-sliderAmplitudeB.label = "Amplitude";
-sliderAmplitudeB.labelStyle = "#0000FF";
-sliderAmplitudeB.labelFont = "16px Ariel"
-sliderAmplitudeB.onChange = amplitudeWaveLeftOnChange;
-commonUIRegister(sliderAmplitudeB);
-let sliderPhaseB = new Slider(theCanvas.width * 0.5 + 375,390,0,390,0);
-sliderPhaseB.label = "Phase";
-sliderPhaseB.labelStyle = "#0000FF";
-sliderPhaseB.labelFont = "16px Ariel"
-sliderPhaseB.onChange = phaseWaveLeftOnChange;
-commonUIRegister(sliderPhaseB);
-
-let g_Type = "wave";
-function typeSelect(value)
+function onModeSelect()
 {
-	g_Type = value;
-	if (g_Type == "wave")
+	if (g_radioMode[1].checked)
 	{
-		sliderPhaseA.visible = true;
-		sliderPhaseA.disabled = false;
-		sliderPulseFreqA.visible = false;
-		sliderPulseFreqA.disabled = true;
-		if (g_Motion == "dual")
-		{
-			sliderPhaseB.visible = true;
-			sliderPhaseB.disabled = false;
-			sliderPulseFreqB.visible = false;
-			sliderPulseFreqB.disabled = true;
-		}
+		g_waves[0].direction = 1;
+		g_waves[1].direction = 1;
+	}
+	else // if (g_radioMode[0].checked)
+	{
+		g_waves[0].direction = 1;
+		g_waves[1].direction = -1;
+	}
+	
+	if (g_radioMode[2].checked)
+	{
+		g_waves[0].phase = 0;
+		// reflection mode: disable wave 2 controls and change wave 1 controls to reflction mode
+		g_blockFrequency[1].style.display = "none";
+//		g_blockVelocity[1].style.display = "none";
+		g_blockAmplitude[1].style.display = "none";
+		g_blockPhaseLength[1].style.display = "none";
+		g_sliderLabelPhaseLength[0].innerText = "Length";
+		g_blockPhaseLength[0].style.display = "table-cell"; // wave 1 length nedds to be displayed
 	}
 	else
 	{
-		sliderPhaseA.visible = false;
-		sliderPhaseA.disabled = true;
-		sliderPulseFreqA.visible = true;
-		sliderPulseFreqA.disabled = false;
-		if (g_Motion == "dual")
+		g_waves[0].phase = radians(Number(g_sliderPhaseLength[0].value));
+		// normal modes: display controls for wave 2
+		if (g_radioPattern[1].checked) // if pulse mode, no phase display
 		{
-			sliderPhaseB.visible = false;
-			sliderPhaseB.disabled = true;
-			sliderPulseFreqB.visible = true;
-			sliderPulseFreqB.disabled = false;
-		}
-	}
-}
-
-let rbtnTypeArray = new Array();
-let rbtnWaves = new RadioButton("Waves","wave",theCanvas.width * 0.5 - 105,20,100,30);
-rbtnTypeArray.push(rbtnWaves);
-let rbtnPulses = new RadioButton("Pulses","pulse",theCanvas.width * 0.5 + 5,20,100,30);
-rbtnTypeArray.push(rbtnPulses);
-let radioType = new Radio("Type","wave",typeSelect,rbtnTypeArray);
-commonUIRegister(radioType);
-
-let g_Motion = "dual";
-function motionSelect(value)
-{
-	g_Motion = value;
-	if (value == "dual")
-	{
-		sliderReflectionLength.visible = false;
-		sliderReflectionLength.disabled = true;
-		g_reflectionLength = theCanvas.width;
-		if (g_Type == "wave")
-		{
-			sliderPulseFreqB.visible = false;
-			sliderPulseFreqB.disabled = true;
-			sliderPhaseB.visible = true;
-			sliderPhaseB.disabled = false;
+			g_blockFrequency[1].style.display = "none";
+	//		g_blockVelocity[1].style.display = "none";
+			g_blockAmplitude[1].style.display = "none";
+			g_blockPhaseLength[0].style.display = "none";
+			g_blockPhaseLength[1].style.display = "none";
 		}
 		else
 		{
-			sliderPulseFreqB.visible = true;
-			sliderPulseFreqB.disabled = false;
-			sliderPhaseB.visible = false;
-			sliderPhaseB.disabled = true;
+			g_blockFrequency[1].style.display = "table-cell";
+	//		g_blockVelocity[1].style.display = "none";
+			g_blockAmplitude[1].style.display = "table-cell";
+			g_blockPhaseLength[0].style.display = "table-cell";
+			g_blockPhaseLength[1].style.display = "table-cell";
 		}
-		sliderFreqB.visible = true;
-		sliderFreqB.disabled = false;
-		sliderVelocityB.visible = true;
-		sliderVelocityB.disabled = false;
-		sliderAmplitudeB.visible = true;
-		sliderAmplitudeB.disabled = false;
+		g_sliderLabelPhaseLength[0].innerText = "Phase";
+
+	}
+	updatePhaseLengthOutput();
+}
+g_radioMode[0].addEventListener("change",onModeSelect,false);
+g_radioMode[1].addEventListener("change",onModeSelect,false);
+g_radioMode[2].addEventListener("change",onModeSelect,false);
+
+let g_radioPattern = [document.getElementById("waves"),document.getElementById("pulse")];
+
+function onPatternSelect()
+{
+	if (g_radioPattern[1].checked)
+	{
+		g_waves[0].pulse_frequency = Number(g_sliderFrequency[0].value);
+		g_waves[1].pulse_frequency = Number(g_sliderFrequency[1].value);
+		g_waves[0].frequency = Number(g_sliderFrequency[0].value);
+		g_waves[1].frequency = Number(g_sliderFrequency[1].value);
+
+
+		g_blockFrequency[1].style.display = "none";
+//		g_blockVelocity[1].style.display = "none";
+		g_blockAmplitude[1].style.display = "none";
+		g_blockPhaseLength[1].style.display = "none";
+		if (g_radioMode[2].checked)
+				g_blockPhaseLength[0].style.display = "table-cell";
+		else
+			g_blockPhaseLength[0].style.display = "none";
 	}
 	else
 	{
-		sliderReflectionLength.visible = true;
-		sliderReflectionLength.disabled = false;
-		
-		sliderPulseFreqB.visible = false;
-		sliderPulseFreqB.disabled = true;
-		sliderFreqB.visible = false;
-		sliderFreqB.disabled = true;
-		sliderVelocityB.visible = false;
-		sliderVelocityB.disabled = true;
-		sliderAmplitudeB.visible = false;
-		sliderAmplitudeB.disabled = true;
-		sliderPhaseB.visible = false;
-		sliderPhaseB.disabled = true;
-		
-		g_reflectionLength = theCanvas.width * sliderReflectionLength.value;
+		g_waves[0].pulse_period = null;
+		g_waves[1].pulse_period = null;
+		g_waves[0].frequency = Number(g_sliderFrequency[0].value);
+		g_waves[1].frequency = Number(g_sliderFrequency[1].value);
+
+		if (g_radioMode[2].checked)
+		{
+			g_blockFrequency[1].style.display = "none";
+	//		g_blockVelocity[1].style.display = "none";
+			g_blockAmplitude[1].style.display = "none";
+			g_blockPhaseLength[1].style.display = "none";
+		}
+		else
+		{
+			g_blockFrequency[1].style.display = "table-cell";
+	//		g_blockVelocity[1].style.display = "none";
+			g_blockAmplitude[1].style.display = "table-cell";
+			g_blockPhaseLength[1].style.display = "table-cell";
+		}
+		g_blockPhaseLength[0].style.display = "table-cell";
 	}
 }
+g_radioPattern[0].addEventListener("change",onPatternSelect,false);
+g_radioPattern[1].addEventListener("change",onPatternSelect,false);
 
-let rbtnMotionArray = new Array();
-let rbtnLeftRight = new RadioButton("Left & Right","dual",theCanvas.width * 0.5 - 105,60,100,30);
-rbtnMotionArray.push(rbtnLeftRight);
-let rbtnReflect = new RadioButton("Reflection","reflect",theCanvas.width * 0.5 + 5,60,100,30);
-rbtnMotionArray.push(rbtnReflect);
-let radioMotion = new Radio("Motion","dual",motionSelect,rbtnMotionArray);
-commonUIRegister(radioMotion);
+let g_buttonPausePlay = document.getElementById("pauseplay");
 
 let g_timestep = 1.0 / 30.0;
 let g_timer = 0.0;
 const g_slewSpeed = 0.01;
 
 let g_pause = false;
-function pause()
+function onPausePlay()
 {
 	g_pause = !g_pause;
 	if (g_pause)
-		btnPause.text = "Resume"
+	{
+		g_buttonPausePlay.value = "Resume"
+		g_buttonStep.disabled = false;
+	}
 	else
-		btnPause.text = "Pause"
+	{
+		g_buttonPausePlay.value = "Pause"
+		g_buttonStep.disabled = true;
+	}
 }
-let btnPause = new Button("Pause",theCanvas.width * 0.5 + 150,20,80,30,pause);
-commonUIRegister(btnPause);
+g_buttonPausePlay.addEventListener("click",onPausePlay,false);
 
-function step()
+let g_buttonStep = document.getElementById("step");
+
+function onStep()
 {
 	if (g_pause)
 		g_timer += g_timestep;
 }
-let btnStep = new Button("Step",theCanvas.width * 0.5 + 240,20,60,30,step);
-commonUIRegister(btnStep);
+g_buttonStep.addEventListener("click",onStep,false);
 
-function work()
+function draw()
 {
 	if (!g_pause)
 		g_timer += g_timestep;
 
+	if (g_radioMode[2].checked)
+	{
+		const value = Number(g_sliderPhaseLength[0].value);
+		g_reflectionLength = canvas1.width - (1.0 - value / 360.0) * g_waves[0].wavelength;
+		updatePhaseLengthOutput();
+	}
+		
+	canvas1.width = window.innerWidth;
+	canvas2.width = window.innerWidth;
+	canvas3.width = window.innerWidth;
 
+
+	// calculate waves and sum
 	let x;
+	let waves = [new Array(), new Array(), new Array()];
+	const startX = -canvas1.width * 0.5;
+	const endX = g_radioMode[2].checked ? (-canvas1.width * 0.5 + g_reflectionLength) : (canvas1.width * 0.5);
+	for (x = startX; x <= endX; x++)
+	{
+		const w1 = g_waves[0].y(x,g_timer);
+		const w2x = g_radioMode[2].checked ? (endX + g_reflectionLength - x) : x;
+		const w2 = g_waves[g_radioMode[2].checked ? 0 : 1].y(w2x,g_timer);
+		waves[0].push(w1);
+		waves[1].push(w2);
+		waves[2].push(w1 + w2);
+	}
 	
-	theContext.clearRect(0, 0, theCanvas.width, theCanvas.height);
-	theContext.fillStyle = '#000000';
-	theContext.fillRect(0, 0, theCanvas.width, theCanvas.height);
+	
+	// draw wave 1
+	context1.clearRect(0, 0, canvas1.width, canvas1.height);
+	context1.fillStyle = '#000000';
+	context1.fillRect(0, 0, canvas1.width, canvas1.height);
 
-	theContext.font = "18px Arial";
-
-	if (g_Motion == "reflect")
-	{
-		const L = g_reflectionLength / wave_right.wavelength;
-		theContext.fillStyle = "#00FFFF";
-		const Lr = Math.round(L * 1000.0) / 1000.0;
-		let Ls = Lr.toString();
-		if (Ls.indexOf(".") == -1)
-			Ls += '.';
-		let addCnt = 0;
-		while (addCnt < 3 && Ls.charAt(Ls.length - 4) != '.')
+	context1.save();
+		context1.translate(0,canvas1.height * 0.5);
+		context1.strokeStyle = "#00FF00";
+		context1.beginPath();
+		context1.moveTo(0,waves[0][0]);
+		for (x = 1; x < waves[0].length; x++)
 		{
-			Ls += '0';
-			addCnt++;
+			context1.lineTo(x,waves[0][x]);
 		}
-		Ls += 'λ';
-		theContext.fillText(Ls,theCanvas.width * 0.5 + 500,370);
-	}
+		context1.stroke();
+		context1.strokeStyle = "#0000FF";
+		context1.beginPath();
+		context1.moveTo(0,0);
+		context1.lineTo(canvas1.width,0);
+		context1.stroke();
+	context1.restore();
 
-	let horizOffset = 0;
-	if (g_Motion != "dual")
-		horizOffset = (theCanvas.width - g_reflectionLength) * 0.5;
+	// draw wave 2
+	context2.clearRect(0, 0, canvas2.width, canvas2.height);
+	context2.fillStyle = '#000000';
+	context2.fillRect(0, 0, canvas2.width, canvas2.height);
 
-	if (g_Type == "wave")
-	{
-				
-		// continuous right-going wave
-		theContext.save();
-		theContext.translate(horizOffset,260);
-		theContext.strokeStyle = "#00FF00";
-		theContext.beginPath();
-		theContext.moveTo(0,wave_right.y(0,g_timer));
-		for (x = 1; x <= g_reflectionLength; x++)
+	context2.save();
+		context2.translate(0,canvas2.height * 0.5);
+		context2.strokeStyle = "#FF0000";
+		context2.beginPath();
+		context2.moveTo(0,waves[1][0]);
+		for (x = 1; x < waves[1].length; x++)
 		{
-			theContext.lineTo(x,wave_right.y(x,g_timer));
+			context2.lineTo(x,waves[1][x]);
 		}
-		theContext.stroke();
-		theContext.restore();
-		
-		// continuous left-going wave
-		theContext.save();
-		theContext.translate(horizOffset,510);
-		theContext.strokeStyle = "#0000FF";
+		context2.stroke();
+		context2.strokeStyle = "#0000FF";
+		context2.beginPath();
+		context2.moveTo(0,0);
+		context2.lineTo(canvas2.width,0);
+		context2.stroke();
+	context2.restore();
 
-		theContext.beginPath();
-		if (g_Motion == "dual")
-		{
-			theContext.moveTo(0,wave_left.y(0,g_timer));
-			for (x = 1; x <= g_reflectionLength; x++)
-			{
-				theContext.lineTo(x,wave_left.y(x,g_timer));
-			}
-		}
-		else // reflection
-		{
-			theContext.moveTo(0,wave_right.y(2*g_reflectionLength,g_timer));
-			for (x = 1; x < g_reflectionLength; x++)
-			{
-				theContext.lineTo(x,wave_right.y(2 * g_reflectionLength - x,g_timer));
-			}
-		}
-		theContext.stroke();
-		theContext.restore();
+	// draw combined wave
+	context3.clearRect(0, 0, canvas3.width, canvas3.height);
+	context3.fillStyle = '#000000';
+	context3.fillRect(0, 0, canvas3.width, canvas3.height);
 
+	context3.save();
+		context3.translate(0,canvas3.height * 0.5);
+		context3.strokeStyle = "#FFFF00";
+		context3.beginPath();
+		context3.moveTo(0,waves[2][0]);
+		for (x = 1; x < waves[2].length; x++)
+		{
+			context3.lineTo(x,waves[2][x]);
+		}
+		context3.stroke();
+		context3.strokeStyle = "#0000FF";
+		context3.beginPath();
+		context3.moveTo(0,0);
+		context3.lineTo(canvas3.width,0);
+		context3.stroke();
+	context3.restore();
 
-		// right + left continuous waves
-		theContext.save();
-		theContext.translate(horizOffset,720);
-		theContext.strokeStyle = "#00FFFF";
-		theContext.beginPath();
-		if (g_Motion == "dual")
-		{
-			theContext.moveTo(0,wave_left.y(0,g_timer) + wave_right.y(0,g_timer));
-			for (x = 1; x <= g_reflectionLength; x++)
-			{
-				theContext.lineTo(x,wave_left.y(x,g_timer) + wave_right.y(x,g_timer));
-			}
-			theContext.stroke();
-			theContext.restore();
-		}
-		else // reflection
-		{
-			theContext.moveTo(0,wave_right.y(g_reflectionLength * 2,g_timer) + wave_right.y(0,g_timer));
-			for (x = 1; x <= g_reflectionLength; x++)
-			{
-				theContext.lineTo(x,wave_right.y(2 * g_reflectionLength - x,g_timer) + wave_right.y(x,g_timer));
-			}
-			theContext.stroke();
-			theContext.restore();
-		}
-	}
-	else
-	{
-		
-		// right-going pulse
-		theContext.save();
-		theContext.strokeStyle = "#00FF00";
-		theContext.translate(horizOffset,260);
-		theContext.beginPath();
-		theContext.moveTo(0,pulse_wave_right.y(0,g_timer));
-		for (x = 1; x <= g_reflectionLength; x++)
-		{
-			theContext.lineTo(x,pulse_wave_right.y(x,g_timer));
-		}
-		theContext.stroke();
-		theContext.restore();
-
-
-		// left-going pulse
-		theContext.save();
-		theContext.translate(horizOffset,510);
-		theContext.strokeStyle = "#0000FF";
-		theContext.beginPath();
-		if (g_Motion == "dual")
-		{
-			theContext.moveTo(0,pulse_wave_left.y(0,g_timer));
-			for (x = 1; x <= g_reflectionLength; x++)
-			{
-				theContext.lineTo(x,pulse_wave_left.y(x,g_timer));
-			}
-		}
-		else
-		{
-			theContext.moveTo(g_reflectionLength,pulse_wave_right.y(0,g_timer));
-			for (x = 1; x <= g_reflectionLength; x++)
-			{
-				theContext.lineTo(g_reflectionLength - x,pulse_wave_right.y(x,g_timer));
-			}
-		}
-		theContext.stroke();
-		theContext.restore();
-
-		// combined pulse
-		theContext.save();
-		theContext.translate(horizOffset,720);
-		theContext.strokeStyle = "#00FFFF";
-		theContext.beginPath();
-		if (g_Motion == "dual")
-		{
-			theContext.moveTo(0,pulse_wave_right.y(0,g_timer) + pulse_wave_left.y(0,g_timer));
-			for (x = 1; x <= g_reflectionLength; x++)
-			{
-				theContext.lineTo(x,pulse_wave_left.y(x,g_timer) + pulse_wave_right.y(x,g_timer));
-			}
-		}
-		else
-		{
-			theContext.moveTo(0,pulse_wave_right.y(0,g_timer) + pulse_wave_right.y(g_reflectionLength,g_timer));
-			for (x = 1; x <= g_reflectionLength; x++)
-			{
-				theContext.lineTo(x,pulse_wave_right.y(x,g_timer) + pulse_wave_right.y(g_reflectionLength - x,g_timer));
-			}
-		}
-		theContext.stroke();
-		theContext.restore();
-	}
-		
-	commonUIdraw(theContext);
-
-
-	window.setTimeout(work, 1.0/30.0);
+	window.setTimeout(draw, 1.0/30.0);
 }
 
-work();
+draw();
 

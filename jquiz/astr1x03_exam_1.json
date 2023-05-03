@@ -1,0 +1,53 @@
+
+{
+	"title": "ASTR 1403 Exam 1 Review",
+	"categories": ["Coordinates", "Time", "Angles in Astronomy", "Light", "More Light", "Potpurri"],
+	"questions": 
+	[
+		[
+			[
+				{"q":"Basically just pointing - the coordinate system that works best when someone is right next to you","a":"altitude and azimuth","complete":false},
+				{"q":"The angle of the an object with respect to the meridian","a":"Hour Angle","complete":false},
+				{"q":"The best coordinate system for someone across the country","a":"Right ascension & declination","complete":false},
+				{"q":"An angle northward from the equator","a":"Declination","complete":false},
+				{"q":"The best coordinate system for describing the position of a planet","a":"Ecliptic","complete":false}
+			],
+			[
+				{"q":"The time between two vernal equinoxes","a":"Year","complete":false},
+				{"q":"23 hours and 56 minutes ","a":"Sidereal Day","complete":false},
+				{"q":"The Islamic calendar is this form - following only the Moon","a":"Lunar Calendar","complete":false},
+				{"q":"The time it takes the Earth to rotate with respect to the stars","a":"Sidereal Day","complete":false},
+				{"q":"This calendar is the one presently in use through most of the world, started in 1582","a":"Gregorian Calendar","complete":false}
+			],
+			[
+				{"q":"1/60 of a degree ","a":"Arc-minute","complete":false},
+				{"q":"The angular position shift caused by a shift in perspective","a":"Parallax","complete":false},
+				{"q":"1/60 of a arc-minute.","a":"Arc-second","complete":false},
+				{"q":"The distance between the Earth and the Sun.","a":"Astronomical Unit","complete":false},
+				{"q":"The distance of an object with a parallax of 1 arc-second","a":"Parsec","complete":false}
+			],
+			[
+				{"q":"The technical term for apparent brightness", "a": "Flux","complete":false},
+				{"q":"The technical term for intrinsic brightness","a":"Luminosity","complete":false},
+				{"q":"This can be measured by a telescope and camera.","a":"Flux","complete":false},
+				{"q":"This quantity can be found if both distance and flux are known.","a":"Luminosity","complete":false},
+				{"q":"In general, flux is luminosity divided by this.","a":"Area","complete":false}
+			],
+			[
+				{"q":"Used to describe how bright a star appears to the eye", "a": "Apparent Magnitude","complete":false},
+				{"q":"B - V, for example.","a":"Color Index","complete":false},
+				{"q":"Used to describe the intrinsic brightness of a star ","a":"Absolute Magnitude","complete":false},
+				{"q":"This filter is equivalent to green","a":"V","complete":false},
+				{"q":"A star with a B - V of 0 will appear to be this color","a":"Blue-white","complete":false}
+			],
+			[
+				{"q":"The distance to the nearest star if the Sun shrank down to the size of a marble", "a": "60 mi (Temple, TX)","complete":false},
+				{"q":"The zero reference for declination","a":"The equator","complete":false},
+				{"q":"Solar Time","a":"Time measured with respect to the Sun","complete":false},
+				{"q":"An I filter is used for this type of light","a":"Infrared","complete":false},
+				{"q":"North","a":"The zero reference for azimuth","complete":false}
+			]
+		]
+	]
+}
+

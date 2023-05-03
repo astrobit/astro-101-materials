@@ -1,0 +1,13 @@
+{
+	"data":[
+		{
+			"class":"ASTR 1x03",
+			"quizzes":[
+				{"title":"Exam 1 Review",	"file":"astr1x03_exam_1.json"},
+				{"title":"Exam 2 Review",	"file":"astr1x03_exam_2.json"},
+				{"title":"Exam 3 Review",	"file":"astr1x03_exam_3.json"},
+				{"title":"Exam 4 Review",	"file":"astr1x03_exam_4.json"}
+			]
+		}
+	]	
+}

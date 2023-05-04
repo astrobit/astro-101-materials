@@ -1,6 +1,6 @@
 let tab = document.getElementById("grid");
 tab.setAttribute("hidden","true");
-let tabCategories = document.getElementById("catetories");
+let tabHead = document.getElementById("catetories");
 let tabGridBody = document.getElementById("gridbody");
 
 let title = document.getElementById("title");
@@ -168,13 +168,13 @@ function initialize()
 	questionholder.setAttribute("hidden","true");
 	title.innerHTML = g_currentQuiz.title;
 	
-	let categoriesHTML = '<tr id="catetories">';
+	let categoriesHTML = '<tr>';
 	for (let i = 0; i < g_currentQuiz.categories.length; i++)
 	{
 		categoriesHTML += '<th id="cat"'+i+'">' + g_currentQuiz.categories[i] + '</th>';
 	}
 	categoriesHTML += '</tr>'
-	tabCategories.innerHTML = categoriesHTML;
+	tabHead.innerHTML = categoriesHTML;
 	
 	let bodyHTML = new String();
 	for (let row = 0; row < 5; row++)

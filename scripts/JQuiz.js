@@ -165,6 +165,7 @@ function onSelect(category,row)
 
 function onReset()
 {
+	let qset = g_currentQuiz.questions[level];
 	for (let row = 0; row < 5; row++)
 	{
 		for (let i = 0; i < g_currentQuiz.categories.length; i++)

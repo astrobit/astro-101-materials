@@ -50,7 +50,7 @@ function onSelectClass()
 	{
 		let option = document.createElement("option");
 		option.text = thisClass.quizzes[i].title;
-		g_currentQuizList[thisClass.quizzes[i].title] = thisClass.quizzes[i].file;
+		g_currentQuizList[g_thisClass.quizzes[i].title] = g_thisClass.quizzes[i].file;
 		g_selectQuiz.add(option)
 	}
 	g_selectQuizTab.removeAttribute("hidden");

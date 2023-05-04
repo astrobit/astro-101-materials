@@ -138,6 +138,7 @@ function onAnswer()
 //				window.setTimeout(onAnswer, timerlength * 1000);
 				
 		}
+		g_quizControls.removeAttribute("hidden");
 	}
 }
 
@@ -159,6 +160,7 @@ function onSelect(category,row)
 			currButton.innerHTML = null;
 //			window.setTimeout(onAnswer, timerlength * 1000);
 		}
+		g_quizControls.setAttribute("hidden","true");
 	}
 	
 }

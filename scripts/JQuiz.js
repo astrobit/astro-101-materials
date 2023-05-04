@@ -141,6 +141,7 @@ function onAnswer()
 
 function onSelect(category,row)
 {
+	let buttonid = category.toFixed(0) + row.toFixed(0);
 	let qset = g_currentQuiz.questions[level];
 	currquestion = qset[category][row];
 	if (!mode || !currquestion.complete)
@@ -152,7 +153,8 @@ function onSelect(category,row)
 		qmode = true;
 		if (mode)
 		{
-			this.innerHTML = null;
+			let currButton = document.getElementById(buttonid);
+			currButton.innerHTML = null;
 //			window.setTimeout(onAnswer, timerlength * 1000);
 		}
 	}

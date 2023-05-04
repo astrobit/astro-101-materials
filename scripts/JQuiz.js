@@ -76,6 +76,16 @@ function indexWaiter()
 		// 
 		if (g_quizIndex.data.length == 1)
 		{
+			let option = document.createElement("option");
+			option.text = "Select Class ...";
+			g_selectClass.add(option)
+			
+			option = document.createElement("option");
+			g_classList[g_quizIndex.data[0].class] = {class: g_quizIndex.data[0].class, quizzes: g_quizIndex.data[0].quizzes};
+			option.text = g_quizIndex.data[0].class;
+			g_selectClass.add(option)
+			
+			g_selectClass.value = g_quizIndex.data[0].class;
 			onSelectClass();
 		}
 		else

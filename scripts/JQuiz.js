@@ -141,8 +141,8 @@ function onAnswer()
 
 function onSelect()
 {
-	const category = Number(this.id.charAt(0)) - 1;
-	const row = Number(this.id.charAt(1)) - 1;
+	const category = Number(this.id.charAt(0));
+	const row = Number(this.id.charAt(1));
 	
 	let qset = g_currentQuiz.questions[level];
 	currquestion = qset[category][row];

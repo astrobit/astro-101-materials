@@ -27,7 +27,9 @@ let g_classList = new Array();
 let g_currentQuizList = null;
 let g_currentQuiz = null;
 let g_thisClass = null;
+let g_quizControls = document.getElementById("quizControls");
 g_selectQuizTab.setAttribute("hidden","true");
+g_quizControls.setAttribute("hidden","true");
 
 function onSelectQuiz()
 {
@@ -36,7 +38,7 @@ function onSelectQuiz()
 		g_currentQuiz = null;
 		let quiz_data_file_promise = getFile("https://www.astronaos.com/astronomy/jquiz/" + g_currentQuizList[g_selectQuiz.value]);
 		if (typeof quiz_data_file_promise != 'undefined' && quiz_data_file_promise !== null)
-			quiz_data_file_promise.then(function(value){g_currentQuiz = JSON.parse(value); tab.removeAttribute("hidden"); g_selectQuizTab.setAttribute("hidden","true"); g_selectClassTab.setAttribute("hidden","true"); initialize();},function(error){g_currentQuiz = null; ret.failed = true; ret.failed = error;})
+			quiz_data_file_promise.then(function(value){g_currentQuiz = JSON.parse(value); initialize();},function(error){g_currentQuiz = null; ret.failed = true; ret.failed = error;})
 	}
 }
 g_selectQuiz.onchange = onSelectQuiz;
@@ -161,10 +163,38 @@ function onSelect(category,row)
 	
 }
 
+function onReset()
+{
+	for (let row = 0; row < 5; row++)
+	{
+		for (let i = 0; i < g_currentQuiz.categories.length; i++)
+		{
+			let buttonid = i.toFixed(0) + row.toFixed(0);
+			let currButton = document.getElementById(buttonid);
+			currButton.innerHTML = ((row + 1) * 100).toFixed(0);
+			currquestion = qset[i][row].complete = false;
+		}
+	}
+}
+
+function onSwitchQuiz()
+{
+	tab.setAttribute("hidden","true");
+	questionholder.setAttribute("hidden","true");
+	g_selectClassTab.removeAttribute("hidden");
+	g_selectQuizTab.removeAttribute("hidden");
+	g_quizControls.setAttribute("hidden","true");
+}
+
 function initialize()
 {
-	let i;
+	tab.removeAttribute("hidden"); 
 	questionholder.setAttribute("hidden","true");
+	g_selectQuizTab.setAttribute("hidden","true"); 
+	g_selectClassTab.setAttribute("hidden","true");
+	g_quizControls.removeAttribute("hidden");
+
+	let i;
 	title.innerHTML = g_currentQuiz.title;
 	
 	let categoriesHTML = '<tr>';

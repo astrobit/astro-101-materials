@@ -19,12 +19,14 @@ let g_quizIndex = null;
 if (typeof quiz_index_file_promise != 'undefined' && quiz_index_file_promise !== null)
 	quiz_index_file_promise.then(function(value){g_quizIndex = JSON.parse(value)},function(error){console.log("quiz index fetch error: " + error);})
 
+let g_selectClassTab = document.getElementById("classselectDiv");
+let g_selectQuizTab = document.getElementById("quizselectDiv");
 let g_selectQuiz = document.getElementById("quizselect");
 let g_selectClass = document.getElementById("classselect");
 let g_classList = new Array();
 let g_currentQuizList = null;
 let g_currentQuiz = null;
-g_selectQuiz.setAttribute("hidden","true");
+g_selectQuizTab.setAttribute("hidden","true");
 
 function onSelectQuiz()
 {
@@ -50,7 +52,7 @@ function onSelectClass()
 		g_currentQuizList[thisClass.quizzes[i].title] = thisClass.quizzes[i].file;
 		g_selectQuiz.add(option)
 	}
-	g_selectQuiz.removeAttribute("hidden");
+	g_selectQuizTab.removeAttribute("hidden");
 }
 g_selectClass.onchange = onSelectClass;
 

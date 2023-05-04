@@ -171,7 +171,7 @@ function initialize()
 	let categoriesHTML = '<tr id="catetories">';
 	for (let i = 0; i < g_currentQuiz.categories.length; i++)
 	{
-		categoriesHTML += '<th id="cat"'+i+'">' + g_currentQuiz.categories[i] + '</th>;
+		categoriesHTML += '<th id="cat"'+i+'">' + g_currentQuiz.categories[i] + '</th>';
 	}
 	categoriesHTML += '</tr>'
 	tabCategories.innerHTML = categoriesHTML;

@@ -78,7 +78,9 @@ function indexWaiter()
 	else
 		window.setTimeout(indexWaiter, 1000.0);
 	
-}		
+}	
+indexWaiter();
+	
 function onAnswer()
 {
 	if (currquestion !== null)

@@ -46,10 +46,10 @@ function onSelectClass()
 	}
 	g_thisClass = g_classList[g_selectClass.value];
 	g_currentQuizList = new Array();
-	for (let i = 0; i < thisClass.quizzes.length; i++)
+	for (let i = 0; i < g_thisClass.quizzes.length; i++)
 	{
 		let option = document.createElement("option");
-		option.text = thisClass.quizzes[i].title;
+		option.text = g_thisClass.quizzes[i].title;
 		g_currentQuizList[g_thisClass.quizzes[i].title] = g_thisClass.quizzes[i].file;
 		g_selectQuiz.add(option)
 	}

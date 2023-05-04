@@ -76,6 +76,9 @@ function indexWaiter()
 			option.text = classArray[i];
 			g_selectClass.add(option)
 		}
+		g_selectQuiz.removeAttribute("hidden");
+		if (classArray.length == 1)
+			onSelectClass();
 	}
 	else
 		window.setTimeout(indexWaiter, 1000.0);

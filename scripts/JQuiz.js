@@ -67,7 +67,7 @@ function indexWaiter()
 		{
 			const classQuizzes = g_quizIndex.data[i];
 			g_classList[classQuizzes.class] = {class: classQuizzes.class, quizzes: classQuizzes.quizzes};
-			classArray.add(classQuizzes.class);
+			classArray.push(classQuizzes.class);
 		}
 		classArray.sort();
 		for (let i = 0; i < classArray.length; i++)

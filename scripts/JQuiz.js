@@ -1,13 +1,13 @@
 let tab = document.getElementById("grid");
 tab.setAttribute("hidden","true");
+let tabCategories = document.getElementById("catetories");
+let tabGridBody = document.getElementById("gridbody");
 
 let title = document.getElementById("title");
 let question = document.getElementById("question");
 let questionholder = document.getElementById("questionholder");
 questionholder.setAttribute("hidden","true");
 
-let categories = new Array();
-let selections = new Array();
 let mode = true; // true = normal mode / false = flashcard
 let qmode = true; // true = show question / false = show answer
 let level = 0; //0 = 1st round, 1 = 2nd round, 2 = 3rd round
@@ -167,23 +167,26 @@ function initialize()
 	let i;
 	questionholder.setAttribute("hidden","true");
 	title.innerHTML = g_currentQuiz.title;
-	for (i = 1; i < 8; i++)
+	
+	let categoriesHTML = '<tr id="catetories">';
+	for (let i = 0; i < g_currentQuiz.categories.length; i++)
 	{
-		let cathdr = document.getElementById("cat" + i.toFixed(0));
-		cathdr.innerHTML = g_currentQuiz.categories[i - 1];
-		categories.push(cathdr)
-		let Sarray = new Array();
-		let j;
-		for (j = 1; j < 6; j++)
-		{
-			const id = i.toFixed(0) + j.toFixed(0);
-			let button = document.getElementById(id); 
-			button.onclick = onSelect;
-			button.innerHTML = j * 100;
-			Sarray.push(button);
-		}
-		selections.push(Sarray);
+		categoriesHTML += '<th id="cat"'+i+'">' + g_currentQuiz.categories[i] + '</th>;
 	}
+	categoriesHTML += '</tr>'
+	tabCategories.innerHTML = categoriesHTML;
+	
+	let bodyHTML = new String();
+	for (let row = 0; row < 5; row++)
+	{
+		bodyHTML += '<tr>';
+		for (let i = 0; i < g_currentQuiz.categories.length; i++)
+		{
+			bodyHTML += '<td><button id="'+i.toFixed(0)+row.toFixed(0)+'" onclick="onSelect(this.id);">'+((row+1)*100)+'</button></td>'
+		}
+		bodyHTML += '</tr>'
+	}
+	tabGridBody.innerHTML = bodyHTML;	
 }
 
 

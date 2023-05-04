@@ -26,12 +26,13 @@ let g_selectClass = document.getElementById("classselect");
 let g_classList = new Array();
 let g_currentQuizList = null;
 let g_currentQuiz = null;
+let g_thisClass = null;
 g_selectQuizTab.setAttribute("hidden","true");
 
 function onSelectQuiz()
 {
 	g_currentQuiz = null;
-	let quiz_data_file_promise = getFile("https://www.astronaos.com/astronomy/jquiz/" + g_currentQuizList[thisClass.quizzes[i].title] + ".json");
+	let quiz_data_file_promise = getFile("https://www.astronaos.com/astronomy/jquiz/" + g_currentQuizList[g_thisClass.quizzes[i].title] + ".json");
 	if (typeof quiz_data_file_promise != 'undefined' && quiz_data_file_promise !== null)
 		quiz_data_file_promise.then(function(value){g_currentQuiz = JSON.parse(value); tab.removeAttribute("hidden"); g_selectQuizTab.setAttribute("hidden","true"); g_selectClassTab.setAttribute("hidden","true"); initialize();},function(error){g_currentQuiz = null; ret.failed = true; ret.failed = error;})
 }
@@ -43,7 +44,7 @@ function onSelectClass()
 	{
 		g_selectQuiz.remove(0);
 	}
-	const thisClass = g_classList[g_selectClass.value];
+	g_thisClass = g_classList[g_selectClass.value];
 	g_currentQuizList = new Array();
 	for (let i = 0; i < thisClass.quizzes.length; i++)
 	{

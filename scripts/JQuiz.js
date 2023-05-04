@@ -129,6 +129,7 @@ function onAnswer()
 		{
 			tab.removeAttribute("hidden");
 			questionholder.setAttribute("hidden","true");
+			g_quizControls.removeAttribute("hidden");
 		}
 		else
 		{
@@ -138,7 +139,6 @@ function onAnswer()
 //				window.setTimeout(onAnswer, timerlength * 1000);
 				
 		}
-		g_quizControls.removeAttribute("hidden");
 	}
 }
 

@@ -31,10 +31,13 @@ g_selectQuizTab.setAttribute("hidden","true");
 
 function onSelectQuiz()
 {
-	g_currentQuiz = null;
-	let quiz_data_file_promise = getFile("https://www.astronaos.com/astronomy/jquiz/" + g_currentQuizList[g_selectQuiz.value]);
-	if (typeof quiz_data_file_promise != 'undefined' && quiz_data_file_promise !== null)
-		quiz_data_file_promise.then(function(value){g_currentQuiz = JSON.parse(value); tab.removeAttribute("hidden"); g_selectQuizTab.setAttribute("hidden","true"); g_selectClassTab.setAttribute("hidden","true"); initialize();},function(error){g_currentQuiz = null; ret.failed = true; ret.failed = error;})
+	if (g_selectQuiz.value !== "Select Quiz ...")
+	{
+		g_currentQuiz = null;
+		let quiz_data_file_promise = getFile("https://www.astronaos.com/astronomy/jquiz/" + g_currentQuizList[g_selectQuiz.value]);
+		if (typeof quiz_data_file_promise != 'undefined' && quiz_data_file_promise !== null)
+			quiz_data_file_promise.then(function(value){g_currentQuiz = JSON.parse(value); tab.removeAttribute("hidden"); g_selectQuizTab.setAttribute("hidden","true"); g_selectClassTab.setAttribute("hidden","true"); initialize();},function(error){g_currentQuiz = null; ret.failed = true; ret.failed = error;})
+	}
 }
 g_selectQuiz.onchange = onSelectQuiz;
 
@@ -46,6 +49,12 @@ function onSelectClass()
 	}
 	g_thisClass = g_classList[g_selectClass.value];
 	g_currentQuizList = new Array();
+
+	{
+		let option = document.createElement("option");
+		option.text = "Select Quiz ...";
+		g_selectQuiz.add(option)
+	}
 	for (let i = 0; i < g_thisClass.quizzes.length; i++)
 	{
 		let option = document.createElement("option");
@@ -65,23 +74,34 @@ function indexWaiter()
 	{
 		// populate quiz select
 		// 
-		let classArray = new Array();
-		for (let i = 0; i < g_quizIndex.data.length; i++)
+		if (g_quizIndex.data.length == 1)
 		{
-			const classQuizzes = g_quizIndex.data[i];
-			g_classList[classQuizzes.class] = {class: classQuizzes.class, quizzes: classQuizzes.quizzes};
-			classArray.push(classQuizzes.class);
+			onSelectClass();
 		}
-		classArray.sort();
-		for (let i = 0; i < classArray.length; i++)
+		else
 		{
-			let option = document.createElement("option");
-			option.text = classArray[i];
-			g_selectClass.add(option)
+			let classArray = new Array();
+			for (let i = 0; i < g_quizIndex.data.length; i++)
+			{
+				const classQuizzes = g_quizIndex.data[i];
+				g_classList[classQuizzes.class] = {class: classQuizzes.class, quizzes: classQuizzes.quizzes};
+				classArray.push(classQuizzes.class);
+			}
+			classArray.sort();
+			
+			{
+				let option = document.createElement("option");
+				option.text = "Select Class ...";
+				g_selectClass.add(option)
+			}
+			for (let i = 0; i < classArray.length; i++)
+			{
+				let option = document.createElement("option");
+				option.text = classArray[i];
+				g_selectClass.add(option)
+			}
 		}
 		g_selectQuiz.removeAttribute("hidden");
-		if (classArray.length == 1)
-			onSelectClass();
 	}
 	else
 		window.setTimeout(indexWaiter, 1000.0);

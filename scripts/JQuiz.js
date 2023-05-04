@@ -62,16 +62,18 @@ function indexWaiter()
 	{
 		// populate quiz select
 		// 
+		let classArray = new Array();
 		for (let i = 0; i < g_quizIndex.data.length; i++)
 		{
 			const classQuizzes = g_quizIndex.data[i];
 			g_classList[classQuizzes.class] = {class: classQuizzes.class, quizzes: classQuizzes.quizzes};
+			classArray.add(classQuizzes.class);
 		}
-		g_classList.sort(function (a, b) { return a.class.localeCompare(b.class) });
-		for (let i = 0; i < g_classList.length; i++)
+		classArray.sort();
+		for (let i = 0; i < classArray.length; i++)
 		{
 			let option = document.createElement("option");
-			option.text = g_classList[i].class;
+			option.text = classArray[i];
 			g_selectClass.add(option)
 		}
 	}

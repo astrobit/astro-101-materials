@@ -14,10 +14,14 @@ let level = 0; //0 = 1st round, 1 = 2nd round, 2 = 3rd round
 let timerlength = 90; // seconds
 let currquestion = null;
 
+function processQuizIndex(value)
+{
+	g_quizIndex = JSON.parse(value);
+}
 let quiz_index_file_promise = getFile("https://www.astronaos.com/astronomy/jquiz/index.json");
 let g_quizIndex = null;
 if (typeof quiz_index_file_promise != 'undefined' && quiz_index_file_promise !== null)
-	quiz_index_file_promise.then(function(value){g_quizIndex = JSON.parse(value)},function(error){console.log("quiz index fetch error: " + error);})
+	quiz_index_file_promise.then(processQuizIndex,function(error){console.log("quiz index fetch error: " + error);})
 
 let g_selectClassTab = document.getElementById("classselectDiv");
 let g_selectQuizTab = document.getElementById("quizselectDiv");

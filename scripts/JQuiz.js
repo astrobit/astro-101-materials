@@ -33,7 +33,7 @@ function onSelectQuiz()
 	g_currentQuiz = null;
 	let quiz_data_file_promise = getFile("https://www.astronaos.com/astronomy/jquiz/" + g_currentQuizList[thisClass.quizzes[i].title] + ".json");
 	if (typeof quiz_data_file_promise != 'undefined' && quiz_data_file_promise !== null)
-		quiz_data_file_promise.then(function(value){g_currentQuiz = JSON.parse(value); initialize();},function(error){g_currentQuiz = null; ret.failed = true; ret.failed = error;})
+		quiz_data_file_promise.then(function(value){g_currentQuiz = JSON.parse(value); tab.removeAttribute("hidden"); g_selectQuizTab.setAttribute("hidden","true"); g_selectClassTab.setAttribute("hidden","true"); initialize();},function(error){g_currentQuiz = null; ret.failed = true; ret.failed = error;})
 }
 g_selectQuiz.onchange = onSelectQuiz;
 

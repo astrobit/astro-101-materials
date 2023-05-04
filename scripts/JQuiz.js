@@ -139,11 +139,8 @@ function onAnswer()
 	}
 }
 
-function onSelect()
+function onSelect(category,row)
 {
-	const category = Number(this.id.charAt(0));
-	const row = Number(this.id.charAt(1));
-	
 	let qset = g_currentQuiz.questions[level];
 	currquestion = qset[category][row];
 	if (!mode || !currquestion.complete)
@@ -182,7 +179,7 @@ function initialize()
 		bodyHTML += '<tr>';
 		for (let i = 0; i < g_currentQuiz.categories.length; i++)
 		{
-			bodyHTML += '<td><button id="'+i.toFixed(0)+row.toFixed(0)+'" onclick="onSelect(this.id);">'+((row+1)*100)+'</button></td>'
+			bodyHTML += '<td><button id="'+i.toFixed(0)+row.toFixed(0)+'" onclick="onSelect('+i+','+row+');">'+((row+1)*100)+'</button></td>'
 		}
 		bodyHTML += '</tr>'
 	}

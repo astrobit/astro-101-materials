@@ -1,57 +1,50 @@
 {
-	"title": "ASTR 1303/1403 Exam 4 Review",
-	"categories": ["Fusion", "Stars", "Star Formation", "Stellar Evolution", "White Dwarfs", "Super- novae", "Neutron Stars and Black Holes"],
+	"title": "ASTR 1303 Exam 4 Review",
+	"categories": ["The Milky Way", "Galaxies", "Quasars", "The Universe", "Dark Matter", "The Big Bang"],
 	"questions": 
 	[
 		[
 			[
-				{"q":"The element beyond which fusion can't release energy.","a":"Iron (Fe)","complete":false},
-				{"q":"The end product of the p-p chain.","a":"Helium (He)","complete":false},
-				{"q":"The temperature needed to star hydrogen fusion.","a":"10 - 15 Million K ","complete":false},
-				{"q":"Carbon, nitrogen, or oxygen catalyze this form of fusion, which forms helium from hydrogen.","a":"CNO Cycle","complete":false},
-				{"q":"This subatomic particle is released when a proton transforms into a neutron, or vice-versa.","a":"Neutrino","complete":false}
+				{"q":"The Milky Way is this type of galaxy.","a":"Barred Spiral","complete":false},
+				{"q":"The Sun is this type of star, found most commonly in the disk of the galaxy.","a":"Population I","complete":false},
+				{"q":"The Sun is located in this portion of the galaxy.","a":"Disk","complete":false},
+				{"q":"These types of stars make up the bulge, halo, and globular clusters.","a":"Population II","complete":false},
+				{"q":"This feature connects the bulge to the spiral arms of the Milky Way.","a":"Bar","complete":false}
 			],
 			[
-				{"q":"The majority of stars can be found in this region of the H-R diagram or CMD.","a":"Main Sequence","complete":false},
-				{"q":"This spectral type is hottest.","a":"O","complete":false},
-				{"q":"This spectral type is coolest, and has the strongest molecular lines.","a":"M","complete":false},
-				{"q":"The Sun is of this spectral type.","a":"G","complete":false},
-				{"q":"The luminosity of a star is proportional to its mass to this power.","a":"Four (4)","complete":false}
+				{"q":"Stars that vary in brightness with regularity; the period of the variation is proportional to their luminosity.","a":"Cepheid Variables","complete":false},
+				{"q":"The Andromeda galaxy is this type of galaxy.","a":"Spiral","complete":false},
+				{"q":"These galaxies have a disk, bulge, and arms where star formation is happening.","a":"Spiral","complete":false},
+				{"q":"These galaxies are in the process of merging; they have no specific structure.","a":"Irregular","complete":false},
+				{"q":"The most massive of all types of galaxies, they are the result of a major merger between galaxies.","a":"Elliptical","complete":false}
 			],
 			[
-				{"q":"This is the cause for a cloud to flatten into a disk, and for increasing rotation as a cloud shrinks","a":"Conservation of Angular Momentum","complete":false},
-				{"q":"Blobs of gas that don't have enough material to become a proper star will become this.","a":"Brown Dwarf","complete":false},
-				{"q":"This is the term for when a star first beomes a star; or more specifically, where it is on an H-R diagram at this moment.","a":"Zero Age Main Sequence (ZAMS)","complete":false},
-				{"q":"The name for a dense core of gas that is opaque, but not yet a star.","a":"Protostar","complete":false},
-				{"q":"Protorstars shoot out these to help them shrink further.","a":"Polar Jet","complete":false}
+				{"q":"At the heart of every quasar lies on of these.","a":"Supermassive Black Hole","complete":false},
+				{"q":"Long tails of gas that was expelled from a quasar, they move at nearly the speed of light.","a":"Radio Lobes / Radio Jets","complete":false},
+				{"q":"The term for quasars that are pointed directly at Earth.","a":"Blazars","complete":false},
+				{"q":"This type of quasar is partially obscured by dust; they show broad emission lines in their spectra.","a":"Type I","complete":false},
+				{"q":"This type of quasar is seen nearly face on; they show narrow emission lines in their spectra.","a":"Type II","complete":false}
 			],
 			[
-				{"q":"In this phase of a star's life, its used all of the hydrogen in the core. The star is cooling and expanding, while the core is shrinking and heating up.", "a": "Red Giant","complete":false},
-				{"q":"The phase of many stars life when it is fusing helium into carbon and oxygen in the core, and the star is mostly stable.","a":"Horizontal Branch","complete":false},
-				{"q":"The penultimate stage of an intermediate mass star's life, when its core is exhausted of helium.","a":"Asymptotic Giant Branch","complete":false},
-				{"q":"A term for when a star is fusing both hydrogen and helium outside of the core.","a":"Double Shell Burning","complete":false},
-				{"q":"A term for the internal structure of a a massive star, which developed sucessively more massive elements.","a":"Onion Layers","complete":false}
+				{"q":"The term for the nearby galaxies that include the Milky Way and Andromeda galaxies.", "q": "Local Group","complete":false},
+				{"q":"This cluster, discovered in the 1990s, is one of the best pieces of evidence for the existance of dark matter.","a":"Bullet Cluster","complete":false},
+				{"q":"Light being bent by the gravity of clusters or black holes; this effect is used to measure the mass of clusters of galaxes.","a":"Gravitational Lensing","complete":false},
+				{"q":"Hot gas surrounding galaxies and clusters emits this type of light; the temperature of the gas is then used to measure the mass of a galaxy cluster.","a":"x-rays","complete":false},
+				{"q":"The term for the rate at which the Universe is expanding; the current value is 74 km/s/Mpc or 67 km/s/Mpc.","a":"Hubble Constant","complete":false}
 			],
 			[
-				{"q":"The maximum mass of a white dwarf, also known as the Chandrasekhar limit.", "a": "1.44 Solar Masses","complete":false},
-				{"q":"The type of pressure that balances gravity in a white dwarf.","a":"Degenerate Electron Pressure / Quantum Electron Pressure","complete":false},
-				{"q":"Most white dwarfs are made of these two elements.","a":"Carbon and Oxygen","complete":false},
-				{"q":"Most white dwarfs that are in a binary star system will become these bright events.","a":"Nova","complete":false},
-				{"q":"Many stars create this large color cloud of gas and dust as they transition to becoming a white dwarf.","a":"Planetary Nebula","complete":false}
+				{"q":"This type of particle dark matter interacts via the weak force and gravity.", "q": "WIMP","complete":false},
+				{"q":"The term for dark matter that consists of black holes, planets, or small stars.","a":"MaCHOs","complete":false},
+				{"q":"The term for an alternative theory of gravity that could explain dark matter.","a":"MOND","complete":false},
+				{"q":"This experiment is running in a mine in Minnesota looking for a specific form of dark matter.","a":"CDMS","complete":false},
+				{"q":"The astronomer credited with finding the first strong evidence of dark matter in galaxies.","a":"Vera Rubin","complete":false}
 			],
 			[
-				{"q":"This type of supernova is the brightest. It lacks hydrogen and helium in its spectra, and exhibits strong silicon absorption. They are explained as exploding white dwarfs.","a":"Type Ia","complete":false},
-				{"q":"SN 1987A was one of this type of supernova, the result of a massive star running out of fuel.","a":"Type II","complete":false},
-				{"q":"Type II supernova are expected to leave behind this remnant.", "a":"Neutron Star","complete":false},
-				{"q":"The result of some of the most massive stars exhausting their fuel. These supernova lack hydrogen, but may or may not have helium absorption lines.", "a":"Type Ib/Ic Supernova","complete":false},
-				{"q":"The approximate mass required for a main sequence star to go supernova.", "a":"8 - 10 Solar Masses","complete":false}
-			],
-			[
-				{"q":"The type of pressure that supports a neutron star.", "a":"Neutron Degeneracy Pressure / Quantum Neutron Pressure","complete":false},
-				{"q":"The name for a neutron star whose magnetic pole periodically points toward Earth.", "a":"Pulsar","complete":false},
-				{"q":"A term for the size of a black hole.", "a": "Schwarzchild Radius / Event Horizon","complete":false},
-				{"q":"This event occurs when two neutron stars merge together.", "a": "Kilonova","complete":false},
-				{"q":"Gamma ray bursts are thought to be the result of this.", "a":"Black Hole Formation","complete":false}
+				{"q":"Between about 10^-36 s and 10^-32 s after the Big Bang, the Universe underwent this phase.", "q": "Inflation","complete":false},
+				{"q":"The process of forming helium between about 10 s to 20 minutes after the Big Bang.","a":"Bib Bang Nucleosynthesis","complete":false},
+				{"q":"This type of star probably formed about 100 - 400 million years after the Big Bang.","a":"Population III","complete":false},
+				{"q":"This uniform glow can be observed in all directions; it is evidence that the Universe was once much hotter than today.","a":"Cosmic Microwave Background","complete":false},
+				{"q":"The current average temperature of the Universe.","a":"2.73 K","complete":false}
 			]
 		]
 	]

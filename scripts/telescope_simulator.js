@@ -468,11 +468,11 @@ function draw()
 		let collecting_area_units = "m²"
 		if (collecting_area < 2)
 		{
-			collecting_area = Math.round(Math.PI * (g_selectTelescope._diameter ** 2) * 1.0e4);
+			collecting_area = Math.round(Math.PI * (g_selectTelescope._diameter ** 2) * 1.0e4 * 0.25);
 			collecting_area_units = "cm²"
 		}
 		else if (collecting_area < 10)
-			collecting_area = Math.round(Math.PI * (g_selectTelescope._diameter ** 2) * 10.0) / 10.0;
+			collecting_area = Math.round(Math.PI * (g_selectTelescope._diameter ** 2) * 10.0 * 0.25) / 10.0;
 		setOutputText("collecting area",collecting_area + " " + collecting_area_units);
 		setOutputText("focal length",g_selectFocus._focal_length.toString() + " m");
 		const plate_scale_displ = Math.round(degrees(1.0e-3 / f) * 3600.0 * 1000.0) / 1000.0;

@@ -39,6 +39,83 @@
                 background: #4CAF50;
                 cursor: pointer;
             }
+
+		/* Style the tab */
+		.tab {
+		  overflow: hidden;
+		  border: 1px solid #ccc;
+		  background-color: #f1f1f1;
+		}
+
+		/* Style the buttons inside the tab */
+		.tab button {
+		  background-color: inherit;
+		  float: left;
+		  border: none;
+		  outline: none;
+		  cursor: pointer;
+		  padding: 14px 16px;
+		  transition: 0.3s;
+		  font-size: 17px;
+		}
+
+		/* Change background color of buttons on hover */
+		.tab button:hover {
+		  background-color: #ddd;
+		}
+
+		/* Create an active/current tablink class */
+		.tab button.active {
+		  background-color: #ccc;
+		}
+
+		/* Style the tab content */
+		.tabcontent {
+		  display: none;
+		  padding: 6px 12px;
+		  border: 1px solid #ccc;
+		  border-top: none;
+		}
+		
+
+		/* The Modal (background) */
+		.modal {
+		  display: none; /* Hidden by default */
+		  position: fixed; /* Stay in place */
+		  z-index: 1; /* Sit on top */
+		  padding-top: 100px; /* Location of the box */
+		  left: 0;
+		  top: 0;
+		  width: 100%; /* Full width */
+		  height: 100%; /* Full height */
+		  overflow: auto; /* Enable scroll if needed */
+		  background-color: rgb(0,0,0); /* Fallback color */
+		  background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+		}
+
+		/* Modal Content */
+		.modal-content {
+		  background-color: #fefefe;
+		  margin: auto;
+		  padding: 20px;
+		  border: 1px solid #888;
+		  width: 80%;
+		}
+
+		/* The Close Button */
+		.close {
+		  color: #aaaaaa;
+		  float: right;
+		  font-size: 28px;
+		  font-weight: bold;
+		}
+
+		.close:hover,
+		.close:focus {
+		  color: #000;
+		  text-decoration: none;
+		  cursor: pointer;
+		}		
     </style>
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-RK4K0CMEJL"></script>
     <script>
@@ -49,16 +126,93 @@
         gtag('config', 'G-RK4K0CMEJL');
     </script>
 </head>
-<body style="font-family:sans-serif;font-size:15px;width:1200px;margin-left:auto;margin-right:auto;background-color:#000000;">
-    <div style="width:1200px; margin-left:auto; margin-right:auto;height:800px;">
-        <canvas id="theCanvas" width="1200" height="800">
+<body style="font-family:sans-serif;font-size:15px;width:1200px;margin-left:auto;margin-right:auto;background-color:#000000;text-align: center;">
+<div class="tab" style="text-align:center;margin-left:auto;margin-right:auto;">
+  <button id="tabSkyMap" class="tablinks" onclick="selectTab('Sky Map')">Sky Map</button>
+  <button id="tabTelescopeView" class="tablinks" onclick="selectTab('Telescope View')">Telescope View</button>
+  <button id="tabGalaxyList" class="tablinks" onclick="selectTab('Galaxy List')">Galaxy List</button>
+  <button id="tabHubbleGraph" class="tablinks" onclick="selectTab('Hubble Graph')">Hubble Graph</button>
+</div>
+    <div id="divGalaxyList" style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align: center;">
+    	<p style="text-align:center;color:white;font-size:12pt;">Click on the galaxy ID to slew the telescope to that galaxy.</p>
+    	<table style="text-align:center;margin-left:auto;margin-right:auto;">
+    		<thead style="color:white;font-size:18pt;">
+    			<tr>
+    				<td>Galaxy</td><td>RA (h)</td><td>Dec (°)</td><td>V</td><td>z</td><td>D (Mpc)</td>
+    			<tr>
+    		</thead>
+    		<tbody id="bodyGalaxyList" style="color:gray;font-size:14pt;">>
+    			<tr>
+    				<td>------------</td><td>---</td><td>---</td><td>---</td><td>---</td><td>---</td>
+    			</tr>
+    		</tbody>
+    	</table>
+    </div>
+    <div id="divSkyMap" style="width:100%; margin-left:auto; margin-right:auto;height:100%;">
+    	<p style="text-align:center;color:white;font-size:12pt;">Yellow circle shows where telescope is pointing.</p>
+    	<p style="text-align:center;color:white;font-size:12pt;">Click on the map to slew telescope to a galaxy.</p>
+        <canvas id="canvasSkyMap">
             Canvas not supported; please update your browser.
         </canvas>
+		<div id="controlsSimulation" style="margin-left:auto; margin-right:auto;text-align: center">
+			<input type="button" id="btnFindMilkyWay" disabled value="Find the Milky Way" onclick="findHome();">
+			<input type="button" id="btnReturnMilkyWay" disabled value="Return to the Milky Way" onclick="moveHome(true);">
+			<input type="button" id="btnMoveGalaxy" value="Move to a New Galaxy" onclick="moveHome(false);">
+			<input type="button" id="btnGenerateUniverse" value="Create a new Universe" onclick="confirmUniverseGenerate();">
+		</div>
     </div>
+    <div id="divTelescopeView" style="margin-left:auto; margin-right:auto;margin-top:20px;">
+    	<p style="text-align:center;color:white;font-size:12pt;">Telescope Viewpoint</p>
+    	<p id="readoutTelescopeView" style="text-align:center;color:gray;font-size:12pt;">Telescope Viewpoint</p>
+        <canvas id="canvasTelescopeView" width="600" height="400">
+            Canvas not supported; please update your browser.
+        </canvas>
+        <div id="divGalaxyInfoTable" style="margin-left:auto; margin-right:auto;text-align:center;">
+        	<table style="text-align:center;margin-left:auto;margin-right:auto;">
+        		<thead style="color:white;font-size:18pt;">
+        			<tr>
+        				<td>Galaxy</td><td>V</td><td>z</td><td>D (Mpc)</td>
+        			<tr>
+        		</thead>
+        		<tbody id="bodyTelescopeViewTable" style="color:gray;font-size:14pt;">>
+        			<tr>
+        				<td>------------</td><td>---</td><td>---</td><td>---</td>
+        			</tr>
+        		</tbody>
+        	</table>
+        </div>
+	    <div id="controlsTelescope" style="margin-left:auto; margin-right:auto;text-align: center">
+			<input type="button" value="Take Image" onclick="takeImage();">
+			<input type="button" value="Take Spectrum" onclick="takeSpectrum();">
+		</div>
+    </div>
+    <div id="divHubbleGraph" style="width:1200px; margin-left:auto; margin-right:auto;height:800px;">
+        <canvas id="canvasHubbleGraph" width="1200" height="800">
+            Canvas not supported; please update your browser.
+        </canvas>
+        <div id="divHubbleConstant">
+        	<p id="HubbleConstant" style="color:white; text-align:center">H<sub>0</sub> = --- </p>
+        </div>
+		<div id="controlsSimulation" style="margin-left:auto; margin-right:auto;text-align: center">
+			<input type="button" value="Download Measurements" onclick="downloadMeasurements();">
+			<input type="button" value="Download Dist/Vel Measurements" onclick="downloadAnalysis();">
+			<input type="button" value="Download Hubble Data" onclick="downloadHubbleAnalysis();">
+		</div>
+    </div>
+    <div id="confirmNewUniverse" class="modal">
 
+  <!-- Modal content -->
+  <div class="modal-content" id="modalConfirmUniverseRecreate">
+    <span id="modalConfirmUniverseRecreateClose" class="close" onclick="closeModal();">&times;</span>
+    <p>Are you sure?This will erase all measurements you have made.</p></br>
+    <input id="confirmNewUniverseCancel" type="button" value="Cancel" onclick="closeModal();">
+    <input id="confirmNewUniverseOK" type="button" value="OK" onclick="confirmUniverseGenerateConfirmed();">
+  </div>
+	</div>
+</div>
     <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
         <p style="color: gray;font-size:75%">
-            Copyright (c) 2020 - 2021, Brian W. Mulligan
+            Copyright &copy; 2020 - 2023, Brian W. Mulligan
             <a href="https://www.iubenda.com/privacy-policy/91469080" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe " title="Privacy Policy ">Privacy Policy</a>
             <script type="text/javascript">(function (w, d) { var loader = function () { var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src = "https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s, tag); }; if (w.addEventListener) { w.addEventListener("load", loader, false); } else if (w.attachEvent) { w.attachEvent("onload", loader); } else { w.onload = loader; } })(window, document);</script>
         </p>

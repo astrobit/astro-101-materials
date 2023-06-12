@@ -1,63 +1,111 @@
-// JavaScript source code
+
+
 class ThreeVector
 {
-	calcPolar()
+	#r;
+	#theta;
+	#psi;
+	#x;
+	#y;
+	#z;
+	#calcPolar()
 	{
-		if (typeof this._x == 'number' && typeof this._y == 'number' && typeof this._z == 'number')
+		if (typeof this.#x == 'number' && typeof this.#y == 'number' && typeof this.#z == 'number')
 		{
-			this._r = Math.sqrt(this._x * this._x + this._y * this._y + this._z * this._z);
-			this._theta = Math.atan2(this._y,this._x);
-			if (this._r == 0.0)
-				this._psi = 0.0;
+			this.#r = Math.sqrt(this.#x * this.#x + this.#y * this.#y + this.#z * this.#z);
+			this.#theta = Math.atan2(this.#y,this.#x);
+			if (this.#r == 0.0)
+				this.#psi = 0.0;
 			else
-				this._psi = Math.asin(this._z / this._r);
+				this.#psi = Math.asin(this.#z / this.#r);
 		}
 	}
-	calcRectangular()
+	#calcRectangular()
 	{
-		if (typeof this._r == 'number' && typeof this._theta == 'number' && typeof this._psi == 'number')
+		if (typeof this.#r == 'number' && typeof this.#theta == 'number' && typeof this.#psi == 'number')
 		{
-			this._x = this._r * Math.cos(this._theta) * Math.cos(this._psi);
-			this._y = this._r * Math.sin(this._theta) * Math.cos(this._psi);
-			this._z = this._r * Math.sin(this._psi);
+			this.#x = this.#r * Math.cos(this.#theta) * Math.cos(this.#psi);
+			this.#y = this.#r * Math.sin(this.#theta) * Math.cos(this.#psi);
+			this.#z = this.#r * Math.sin(this.#psi);
 		}
 	}
-	constructor(x,y,z)
+	selfCopy(vector)
 	{
-		if (x instanceof ThreeVector)
+		if (arguments.length >= 1 && arguments[0] instanceof Object)
 		{
-			this.selfCopy(x);
+			if ("__type" in arguments[0] && arguments[0].__type == "Vector")
+			{
+				this.#x = arguments[0].#x;
+				this.#y = arguments[0].#y;
+				this.#z = arguments[0].#z;
+			}
+			else
+			{
+				this.#x = ("#x" in arguments[0] && typeof arguments[0].#x  == "number") ? arguments[0].#x : 0;
+				this.#y = ("#y" in arguments[0] && typeof arguments[0].#y  == "number") ? arguments[0].#y : 0;
+				this.#z = ("#z" in arguments[0] && typeof arguments[0].#z  == "number") ? arguments[0].#z : 0;
+			}
+			this.#calcPolar();
+		}
+	}
+	
+	constructor()
+	{
+		this.__type = "Vector";
+//		Object.defineProperty(this, "__type", {value: "Vector", writable: false});
+		if (arguments.length == 1)
+		{
+			if (arguments[0] instanceof Object)
+			{
+				if (arguments[0] instanceof Array)
+				{
+					this.#x = (arguments[0].length > 0) ? arguments[0][0] : 0;
+					this.#y = (arguments[0].length > 1) ? arguments[0][1] : 0;
+					this.#z = (arguments[0].length > 2) ? arguments[0][2] : 0;
+				}
+				else if ("__type" in arguments[0] && arguments[0].__type == "Vector")
+				{
+					this.#x = arguments[0].#x;
+					this.#y = arguments[0].#y;
+					this.#z = arguments[0].#z;
+				}
+				else
+				{
+					this.#x = ("#x" in arguments[0] && typeof arguments[0].#x  == "number") ? arguments[0].#x : 0;
+					this.#y = ("#y" in arguments[0] && typeof arguments[0].#y  == "number") ? arguments[0].#y : 0;
+					this.#z = ("#z" in arguments[0] && typeof arguments[0].#z  == "number") ? arguments[0].#z : 0;
+				}
+			}
+			else
+			{
+				this.#x = (arguments[0]  == "number") ? arguments[0] : 0;
+				this.#y = 0;
+				this.#z = 0;
+			}
 		}
 		else
 		{
-			this._x = 0;
-			this._y = 0;
-			this._z = 0;
-
-			if (typeof x == 'number')
-				this._x = x;
-			if (typeof y == 'number')
-				this._y = y;
-			if (typeof z == 'number')
-				this._z = z;
-			this.calcPolar();
+			this.#x = (arguments.length > 0 && typeof arguments[0]  == "number") ? arguments[0] : 0;
+			this.#y = (arguments.length > 1 && typeof arguments[1]  == "number") ? arguments[1] : 0;
+			this.#z = (arguments.length > 2 && typeof arguments[2]  == "number") ? arguments[2] : 0;
 		}
+		this.#calcPolar();
 	}
 	add(vector)
 	{
-		return new ThreeVector(this._x + vector._x,this._y + vector._y, this._z + vector._z);
+		return new ThreeVector(this.#x + vector.#x,this.#y + vector.#y, this.#z + vector.#z);
 	}
 	subtract(vector)
 	{
-		return new ThreeVector(this._x - vector._x,this._y - vector._y, this._z - vector._z);
+		return new ThreeVector(this.#x - vector.#x,this.#y - vector.#y, this.#z - vector.#z);
 	}
 	dot(vector)
 	{
-		return this._x * vector._x + this._y * vector._y + this._z * vector._z;
+		return this.#x * vector.#x + this.#y * vector.#y + this.#z * vector.#z;
 	}
 	cross(vector)
 	{
-		return new ThreeVector(this._y * vector._z - vector._y * this._z, this._z * vector._x - this._x * vector._z, this._x * vector._y - this._y * vector._x);
+		return new ThreeVector(this.#y * vector.#z - vector.#y * this.#z, this.#z * vector.#x - this.#x * vector.#z, this.#x * vector.#y - this.#y * vector.#x);
 	}
 	scale(scalar)
 	{
@@ -67,53 +115,44 @@ class ThreeVector
 	}
 	get magnitude()
 	{
-		return this._r;
+		return this.#r;
 	}
 	get unit()
 	{
 		let ret = new ThreeVector(this);
-		ret.selfScale(1.0 / ret._r);
+		ret.selfScale(1.0 / ret.#r);
 		return ret;
 	}
 
 	selfDot()
 	{
-		return this._r * this._r;
+		return this.#r * this.#r;
 	}
 	selfAdd(vector)
 	{
-		this._x += vector._x;
-		this._y += vector._y;
-		this._z += vector._z;
-		this.calcPolar();
+		this.#x += vector.#x;
+		this.#y += vector.#y;
+		this.#z += vector.#z;
+		this.#calcPolar();
 	}
 	selfSubtract(vector)
 	{
-		this._x -= vector._x;
-		this._y -= vector._y;
-		this._z -= vector._z;
-		this.calcPolar();
+		this.#x -= vector.#x;
+		this.#y -= vector.#y;
+		this.#z -= vector.#z;
+		this.#calcPolar();
 	}
 	selfScale(scalar)
 	{
-		this._x *= scalar;
-		this._y *= scalar;
-		this._z *= scalar;
-		this._r *= Math.abs(scalar);
+		this.#x *= scalar;
+		this.#y *= scalar;
+		this.#z *= scalar;
+		this.#r *= Math.abs(scalar);
 		//this.calcPolar();
 	}
 	selfUnit()
 	{
-		this.selfScale(1.0 / this._r);
-	}
-	selfCopy(vector)
-	{
-		this._x = vector._x;
-		this._y = vector._y;
-		this._z = vector._z;
-		this._r = vector._r;
-		this._theta = vector._theta;
-		this._psi = vector._psi;
+		this.selfScale(1.0 / this.#r);
 	}
 
 	copy()
@@ -122,110 +161,154 @@ class ThreeVector
 	}
 	updateXYZ(x,y,z)
 	{
-		this._x = x;
-		this._y = y;
-		this._z = z;
-		this.calcPolar();
+		this.#x = x;
+		this.#y = y;
+		this.#z = z;
+		this.#calcPolar();
 	}
 	updatePolar(r,theta,psi)
 	{
-		this._r = r;
-		this._theta = theta;
-		this._psi = psi;
-		this.calcRectangular();
+		this.#r = r;
+		this.#theta = theta;
+		this.#psi = psi;
+		this.#calcRectangular();
 	}
 	set x(val)
 	{
-		this._x = val;
-		this.calcPolar();
+		this.#x = val;
+		this.#calcPolar();
 	}
 	set y(val)
 	{
-		this._y = val;
-		this.calcPolar();
+		this.#y = val;
+		this.#calcPolar();
 	}
 	set z(val)
 	{
-		this._z = val;
-		this.calcPolar();
+		this.#z = val;
+		this.#calcPolar();
 	}
 	set r(val)
 	{
-		this._r = val;
-		this.calcRectangular();
+		this.#r = val;
+		this.#calcRectangular();
 	}
 	set theta(val)
 	{
-		this._theta = val;
-		this.calcRectangular();
+		this.#theta = val;
+		this.#calcRectangular();
 	}
 	set psi(val)
 	{
-		this._psi = val;
-		this.calcRectangular();
+		this.#psi = val;
+		this.#calcRectangular();
 	}
 	get x()
 	{
-		return this._x;
+		return this.#x;
 	}
 	get y()
 	{
-		return this._y;
+		return this.#y;
 	}
 	get z()
 	{
-		return this._z;
+		return this.#z;
 	}
 	get r()
 	{
-		return this._r;
+		return this.#r;
 	}
 	get radius()
 	{
-		return this._r;
+		return this.#r;
 	}
 	get theta()
 	{
-		return this._theta;
+		return this.#theta;
 	}
 	get psi()
 	{
-		return this._psi;
+		return this.#psi;
 	}
-
 }
-
 
 class ThreeMatrix
 {
-	constructor(Ax,Ay,Az,Bx,By,Bz,Cx,Cy,Cz)
-	{
-		this.data = new Array(3);
-		this.data[0] = new ThreeVector(Ax,Ay,Az);
-		this.data[1] = new ThreeVector(Bx,By,Bz);
-		this.data[2] = new ThreeVector(Cx,Cy,Cz);
-		if (Ax instanceof ThreeMatrix) // allow 
-		{
-			this.selfCopy(Ax);
-		}
-		else if (Ax instanceof ThreeVector && Ay instanceof ThreeVector && Az instanceof ThreeVector)
-		{
-			//this.data[0] = new ThreeVector(Ax); //this is already done by the constructor for the data[0] ThreeVector
-			this.data[1] = new ThreeVector(Ay);
-			this.data[2] = new ThreeVector(Az);
-		}
-	}
+	#data;
 	loadIdentity()
 	{
-		this.data[0].x = 1;
-		this.data[0].y = 0;
-		this.data[0].z = 0;
-		this.data[1].x = 0;
-		this.data[1].y = 1;
-		this.data[1].z = 0;
-		this.data[2].x = 0;
-		this.data[2].y = 0;
-		this.data[2].z = 1;
+		this.#data[0].x = 1;
+		this.#data[0].y = 0;
+		this.#data[0].z = 0;
+		this.#data[1].x = 0;
+		this.#data[1].y = 1;
+		this.#data[1].z = 0;
+		this.#data[2].x = 0;
+		this.#data[2].y = 0;
+		this.#data[2].z = 1;
+	}
+	constructor()
+	{
+		this.__type = "Matrix";
+//		Object.defineProperty(this, "__type", {value: "Matrix", writable: false});
+		this.#data = new Array(3);
+		let loadSuccess = false;
+		if (arguments.length == 1)
+		{
+			if (arguments[0] instanceof Array && arguments[0].length == 9 &&
+				typeof arguments[0][0] == "number" && typeof arguments[0][1]  == "number" && typeof arguments[0][2]  == "number" &&
+				typeof arguments[0][3]  == "number" && typeof arguments[0][4]  == "number" && typeof arguments[0][5]  == "number" &&
+				typeof arguments[0][6]  == "number" && typeof arguments[0][7]  == "number" && typeof arguments[0][8]  == "number")
+			{
+				this.#data[0] = new ThreeVector(arguments[0][0],arguments[0][1],arguments[0][2]);
+				this.#data[1] = new ThreeVector(arguments[0][3],arguments[0][4],arguments[0][5]);
+				this.#data[2] = new ThreeVector(arguments[0][6],arguments[0][7],arguments[0][8]);
+				loadSuccess = true;
+			}
+			else if (arguments[0] instanceof Object &&
+				(("__type" in arguments[0] && arguments[0].__type == "Matrix") ||
+					("data" in arguments[0] && arguments[0].#data instanceof Array && arguments[0].length == 3)) &&
+				("__type" in arguments[0].#data[0] && arguments[0].#data[0].__type == "Vector") &&
+				("__type" in arguments[0].#data[1] && arguments[0].#data[1].__type == "Vector") &&
+				("__type" in arguments[0].#data[2] && arguments[0].#data[2].__type == "Vector"))
+			{
+				this.#data[0] = new ThreeVector(arguments[0].data[0]);
+				this.#data[1] = new ThreeVector(arguments[0].data[1]);
+				this.#data[2] = new ThreeVector(arguments[0].data[2]);
+				loadSuccess = true;
+			}
+		}
+		else if (arguments.length == 3)
+		{
+			if (((arguments[0] instanceof Array && arguments[0].length == 3) || (arguments[0] instanceof Object && "__type" in arguments[0] && arguments[0].__type == "Vector")) &&
+				((arguments[1] instanceof Array && arguments[1].length == 3) || (arguments[1] instanceof Object && "__type" in arguments[1] && arguments[1].__type == "Vector")) &&
+				((arguments[2] instanceof Array && arguments[2].length == 3) || (arguments[2] instanceof Object && "__type" in arguments[2] && arguments[2].__type == "Vector")))
+			{
+				this.#data[0] = new ThreeVector(arguments[0]);
+				this.#data[1] = new ThreeVector(arguments[1]);
+				this.#data[2] = new ThreeVector(arguments[2]);
+				loadSuccess = true;
+			}
+		}
+		else if (arguments.length == 9)
+		{
+			if (typeof arguments[0] == "number" && typeof arguments[1]  == "number" && typeof arguments[2]  == "number" &&
+				typeof arguments[3]  == "number" && typeof arguments[4]  == "number" && typeof arguments[5]  == "number" &&
+				typeof arguments[6]  == "number" && typeof arguments[7]  == "number" && typeof arguments[8]  == "number")
+			{
+				this.#data[0] = new ThreeVector(arguments[0],arguments[1],arguments[2]);
+				this.#data[1] = new ThreeVector(arguments[3],arguments[4],arguments[5]);
+				this.#data[2] = new ThreeVector(arguments[6],arguments[7],arguments[8]);
+				loadSuccess = true;
+			}
+		}
+		if (!loadSuccess)
+		{
+			this.#data[0] = new ThreeVector(1,0,0);
+			this.#data[1] = new ThreeVector(0,1,0);
+			this.#data[2] = new ThreeVector(0,0,1);
+		}
 	}
 	getRowVector(row)
 	{
@@ -233,13 +316,13 @@ class ThreeMatrix
 		switch (row)
 		{
 		case 0:
-			ret = new ThreeVector(this.data[0].x,this.data[1].x,this.data[2].x);
+			ret = new ThreeVector(this.#data[0].x,this.#data[1].x,this.#data[2].x);
 			break;
 		case 1:
-			ret = new ThreeVector(this.data[0].y,this.data[1].y,this.data[2].y);
+			ret = new ThreeVector(this.#data[0].y,this.#data[1].y,this.#data[2].y);
 			break;
 		case 2:
-			ret = new ThreeVector(this.data[0].z,this.data[1].z,this.data[2].z);
+			ret = new ThreeVector(this.#data[0].z,this.#data[1].z,this.#data[2].z);
 			break;
 		default:
 			break;
@@ -252,19 +335,19 @@ class ThreeMatrix
 		switch (row)
 		{
 		case 0:
-			this.data[0].x = vector.x;
-			this.data[1].x = vector.y;
-			this.data[2].x = vector.z;
+			this.#data[0].x = vector.x;
+			this.#data[1].x = vector.y;
+			this.#data[2].x = vector.z;
 			break;
 		case 1:
-			this.data[0].y = vector.x;
-			this.data[1].y = vector.y;
-			this.data[2].y = vector.z;
+			this.#data[0].y = vector.x;
+			this.#data[1].y = vector.y;
+			this.#data[2].y = vector.z;
 			break;
 		case 2:
-			this.data[0].z = vector.x;
-			this.data[1].z = vector.y;
-			this.data[2].z = vector.z;
+			this.#data[0].z = vector.x;
+			this.#data[1].z = vector.y;
+			this.#data[2].z = vector.z;
 			break;
 		default:
 			break;
@@ -274,14 +357,14 @@ class ThreeMatrix
 	getColumnVector(col)
 	{
 		if (col >= 0 && col <= 2)
-			return new ThreeVector(this.data[col]);
+			return new ThreeVector(this.#data[col]);
 		else
 			return undefined;
 	}
 	setColumnVector(col,vector)
 	{
 		if (col >= 0 && col <= 2)
-			this.data[col].selfCopy(vector);
+			this.#data[col].selfCopy(vector);
 	}
 	dot(rho)
 	{
@@ -290,9 +373,9 @@ class ThreeMatrix
 //			const rowVectX = this.getRowVector(0);
 //			const rowVectY = this.getRowVector(1);
 //			const rowVectZ = this.getRowVector(2);
-			return new ThreeVector(this.data[0]._x * rho._x + this.data[1]._x * rho._y + this.data[2]._x * rho._z,
-									this.data[0]._y * rho._x + this.data[1]._y * rho._y + this.data[2]._y * rho._z,
-									this.data[0]._z * rho._x + this.data[1]._z * rho._y + this.data[2]._z * rho._z);
+			return new ThreeVector(this.#data[0].x * rho.x + this.#data[1].x * rho.y + this.#data[2].x * rho.z,
+									this.#data[0].y * rho.x + this.#data[1].y * rho.y + this.#data[2].y * rho.z,
+									this.#data[0].z * rho.x + this.#data[1].z * rho.y + this.#data[2].z * rho.z);
 //									rowVectX.dot(rho),
 //									rowVectY.dot(rho),
 //									rowVectZ.dot(rho));
@@ -319,9 +402,9 @@ class ThreeMatrix
 	}
 	selfScale(scalar)
 	{
-		this.data[0].selfScale(scalar);
-		this.data[1].selfScale(scalar);
-		this.data[2].selfScale(scalar);
+		this.#data[0].selfScale(scalar);
+		this.#data[1].selfScale(scalar);
+		this.#data[2].selfScale(scalar);
 	}
 	selfDot(matrix)
 	{
@@ -329,19 +412,19 @@ class ThreeMatrix
 //		const rowVectY = this.getRowVector(1);
 //		const rowVectZ = this.getRowVector(2);
 
-		this.data[0].updateXYZ(this._data[0]._x * matrix.data[0]._x,this._data[1]._x * matrix.data[0]._y,this._data[2]._x * matrix.data[0]._z);
-		this.data[1].updateXYZ(this._data[0]._y * matrix.data[1]._x,this._data[1]._y * matrix.data[1]._y,this._data[2]._y * matrix.data[1]._z);
-		this.data[2].updateXYZ(this._data[0]._z * matrix.data[2]._x,this._data[1]._z * matrix.data[2]._y,this._data[2]._z * matrix.data[2]._z);
+		this.#data[0].updateXYZ(this._data[0].x * matrix.data[0].x,this._data[1].x * matrix.data[0].y,this._data[2].x * matrix.data[0].z);
+		this.#data[1].updateXYZ(this._data[0].y * matrix.data[1].x,this._data[1].y * matrix.data[1].y,this._data[2].y * matrix.data[1].z);
+		this.#data[2].updateXYZ(this._data[0].z * matrix.data[2].x,this._data[1].z * matrix.data[2].y,this._data[2].z * matrix.data[2].z);
 		
-//		this.data[0].updateXYZ(rowVectX.dot(matrix.data[0]),rowVectY.dot(matrix.data[0]),rowVectZ.dot(matrix.data[0]));
-//		this.data[1].updateXYZ(rowVectX.dot(matrix.data[1]),rowVectY.dot(matrix.data[1]),rowVectZ.dot(matrix.data[1]));
-//		this.data[2].updateXYZ(rowVectX.dot(matrix.data[2]),rowVectY.dot(matrix.data[2]),rowVectZ.dot(matrix.data[2]));
+//		this.#data[0].updateXYZ(rowVectX.dot(matrix.data[0]),rowVectY.dot(matrix.data[0]),rowVectZ.dot(matrix.data[0]));
+//		this.#data[1].updateXYZ(rowVectX.dot(matrix.data[1]),rowVectY.dot(matrix.data[1]),rowVectZ.dot(matrix.data[1]));
+//		this.#data[2].updateXYZ(rowVectX.dot(matrix.data[2]),rowVectY.dot(matrix.data[2]),rowVectZ.dot(matrix.data[2]));
 	}
 	selfCopy(matrix)
 	{
-		this.data[0].selfCopy(matrix.data[0]);
-		this.data[1].selfCopy(matrix.data[1]);
-		this.data[2].selfCopy(matrix.data[2]);
+		this.#data[0].selfCopy(matrix.data[0]);
+		this.#data[1].selfCopy(matrix.data[1]);
+		this.#data[2].selfCopy(matrix.data[2]);
 	}
 	copy()
 	{
@@ -355,13 +438,13 @@ class ThreeMatrix
 	}
 	selfTranspose()
 	{
-		const colVectA = new ThreeVector(this.data[0]);
-		const colVectB = new ThreeVector(this.data[1]);
-		const colVectC = new ThreeVector(this.data[2]);
+		const colVectA = new ThreeVector(this.#data[0]);
+		const colVectB = new ThreeVector(this.#data[1]);
+		const colVectC = new ThreeVector(this.#data[2]);
 		
-		this.data[0].updateXYZ(colVectA._x,colVectB._x,colVectC._x);
-		this.data[1].updateXYZ(colVectA._y,colVectB._y,colVectC._y);
-		this.data[2].updateXYZ(colVectA._z,colVectB._z,colVectC._z);
+		this.#data[0].updateXYZ(colVectA.x,colVectB.x,colVectC.x);
+		this.#data[1].updateXYZ(colVectA.y,colVectB.y,colVectC.y);
+		this.#data[2].updateXYZ(colVectA.z,colVectB.z,colVectC.z);
 	}
 
 	loadBasis(vectX,vectY,vectZ)
@@ -407,5 +490,24 @@ const LinAlg = {
 unitX: new ThreeVector(1,0,0),
 unitY: new ThreeVector(0,1,0),
 unitZ: new ThreeVector(0,0,1),
-identityMatrix: new ThreeMatrix(this.unitX,this.unitY,this.unitZ)
+identityMatrix: new ThreeMatrix(this.unitX,this.unitY,this.unitZ),
+isVector: function (a) { return a instanceof Vector || (a instanceof Object && "__type" in a && a.__type == "Vector");},
+isMatrix: function (a) { return a instanceof Vector || (a instanceof Object && "__type" in a && a.__type == "Matrix");},
+generateRandomVector: function (cubeSize)
+{
+	return new ThreeVector((Math.random() - 0.5) * cubeSize,
+								(Math.random() - 0.5) * cubeSize,
+								(Math.random() - 0.5) * cubeSize);
+},
+generateRandomUnitVector: function ()
+{
+	const theta = Math.random() * 2.0 * Math.PI;
+	const phi = (Math.random() - 0.5) * Math.PI;
+	const cosPhi = Math.cos(phi);
+	const x = Math.cos(theta) * cosPhi;
+	const y = Math.sin(theta) * cosPhi;
+	const z = Math.sin(phi);
+	 
+	return new ThreeVector(x,y,z);
+},
 }

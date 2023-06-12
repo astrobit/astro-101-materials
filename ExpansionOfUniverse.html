@@ -126,73 +126,88 @@
         gtag('config', 'G-RK4K0CMEJL');
     </script>
 </head>
-<body style="font-family:sans-serif;font-size:15px;width:1200px;margin-left:auto;margin-right:auto;background-color:#000000;text-align: center;">
-<div class="tab" style="text-align:center;margin-left:auto;margin-right:auto;">
-  <button id="tabSkyMap" class="tablinks" onclick="selectTab('Sky Map')">Sky Map</button>
-  <button id="tabTelescopeView" class="tablinks" onclick="selectTab('Telescope View')">Telescope View</button>
-  <button id="tabGalaxyList" class="tablinks" onclick="selectTab('Galaxy List')">Galaxy List</button>
-  <button id="tabHubbleGraph" class="tablinks" onclick="selectTab('Hubble Graph')">Hubble Graph</button>
-</div>
-    <div id="divGalaxyList" style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align: center;">
-    	<p style="text-align:center;color:white;font-size:12pt;">Click on the galaxy ID to slew the telescope to that galaxy.</p>
-    	<table style="text-align:center;margin-left:auto;margin-right:auto;">
-    		<thead style="color:white;font-size:18pt;">
+<body style="font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#000000;text-align: center;">
+	<div class="tab" style="text-align:center;margin-left:0px;margin-right:auto;">
+	  <button id="tabSkyMap" class="tablinks" onclick="selectTab('Sky Map')">Sky Map</button>
+	  <button id="tabTelescopeView" class="tablinks" onclick="selectTab('Telescope View')">Telescope View</button>
+	  <button id="tabGalaxyList" class="tablinks" onclick="selectTab('Galaxy List')">Galaxy List</button>
+	  <button id="tabHubbleGraph" class="tablinks" onclick="selectTab('Hubble Graph')">Hubble Graph</button>
+	  <button id="tabMeasurementStats" class="tablinks" onclick="selectTab('Measurement Stats')">Measurement Stats</button>
+	</div>
+    <div id="divGalaxyList" style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align: center;overflow:auto;">
+    	<table style="text-align:center;margin-left:auto;margin-right:auto;border-collapse: collapse;">
+    		<thead style="color:white;font-size:18pt;position:sticky;top: 0px;">
     			<tr>
-    				<td>Galaxy</td><td>RA (h)</td><td>Dec (°)</td><td>V</td><td>z</td><td>D (Mpc)</td>
+    				<td>Galaxy</td><td></td><td>RA </td><td>Dec</td><td>V</td><td>z</td><td>Distance</td><td> #</td><td> #</td>
+    			</tr>
     			<tr>
+    				<td></td><td></td><td></td><td></td><td></td><td></td><td>(Mpc)</td><td> Images</td><td> Spectra</td>
+    			</tr>
     		</thead>
     		<tbody id="bodyGalaxyList" style="color:gray;font-size:14pt;">>
     			<tr>
-    				<td>------------</td><td>---</td><td>---</td><td>---</td><td>---</td><td>---</td>
+    				<td>------------</td><td></td><td>---</td><td>---</td><td>---</td><td>---</td><td>---</td><td>0</td><td>0</td>
     			</tr>
     		</tbody>
     	</table>
     </div>
-    <div id="divSkyMap" style="width:100%; margin-left:auto; margin-right:auto;height:100%;">
+    <div id="divSkyMap" style="width:100%; margin-left:auto; margin-right:auto;display:none;">
     	<p style="text-align:center;color:white;font-size:12pt;">Yellow circle shows where telescope is pointing.</p>
     	<p style="text-align:center;color:white;font-size:12pt;">Click on the map to slew telescope to a galaxy.</p>
-        <canvas id="canvasSkyMap">
+        <canvas id="canvasSkyMap" style="margin-left:0px	; margin-right:0px;">
             Canvas not supported; please update your browser.
         </canvas>
 		<div id="controlsSimulation" style="margin-left:auto; margin-right:auto;text-align: center">
-			<input type="button" id="btnFindMilkyWay" disabled value="Find the Milky Way" onclick="findHome();">
-			<input type="button" id="btnReturnMilkyWay" disabled value="Return to the Milky Way" onclick="moveHome(true);">
+			<input type="button" id="btnFindMilkyWay" disabled value="Find the Milky Way" onclick="findMilkyWay();">
+			<input type="button" id="btnReturnMilkyWay" disabled value="Return to the Milky Way" onclick="moveToGalaxy(0);">
 			<input type="button" id="btnMoveGalaxy" value="Move to a New Galaxy" onclick="moveHome(false);">
 			<input type="button" id="btnGenerateUniverse" value="Create a new Universe" onclick="confirmUniverseGenerate();">
 		</div>
     </div>
-    <div id="divTelescopeView" style="margin-left:auto; margin-right:auto;margin-top:20px;">
+    <div id="divTelescopeView" style="width:100%; margin-left:auto; margin-right:auto;display:none;">
     	<p style="text-align:center;color:white;font-size:12pt;">Telescope Viewpoint</p>
     	<p id="readoutTelescopeView" style="text-align:center;color:gray;font-size:12pt;">Telescope Viewpoint</p>
         <canvas id="canvasTelescopeView" width="600" height="400">
             Canvas not supported; please update your browser.
         </canvas>
-        <div id="divGalaxyInfoTable" style="margin-left:auto; margin-right:auto;text-align:center;">
+        <div id="divGalaxyInfoTable" style="width:100%; margin-left:auto; margin-right:auto;height:10%;text-align: center;overflow:auto;">
         	<table style="text-align:center;margin-left:auto;margin-right:auto;">
         		<thead style="color:white;font-size:18pt;">
         			<tr>
-        				<td>Galaxy</td><td>V</td><td>z</td><td>D (Mpc)</td>
+        				<td>Galaxy</td><td>V</td><td>z</td><td>D (Mpc)</td><td> # Images</td><td> # Spectra</td>
         			<tr>
         		</thead>
-        		<tbody id="bodyTelescopeViewTable" style="color:gray;font-size:14pt;">>
+        		<tbody id="bodyTelescopeViewTable" style="color:gray;font-size:14pt;">
         			<tr>
-        				<td>------------</td><td>---</td><td>---</td><td>---</td>
+        				<td>------------</td><td>---</td><td>---</td><td>---</td><td>0</td><td>0</td>
         			</tr>
         		</tbody>
         	</table>
         </div>
 	    <div id="controlsTelescope" style="margin-left:auto; margin-right:auto;text-align: center">
-			<input type="button" value="Take Image" onclick="takeImage();">
-			<input type="button" value="Take Spectrum" onclick="takeSpectrum();">
+			<input type="button" value="Take Image" onclick="onImageRequest();">
+			<input type="button" value="Take Spectrum" onclick="onSpectraRequest();">
 		</div>
     </div>
-    <div id="divHubbleGraph" style="width:1200px; margin-left:auto; margin-right:auto;height:800px;">
+    <div id="divHubbleGraph" style="width:100%; margin-left:auto; margin-right:auto;display:none">
         <canvas id="canvasHubbleGraph" width="1200" height="800">
             Canvas not supported; please update your browser.
         </canvas>
         <div id="divHubbleConstant">
         	<p id="HubbleConstant" style="color:white; text-align:center">H<sub>0</sub> = --- </p>
         </div>
+     </div>
+    <div id="divMeasurementInfo" style="width:100%; margin-left:auto; margin-right:auto;display:none">
+    	<div id="outputs"  style="margin-left:auto; margin-right:auto;text-align:center">
+        	<table style="text-align:center;margin-left:auto;margin-right:auto;">
+		   		<tbody id="bodyMeasurementTable" style="color:gray;font-size:14pt;">
+		   			<tr><td style="color:white; font-size:14pt;text-align:left;">Current Home Galaxy</td><td id="outputCurrentHome" style="color:white; text-align:right;font-size:14pt;">Milky Way</td></tr>
+		   			<tr><td style="color:white; font-size:14pt;text-align:left;">Number of Galaxies Measured</td><td id="outputNumMeasGalaxies" style="color:white; text-align:right;font-size:14pt;">0</td></tr>
+		   			<tr><td style="color:white; font-size:14pt;text-align:left;">Home Galaxy Velocity</td><td id="outputHomeGalaxyVelocity" style="color:white; text-align:right;font-size:14pt;">(0 ± ∞) km/s</td></tr>
+		   			<tr><td style="color:white; font-size:14pt;text-align:left;">χ²</td><td id="outputChiSquared" style="color:white; text-align:right;font-size:14pt;">∞</td></tr>
+		   		</tbody>
+       		</table>
+    	</div>
 		<div id="controlsSimulation" style="margin-left:auto; margin-right:auto;text-align: center">
 			<input type="button" value="Download Measurements" onclick="downloadMeasurements();">
 			<input type="button" value="Download Dist/Vel Measurements" onclick="downloadAnalysis();">
@@ -200,17 +215,15 @@
 		</div>
     </div>
     <div id="confirmNewUniverse" class="modal">
-
-  <!-- Modal content -->
-  <div class="modal-content" id="modalConfirmUniverseRecreate">
-    <span id="modalConfirmUniverseRecreateClose" class="close" onclick="closeModal();">&times;</span>
-    <p>Are you sure?This will erase all measurements you have made.</p></br>
-    <input id="confirmNewUniverseCancel" type="button" value="Cancel" onclick="closeModal();">
-    <input id="confirmNewUniverseOK" type="button" value="OK" onclick="confirmUniverseGenerateConfirmed();">
-  </div>
+		<!-- Modal content -->
+		<div class="modal-content" id="modalConfirmUniverseRecreate">
+			<span id="modalConfirmUniverseRecreateClose" class="close" onclick="closeModal();">&times;</span>
+			<p>Are you sure?This will erase all measurements you have made.</p></br>
+			<input id="confirmNewUniverseCancel" type="button" value="Cancel" onclick="closeModal();">
+			<input id="confirmNewUniverseOK" type="button" value="OK" onclick="confirmUniverseGenerateConfirmed();">
+		</div>
 	</div>
-</div>
-    <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
+    <div style="width:100%; margin-left:auto; margin-right:auto;text-align:center">
         <p style="color: gray;font-size:75%">
             Copyright &copy; 2020 - 2023, Brian W. Mulligan
             <a href="https://www.iubenda.com/privacy-policy/91469080" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe " title="Privacy Policy ">Privacy Policy</a>
@@ -221,13 +234,15 @@
     <script type="text/javascript" src="scripts/commonGP.js"></script>
     <script type="text/javascript" src="scripts/common.js"></script>
     <script type="text/javascript" src="scripts/commonGraph.js"></script>
-    <script type="text/javascript" src="scripts/VectorMatrix.js"></script>
+    <script type="text/javascript" src="scripts/VectorMatrix2.js"></script>
     <script type="text/javascript" src="scripts/commonAstro.js"></script>
-    <script type="text/javascript" src="scripts/LLS.js"></script>
+    <script type="text/javascript" src="scripts/LLS2.js"></script>
+	<script id="main" type="text/javascript" src="scripts/GalaxyLuminosityFunction.js"></script>
     <script type="text/javascript" src="scripts/tutorial.js"></script>
     <script type="text/javascript" src="scripts/ui.js"></script>
     <script type="text/javascript" src="scripts/Mollweide.js"></script>
-    <script type="text/javascript" src="scripts/Simulation.js"></script>
+    <script type="text/javascript" src="scripts/Ex_of_U_Universe.js"></script>
+    <script type="text/javascript" src="scripts/Simulation2.js"></script>
     <script type="text/javascript" src="scripts/ExpansionOfUniverse.js"></script>
     <!-- Global site tag (gtag.js) - Google Analytics -->
 </body>

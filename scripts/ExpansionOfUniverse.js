@@ -1,35 +1,95 @@
-﻿// Galaxy Rotation simulation for introductory astronomy
+// Galaxy Rotation simulation for introductory astronomy
 // written by Brian W. Mulligan
 // Copyright (c) 2020,2021, Brian W. Mulligan
 
 
+
+function onResetRequest()
+{
+	//@@TODO: confirm request with a popup dialogue
+	generateUniverse();
+}
+
+function generateUniverse()
+{
+	Universe.regenerateUniverse();
+}
+
+
+let btnReturnMilkyWay = document.getElementById("btnReturnMilkyWay");
+let btnMoveHome = document.getElementById("btnMoveGalaxy");
+let btnFindMilkyWay = document.getElementById("btnFindMilkyWay");
+
+function moveToGalaxy(galaxyID)
+{
+	Universe.selectHomeGalaxy(galaxyID);
+	if (!Universe.isHomeMilkyWay())
+	{
+		if (btnFindMilkyWay.hasAttribute("disabled"))
+			btnFindMilkyWay.removeAttribute("disabled");
+		if (btnReturnMilkyWay.hasAttribute("disabled"))
+			btnReturnMilkyWay.removeAttribute("disabled");
+	}
+	else
+	{
+		btnFindMilkyWay.disabled = true;
+		btnReturnMilkyWay.disabled = true;
+	}
+}
+
+function moveHome()
+{
+	moveToGalaxy(Math.floor(Math.random() * universe.galaxies.length));
+}
+function findMilkyWay()
+{
+	if (!Universe.isHomeMilkyWay())
+	{
+		const relPos = Universe.getGalaxyViewCoordinates(0);
+		g_currentTelescope.setSlewTarget(relPos.psi,relPos.theta);
+	}
+}
+
+
+function downloadMeasurements()
+{
+	const data = Universe.getMeasurementsCSV();
+	download(data,"ExpansionOfUniverseMeasurements.csv","csv");
+}
+function downloadAnalysis()
+{
+	const data = Universe.getAnalysisCSV();
+	download(data,"ExpansionOfUniverseAnalysis.csv","csv");
+}
+
+function downloadHubbleAnalysis()
+{
+	const data = Universe.getHubbleAnalysisCSV();
+	download(data,"ExpansionOfUniverseH0.csv","csv");
+}
+
+
 let theCanvasSkyMap = document.getElementById("canvasSkyMap");
 theCanvasSkyMap.onselectstart = function () { return false; }
-theCanvasSkyMap.height = window.innerHeight - 250
-theCanvasSkyMap.width = theCanvasSkyMap.height * 2.0;
 
-let theContextSkyMap = theCanvasSkyMap.getContext("2d");
 
 let canvasTelescopeView = document.getElementById("canvasTelescopeView");
-canvasTelescopeView.width = 384;
-canvasTelescopeView.height = 384;
-let contextTelescopeView = canvasTelescopeView.getContext("2d");
 
 
 let canvasHubbleGraph = document.getElementById("canvasHubbleGraph");
-canvasHubbleGraph.width = window.innerHeight - 250;
-canvasHubbleGraph.height = canvasHubbleGraph.width;
-let contextHubbleGraph = canvasHubbleGraph.getContext("2d");
 
 let divGalaxyList = document.getElementById("divGalaxyList");
+divGalaxyList.style.height = (window.innerHeight - 150).toFixed(0) + "px";
 let divSkyMap = document.getElementById("divSkyMap");
 let divTelescopeView = document.getElementById("divTelescopeView");
 let divHubbleGraph = document.getElementById("divHubbleGraph");
+let divMeasurementInfo = document.getElementById("divMeasurementInfo");
 
 let tabSkyMap = document.getElementById("tabSkyMap");
 let tabTelescopeView = document.getElementById("tabTelescopeView");
 let tabGalaxyList = document.getElementById("tabGalaxyList");
 let tabHubbleGraph = document.getElementById("tabHubbleGraph");
+let tabMeasurementStats = document.getElementById("tabMeasurementStats");
 
 function selectTab(tab)
 {
@@ -37,11 +97,13 @@ function selectTab(tab)
 	divSkyMap.style.display = (tab == "Sky Map") ? "block" : "none";
 	divTelescopeView.style.display = (tab == "Telescope View") ? "block" : "none";
 	divHubbleGraph.style.display = (tab == "Hubble Graph") ? "block" : "none";
+	divMeasurementInfo.style.display = (tab == "Measurement Stats") ? "block" : "none";
 	
 	tabSkyMap.className = (tab != "Sky Map") ? "tablinks" : "tablinks active"
 	tabGalaxyList.className = (tab != "Galaxy List") ? "tablinks" : "tablinks active"
 	tabTelescopeView.className = (tab != "Telescope View") ? "tablinks" : "tablinks active"
 	tabHubbleGraph.className = (tab != "Hubble Graph") ? "tablinks" : "tablinks active"
+	tabMeasurementStats.className = (tab != "Measurement Stats") ? "tablinks" : "tablinks active"
 	
 }
 
@@ -60,9 +122,27 @@ function confirmUniverseGenerateConfirmed()
 {
 	confirmNewUniverse.style.display = "none";
 	generateUniverse();
-	setSlewTarget(0.0,0.0);
-	updateHubbleLaw();
-	draw();
+	g_currentTelescope.setSlewTarget(0.0,0.0);
+}
+function onImageRequest()
+{
+	if (g_galaxiesInView !== null)
+	{
+		for (i in g_galaxiesInView)
+		{
+			Universe.takeGalaxyImage(g_galaxiesInView[i].idx,50.0,g_currentTelescope._diameter * 100.0);
+		}
+	}
+}
+function onSpectraRequest()
+{
+	if (g_galaxiesInView !== null)
+	{
+		for (i in g_galaxiesInView)
+		{
+			Universe.takeGalaxySpectrum(g_galaxiesInView[i].idx,10.0);
+		}
+	}
 }
 
 function insertTableData(data,width)
@@ -79,12 +159,11 @@ function insertTableData(data,width)
 
 function onSelectGalaxy(id,idx)
 {
-	if (idx < universe.galaxies.length)
+	if (idx < Universe.getGalaxyCount())
 	{
-		const selected = universe.galaxies[idx];
-		const relPos = getRelPos(universe.galaxies[universe.currentHome]._position,universe.galaxies[idx]._position);
-		const relPosUnit = relPos.unit;
-		setSlewTarget(relPosUnit.psi,relPosUnit.theta);
+		const selected = Universe.getGalaxy(idx)
+		const relPos = Universe.getGalaxyViewCoordinates(idx);
+		g_currentTelescope.setSlewTarget(relPos.phi,relPos.theta);
 		tabTelescopeView.click();
 	}
 }
@@ -93,24 +172,28 @@ function populateGalaxyList()
 {
 	let bodyGalaxyList = document.getElementById("bodyGalaxyList");
 	let tableBody = new String();
-	for (let i = 0; i < universe.galaxies.length; i++)
+	const numGalaxies = Universe.getGalaxyCount();
+	for (let i = 0; i < numGalaxies; i++)
 	{
-		if (i !== universe.currentHome)
+		if (i !== Universe.getHomeGalaxyIndex())
 		{
+			const galaxy = Universe.getGalaxy(i);
 			tableBody += "<tr>";
-			const onClick = " onclick=\"onSelectGalaxy('"+universe.galaxies[i]._id + "'," + i + ");\"";
+			const onClickSlew = " onclick=\"onSelectGalaxy('"+galaxy._id + "'," + i + ");\"";
+			const onClickMove = " onclick=\"moveToGalaxy("+ i + ");\"";
 			
-			tableBody += insertTableData('<input type="button" value="' + universe.galaxies[i]._id + '" ' + onClick + '>',120);
+			tableBody += insertTableData(galaxy._id,120);
+			tableBody += insertTableData('<input type="button" value="Slew Telescope"' + onClickSlew + '>' + '<input type="button" value="Move Here"' + onClickMove + '>',120);
 			
-			const relPos = getRelPos(universe.galaxies[universe.currentHome]._position,universe.galaxies[i]._position);
-			const rpUnit = relPos.unit;
-			const raHMS = degreestoHMSDisplayable((degrees(rpUnit.theta) + 360.0) % 360.0);
-			const decDMS = degreestoDMSDisplayable(degrees(rpUnit.psi));
+			const relPos = Universe.getGalaxyViewCoordinates(i);
+			const raHMS = degreestoHMSDisplayable((degrees(relPos.theta) + 360.0) % 360.0);
+			const decDMS = degreestoDMSDisplayable(degrees(relPos.phi));
 			tableBody += insertTableData(raHMS.hr + "h " + raHMS.min + "m " + raHMS.sec + "s",150);
 			tableBody += insertTableData(decDMS.deg + "° " + decDMS.min + "' " + decDMS.sec + "\"",150);
 
-			const measData = universe.galaxies[i].getMeasurementSet(universe.currentHome);
-			if (typeof measData !== 'undefined')
+
+			const measData = Universe.getGalaxyAnalysisResults(i);
+			if (measData !== null)
 			{
 				if (measData._Mv_u > 0)
 				{
@@ -130,12 +213,16 @@ function populateGalaxyList()
 				}
 				else
 					tableBody += insertTableData("------------",150)
+				tableBody += insertTableData(measData._imagesCount,40);
+				tableBody += insertTableData(measData._spectraCount,40);
 			}
 			else
 			{
 				tableBody += insertTableData("--------------",150)
 				tableBody += insertTableData("-----",50)
 				tableBody += insertTableData("------------",150)
+				tableBody += insertTableData("0",40)
+				tableBody += insertTableData("0",40)
 			}
 			tableBody += "</tr>";
 		}
@@ -148,22 +235,21 @@ function populateTelescopeFieldList()
 {
 	let bodyGalaxyList = document.getElementById("bodyTelescopeViewTable");
 	let tableBody = new String();
-	if (inViewList.length > 0)
+	if (g_galaxiesInView.length > 0)
 	{
-		for (idxLcl = 0; idxLcl < inViewList.length; idxLcl++)
+		for (let idxLcl in g_galaxiesInView)
 		{
-			const curr = universe.galaxies[inViewList[idxLcl].idx];
+			const galaxy = Universe.getGalaxy(g_galaxiesInView[idxLcl].idx);
 			tableBody += "<tr>";
-			tableBody += insertTableData(curr._id,120);
+			tableBody += insertTableData(galaxy._id,120);
 			
 //			const relPos = getRelPos(universe.galaxies[universe.currentHome]._position,curr._position);
 //			const rpUnit = relPos.unit;
 			
 //			tableBody += insertTableData((degrees(rpUnit.theta) / 15 + 24.0) % 24.0);
 //			tableBody += insertTableData(degrees(rpUnit.psi));
-
-			const measData = curr.getMeasurementSet(universe.currentHome);
-			if (typeof measData !== 'undefined')
+			const measData = Universe.getGalaxyAnalysisResults(g_galaxiesInView[idxLcl].idx);
+			if (measData !== null)
 			{
 				if (measData._Mv_u > 0)
 				{
@@ -183,12 +269,17 @@ function populateTelescopeFieldList()
 				}
 				else
 					tableBody += insertTableData("------------",150)
+				tableBody += insertTableData(measData._imagesCount,40);
+				tableBody += insertTableData(measData._spectraCount,40);
+				
 			}
 			else
 			{
 				tableBody += insertTableData("--------------",150)
-				tableBody += insertTableData("----",50)
+				tableBody += insertTableData("-----",50)
 				tableBody += insertTableData("------------",150)
+				tableBody += insertTableData("0",40)
+				tableBody += insertTableData("0",40)
 			}
 			tableBody += "</tr>";
 		}
@@ -200,6 +291,8 @@ function populateTelescopeFieldList()
 			tableBody += insertTableData("--------------",150)
 			tableBody += insertTableData("-----",50)
 			tableBody += insertTableData("------------",150)
+			tableBody += insertTableData("0",40)
+			tableBody += insertTableData("0",40)
 			tableBody += "</tr>";
 	}
 	bodyGalaxyList.innerHTML = tableBody;
@@ -209,26 +302,34 @@ let projection = new Mollweide(0,0);
 
 function drawMap()
 {
+	const desiredHeight = window.innerHeight - 250;
+	const width = Math.min(desiredHeight * 2,window.innerWidth);
+	theCanvasSkyMap.width = width;
+	theCanvasSkyMap.height = width * 0.5;
+	let theContextSkyMap = theCanvasSkyMap.getContext("2d");
+
 	theContextSkyMap.clearRect(0, 0, theCanvasSkyMap.width, theCanvasSkyMap.height);
 	theContextSkyMap.save();
 	theContextSkyMap.translate(theCanvasSkyMap.width * 0.5,theCanvasSkyMap.height * 0.5);
-	theContextSkyMap.fillStyle = "#0F0F0F";
-	drawEllipseByCenterFill(theContextSkyMap,0,0,theCanvasSkyMap.width,theCanvasSkyMap.height)
+//	theContextSkyMap.fillStyle = "#0F0F0F";
+//	drawEllipseByCenterFill(theContextSkyMap,0,0,theCanvasSkyMap.width,theCanvasSkyMap.height)
 	theContextSkyMap.strokeStyle = "#FFFFFF";
 	drawEllipseByCenter(theContextSkyMap,0,0,theCanvasSkyMap.width,theCanvasSkyMap.height)
 	
 	theContextSkyMap.fillStyle = "#FFFFFF";
 	let idxLcl;
 	
-	for (idxLcl = 0; idxLcl < universe.galaxies.length; idxLcl++)
+	const numGalaxies = Universe.getGalaxyCount();
+	for (let i = 0; i < numGalaxies; i++)
 	{
-		if (idxLcl != universe.currentHome)
+		if (i !== Universe.getHomeGalaxyIndex())
 		{
-			
-			const relPos = getRelPos(universe.galaxies[universe.currentHome]._position,universe.galaxies[idxLcl]._position);
+			const galaxy = Universe.getGalaxy(i);
+		
+			const relPos = Universe.getGalaxyViewCoordinates(i);
 			const dist = relPos.radius;
 			const long = relPos.theta * 180.0 / Math.PI;//Math.atan2(universe.galaxies[idxLcl]._position.y - universe.galaxies[universe.currentHome]._position.y,universe.galaxies[idxLcl]._position.x - universe.galaxies[universe.currentHome]._position.x);
-			const lat = relPos.psi * 180.0 / Math.PI;//Math.asin(z / dist);
+			const lat = relPos.phi * 180.0 / Math.PI;//Math.asin(z / dist);
 			const proj = projection.calculate(lat,long);
 			
 			theContextSkyMap.fillStyle = "#FFFFFF";
@@ -244,7 +345,7 @@ function drawMap()
 	}
 	
 	theContextSkyMap.strokeStyle = '#FFFF00';
-	const proj = projection.calculate(viewLat * 180.0 / Math.PI,viewLong * 180.0 / Math.PI);
+	const proj = projection.calculate(g_currentTelescope.viewLat * 180.0 / Math.PI,g_currentTelescope.viewLong * 180.0 / Math.PI);
 	const radius = 3;
 	theContextSkyMap.beginPath();
 	theContextSkyMap.arc(proj.x * theCanvasSkyMap.width  * 0.5,-proj.y * theCanvasSkyMap.height  * 0.5,radius,0,2.0 * Math.PI);
@@ -259,8 +360,8 @@ function clickMap(event)
 	const x = event.offsetX / theCanvasSkyMap.width;
 	const y = event.offsetY / theCanvasSkyMap.height;
 	const pos = projection.calculateReverse(x * 2.0 - 1.0,1.0 - y * 2.0);
-	const nearest = findNearestGalaxy(radians(pos.lat),radians(pos.long));
-	setSlewTarget(nearest.lat,nearest.long);
+	const nearest = Universe.findNearestGalaxy(radians(pos.lat),radians(pos.long));
+	g_currentTelescope.setSlewTarget(nearest.lat,nearest.long);
 	tabTelescopeView.click();
 }
 theCanvasSkyMap.onclick = clickMap;
@@ -319,17 +420,35 @@ function drawElliptical(context,size,color,x)
 }
 let readoutTelescopeView = document.getElementById("readoutTelescopeView");
 
+function getPointInEllipse(x,y,a,b,cosOrientation,sinOrientation)
+{
+	const xp = x *cosOrientation - y * sinOrientation;
+	const yp = y * cosOrientation + x * sinOrientation;
+	const xe = xp / a;
+	const ye = yp / b;
+
+	return {x: xp, xe: xe,y: yp, ye: ye};
+}
+
+function testPointInEllipse(x,y,a,b,cosOrientation,sinOrientation)
+{
+	const coord = getPointInEllipse(x,y,a,b,cosOrientation,sinOrientation)
+	return ((coord.xe * coord.xe + coord.ye * coord.ye) <= 1.0) // point is in the ellipse
+}
+
+
 function drawTelescopeField()
 {
-	const raHMS = degreestoHMSDisplayable((degrees(viewLong) + 360.0) % 360.0);
-	const decDMS = degreestoDMSDisplayable(degrees(viewLat));
+	const raHMS = degreestoHMSDisplayable((degrees(g_currentTelescope.viewLong) + 360.0) % 360.0);
+	const decDMS = degreestoDMSDisplayable(degrees(g_currentTelescope.viewLat));
 
-	readoutTelescopeView.innerHTML = raHMS.hr + "h " + raHMS.min + "m " + raHMS.sec + "s  " + ((viewLat >= 0) ? "+" : "") + decDMS.deg + "° " + decDMS.min + "' " + decDMS.sec + "\""; 
+	readoutTelescopeView.innerHTML = raHMS.hr + "h " + raHMS.min + "m " + raHMS.sec + "s  " + ((g_currentTelescope.viewLat >= 0) ? "+" : "") + decDMS.deg + "° " + decDMS.min + "' " + decDMS.sec + "\""; 
+	
+	canvasTelescopeView.height = Math.min(Math.min(384,window.innerHeight - 500),window.innerWidth);
+	canvasTelescopeView.width = canvasTelescopeView.height;
+	let contextTelescopeView = canvasTelescopeView.getContext("2d");
 	
 	
-	
-	inView = new Array();
-	inViewDist = new Array();
 	contextTelescopeView.clearRect(0, 0, canvasTelescopeView.width, canvasTelescopeView.height);
 	
 
@@ -337,7 +456,7 @@ function drawTelescopeField()
 	const cx = canvasTelescopeView.width * 0.5;
 	const cy = canvasTelescopeView.height * 0.5;
 	const radius = canvasTelescopeView.width * 0.5 - 2;
-	const telescopePixelToViewPixel = radius / telescopes[currentTelescope]._CCDresolution;
+	const telescopePixelToViewPixel = radius / g_currentTelescope._CCDresolution;
 	contextTelescopeView.translate(cx,cy);
 	// draw black background for image
 	contextTelescopeView.fillStyle = "#000000";
@@ -353,31 +472,31 @@ function drawTelescopeField()
 	let lclList = new Array();
 
 	let idxLcl;
-	for (idxLcl = 0; idxLcl < inViewList.length; idxLcl++)
+	for (idxLcl in g_galaxiesInView)
 	{
-		const curr = universe.galaxies[inViewList[idxLcl].idx];
+		const curr = Universe.getGalaxy(g_galaxiesInView[idxLcl].idx);
 		let currLcl = new Object();
 		currLcl.eqDiskSize = null;
 		currLcl.polDiskSize = null;
 		currLcl.colorDisk = null;
 		if (curr._galaxyType == 0) // elliptical
 		{
-			currLcl.eqSize = Math.max(curr._radiusEquatorial * inViewList[idxLcl].pixelScale * telescopePixelToViewPixel,1);
-			currLcl.polSize = Math.max(curr._radiusPolar * inViewList[idxLcl].pixelScale * telescopePixelToViewPixel,1);
-			currLcl.color = scaleColorElliptical(inViewList[idxLcl].bright,curr._color)
+			currLcl.eqSize = Math.max(curr._radiusEquatorial * g_galaxiesInView[idxLcl].pixelScale * telescopePixelToViewPixel,1);
+			currLcl.polSize = Math.max(curr._radiusPolar * g_galaxiesInView[idxLcl].pixelScale * telescopePixelToViewPixel,1);
+			currLcl.color = scaleColorElliptical(g_galaxiesInView[idxLcl].bright,curr._color)
 		}
 		else
 		{
-			currLcl.eqSize = Math.max(curr._bulgeSize * inViewList[idxLcl].pixelScale * telescopePixelToViewPixel,1);
-			currLcl.polSize = Math.max(curr._bulgeSize * inViewList[idxLcl].pixelScale * telescopePixelToViewPixel,1);
-			currLcl.eqDiskSize = Math.max(curr._diskSize * inViewList[idxLcl].pixelScale * telescopePixelToViewPixel,1);
-			currLcl.polDiskSize = Math.max(curr._diskSize * inViewList[idxLcl].pixelScale * curr._cosOrientationFace * telescopePixelToViewPixel,1);
-			currLcl.color = scaleColorElliptical(inViewList[idxLcl].bright,curr._color)
-			currLcl.colorDisk = scaleColorSpiral(inViewList[idxLcl].bright,curr._color)
+			currLcl.eqSize = Math.max(curr._bulgeSize * g_galaxiesInView[idxLcl].pixelScale * telescopePixelToViewPixel,1);
+			currLcl.polSize = Math.max(curr._bulgeSize * g_galaxiesInView[idxLcl].pixelScale * telescopePixelToViewPixel,1);
+			currLcl.eqDiskSize = Math.max(curr._diskSize * g_galaxiesInView[idxLcl].pixelScale * telescopePixelToViewPixel,1);
+			currLcl.polDiskSize = Math.max(curr._diskSize * g_galaxiesInView[idxLcl].pixelScale * curr._cosOrientationFace * telescopePixelToViewPixel,1);
+			currLcl.color = scaleColorElliptical(g_galaxiesInView[idxLcl].bright,curr._color)
+			currLcl.colorDisk = scaleColorSpiral(g_galaxiesInView[idxLcl].bright,curr._color)
 		}
-		currLcl.x = inViewList[idxLcl].x * telescopePixelToViewPixel;
-		currLcl.y = inViewList[idxLcl].y * telescopePixelToViewPixel;
-		currLcl.bright = inViewList[idxLcl].bright;
+		currLcl.x = g_galaxiesInView[idxLcl].x * telescopePixelToViewPixel;
+		currLcl.y = g_galaxiesInView[idxLcl].y * telescopePixelToViewPixel;
+		currLcl.bright = g_galaxiesInView[idxLcl].bright;
 		currLcl._cosOrientation = curr._cosOrientation;
 		currLcl._sinOrientation = curr._sinOrientation;
 		lclList.push(currLcl);
@@ -428,8 +547,21 @@ function drawTelescopeField()
 	
 	populateTelescopeFieldList();
 }
-function drawcurrentHome()
+
+let outputCurrentHome = document.getElementById("outputCurrentHome");
+let outputNumMeasGalaxies = document.getElementById("outputNumMeasGalaxies");
+let outputHomeGalaxyVelocity = document.getElementById("outputHomeGalaxyVelocity");
+let outputChiSquared = document.getElementById("outputChiSquared");
+
+function drawMeasurementInfo()
 {
+	let galaxy = Universe.getGalaxy(Universe.getHomeGalaxyIndex());
+	outputCurrentHome.innerHTML = galaxy._id;
+	let hubbleLaw = Universe.getHubbleAnalysis(Universe.getHomeGalaxyIndex())
+	
+	outputNumMeasGalaxies.innerHTML = (hubbleLaw !== null && hubbleLaw.lls !== null) ? LLS.count(hubbleLaw.lls) : 0;
+	outputHomeGalaxyVelocity.innerHTML = (hubbleLaw !== null && hubbleLaw.lls !== null) ? hubbleLaw.displayableV0 : "--- km/s";
+	outputChiSquared.innerHTML = (hubbleLaw !== null && hubbleLaw.lls !== null) ? LLS.chi_squared(hubbleLaw.lls)  : "---";
 }
 /*
 function drawcurrentHome(cx,ty,size)
@@ -444,48 +576,51 @@ function drawcurrentHome(cx,ty,size)
 	theContext.restore(state);
 }*/
 
-let g_graphHubble = new Graph("Hubble Diagram",canvasHubbleGraph.height - 25,canvasHubbleGraph.width,"#ffffff");
-let g_graphAxisDistance = new GraphAxis("xaxis","Distance (100 Mpc)",0,15);
-let g_graphAxisRedshift = new GraphAxis("yaxis","Velocity (1000 km/s)",0,125);
+let g_graphAxisDistance = new GraphAxis("xaxis","Distance (100 Mpc)",0,16);
+let g_graphAxisRedshift = new GraphAxis("yaxis","Velocity (1000 km/s)",0,130);
 let g_graphdatasetMeasurements = new GraphDataSet("data","xaxis", "yaxis", null,1,4,"#ff0000",true);
 let g_graphdatatrendMeasurements = new GraphTrend("Hubble Diagram trend","xaxis", "yaxis", "linear", 0,0,"#0000ff" );
 g_graphdatatrendMeasurements.disabled = true;
 
-g_graphHubble.addHorizontalAxis(g_graphAxisDistance);
-g_graphHubble.addVerticalAxis(g_graphAxisRedshift);
-g_graphHubble.addDataSet(g_graphdatasetMeasurements);
-g_graphHubble.addTrend(g_graphdatatrendMeasurements);
 
 function drawHubble()
 {
+	canvasHubbleGraph.width = Math.min(window.innerHeight - 250,window.innerWidth);
+	canvasHubbleGraph.height = canvasHubbleGraph.width;
+	let contextHubbleGraph = canvasHubbleGraph.getContext("2d");
+	let hubbleLaw = Universe.getHubbleAnalysis(Universe.getHomeGalaxyIndex())
+
+	let g_graphHubble = new Graph("Hubble Diagram",canvasHubbleGraph.height - 25,canvasHubbleGraph.width,"#ffffff");
+	g_graphHubble.addHorizontalAxis(g_graphAxisDistance);
+	g_graphHubble.addVerticalAxis(g_graphAxisRedshift);
+	g_graphHubble.addDataSet(g_graphdatasetMeasurements);
+	g_graphHubble.addTrend(g_graphdatatrendMeasurements);
+
 	contextHubbleGraph.clearRect(0, 0, canvasHubbleGraph.width, canvasHubbleGraph.height);
 //	const x = cx - width * 0.5;
 //	const y = ty;
 	
 	
 	
-	g_graphdatatrendMeasurements.disable = !(hubbleLaw.measH0u > 0);
-	g_graphdatatrendMeasurements._m = hubbleLaw.measH0 / 10.0;// / 1000.0 * 100.0;;
-	g_graphdatatrendMeasurements._b = hubbleLaw.measIntercept / 1000.0;
+	g_graphdatatrendMeasurements.disable = (hubbleLaw === null || hubbleLaw.lls === null || LLS.count(hubbleLaw.lls) < 2);
+	g_graphdatatrendMeasurements._m = !g_graphdatatrendMeasurements.disable ? hubbleLaw.H0 / 10.0 : 0.0;// / 1000.0 * 100.0;;
+	g_graphdatatrendMeasurements._b = !g_graphdatatrendMeasurements.disable ? hubbleLaw.v0 / 1000.0 : 0.0;
 
 	g_graphdatasetMeasurements.clear();
-	for (idxLcl = 0; idxLcl < universe.listMeasurements.length; idxLcl++)
+	if (hubbleLaw !== null && hubbleLaw.data !== null)
 	{
-		if (universe.listMeasurements[idxLcl]._fromGalaxy == universe.currentHome && universe.listMeasurements[idxLcl]._dist_u > 0 && universe.listMeasurements[idxLcl]._redshift_u > 0)
+		const iMax = LLSdatasetContainer.count(hubbleLaw.data)
+		for (let i = 0; i < iMax; i++)
 		{
-			let datum = new GraphDatum(universe.listMeasurements[idxLcl]._dist / 100.0,universe.listMeasurements[idxLcl]._redshift * 299.792458);
+			const set = LLSdatasetContainer.get(hubbleLaw.data,i);
+			let datum = new GraphDatum(set.x / 100.0,set.y / 1000.0);
 			g_graphdatasetMeasurements.add(datum);
 		}
 	}
+
 	g_graphHubble.draw(contextHubbleGraph,0,25);
 	
-	const readout = sig_figs(hubbleLaw.measH0,hubbleLaw.measH0u);
-	if (hubbleLaw.measH0 <= 0)
-		displayHubbleConstant.innerHTML = "H<sub>0</sub> = ---"
-	else if (hubbleLaw.measH0u <= 0)
-		displayHubbleConstant.innerHTML = "H<sub>0</sub> = (" + hubbleLaw.measH0.toFixed(0) + " ± ∞) km/s/Mpc";
-	else
-		displayHubbleConstant.innerHTML = "H<sub>0</sub> = " + readout.standard_notation + " km/s/Mpc";
+	displayHubbleConstant.innerHTML = "H<sub>0</sub> = " + hubbleLaw.displayable;
 }
 
 let displayHubbleConstant = document.getElementById("HubbleConstant");
@@ -495,7 +630,7 @@ function draw()
 	populateGalaxyList();
 	drawMap();
 	drawTelescopeField();
-	drawcurrentHome();
+	drawMeasurementInfo();
 	drawHubble()
 //	const decD = degreestoDMSDisplayable(degrees(viewLat));
 //	const raD = degreestoDMSDisplayable(degrees(viewLong));
@@ -504,10 +639,4 @@ function draw()
 
 
 
-function onResetRequest()
-{
-	//@@TODO: confirm request with a popup dialogue
-	generateUniverse();
-}
 
-draw();

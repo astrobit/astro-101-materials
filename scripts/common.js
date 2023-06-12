@@ -15,7 +15,10 @@
 // 2022-Sep-27
 // Changes
 // - fix bug in setAtRelative function that allowed for negative x or y values that would bleed into the right side of the image
-
+//
+// 2022-Jun-12
+// Changes
+// - in drawEllipse, use ellipse function from the context if it is available
 
 /////////////////////////////////////////////////////////////////////////
 //
@@ -177,21 +180,29 @@ function drawEllipseByCenter(ctx, cx, cy, w, h)
 /////////////////////////////////////////////////////////////////////////
 function drawEllipse(ctx, x, y, w, h, fill)
 {
-	const kappa = 4.0 / 3.0 * (Math.sqrt(2) - 1);//.5522848,
-		ox = (w * 0.5) * kappa, // control point offset horizontal
-		oy = (h * 0.5) * kappa, // control point offset vertical
-		xe = x + w,           // x-end
-		ye = y + h,           // y-end
-		xm = x + w * 0.5,       // x-middle
-		ym = y + h * 0.5;       // y-middle
+	if ("ellipse" in ctx)
+	{
+		ctx.beginPath();
+		ctx.ellipse(x + 0.5 * w, y + 0.5 * h, w * 0.5, h * 0.5, 0.0, 0, 2 * Math.PI);
+	}
+	else
+	{
+		const kappa = 4.0 / 3.0 * (Math.sqrt(2) - 1);//.5522848,
+			ox = (w * 0.5) * kappa, // control point offset horizontal
+			oy = (h * 0.5) * kappa, // control point offset vertical
+			xe = x + w,           // x-end
+			ye = y + h,           // y-end
+			xm = x + w * 0.5,       // x-middle
+			ym = y + h * 0.5;       // y-middle
 
-	ctx.beginPath();
-	ctx.moveTo(x, ym);
-	ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
-	ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
-	ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
-	ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
-	//ctx.closePath(); // not used correctly, see comments (use to close off open path)
+		ctx.beginPath();
+		ctx.moveTo(x, ym);
+		ctx.bezierCurveTo(x, ym - oy, xm - ox, y, xm, y);
+		ctx.bezierCurveTo(xm + ox, y, xe, ym - oy, xe, ym);
+		ctx.bezierCurveTo(xe, ym + oy, xm + ox, ye, xm, ye);
+		ctx.bezierCurveTo(xm - ox, ye, x, ym + oy, x, ym);
+		//ctx.closePath(); // not used correctly, see comments (use to close off open path)
+	}
 	if (ValidateBoolean(fill) && fill)
 		ctx.fill();
 	else

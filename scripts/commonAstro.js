@@ -46,6 +46,11 @@
 // 2023-Mar-31
 // Additions
 // - SAOImageColorTypeBlackbody, SAOImageColorTypeA, SAOImageColorTypeB, SAOImageColorGeneral and SAOImageColor to complement fitsES6
+//
+// 2023-Jun-12
+// Additions:
+// - add kLuminositySolar, kRadiusSolar, kTemperatureSolar, and kGMSolar to Phys 
+// - freeze Phys to prevent changes
 
 /////////////////////////////////////////////////////////////////////////
 //
@@ -73,8 +78,13 @@ const Phys = {
 	kMasRadians: Math.PI / (180.0 * 3600.0 * 1000.0),
 	kParsec: 3600.0 * 180.0 / Math.PI * 14959787070000.0,
 	kYearSeconds: 365.0 * 86400.0,
-	kRadiusEarth:  6371.0
+	kRadiusEarth:  6371.0,
+	kLuminositySolar: 3.828e33,
+	kRadiusSolar: 6.957e10,
+	kTemperatureSolar: 5772,
+	kGMSolar: 1.3271244e26,
 }
+Object.freeze(Phys);
 
 //let commonAstroLogRegister = 0; // used to report to the log choices of minimum and maximum magnitudes
 

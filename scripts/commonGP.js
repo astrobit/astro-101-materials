@@ -1,5 +1,5 @@
 //
-// Requires:
+// Requires: none
 //
 // CHANGE LOG
 // 
@@ -28,6 +28,20 @@
 // 2023-Mar-31
 // Changes
 // - don't check for null in ValidateXXX functions - the check is redundant
+//
+// 2023-Jun-12
+// Changes
+// - use SigFigsFactory within the SigFigs class
+// - SigFigs value string will now return a number in scientific notation if it is large or small
+// - suffle fucntion modified to specify some variables as const (optimization)
+// - add private member #type to Averager and AngularAverager
+// Additions
+// - create functional programming model of SigFigs as SigFigsFactory
+// - add WeightedAverager (as factory)
+// - add padZero function to display a number with left-padded zeros
+// - add initializeVariable function that returns a default value if the initialzing value is null or undefined
+// - add clone function to clone objects
+
 
 /////////////////////////////////////////////////////////////////////////
 //
@@ -243,6 +257,155 @@ function download(data, filename, type) {
         }, 0); 
     }
 }
+
+/////////////////////////////////////////////////////////////////////////
+//
+//  SigFigsFactory
+
+const SigFigsFactory = {
+	__type: "SigFigsInstance",
+/////////////////////////////////////////////////////////////////////////
+//
+//  generateInstance
+//
+// generate a container class that holds the value and uncertainty information
+// public keys:
+//		value (number) - the value
+//		uncertainty (number) - the numberuncertainty in the value
+//		rounding (number) - the rounding to be used for retreiving the 
+//							value
+//
+/////////////////////////////////////////////////////////////////////////
+	generateInstance: function (value, uncertainty, rounding)
+	{
+		return {__type: SigFigsFactory.__type, value: value, uncertainty: uncertainty, rounding: rounding};
+	},
+/////////////////////////////////////////////////////////////////////////
+//
+//  isSigFigsInstance
+//
+// generate a container class that holds the value and uncertainty information
+// public keys:
+//		value (number) - the value
+//		uncertainty (number) - the numberuncertainty in the value
+//		rounding (number) - the rounding to be used for retreiving the 
+//							value
+//
+/////////////////////////////////////////////////////////////////////////
+	isSigFigsInstance: function(instance)
+	{
+		return (typeof instance == "object" && "__type" in instance && instance.__type == SigFigsFactory.__type);
+	},
+/////////////////////////////////////////////////////////////////////////
+//
+//  value_string
+//
+// this function returns the value as a string, rounded to this.rounding
+// inputs: a SigFigs instance
+// outputs: (string) - the value as a string, rounded to this.rounding
+/////////////////////////////////////////////////////////////////////////
+	value_string: function (instance)
+	{
+		let ret = null;
+		if(SigFigsFactory.isSigFigsInstance(instance) && instance.uncertainty > 0)
+		{
+			instance.value.toFixed(instance.rounding)
+			const log_value = Math.log10(Math.abs(instance.value));
+			if ((log_value >= 4 || log_value <= -4) && instance.uncertainty > 0)
+			{
+				const sign = (instance.value < 0);
+				const power = Math.pow(10.0,-Math.floor(log_value));
+				const exp = Math.floor(log_value);
+				const exp_u = Math.floor(Math.log10(instance.uncertainty));
+
+				const mantissa = instance.value * power;
+				const rounding = Math.max(0,exp - exp_u);
+
+				//			return "(" + this.value_string + " ± " + this.uncertainty_string + ")";
+				const exponent = toSuperscript(exp.toFixed(0));
+				ret = mantissa.toFixed(rounding) + "×10" + exponent;
+			}
+			else
+				ret = instance.value.toFixed(instance.rounding);
+		}
+		return ret;
+	},
+/////////////////////////////////////////////////////////////////////////
+//
+//  uncertainty_string
+//
+// this function returns the uncertainty as a string, rounded to
+// this.rounding
+// inputs: a SigFigs instance
+// outputs: (string) - the uncertainty as a string, rounded to 
+//						this.rounding
+/////////////////////////////////////////////////////////////////////////
+	uncertainty_string: function(instance)
+	{
+		let ret = null;
+		if(SigFigsFactory.isSigFigsInstance(instance) && instance.uncertainty > 0)
+		{
+			instance.value.toFixed(instance.rounding)
+			const log_value = Math.log10(Math.abs(instance.value));
+			if ((log_value >= 4 || log_value <= -4) && instance.uncertainty > 0)
+			{
+				const sign = (instance.value < 0);
+				const power = Math.pow(10.0,-Math.floor(log_value));
+				const exp = Math.floor(log_value);
+				const exp_u = Math.floor(Math.log10(instance.uncertainty));
+
+				const mantissa_u = instance.uncertainty * power;
+				const rounding = Math.max(0,exp - exp_u);
+
+				//			return "(" + this.value_string + " ± " + this.uncertainty_string + ")";
+				const exponent = toSuperscript(exp.toFixed(0));
+				ret = mantissa_u.toFixed(rounding) + "×10" + exponent;
+			}
+			else
+				ret = instance.uncertainty.toFixed(instance.rounding);
+		}
+		
+		return ret;
+	},
+/////////////////////////////////////////////////////////////////////////
+//
+//  standard_notation
+//
+// this function returns the value and uncertainty as a string in 
+// standard notation.
+// if the |value| > 10,000 or |value| < 0.0001, then the value and 
+// uncertainty will be returned using scientific notation.
+// inputs: a SigFigs instance
+// outputs: (string) - the value and uncertatinty in standard notation
+/////////////////////////////////////////////////////////////////////////
+	standard_notation: function(instance)
+	{
+		let ret = null;
+		if (SigFigsFactory.isSigFigsInstance(instance) && instance.uncertainty > 0)
+		{
+			const log_value = Math.log10(Math.abs(instance.value));
+			if ((log_value >= 4 || log_value <= -4))
+			{
+				const sign = (instance.value < 0);
+				const power = Math.pow(10.0,-Math.floor(log_value));
+				const exp = Math.floor(log_value);
+				const exp_u = Math.floor(Math.log10(instance.uncertainty));
+				
+				const mantissa = instance.value * power;
+				const mantissa_u = instance.uncertainty * power;
+				const rounding = Math.max(0,exp - exp_u);
+				
+	//			return "(" + this.value_string + " ± " + this.uncertainty_string + ")";
+				const exponent = toSuperscript(exp.toFixed(0));
+				ret = "(" + mantissa.toFixed(rounding) + " ± " + mantissa_u.toFixed(rounding) + ")×10" + exponent;
+			}
+			else
+				ret = "(" + SigFigsFactory.value_string(instance) + " ± " + SigFigsFactory.uncertainty_string(instance) + ")";
+		}
+		return ret;
+	},
+}
+
 /////////////////////////////////////////////////////////////////////////
 //
 //  class Sig_Figs
@@ -258,11 +421,12 @@ function download(data, filename, type) {
 
 class Sig_Figs
 {
+	#type
+	#instance
 	constructor(value,uncertainty,rounding)
 	{
-		this.value = value;
-		this.uncertainty = uncertainty;
-		this.rounding = rounding;
+		this.#type = "SigFigs";
+		this.#instance = SigFigsFactory.generateInstance(value,uncertainty,rounding);
 	}
 /////////////////////////////////////////////////////////////////////////
 //
@@ -274,7 +438,7 @@ class Sig_Figs
 /////////////////////////////////////////////////////////////////////////
 	get value_string()
 	{
-		return this.value.toFixed(this.rounding)
+		return SigFigsFactory.value_string(this.#instance);
 	}
 /////////////////////////////////////////////////////////////////////////
 //
@@ -288,7 +452,7 @@ class Sig_Figs
 /////////////////////////////////////////////////////////////////////////
 	get uncertainty_string()
 	{
-		return this.uncertainty.toFixed(this.rounding)
+		return SigFigsFactory.uncertainty_string(this.#instance);
 	}
 /////////////////////////////////////////////////////////////////////////
 //
@@ -303,27 +467,80 @@ class Sig_Figs
 /////////////////////////////////////////////////////////////////////////
 	get standard_notation()
 	{
-		const log_value = Math.log10(Math.abs(this.value));
-		if (log_value >= 4 || log_value <= -4)
-		{
-			const sign = (this.value < 0);
-			const power = Math.pow(10.0,-Math.floor(log_value));
-			const exp = Math.floor(log_value);
-			const exp_u = Math.floor(Math.log10(this.uncertainty));
-			
-			const mantissa = this.value * power;
-			const mantissa_u = this.uncertainty * power;
-			const rounding = Math.max(0,exp - exp_u);
-			
-//			return "(" + this.value_string + " ± " + this.uncertainty_string + ")";
-			const exponent = toSuperscript(exp.toFixed(0));
-			return "(" + mantissa.toFixed(rounding) + " ± " + mantissa_u.toFixed(rounding) + ")×10" + exponent;
-		}
-		else
-			return "(" + this.value_string + " ± " + this.uncertainty_string + ")";
+		return SigFigsFactory.standard_notation(this.#instance);
 	}
-	
-	
+/////////////////////////////////////////////////////////////////////////
+//
+//  getter value
+//
+// this function returns the value as a number
+// inputs: none
+// outputs: (number) - the value 
+/////////////////////////////////////////////////////////////////////////
+	get value()
+	{
+		return this.#instance.value;
+	}
+/////////////////////////////////////////////////////////////////////////
+//
+//  setter value
+//
+// this function set the value, then returns the new value as a number
+// inputs: (number) the new value
+// outputs: (number) - the new value
+/////////////////////////////////////////////////////////////////////////
+	set value(newValue)
+	{
+		return this.#instance.value = newValue;
+	}
+/////////////////////////////////////////////////////////////////////////
+//
+//  getter uncertainty
+//
+// this function returns the uncertainty as a number
+// inputs: none
+// outputs: (number) - the uncertainty 
+/////////////////////////////////////////////////////////////////////////
+	get uncertainty()
+	{
+		return this.#instance.uncertainty;
+	}
+/////////////////////////////////////////////////////////////////////////
+//
+//  setter uncertainty
+//
+// this function set the uncertainty, then returns the new uncertainty as a number
+// inputs: (number) the new uncertainty
+// outputs: (number) - the new uncertainty
+/////////////////////////////////////////////////////////////////////////
+	set uncertainty(newValue)
+	{
+		return this.#instance.uncertainty = newValue;
+	}
+/////////////////////////////////////////////////////////////////////////
+//
+//  getter rounding
+//
+// this function returns the rounding as a number
+// inputs: none
+// outputs: (number) - the rounding 
+/////////////////////////////////////////////////////////////////////////
+	get rounding()
+	{
+		return this.#instance.uncertainty;
+	}
+/////////////////////////////////////////////////////////////////////////
+//
+//  setter rounding
+//
+// this function set the rounding, then returns the new rounding as a number
+// inputs: (number) the new rounding
+// outputs: (number) - the new rounding
+/////////////////////////////////////////////////////////////////////////
+	set rounding(newValue)
+	{
+		return this.#instance.rounding = newValue;
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////
@@ -574,16 +791,16 @@ function getFontSize(font)
 /////////////////////////////////////////////////////////////////////////
 
 function shuffle(array) {
-  let m = array.length, t, i;
+  let m = array.length;
 
   // While there remain elements to shuffle…
   while (m) {
 
     // Pick a remaining element…
-    i = Math.floor(Math.random() * m--);
+    const i = Math.floor(Math.random() * m--);
 
     // And swap it with the current element.
-    t = array[m];
+    const t = array[m];
     array[m] = array[i];
     array[i] = t;
   }
@@ -938,8 +1155,10 @@ function newton_raphson(x0, f, f_prime, tolerance, epsilon, max_iterations)
 
 class Averager
 {
+	#type
 	constructor()
 	{
+		this.#type = "Averageer";
 		this._sum = 0;
 		this._count = 0;
 		this._sum_sq = 0;
@@ -1198,6 +1417,294 @@ class Averager
 
 /////////////////////////////////////////////////////////////////////////
 //
+//  class WeightedAverager
+//
+// a class used to calculate the average, standard deviation, and 
+// standard error of a set of values.
+// public keys:
+//		none
+//
+/////////////////////////////////////////////////////////////////////////
+
+
+const WeightedAverager =
+{
+/////////////////////////////////////////////////////////////////////////
+//
+//  generateInstance
+//
+// generates an empty WeightedAverager instance
+// inputs: none
+// output: none
+//
+/////////////////////////////////////////////////////////////////////////
+	generateInstance: function()
+	{
+		let ret = new Object();
+		ret.__type = "WeightedAverager";
+		ret._sum = 0;
+		ret._sumWeights = 0;
+		ret._count = 0;
+		ret._sum_sq = 0;
+		ret._max = null;
+		ret._min = null;
+		
+		ret._avg = NaN;
+		ret._stdevp = NaN;
+		ret._stdevs = NaN;
+		ret._sterrp = NaN;
+		ret._sterrs = NaN;
+	
+		ret._statistics_count_last = 0;	
+		Object.seal(ret);
+		return ret;
+	},
+/////////////////////////////////////////////////////////////////////////
+//
+//  function _calc_statistics
+//
+// calculate the current average, standard deviations, and standard
+// errors; intended for internal use, but may be called externally to 
+// ensure the calculations have been performed.
+// inputs: none
+// output: none; values are stored internally
+//
+/////////////////////////////////////////////////////////////////////////
+	_calc_statistics: function (instance)
+	{
+		if (instance._count > 0 && instance._count > instance._statistics_count_last)
+		{
+			instance._avg = instance._sum / instance._sumWeights;
+			instance._sterrs = Math.sqrt(1.0 / instance._sumWeights);
+			instance._statistics_count_last = instance._count;
+		}
+	},
+	
+/////////////////////////////////////////////////////////////////////////
+//
+//  function add
+//
+// add a value to the set for the average
+// inputs: value(number) - the value to include in the set
+// output: none; values are stored internally
+//
+/////////////////////////////////////////////////////////////////////////
+	add: function(instance,value,uncertainty)
+	{
+		if (ValidateValue(value) && ValidateValue(uncertainty))
+		{
+			const weight = 1.0 / (uncertainty * uncertainty);
+			instance._sum += value * weight;
+			instance._sumWeights += weight;
+			instance._count++;
+			if (instance._max === null || value > instance._max)
+				instance._max = value;
+			if (instance._min === null || value < instance._min)
+				instance._min = value;
+		}
+	},
+/////////////////////////////////////////////////////////////////////////
+//
+//  get average
+//
+// returns the average of the set, or NaN if there is no data in the set
+// inputs: none
+// output: (number) the average of the set, or NaN if there is no data in 
+//				the set
+//
+/////////////////////////////////////////////////////////////////////////
+	average: function(instance)
+	{
+		WeightedAverager._calc_statistics(instance);
+		return instance._avg;
+	},
+/////////////////////////////////////////////////////////////////////////
+//
+//  get stdevp
+//
+// returns the standard deviation of a population, or NaN if there is no
+// data in the set
+// inputs: none
+// output: (number) the standard devation of the population, or NaN if 
+//					there is no data in the set
+//
+/////////////////////////////////////////////////////////////////////////
+	stdevp: function(instance)
+	{
+		WeightedAverager._calc_statistics(instance);
+		return instance._stdevp;
+	},
+/////////////////////////////////////////////////////////////////////////
+//
+//  get stdevs
+//
+// returns the standard deviation of a sample, or NaN if there is no
+// data in the set
+// inputs: none
+// output: (number) the standard devation of the sample, or NaN if 
+//					there is no data in the set
+//
+/////////////////////////////////////////////////////////////////////////
+	stdevs: function(instance)
+	{
+		WeightedAverager._calc_statistics(instance);
+		return instance._stdevs; 
+	},
+/////////////////////////////////////////////////////////////////////////
+//
+//  get sterrp
+//
+// returns the standard error of a population, or NaN if there is no
+// data in the set
+// inputs: none
+// output: (number) the standard error of the population, or NaN if 
+//					there is no data in the set
+//
+/////////////////////////////////////////////////////////////////////////
+	sterrp: function(instance)
+	{
+		WeightedAverager._calc_statistics(instance);
+		return instance._sterrp;
+	},
+/////////////////////////////////////////////////////////////////////////
+//
+//  get sterrs
+//
+// returns the standard error of a sample, or NaN if there is no
+// data in the set
+// inputs: none
+// output: (number) the standard error of the sample, or NaN if 
+//					there is no data in the set
+//
+/////////////////////////////////////////////////////////////////////////
+	sterrs: function(instance)
+	{
+		WeightedAverager._calc_statistics(instance);
+		return instance._sterrs;
+	},
+/////////////////////////////////////////////////////////////////////////
+//
+//  get max
+//
+// returns the maxmimum value of the set, or NaN if there is no
+// data in the set
+// inputs: none
+// output: (number) the maximum value of the set, or NaN if 
+//					there is no data in the set
+//
+/////////////////////////////////////////////////////////////////////////
+	max: function(instance)
+	{
+		return instance._max !== null ? instance._max : NaN;
+	},
+/////////////////////////////////////////////////////////////////////////
+//
+//  get min
+//
+// returns the minimum value of the set, or NaN if there is no
+// data in the set
+// inputs: none
+// output: (number) the minimum value of the set, or NaN if 
+//					there is no data in the set
+//
+/////////////////////////////////////////////////////////////////////////
+	min: function(instance)
+	{
+		return instance._min !== null ? instance._min : NaN;
+	},
+/////////////////////////////////////////////////////////////////////////
+//
+//  get count
+//
+// returns the number of values in the set
+// inputs: none
+// output: (number) the number of values in the set
+//
+/////////////////////////////////////////////////////////////////////////
+	count: function(instance)
+	{
+		return instance._count;
+	},
+/////////////////////////////////////////////////////////////////////////
+//
+//  get sum
+//
+// returns the sum of the values in the set
+// inputs: none
+// output: (number) the sum of the values in the set
+//
+/////////////////////////////////////////////////////////////////////////
+	sum: function(instance)
+	{
+		return instance._sum;
+	},
+/////////////////////////////////////////////////////////////////////////
+//
+//  get sumWeights
+//
+// returns the sum of the weights of the values in the set
+// inputs: none
+// output: (number) the sum of the weights of the values in the set
+//
+/////////////////////////////////////////////////////////////////////////
+	sumWeights: function(instance)
+	{
+		return instance._sumWeights;
+	},
+	
+/////////////////////////////////////////////////////////////////////////
+//
+//  isWeightedAverager
+//
+// checks to see if an instance is an instance of WeightedAverager
+// inputs:	none
+// output: returns true if the instance is a weightedaverager
+//
+/////////////////////////////////////////////////////////////////////////
+	isInstance: function(instance)
+	{
+		return (typeof instance == 'object' && "__type" in instance && instance.__type == "WeightedAverager")	
+	},
+/////////////////////////////////////////////////////////////////////////
+//
+//  copyFrom
+//
+// copies an instance of a WeightedAverager into another
+// inputs:	sourceInstance (object) - the object to copy
+// 			targetInstance (object) - the object that should receive the copy
+// output: none
+//
+/////////////////////////////////////////////////////////////////////////
+	copyFrom: function (sourceInstance, targetInstance)
+	{
+		if (WeightedAverager.isWeightedAverager(sourceInstance))
+		{
+			Object.assign(targetInstance,sourceInstance);
+		}
+	},
+/////////////////////////////////////////////////////////////////////////
+//
+//  clone
+//
+// creates a new instance of a WeightedAverager with the same data as the source
+// inputs:	instance (object) - the object to copy
+// output: none
+//
+/////////////////////////////////////////////////////////////////////////
+	clone: function (instance)
+	{
+		let ret = null;
+		if (WeightedAverager.isWeightedAverager(sourceInstance)) 
+		{
+			ret = WeightedAverager.generateInstance(); 
+			Object.assign(ret,instance);
+		}
+		return ret;
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////
+//
 //  class AngularAverager
 //
 // a class used to calculate the average, standard deviation, and 
@@ -1209,8 +1716,10 @@ class Averager
 
 class AngularAverager
 {
+	#type;
 	constructor()
 	{
+		this.#type = "AngularAverager";
 		this._x = new Averager();
 		this._y = new Averager();
 		
@@ -1592,3 +2101,81 @@ function SIprefix(value)
 	return {value: value * Math.pow(10.0,-l3 * 3), prefix: _SIprefixes[idx]};
 }
 
+
+
+/////////////////////////////////////////////////////////////////////////
+//
+//  padZero
+//
+// pads an integer with leading zeros. If the number is negative, a - sign will
+// be placed at start of string
+// inputs: value: the value to display. Will be written as toFixed(0)
+//			n: total number of digits
+// output: (String): the string containing the zero padded number. 
+//
+/////////////////////////////////////////////////////////////////////////
+
+function padZero(value,n)
+{
+	const N = Math.max(Math.floor(Math.log10(Math.abs(value))) + 1,1);
+	let ret = value < 0 ? "-" : "";
+	for (i = N; i < n; i++)
+		ret += "0";
+	 ret += Math.abs(value).toFixed(0);
+	 return ret;
+}
+
+/////////////////////////////////////////////////////////////////////////
+//
+//  initializeVariable
+//
+// ensures a variable is not undefined; sets value to null if undefined
+// inputs: value: the value assign, or undefined
+//			default_value (optional) : the default value if value is 
+// output: (?): the value or null if the input was undefined
+//
+/////////////////////////////////////////////////////////////////////////
+
+function initializeVariable(value,default_value)
+{
+	return (value === undefined) ? ((default_value !== undefined) ? default_value : null) : ((value === null) ? ((default_value !== undefined) ? default_value : null) : value);
+}
+
+/////////////////////////////////////////////////////////////////////////
+//
+//  clone
+//
+// clones an object or array; or returns a string, boolean, number, null, or undefined
+// inputs: value: the data to clone
+// output: (?): the data contained in value (if value is null, undefined, a
+//                 string, number, or boolean), or a clone of value if
+//                 value is an object or array.
+//
+/////////////////////////////////////////////////////////////////////////
+
+function clone(value)
+{
+	let ret;
+	if (typeof value == "object")
+	{
+		if (value instanceof Array)
+		{
+			ret = new Array(value.length);
+			for (let i in value)
+			{
+				ret[i] = clone(value[i]);
+			}
+		}
+		else
+		{
+			ret = new Object;
+			for (let i in value)
+			{
+				ret[i] = clone(value[i]);
+			}
+		}
+	}
+	else //if (value === undefined || value === null || typeof value == "number" || typeof value == "boolean" || typeof value == "function" || typeof value == "string")
+		ret = value;
+	return ret;
+}

@@ -96,7 +96,7 @@ const Phys = {
 	kWein: 2.897771955, // cm K
 	kCs133: 9192631770, // Hz
 }
-Phys.kParsec = Phys.kAstronomicalUnit / Phys.kArcSecRadians, // cm
+Phys.kParsec = Phys.kAstronomicalUnit / Phys.kArcSecRadians; // cm
 Phys.kMassSolar = Phys.kGMSolar / Phys.kGravity; // g
 Phys.kStefanBoltzmann = 2.0 * Math.PI * Math.pow(Math.PI * Phys.kBoltzmann,4.0) * Math.pow(Phys.kPlanck,-3.0) * Math.pow(Phys.kSpeedOfLight,-2.0) / 15.0;
 Object.freeze(Phys);

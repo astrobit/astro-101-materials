@@ -70,20 +70,35 @@
 /////////////////////////////////////////////////////////////////////////
 
 const Phys = {
-	kSpeedOfLight: 29979245800.0,
-	kPlanck: 6.62607015e-27,
-	kAstronomicalUnit: 14959787070000.0,
-	kDegreesRadians: Math.PI / 180.0,
-	kArcSecRadians:  Math.PI / (180.0 * 3600.0),
-	kMasRadians: Math.PI / (180.0 * 3600.0 * 1000.0),
-	kParsec: 3600.0 * 180.0 / Math.PI * 14959787070000.0,
+	kSpeedOfLight: 29979245800.0, // cm/s
+	kPlanck: 6.62607015e-27, // erg s
+	kAstronomicalUnit: 14959787070000.0, // cm
+	kDegreesRadians: Math.PI / 180.0, // radians / degree
+	kArcSecRadians:  Math.PI / (180.0 * 3600.0), // radians / arcsecond
+	kMasRadians: Math.PI / (180.0 * 3600.0 * 1000.0), // radians / milli-arcsecond
 	kYearSeconds: 365.0 * 86400.0,
-	kRadiusEarth:  6371.0,
-	kLuminositySolar: 3.828e33,
-	kRadiusSolar: 6.957e10,
-	kTemperatureSolar: 5772,
-	kGMSolar: 1.3271244e26,
+	kRadiusEarth:  637100000.0, // cm
+	kRadiusEarthkm:  6371.0, // km
+	kLuminositySolar: 3.828e33, // erg/s
+	kRadiusSolar: 6.957e10, // cm
+	kTemperatureSolar: 5772, // K
+	kGMSolar: 1.3271244e26, // dyne cm² g⁻¹
+	kGravity: 6.67430e-8, //dyne cm² g⁻²
+	kMassNeutron: 1.67492749804e-24, // g
+	kMassProton: 1.67262192369e-24, // g
+	kMassElectron: 9.1093837015e-28, // g
+	kMassAlpha: 6.6446573357e-24, // g
+	kMassDeuteron: 3.3435837724e-24, // g
+	kMassMuon: 1.883531627e-25, // g
+	kMassTau: 3.16754e-24, // g
+	kBoltzmann: 1.380649e-16, // erg/K
+	kAvogadro: 6.02214076e23,
+	kWein: 2.897771955, // cm K
+	kCs133: 9192631770, // Hz
 }
+Phys.kParsec = Phys.kAstronomicalUnit / Phys.kArcSecRadians, // cm
+Phys.kMassSolar = Phys.kGMSolar / Phys.kGravity; // g
+Phys.kStefanBoltzmann = 2.0 * Math.PI * Math.pow(Math.PI * Phys.kBoltzmann,4.0) * Math.pow(Phys.kPlanck,-3.0) * Math.pow(Phys.kSpeedOfLight,-2.0) / 15.0;
 Object.freeze(Phys);
 
 //let commonAstroLogRegister = 0; // used to report to the log choices of minimum and maximum magnitudes

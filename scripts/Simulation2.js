@@ -162,22 +162,29 @@ let g_time = null;
 const kFramerate = 1.0 / 30.0;
 let g_galaxiesInView = new Array();
 let g_universeUpdating = false;
+let g_windowResized = false;
+addEventListener("resize",(event)=>{g_windowResized = true;});
+
 function updateMonitor()
 {
-	let update = false;
+	let telescopeMoved = false;
+	let universeUpdated = Universe.hasUpdate();
 	if (g_currentTelescope.isSlewRequired())
 	{
 		const currTime = Date.now();
 		const timestep = (g_time == null) ? (1000.0 * kFramerate) : currTime - g_time;
 		g_time = currTime;
 		g_currentTelescope.slew(timestep);
-		update = true;
+		telescopeMoved = true;
 	}
-	if (update || Universe.hasUpdate())
-	{
+	
+	if (telescopeMoved || universeUpdated)
 		g_galaxiesInView = Universe.getGalaxiesInView(g_currentTelescope.viewMatrix,g_currentTelescope._FOV,1.0 / g_currentTelescope._pixelSizeSky);
+
+	if (g_windowResized || telescopeMoved || universeUpdated)
+	{
 		draw();
-		g_updateFlag = false;
+		g_windowResized = false;
 	}
 	window.setTimeout(updateMonitor, 1000.0 * kFramerate);
 }

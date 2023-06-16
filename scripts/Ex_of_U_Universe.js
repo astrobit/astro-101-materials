@@ -14,6 +14,7 @@ const Galaxy =
 		__g_galaxyCount++;
 		ret._position = LinAlg.generateRandomVector(universeSize);
 		ret._luminosity = GalaxyLuminosityFunction.random(luminosiftyFunctionInstance);
+		ret._vrot = Math.pow(ret._luminosity / 4.0e10,0.25) * 200.0; // rotational velocity for ellipticals; rotational velocity for spirals
 
 		ret._velocityPeculiarUnit = LinAlg.generateRandomUnitVector();
 		const thisPerculairVelocity = Math.random() * Galaxy.__MAX_PECULIAR_VELOCITY;

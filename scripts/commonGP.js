@@ -22,7 +22,8 @@
 //
 // 2022-Nov-09
 // Additions
-// - add SIprefix to determine the approriate SI prefix for a value. Note: excludes centi-, hecto-, deci-, and deca-
+// - add SIprefix to determine the approriate SI prefix for a value. Note: 
+//    excludes centi-, hecto-, deci-, and deca-
 // - add random_poisson function
 //
 // 2023-Mar-31
@@ -32,16 +33,25 @@
 // 2023-Jun-12
 // Changes
 // - use SigFigsFactory within the SigFigs class
-// - SigFigs value string will now return a number in scientific notation if it is large or small
+// - SigFigs value string will now return a number in scientific notation if it
+//    is large or small
 // - suffle fucntion modified to specify some variables as const (optimization)
 // - add private member #type to Averager and AngularAverager
 // Additions
 // - create functional programming model of SigFigs as SigFigsFactory
 // - add WeightedAverager (as factory)
 // - add padZero function to display a number with left-padded zeros
-// - add initializeVariable function that returns a default value if the initialzing value is null or undefined
+// - add initializeVariable function that returns a default value if the 
+//    initialzing value is null or undefined
 // - add clone function to clone objects
-
+//
+// 2023-Jun-20
+// Changes
+// - fix bug in toSuperscript that incorrectly converted 1 to a garbage 
+//    character
+// - enfore all comment blocks fit within 80 characters
+// Additions
+// - added toScientific function
 
 /////////////////////////////////////////////////////////////////////////
 //
@@ -509,7 +519,8 @@ class Sig_Figs
 //
 //  setter uncertainty
 //
-// this function set the uncertainty, then returns the new uncertainty as a number
+// this function set the uncertainty, then returns the new uncertainty as a 
+//  number
 // inputs: (number) the new uncertainty
 // outputs: (number) - the new uncertainty
 /////////////////////////////////////////////////////////////////////////
@@ -669,7 +680,7 @@ function toSuperscript(value)
 			ret += String.fromCharCode(0x2070)
 			break;
 		case '1':
-			ret += String.fromCharCode(0x20b9)
+			ret += String.fromCharCode(0x00b9)
 			break;
 		case '2':
 			ret += String.fromCharCode(0x00b2)
@@ -2145,7 +2156,8 @@ function initializeVariable(value,default_value)
 //
 //  clone
 //
-// clones an object or array; or returns a string, boolean, number, null, or undefined
+// clones an object or array; or returns a string, boolean, number, null, or 
+// undefined
 // inputs: value: the data to clone
 // output: (?): the data contained in value (if value is null, undefined, a
 //                 string, number, or boolean), or a clone of value if
@@ -2178,4 +2190,38 @@ function clone(value)
 	else //if (value === undefined || value === null || typeof value == "number" || typeof value == "boolean" || typeof value == "function" || typeof value == "string")
 		ret = value;
 	return ret;
+}
+
+/////////////////////////////////////////////////////////////////////////
+//
+//  toScientific
+//
+// similar to toExponential, but returns a value as a string in scientific 
+//    notation of the form (-n.nnn×10¹¹¹¹) or (-n.nnnx10^1111).
+// inputs: value: the value to display
+//         precision: the number of digits after the decimal to display. The 
+//                    default is 2
+//         noUnicode (optional): flag to determine how to display superscript 
+//                    and special charaters; if not set, times will be 
+//                    represented with ×, otherwise with an "x"; if not set, 
+//                    exponent will be unicode superscript, otherwise exponent 
+//                    will be shown as "^nnn" with the digits in the standard 
+//                    ASCII range
+// output: (string): a string containing the value in scientific notation
+//
+/////////////////////////////////////////////////////////////////////////
+
+
+function toScientific(value, precision, noUnicode)
+{
+	const noUnicodeLocal = ValidateBoolean(noUnicode) && noUnicode;
+	const times = noUnicodeLocal ? "x" : "×";
+	const precisionLocal = ValidateValue(precision) ? precision : 2;
+	const sign = (value < 0) ? "-" : "";
+	const logValue = Math.log10(Math.abs(value));
+	const logFrac = logValue - Math.floor(logValue);
+	const logInt = Math.floor(logValue);
+	const mantissa = Math.pow(10.0,logFrac).toFixed(precisionLocal);
+	const exponent = noUnicodeLocal ? ("^" + logInt.toFixed(0)) : toSuperscript(logInt);
+	return sign + mantissa + times + "10" + exponent;
 }

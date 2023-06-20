@@ -2,11 +2,12 @@
 // written by Brian W. Mulligan, except randn_bm function 
 // Copyright (c) 2020, Brian W. Mulligan
 
-
+const kWindowHeightOffset = 500;
+const kCanvasHeight = 300;
 
 let theCanvas = document.getElementById("theCanvas");
 theCanvas.width = window.innerWidth;
-theCanvas.height = window.innerHeight - 300;
+theCanvas.height = kCanvasHeight == null ? window.innerHeight - kWindowHeightOffset : kCanvasHeight;
 let theContext = theCanvas.getContext("2d");
 let timer = 0;
 
@@ -29,7 +30,7 @@ function plot()
 	let MconstDM = model.masses.total * model.masses.DMhaloFraction / Math.pow(100,3+model.shape.DMhalo);
 
 	theCanvas.width = window.innerWidth;
-	theCanvas.height = window.innerHeight - 450;
+	theCanvas.height = kCanvasHeight == null ? window.innerHeight - kWindowHeightOffset : kCanvasHeight;
 	theContext.clearRect(0, 0, theCanvas.width, theCanvas.height);
 
 	theContext.save();
@@ -139,7 +140,7 @@ function plot()
 	theContext.textAlign = "right";
 	theContext.font = "12px Arial";
 	theContext.fillStyle = "#000000";
-	theContext.fillText("Q = " + model.qVelocity,400,180);
+	theContext.fillText("Q = " + toScientific(model.qVelocity,2),400,180);
 
 	theContext.restore(); // clip 
 
@@ -218,7 +219,7 @@ function plot()
 	theContext.textAlign = "right";
 	theContext.font = "12px Arial";
 	theContext.fillStyle = "#000000";
-	theContext.fillText("Q = " + model.qLuminosity,400,30);
+	theContext.fillText("Q = " + toScientific(model.qLuminosity,2),400,30);
 	theContext.restore();
 
 }

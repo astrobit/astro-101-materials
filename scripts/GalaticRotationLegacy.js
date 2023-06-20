@@ -138,7 +138,7 @@ function plot()
 		theContext.fillRect(x - 2, y - 2,4,4);
 	}
 	theContext.textAlign = "right";
-	theContext.font = "12px Arial";
+	theContext.font = "18px Arial";
 	theContext.fillStyle = "#000000";
 	theContext.fillText("Q = " + toScientific(model.qVelocity,2),400,180);
 
@@ -217,7 +217,7 @@ function plot()
 	}
 	theContext.restore();
 	theContext.textAlign = "right";
-	theContext.font = "12px Arial";
+	theContext.font = "18px Arial";
 	theContext.fillStyle = "#000000";
 	theContext.fillText("Q = " + toScientific(model.qLuminosity,2),400,30);
 	theContext.restore();

@@ -16,13 +16,60 @@
 
         gtag('config', 'G-TLY3E2NQDJ');
     </script>
+    <style>
+		.filter {
+		width: 50px;
+		height: 40px;
+		}
+		.constellations {
+		width: 100px;
+		height: 40px;
+		}
+		.coordinatesystem {
+		width: 100px;
+		height: 40px;
+		}
+		legend {
+			color: #ffffff;
+		}
+
+    </style>
 </head>
     <body style="font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#000000;">
-        <div style="width:100%; margin-left:auto; margin-right:auto;height:100%;">
-            <canvas id="mapCanvas" width="1200" height="900" onclick="commonUIOnClick(event);">
+        <div style="width:100%; margin-left:auto; margin-right:auto;height:50%;text-align:center;">
+            <canvas id="mapCanvas">
                 Canvas not supported; please update your browser.
             </canvas>
         </div>
+		<div style="margin-left: auto;margin-right: auto;text-align: center;">
+			<fieldset>
+				<legend>Filter</legend>
+				<input type="button" class="filter" id="buttonFilterNone" value="None" onclick="selectFilter('none')"/>
+				<input type="button" class="filter" id="buttonFilterU" value="U" onclick="selectFilter('U')"/>
+				<input type="button" class="filter" id="buttonFilterB" value="B" onclick="selectFilter('B')"/>
+				<input type="button" class="filter" id="buttonFilterV" value="V" onclick="selectFilter('V')"/>
+				<input type="button" class="filter" id="buttonFilterR" value="R" onclick="selectFilter('R')"/>
+				<input type="button" class="filter" id="buttonFilterI" value="I" onclick="selectFilter('I')"/>
+			</fieldset>
+		</div>
+		<div style="margin-left: auto;margin-right: auto;text-align: center;">
+			<fieldset>
+				<legend>Constellations</legend>
+				<input type="button" class="constellations" id="buttonConstellationsNone" value="None" onclick="selectConstellation('none')"/>
+				<input type="button" class="constellations" id="buttonConstellationsZodiac" value="Zodiac" onclick="selectConstellation('zodiac')"/>
+				<input type="button" class="constellations" id="buttonConstellationsMajor" value="Major" onclick="selectConstellation('major')"/>
+				<input type="button" class="constellations" id="buttonConstellationsMinor" value="Minor" onclick="selectConstellation('minor')"/>
+				<input type="button" class="constellations" id="buttonConstellationsAll" value="All" onclick="selectConstellation('all')"/>
+			</fieldset>
+		</div>
+		<div style="margin-left: auto;margin-right: auto;text-align: center;">
+			<fieldset>
+				<legend>Coordinate System</legend>
+				<input type="button" class="coordinatesystem" id="buttonCoordinatesEquatorial" value="Equatorial" onclick="selectCoordinateSystem('Equatorial');"/>
+				<input type="button" class="coordinatesystem" id="buttonCoordinatesEcliptic" value="Ecliptic" onclick="selectCoordinateSystem('Ecliptic');"/>
+				<input type="button" class="coordinatesystem" id="buttonCoordinatesGalactic" value="Galactic" onclick="selectCoordinateSystem('Galactic');"/>
+			</fieldset>
+		</div>
         <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
             <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
                 <p style="color: gray;font-size:75%">
@@ -32,6 +79,7 @@
                 </p>
             </div>
         </div>
+		
         <!--        <div>
                 <p style="font-size:24px;text-align:center;color:#FFFFFF;">Use page up and page down or the mouse scroll wheel to zoom in and out</p>
                 <p style="font-size:24px;text-align:center;color:#FFFFFF;">Use the W,S,A,D, arrow keys, or click and drag with the mouse to move around the map when zoomed in.</p>

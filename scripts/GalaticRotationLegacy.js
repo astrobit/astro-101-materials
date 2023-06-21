@@ -11,6 +11,26 @@ theCanvas.height = kCanvasHeight == null ? window.innerHeight - kWindowHeightOff
 let theContext = theCanvas.getContext("2d");
 let timer = 0;
 
+let divGalaxyList = document.getElementById("divGalaxyList");
+divGalaxyList.style.height = (window.innerHeight - 150).toFixed(0) + "px";
+let divModel = document.getElementById("divModel");
+
+
+let tabModel = document.getElementById("tabModel");
+let tabGalaxyList = document.getElementById("tabGalaxyList");
+
+function selectTab(tab)
+{
+	divGalaxyList.style.display = (tab == "Galaxy List") ? "block" : "none";
+	divModel.style.display = (tab == "Model") ? "block" : "none";
+	
+	tabModel.className = (tab != "Model") ? "tablinks" : "tablinks active"
+	tabGalaxyList.className = (tab != "Galaxy List") ? "tablinks" : "tablinks active"
+	
+}
+selectTab("Galaxy List");
+
+
 class datapoint
 {
 	constructor(r,v)
@@ -18,6 +38,54 @@ class datapoint
 		this.r = r;
 		this.v = v;
 	}
+}
+function onSelectGalaxy(index)
+{
+	Universe.selectGalaxy(index);
+	setSliders();
+	update();
+	selectTab("Model");
+}
+
+function insertTableData(data,width)
+{
+	let ret = "<td>";
+	if (width !== undefined)
+		ret += '<div style="min-width:' + width + 'px;">';
+	ret += data
+	if (width !== undefined)
+		ret += "</div>"
+	ret +=  "</td>";
+	return ret;
+}
+
+
+function updateGalaxyList()
+{
+	let bodyGalaxyList = document.getElementById("bodyGalaxyList");
+	let tableBody = new String();
+	const numGalaxies = Universe.getGalaxyCount();
+	for (let i = 0; i < numGalaxies; i++)
+	{
+		const galaxy = Universe.getGalaxy(i);
+		const model = Universe.getModel(i);
+		tableBody += "<tr>";
+		const onClickSelect = " onclick=\"onSelectGalaxy(" + i + ");\"";
+		
+		tableBody += insertTableData(galaxy.id,200);
+		tableBody += insertTableData('<input type="button" value="Select Galaxy"' + onClickSelect + '>',50);
+		
+		tableBody += insertTableData(toScientific(model.masses.total),100);
+		tableBody += insertTableData(model.shape.bulge.toFixed(2),50);
+		tableBody += insertTableData(model.shape.disk.toFixed(2),50);
+		tableBody += insertTableData(model.shape.DMhalo.toFixed(2),50);
+		tableBody += insertTableData((model.masses.bulgeFraction * 100.0).toFixed(1),50);
+		tableBody += insertTableData((model.masses.diskFraction * 100.0).toFixed(1),50);
+		tableBody += insertTableData((model.masses.DMhaloFraction * 100.0).toFixed(1),50);
+
+		tableBody += "</tr>";
+	}
+	bodyGalaxyList.innerHTML = tableBody;
 }
 
 function plot()
@@ -252,6 +320,7 @@ function waiter()
 {
 	if (g_Update)
 	{
+		updateGalaxyList();
 		plot();
 		g_Update = false;
 	}
@@ -552,7 +621,7 @@ const Universe = {
 		Universe._saveMonitor();
 		return promise;
 	},
-	selectGalaxy(index)
+	selectGalaxy: function (index)
 	{
 		if(index >= 0 && index <= Universe._NUM_GALAXIES)
 		{
@@ -560,33 +629,37 @@ const Universe = {
 			Universe._markChange();
 		}
 	},
-	selectNextGalaxy()
+	selectNextGalaxy: function ()
 	{
 		__g_universe.selectedGalaxy++;
 		if (__g_universe.selectedGalaxy >= Universe._NUM_GALAXIES)
 			__g_universe.selectedGalaxy -= Universe._NUM_GALAXIES;
 		Universe._markChange();
 	},
-	selectPreviousGalaxy()
+	selectPreviousGalaxy: function ()
 	{
 		__g_universe.selectedGalaxy--;
 		if (__g_universe.selectedGalaxy < 0)
 			__g_universe.selectedGalaxy += Universe._NUM_GALAXIES;
 		Universe._markChange();
 	},
-	getGalaxy(index)
+	getGalaxyCount: function()
+	{
+		return Universe._NUM_GALAXIES;
+	},
+	getGalaxy: function (index)
 	{
 		return clone(__g_universe.galaxies[index]);
 	},
-	getCurrentGalaxy()
+	getCurrentGalaxy: function ()
 	{
 		return clone(__g_universe.galaxies[__g_universe.selectedGalaxy]);
 	},
-	getModel(index)
+	getModel: function (index)
 	{
 		return clone(__g_universe.models[index]);
 	},
-	getCurrentModel()
+	getCurrentModel: function ()
 	{
 		return clone(__g_universe.models[__g_universe.selectedGalaxy]);
 	},
@@ -614,10 +687,11 @@ const Universe = {
 			string += Math.pow(10.0,__g_universe.models[i].masses.logMassToLight);
 			string += ", ";
 			string += __g_universe.models[i].qVelocity;
-			string += "\n";
+			string += ",";
 			string += __g_universe.models[i].qLuminosity;
 			string += "\n";
 		}
+		return string;
 	},
 	setMeasurements: function (logMass, diskShape, bulgeShape, DMhaloShape, diskFraction, massToLight)
 	{
@@ -714,6 +788,13 @@ __g_universeStorageInitializePromise.then(
 		console.log("universe storage initialize failure");
 	}
 );
+
+
+function downloadModels()
+{
+	const data = Universe.getMeasurementsCSV();
+	download(data,"GalaxyRotationModels.csv","csv");
+}
 
 
 

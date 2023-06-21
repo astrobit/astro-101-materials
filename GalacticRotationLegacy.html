@@ -1,151 +1,204 @@
 ﻿<!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <title>Galactic Rotation Curves</title>
-    <style>
-        .slidecontainer {
-            width: 100%; /* Width of the outside container */
-        }
+	<head>
+		<meta charset="utf-8">
+		<title>Galactic Rotation Curves</title>
+		<style>
+		    .slidecontainer {
+		        width: 100%; /* Width of the outside container */
+		    }
 
 
-            /* Mouse-over effects */
-            .slider:hover {
-                opacity: 1; /* Fully shown on mouse-over */
-            }
+		        /* Mouse-over effects */
+		        .slider:hover {
+		            opacity: 1; /* Fully shown on mouse-over */
+		        }
 
-            .slider {
-                -webkit-appearance: none;
-                width: 100%;
-                height: 16px;
-                border-radius: 8px;
-                background: #d3d3d3;
-                outline: none;
-                opacity: 0.7;
-                -webkit-transition: .2s;
-                transition: opacity .2s;
-            }
+		        .slider {
+		            -webkit-appearance: none;
+		            width: 100%;
+		            height: 16px;
+		            border-radius: 8px;
+		            background: #d3d3d3;
+		            outline: none;
+		            opacity: 0.7;
+		            -webkit-transition: .2s;
+		            transition: opacity .2s;
+		        }
 
-                .slider::-webkit-slider-thumb {
-                    -webkit-appearance: none;
-                    appearance: none;
-                    width: 20px;
-                    height: 20px;
-                    border-radius: 50%;
-                    background: #4CAF50;
-                    cursor: pointer;
-                }
+		            .slider::-webkit-slider-thumb {
+		                -webkit-appearance: none;
+		                appearance: none;
+		                width: 20px;
+		                height: 20px;
+		                border-radius: 50%;
+		                background: #4CAF50;
+		                cursor: pointer;
+		            }
 
-                .slider::-moz-range-thumb {
-                    width: 20px;
-                    height: 20px;
-                    border-radius: 50%;
-                    background: #4CAF50;
-                    cursor: pointer;
-                }
-    </style>
-</head>
-<body style="font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#ffffff;text-align:center">
-    <h1 style="font-size:24px;text-align:center;color:#000000;">Galactic Rotation</h1>
-    <div style="
-        margin-left: auto;
-        margin-right: auto;
-        ">
-        <canvas id="theCanvas" width="100%" height="300" style="margin-left:auto; margin-right:auto;text-align:center">
-            Canvas not supported; please update your browser.
-        </canvas>
-    </div>
-    <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
-        <fieldset>
-            <legend>Galaxy</legend>
-            <table style="width: 450px;border: 1px solid black;margin-left: auto;margin-right: auto;text-align: center">
-                <tbody>
-                    <tr>
-                        <td style="width:150px;align-content:center;" id="tdGalID">SiGC nnnnn</td>
-                    </tr>
-                </tbody>
-            </table>
-            <input type="button" id="getGalaxy" onclick="chooseGalaxy();" value="Get New Galaxy">
-        </fieldset>
-    </div>
-    <div style ="width:1200px; margin-left:auto; margin-right:auto;text-align:center">
-        <div style="width:400px; margin-left:auto; margin-right:auto;text-align:center;float:left">
-            <fieldset>
-                <legend>Total Galaxy Mass</legend>
-                <input type="range" min="0" max="100" value="50" step="0.1" class="slider" id="totalMass" oninput="update();">
-                <table style="width: 350px;border: 1px solid black;">
-                    <tbody>
-                        <tr>
-                            <td style="width:100px;align-content:center;" id="tdTotalMass">3.16E+12&nbsp;M<sub>⊙</sub></td>
-                        </tr>
-                    </tbody>
-                </table>
-            </fieldset>
-        </div>
-        <div style="width: 400px;margin-left: auto;margin-right: auto;text-align: center;float:right;">
-            <fieldset>
-                <legend>Component Relative Masses</legend>
-                <label>
-                    Bulge - Disk
-                    <input type="range" min="0" max="100" value="50" class="slider" id="bulgeDiskRatio" oninput="update();">
-                </label>
-                <label>
-                    Mass-To-Light
-                    <input type="range" min="0" max="2" value="0" step="0.01" class="slider" id="MassToLight" oninput="update();">
-                </label>
-                <table style="width: 350px; border: 1px solid black; text-align: center;">
-                    <tbody>
-                        <tr>
-                            <td style="width:100px;align-content:center;">Bulge</td>
-                            <td style="width:100px;align-content:center;">Disk</td>
-                            <td style="width:100px;align-content:center;">Dark Matter</td>
-                        </tr>
-                        <tr>
-                            <td id="tdBulgeMass">0.25</td>
-                            <td id="tdDiskMass">0.25</td>
-                            <td id="tdDMMass">0.5</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </fieldset>
-        </div>
-        <div style="width: 400px;margin-left: auto;margin-right: auto;text-align: center;">
-            <fieldset>
-                <legend>Component Shapes</legend>
-                <label>
-                    Bulge
-                    <input type="range" min="0" max="100" value="50" class="slider" id="bulgeIndex" oninput="update();">
-                </label>
-                <label>
-                    Disk
-                    <input type="range" min="0" max="100" value="50" class="slider" id="diskIndex" oninput="update();">
-                </label>
-                <label>
-                    Dark Matter
-                    <input type="range" min="0" max="100" value="50" class="slider" id="DMIndex" oninput="update();">
-                </label>
-                <table style="width: 350px; border: 1px solid black;">
-                    <tbody>
-                        <tr>
-                            <td style="width:100px;align-content:center;">Bulge</td>
-                            <td style="width:100px;align-content:center;">Disk</td>
-                            <td style="width:100px;align-content:center;">Dark Matter</td>
-                        </tr>
-                        <tr>
-                            <td id="tdBulgeIndex">0</td>
-                            <td id="tdDiskIndex">0</td>
-                            <td id="tdDMIndex">0</td>
-                        </tr>
-                    </tbody>
-                </table>
+		            .slider::-moz-range-thumb {
+		                width: 20px;
+		                height: 20px;
+		                border-radius: 50%;
+		                background: #4CAF50;
+		                cursor: pointer;
+		            }
+			/* Style the tab */
+			.tab {
+			  overflow: hidden;
+			  border: 1px solid #ccc;
+			  background-color: #f1f1f1;
+			}
 
-            </fieldset>
-        </div>
-        </div>
-        <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
-            <p style="color: gray;font-size:75%">Copyright (c) 2020 - 2023 Brian W. Mulligan</p>
-        </div>
-        <script type="text/javascript" src="scripts/commonGP.js"></script>
-        <script type="text/javascript" src="scripts/GalaticRotationLegacy.js"></script>
-</body>
+			/* Style the buttons inside the tab */
+			.tab button {
+			  background-color: inherit;
+			  float: left;
+			  border: none;
+			  outline: none;
+			  cursor: pointer;
+			  padding: 14px 16px;
+			  transition: 0.3s;
+			  font-size: 17px;
+			}
+
+			/* Change background color of buttons on hover */
+			.tab button:hover {
+			  background-color: #ddd;
+			}
+
+			/* Create an active/current tablink class */
+			.tab button.active {
+			  background-color: #ccc;
+			}
+
+			/* Style the tab content */
+			.tabcontent {
+			  display: none;
+			  padding: 6px 12px;
+			  border: 1px solid #ccc;
+			  border-top: none;
+			}
+		</style>
+	</head>
+	<body style="font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#ffffff;text-align:center">
+		<h1 style="font-size:24px;text-align:center;color:#000000;">Galactic Rotation</h1>
+		<div class="tab" style="text-align:center;margin-left:0px;margin-right:auto;">
+		  <button id="tabModel" class="tablinks" onclick="selectTab('Model')">Galaxy Data and Model</button>
+		  <button id="tabGalaxyList" class="tablinks" onclick="selectTab('Galaxy List')">Galaxy Catalog</button>
+		</div>
+		<div id="divGalaxyList" style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align: center;overflow:auto;">
+			<table style="text-align:center;margin-left:auto;margin-right:auto;border-collapse: collapse;">
+				<thead style="color:black;font-size:18pt;position:sticky;top: 0px;">
+					<tr>
+						<td>Galaxy Catalog #</td><td></td><td>Mass (Msolar) </td><td>Bulge Index</td><td>Disk Index</td><td>DM Halo Index</td><td>Bulge Fraction (%)</td><td> Disk Fraction (%)</td><td> DM Fraction (%)</td>
+					</tr>
+				</thead>
+				<tbody id="bodyGalaxyList" style="color:gray;font-size:14pt;">
+					<tr>
+						<td>------------</td><td></td><td>---</td><td>---</td><td>---</td><td>---</td><td>---</td><td>0</td><td>0</td>
+					</tr>
+				</tbody>
+			</table>
+			<input type="button" id="downloadModels" onclick="downloadModels();" value="Download Models">
+		</div>
+		<div id="divModel" style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align: center;">
+			<div style="margin-left: auto;margin-right: auto;">
+				<canvas id="theCanvas" width="100%" style="margin-left:auto; margin-right:auto;text-align:center">
+					Canvas not supported; please update your browser.
+				</canvas>
+			</div>
+			<div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
+				<fieldset>
+					<legend>Galaxy</legend>
+					<table style="width: 450px;border: 1px solid black;margin-left: auto;margin-right: auto;text-align: center">
+						<tbody>
+							<tr>
+								<td style="width:150px;align-content:center;" id="tdGalID">SiGC nnnnn</td>
+							</tr>
+						</tbody>
+					</table>
+<!--					<input type="button" id="getGalaxy" onclick="chooseGalaxy();" value="Get New Galaxy">--><!-- remove this button now that the user can reach the galaxy list-->
+				</fieldset>
+			</div>
+				<div style ="width:1200px; margin-left:auto; margin-right:auto;text-align:center">
+					<div style="width:400px; margin-left:auto; margin-right:auto;text-align:center;float:left">
+						<fieldset>
+							<legend>Total Galaxy Mass</legend>
+							<input type="range" min="0" max="100" value="50" step="0.1" class="slider" id="totalMass" oninput="update();">
+							<table style="width: 350px;border: 1px solid black;">
+								<tbody>
+									<tr>
+										<td style="width:100px;align-content:center;" id="tdTotalMass">3.16E+12&nbsp;M<sub>⊙</sub></td>
+									</tr>
+								</tbody>
+							</table>
+						</fieldset>
+				</div>
+				<div style="width: 400px;margin-left: auto;margin-right: auto;text-align: center;float:right;">
+					<fieldset>
+						<legend>Component Relative Masses</legend>
+						<label>
+						Bulge - Disk
+						<input type="range" min="0" max="100" value="50" class="slider" id="bulgeDiskRatio" oninput="update();">
+						</label>
+						<label>
+						Mass-To-Light
+						<input type="range" min="0" max="2" value="0" step="0.01" class="slider" id="MassToLight" oninput="update();">
+						</label>
+						<table style="width: 350px; border: 1px solid black; text-align: center;">
+							<tbody>
+								<tr>
+									<td style="width:100px;align-content:center;">Bulge</td>
+									<td style="width:100px;align-content:center;">Disk</td>
+									<td style="width:100px;align-content:center;">Dark Matter</td>
+								</tr>
+								<tr>
+									<td id="tdBulgeMass">0.25</td>
+									<td id="tdDiskMass">0.25</td>
+									<td id="tdDMMass">0.5</td>
+								</tr>
+							</tbody>
+						</table>
+					</fieldset>
+				</div>
+				<div style="width: 400px;margin-left: auto;margin-right: auto;text-align: center;">
+					<fieldset>
+						<legend>Component Shapes</legend>
+						<label>
+						Bulge
+						<input type="range" min="0" max="100" value="50" class="slider" id="bulgeIndex" oninput="update();">
+						</label>
+						<label>
+						Disk
+						<input type="range" min="0" max="100" value="50" class="slider" id="diskIndex" oninput="update();">
+						</label>
+						<label>
+						Dark Matter
+						<input type="range" min="0" max="100" value="50" class="slider" id="DMIndex" oninput="update();">
+						</label>
+						<table style="width: 350px; border: 1px solid black;">
+							<tbody>
+								<tr>
+									<td style="width:100px;align-content:center;">Bulge</td>
+									<td style="width:100px;align-content:center;">Disk</td>
+									<td style="width:100px;align-content:center;">Dark Matter</td>
+								</tr>
+								<tr>
+									<td id="tdBulgeIndex">0</td>
+									<td id="tdDiskIndex">0</td>
+									<td id="tdDMIndex">0</td>
+								</tr>
+							</tbody>
+						</table>
+					</fieldset>
+				</div>
+			</div>
+		</div>
+		<div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
+		    <p style="color: gray;font-size:75%">Copyright (c) 2020 - 2023 Brian W. Mulligan</p>
+		</div>
+		<script type="text/javascript" src="scripts/commonGP.js"></script>
+		<script type="text/javascript" src="scripts/GalaticRotationLegacy.js"></script>
+	</body>
 </html>

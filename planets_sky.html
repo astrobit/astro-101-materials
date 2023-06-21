@@ -16,14 +16,65 @@
 
         gtag('config', 'G-0M15ZVRGK6');
     </script>
+    <style>
+		.time {
+		width: 40px;
+		height: 40px;
+		}
+		.planet {
+		width: 100px;
+		height: 40px;
+		}
+		.model {
+		width: 130px;
+		height: 40px;
+		}
+		.focus {
+		width: 130px;
+		height: 40px;
+		}
+
+    </style>
 </head>
 <body style="font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#000000;">
     <!--<h1 style="font-size:24px;text-align:center;color:#FFFFFF;">Elongation</h1>-->
     <div style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center">
-        <canvas id="theCanvas" width="1000" height="900" onclick="commonUIOnClick(event);">
+        <canvas id="theCanvas" onclick="commonUIOnClick(event);">
             Canvas not supported; please update your browser.
         </canvas>
     </div>
+    <div id="divTimeControls" style="margin-left:auto; margin-right:auto;text-align:center">
+		<input type="button" class="time" value="-1y" onclick="requestBackYear();">
+		<input type="button" class="time" value="-30d" onclick="requestBackMonth();">
+		<input type="button" class="time" value="-7d" onclick="requestBackWeek();">
+		<input type="button" class="time" style="margin-right:20px" value="-1d" onclick="requestBackDay();">
+		<input type="button" class="time" value="<<" onclick="requestFasterBackward();">
+		<input type="button" id="buttonPause" class="time" value="| |" onclick="requestPause();">
+		<input type="button" class="time" style="margin-right:20px" value=">>" onclick="requestFasterForward();">
+		<input type="button" class="time" value="+1y" onclick="requestAdvanceYear();">
+		<input type="button" class="time" value="+30d" onclick="requestAdvanceMonth();">
+		<input type="button" class="time" value="+7d" onclick="requestAdvanceWeek();">
+		<input type="button" class="time" value="+1d" onclick="requestAdvanceDay();">
+    </div>
+    <div id="divSelectPlanet" style="margin-left:auto; margin-right:auto;text-align:center">
+		<input type="button" id="buttonPlanetMercury" class="planet" value="Mercury" onclick="selectPlanet('Mercury');">
+		<input type="button" id="buttonPlanetVenus" class="planet" value="Venus" onclick="selectPlanet('Venus');">
+		<input type="button" id="buttonPlanetMars" class="planet" value="Mars" onclick="selectPlanet('Mars');">
+		<input type="button" id="buttonPlanetJupiter" class="planet" value="Jupiter" onclick="selectPlanet('Jupiter');">
+		<input type="button" id="buttonPlanetSaturn" class="planet" value="Saturn" onclick="selectPlanet('Saturn');">
+		<input type="button" id="buttonPlanetUranus" class="planet" value="Uranus" onclick="selectPlanet('Uranus');">
+		<input type="button" id="buttonPlanetNeptune" class="planet" value="Neptune" onclick="selectPlanet('Neptune');">
+    </div>
+    <div id="divSelectModel" style="margin-left:auto; margin-right:auto;text-align:center">
+		<input type="button" id="buttonModelSimple" class="model" value="Simple Model" onclick="selectComplexity('Simple Model');">
+		<input type="button" id="buttonModelReal" class="model" value="Real Model" onclick="selectComplexity('Real Model');">
+    </div>
+    <div id="divFocus" style="margin-left:auto; margin-right:auto;text-align:center">
+		<input type="button" id="buttonFocusSun" class="focus" value="Center on Sun" onclick="selectCenter('Sun');">
+		<input type="button" id="buttonFocusPlanet" class="focus" value="Center on Planet" onclick="selectCenter('Planet');">
+		<input type="button" id="buttonFocusStars" class="focus" value="Center on Stars" onclick="selectCenter('Vernal Equinox');">
+    </div>
+    
     <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
         <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
             <p style="color: gray;font-size:75%">

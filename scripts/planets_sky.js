@@ -3,9 +3,9 @@ theCanvas.onselectstart = function () { return false; } // prevent selection of 
 
 let theContext = theCanvas.getContext("2d");
 
-const minimumControlsHeightTop = 190;
+const minimumControlsHeightTop = 50;
 
-theCanvas.height = window.innerHeight - 60;
+theCanvas.height = window.innerHeight - 220;
 theCanvas.width = window.innerWidth;
 
 const elongationMapHeight = theCanvas.height - minimumControlsHeightTop;
@@ -14,13 +14,23 @@ const elongationMapWidth = elongationMapHeight * 2;
 const elongationMapX = theCanvas.width / 2
 const elongationMapY = elongationMapHeight / 2;
 
-const buttonsTimeY = elongationMapY + elongationMapHeight / 2 + 45;
-const buttonsPlanetsY = buttonsTimeY + 50;
-
 const bottomSpace = theCanvas.width
 
-const modelButtonsY = buttonsPlanetsY + 35
-const viewButtonsY = modelButtonsY + 35;
+
+let buttonPlanetMercury = document.getElementById("buttonPlanetMercury");
+let buttonPlanetVenus = document.getElementById("buttonPlanetVenus");
+let buttonPlanetMars = document.getElementById("buttonPlanetMars");
+let buttonPlanetJupiter = document.getElementById("buttonPlanetJupiter");
+let buttonPlanetSaturn = document.getElementById("buttonPlanetSaturn");
+let buttonPlanetUranus = document.getElementById("buttonPlanetUranus");
+let buttonPlanetNeptune = document.getElementById("buttonPlanetNeptune");
+
+let buttonModelSimple = document.getElementById("buttonModelSimple");
+let buttonModelReal = document.getElementById("buttonModelReal");
+
+let buttonFocusSun = document.getElementById("buttonFocusSun");
+let buttonFocusPlanet = document.getElementById("buttonFocusPlanet");
+let buttonFocusStars = document.getElementById("buttonFocusStars");
 
 
 let g_speed = 1.0;//0.25;
@@ -86,183 +96,98 @@ function selectPlanet(value)
 		selectedElongation  = 7;
 		break;
 	}
+	buttonPlanetMercury.style.backgroundColor = selectedElongation == 0 ? "#00bf00" : "#efefef";
+	buttonPlanetVenus.style.backgroundColor = selectedElongation == 1 ? "#00bf00" : "#efefef";
+	buttonPlanetMars.style.backgroundColor = selectedElongation == 3 ? "#00bf00" : "#efefef";
+	buttonPlanetJupiter.style.backgroundColor = selectedElongation == 4 ? "#00bf00" : "#efefef";
+	buttonPlanetSaturn.style.backgroundColor = selectedElongation == 5 ? "#00bf00" : "#efefef";
+	buttonPlanetUranus.style.backgroundColor = selectedElongation == 6 ? "#00bf00" : "#efefef";
+	buttonPlanetNeptune.style.backgroundColor = selectedElongation == 7 ? "#00bf00" : "#efefef";
 }
+selectPlanet("Venus");
 
-let radButtons = new Array();
-
-radButtons.push(new RadioButton("Mercury","Mercury",theCanvas.width / 2 - 295,buttonsPlanetsY,80,25));
-radButtons.push(new RadioButton("Venus","Venus",theCanvas.width / 2 - 210,buttonsPlanetsY,80,25));
-radButtons.push(new RadioButton("Mars","Mars",theCanvas.width / 2 - 125,buttonsPlanetsY,80,25));
-radButtons.push(new RadioButton("Jupiter","Jupiter",theCanvas.width / 2 - 40,buttonsPlanetsY,80,25));
-radButtons.push(new RadioButton("Saturn","Saturn",theCanvas.width / 2 + 45,buttonsPlanetsY,80,25));
-radButtons.push(new RadioButton("Uranus","Uranus",theCanvas.width / 2 + 130,buttonsPlanetsY,80,25));
-radButtons.push(new RadioButton("Neptune","Neptune",theCanvas.width / 2 + 215,buttonsPlanetsY,80,25));
-
-
-commonUIRegister(new Radio("Planet",selectedPlanet,selectPlanet,radButtons));
 
 function selectComplexity(value)
 {
 	g_simpleSolarSystem = (value == "Simple Model");
+	buttonModelSimple.style.backgroundColor = g_simpleSolarSystem ? "#00bf00" : "#efefef";
+	buttonModelReal.style.backgroundColor = !g_simpleSolarSystem ? "#00bf00" : "#efefef";
 }
-let modelButtons = new Array();
-modelButtons.push(new RadioButton("Simple Model","Simple Model",theCanvas.width / 2 - 150,modelButtonsY,140,25));
-modelButtons.push(new RadioButton("Real Model","Real Model",theCanvas.width / 2 + 10,modelButtonsY,140,25));
-commonUIRegister(new Radio("Model",g_simpleSolarSystem ? "Simple Model" : "Real Model" ,selectComplexity,modelButtons));
+selectComplexity("Real Model");
 
 let g_viewCenter = "Sun";
 function selectCenter(value)
 {
 	g_viewCenter = value;
+
+	buttonFocusSun.style.backgroundColor = (g_viewCenter == "Sun") ? "#00bf00" : "#efefef";
+	buttonFocusPlanet.style.backgroundColor = (g_viewCenter == "Planet") ? "#00bf00" : "#efefef";
+	buttonFocusStars.style.backgroundColor = (g_viewCenter == "Vernal Equinox") ? "#00bf00" : "#efefef";
 }
-let viewButtons = new Array();
-viewButtons.push(new RadioButton("Center on Sun","Sun",theCanvas.width / 2 - 220,viewButtonsY,140,25));
-viewButtons.push(new RadioButton("Center on Planet","Planet",theCanvas.width / 2 - 70,viewButtonsY,140,25));
-viewButtons.push(new RadioButton("Center on Stars","Vernal Equinox",theCanvas.width / 2 + 80,viewButtonsY,140,25));
-commonUIRegister(new Radio("View Center","Sun" ,selectCenter,viewButtons));
+selectCenter("Sun");
 
 let g_basespeed = 1.0;
-
-
-let times = String.fromCharCode(0x00d7)
-let pauseButtonText = '| |'
-let playButtonText = String.fromCharCode(0x25b6);
-let reverseButtonText = String.fromCharCode(0x25c0);
-
-const timesMTwoFiftySix = reverseButtonText + '256'
-const timesMSixtyFour = reverseButtonText + '64'
-const timesMSixteen = reverseButtonText + '16'
-const timesMFour = reverseButtonText + '4'
-const timesMOne = reverseButtonText + '1'
-const timesOne = playButtonText + '1'
-const timesFour = playButtonText + '4'
-const timesSixteen = playButtonText + '16'
-const timesSixtyFour = playButtonText + '64'
-const timesTwoFiftySix = playButtonText + '256'
-function selectSpeed(value)
+function requestFasterBackward()
 {
-	switch (value)
-	{
-	case timesMTwoFiftySix:
-		g_speed = -256.0 * g_basespeed;
-		break;
-	case timesMSixtyFour:
-		g_speed = -64.0 * g_basespeed;
-		break;
-	case timesMSixteen:
-		g_speed = -16.0 * g_basespeed;
-		break;
-	case timesMFour:
-		g_speed = -2.0 * g_basespeed;
-		break;
-	case timesMOne:
-		g_speed = -1.0 * g_basespeed;
-		break;
-	case timesOne:
-	default:
-		g_speed = 1.0 * g_basespeed;
-		break;
-	case timesFour:
-		g_speed = 4.0 * g_basespeed;
-		break;
-	case timesSixteen:
-		g_speed = 16.0 * g_basespeed;
-		break;
-	case timesSixtyFour:
-		g_speed = 64.0 * g_basespeed;
-		break;
-	case timesTwoFiftySix:
-		g_speed = 256.0 * g_basespeed;
-		break;
-	}
+	if (pause)
+		pause = false;
+	else if (g_speed >= 0)
+		g_speed = -g_basespeed;
+	else
+		g_speed *= 2; 
+}
+function requestFasterForward()
+{
+	if (pause)
+		pause = false;
+	else if (g_speed <= 0)
+		g_speed = g_basespeed;
+	else
+		g_speed *= 2; 
 }
 
 
-let speedButtons = new Array();
-speedButtons.push(new RadioButton(timesMTwoFiftySix,timesMTwoFiftySix,theCanvas.width / 2 - 230,buttonsTimeY,40,40));
-speedButtons.push(new RadioButton(timesMSixtyFour,timesMSixtyFour,theCanvas.width / 2 - 190,buttonsTimeY,40,40));
-speedButtons.push(new RadioButton(timesMSixteen,timesMSixteen,theCanvas.width / 2 - 150,buttonsTimeY,40,40));
-speedButtons.push(new RadioButton(timesMFour,timesMFour,theCanvas.width / 2 - 110,buttonsTimeY,40,40));
-speedButtons.push(new RadioButton(timesMOne,timesMOne,theCanvas.width / 2 - 70,buttonsTimeY,40,40));
-speedButtons.push(new RadioButton(timesOne,timesOne,theCanvas.width / 2 + 30,buttonsTimeY,40,40));
-speedButtons.push(new RadioButton(timesFour,timesFour,theCanvas.width / 2 +70,buttonsTimeY,40,40));
-speedButtons.push(new RadioButton(timesSixteen,timesSixteen,theCanvas.width / 2 +110,buttonsTimeY,40,40));
-speedButtons.push(new RadioButton(timesSixtyFour,timesSixtyFour,theCanvas.width / 2 +150,buttonsTimeY,40,40));
-speedButtons.push(new RadioButton(timesTwoFiftySix,timesTwoFiftySix,theCanvas.width / 2 + 190,buttonsTimeY,40,40));
-commonUIRegister(new Radio("speed",timesOne,selectSpeed,speedButtons));
-
-function requestAdvanceDay(event)
+function requestAdvanceDay()
 {
 	g_timer += 1.0;
 }
-function requestAdvanceWeek(event)
+function requestAdvanceWeek()
 {
 	g_timer += 7.0;
 }
-function requestAdvanceMonth(event)
+function requestAdvanceMonth()
 {
 	g_timer += 30.0;
 }
-function requestAdvanceYear(event)
+function requestAdvanceYear()
 {
 	g_timer += 365.0;
 }
 
-let advanceDay = new Button("+1d",theCanvas.width / 2 + 250,buttonsTimeY,40,40,requestAdvanceDay);
-commonUIRegister(advanceDay);
-let advanceWeek = new Button("+7d",theCanvas.width / 2 + 290,buttonsTimeY,40,40,requestAdvanceWeek);
-commonUIRegister(advanceWeek);
-let advanceMonth = new Button("+30d",theCanvas.width / 2 + 330,buttonsTimeY,40,40,requestAdvanceMonth);
-commonUIRegister(advanceMonth);
-let advanceYear = new Button("+1y",theCanvas.width / 2 + 370,buttonsTimeY,40,40,requestAdvanceYear);
-commonUIRegister(advanceYear);
 
-function requestBackDay(event)
+function requestBackDay()
 {
 	g_timer -= 1.0;
 }
-function requestBackWeek(event)
+function requestBackWeek()
 {
 	g_timer -= 7.0;
 }
-function requestBackMonth(event)
+function requestBackMonth()
 {
 	g_timer -= 30.0;
 }
-function requestBackYear(event)
+function requestBackYear()
 {
 	g_timer -= 365.0;
 }
 
-let backDay = new Button("-1d",theCanvas.width / 2 - 290,buttonsTimeY,40,40,requestBackDay);
-commonUIRegister(backDay);
-let backWeek = new Button("-7d",theCanvas.width / 2 - 330,buttonsTimeY,40,40,requestBackWeek);
-commonUIRegister(backWeek);
-let backMonth = new Button("-30d",theCanvas.width / 2 - 370,buttonsTimeY,40,40,requestBackMonth);
-commonUIRegister(backMonth);
-let backYear = new Button("-1y",theCanvas.width / 2 - 410,buttonsTimeY,40,40,requestBackYear);
-commonUIRegister(backYear);
-
-function requestPause(event)
+let buttonPause = document.getElementById("buttonPause");
+function requestPause()
 {
 	pause = !pause;
-	if (!pause)
-	{
-		playButton.text = pauseButtonText;
-	}
-	else
-	{
-		playButton.text = playButtonText
-	}
+	buttonPause.disable = !pause;
 }
-
-let playButton = new Button("Pause",theCanvas.width / 2 - 20,buttonsTimeY,40,40,requestPause);
-if (pause)
-	playButton.text = playButtonText;
-else
-	playButton.text = pauseButtonText;
-playButton.textFont = "24px Arial";
-commonUIRegister(playButton);
 
 
 let g_SelectedPlanetData = {};
@@ -450,7 +375,6 @@ function drawElongationMap()
 }
 
 
-let datechange;
 function work(){
 
 
@@ -498,8 +422,6 @@ function work(){
 
 	drawElongationMap();
 
-	commonUIdraw(theContext);
-	
 	window.setTimeout(work, 1000.0/30.0);
 }
 

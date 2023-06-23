@@ -3,8 +3,8 @@ let canvasSkyView = document.getElementById("canvasSkyView");
 let canvasSolaySystemView = document.getElementById("canvasSolaySystemView");
 let canvasTelescopeView = document.getElementById("canvasTelescopeView");
 
-let contextClassicView = canvasClassicView.getContext("2d");
-let contextSkyView = canvasSkyView.getContext("2d");
+let contextClassicView = canvasClassicView.getContext("2d",{willReadFrequently: true}	);
+let contextSkyView = canvasSkyView.getContext("2d",{willReadFrequently: true}	);
 let contextSolaySystemView = canvasSolaySystemView.getContext("2d");
 let contextTelescopeView = canvasTelescopeView.getContext("2d");
 
@@ -21,8 +21,10 @@ let divSkyView = document.getElementById("divSkyView");
 let divSolaySystemView = document.getElementById("divSolaySystemView");
 let divTelescopeView = document.getElementById("divTelescopeView");
 
+let g_selectedTab = "Classic";
 function selectTab(tab)
 {
+	g_selectedTab = tab;
 	divClassicView.style.display = (tab == "Classic") ? "block" : "none";
 	divSkyView.style.display = (tab == "Sky") ? "block" : "none";
 	divSolaySystemView.style.display = (tab == "Solar System") ? "block" : "none";
@@ -148,14 +150,14 @@ function requestTimeRewind()
 	if (pause)
 		pause = false;
 	if (g_speed > 0)
-		g_speed *= -g_basespeed;
+		g_speed = -g_basespeed;
 }
 function requestTimeForward()
 {
 	if (pause)
 		pause = false;
 	if (g_speed < 0)
-		g_speed *= g_basespeed;
+		g_speed = g_basespeed;
 }
 
 function requestAdvanceDay()
@@ -211,14 +213,18 @@ const planetsID = ['Mercury','Venus','Mars','Jupiter','Saturn','Uranus','Neptune
 
 
 
-function drawSSmap(context, size)
+function drawSSmap(context, size, xOffset, yOffset)
 {
 	const kAU2pixels = 100.0 * g_zoomSS;
 	context.save();
 	context.strokeStyle = "#FFFFFF";
-	context.rect(-size * 0.5, -size * 0.5, size, size);
+	context.beginPath();
+	context.rect(xOffset - size * 0.5, yOffset - size * 0.5, size, size);
 	context.stroke();
 	context.clip();
+
+	context.translate(xOffset,yOffset);
+
 
 // set the size of the Sun based on the Zoom level
 	const sunSize = Math.max(3.0,0.03 * g_zoomSS);
@@ -232,7 +238,7 @@ function drawSSmap(context, size)
 	for (const [key, value] of Object.entries(Planets)) {
 		if (!g_simpleSolarSystem)
 		{
-			context.save();
+//			context.save();
 			const e =value.orbitalParameters.orbitalEccentricity
 			const d = value.orbitalParameters.semiMajorAxis * e * g_zoomSS;
 			const longPerRad = value.orbitalParameters.longitudePerihelion;
@@ -261,7 +267,7 @@ function drawSSmap(context, size)
 			}
 			context.closePath();
 			context.stroke();
-			context.restore();
+//			context.restore();
 		
 		}
 		else
@@ -274,6 +280,14 @@ function drawSSmap(context, size)
 			context.stroke();
 		}
 	}
+// draw the lines onto the overhead view to demonstrate the elongation
+	context.strokeStyle = "#FFFF00"
+	context.beginPath();
+	context.moveTo(0,0);
+	context.lineTo(kAU2pixels*g_planetView["Earth"].planetHelio.radius * Math.cos(-g_planetView["Earth"].planetHelio.theta),kAU2pixels*g_planetView["Earth"].planetHelio.radius * Math.sin(-g_planetView["Earth"].planetHelio.theta));
+	context.lineTo(kAU2pixels*g_planetView[selectedPlanet].planetHelio.radius * Math.cos(-g_planetView[selectedPlanet].planetHelio.theta),kAU2pixels*g_planetView[selectedPlanet].planetHelio.radius * Math.sin(-g_planetView[selectedPlanet].planetHelio.theta));
+	context.stroke();
+
 	//@@NOTE: the projection may be slightly off due to inclination.
 	for (const [key, value] of Object.entries(g_planetView)) 
 	{
@@ -285,20 +299,11 @@ function drawSSmap(context, size)
 		context.fill();
 	}
 
-
-// draw the lines onto the overhead view to demonstrate the elongation
-	context.strokeStyle = "#FFFF00"
-	context.beginPath();
-	context.moveTo(0,0);
-	context.lineTo(kAU2pixels*g_planetView["Earth"].planetHelio.radius * Math.cos(-g_planetView["Earth"].planetHelio.theta),kAU2pixels*g_planetView["Earth"].planetHelio.radius * Math.sin(-g_planetView["Earth"].planetHelio.theta));
-	context.lineTo(kAU2pixels*g_planetView[selectedPlanet].planetHelio.radius * Math.cos(-g_planetView[selectedPlanet].planetHelio.theta),kAU2pixels*g_planetView[selectedPlanet].planetHelio.radius * Math.sin(-g_planetView[selectedPlanet].planetHelio.theta));
-	context.stroke();
-
 	context.restore();
 
 }
 
-function drawElongationMap(context, height)
+function drawElongationMap(context, height, xOffset, yOffset)
 {
 	const halfHeight = height * 0.5;
 	const halfWidth = height;
@@ -310,10 +315,8 @@ function drawElongationMap(context, height)
 // draw the stars on the map
 	if (starsm6.ready)
 	{
-		const mapImage = new ImgData(context, - halfWidth, -halfHeight, height * 2.0, height);
-		const len = starsm6.length;
-		let i;
-		for (i = 0; i < len; i++)
+		const mapImage = new ImgData(context, xOffset - halfWidth, yOffset - halfHeight, height * 2.0, height);
+		for (let i in starsm6._data)
 		{
 			//console.log("here " + starsm6.at(i).latitude + " " + starsm6.at(i).longitude + " " + projection.x + " " + projection.y);
 			const starProj = projection.calculate(starsm6.at(i).eclat, starsm6.at(i).eclong);
@@ -489,8 +492,8 @@ function drawPhase(context, size)
 	context.textBaseline = "bottom";
 
 
-	const sizeEq = (halfHeight - 60) * g_planetView[selectedPlanet].angSizeEq / 1.5029224114395615801287337173096e-4;// / g_planetView[selectedPlanet].angSizeAvg;
-	const sizePol = (halfHeight - 60) * g_planetView[selectedPlanet].angSizePolar / 1.5029224114395615801287337173096e-4;// / g_planetView[selectedPlanet].angSizeAvg;
+	const sizeEq = halfHeight * 0.95 * g_planetView[selectedPlanet].angSizeEq / 1.5029224114395615801287337173096e-4;// / g_planetView[selectedPlanet].angSizeAvg;
+	const sizePol = halfHeight * 0.95 * g_planetView[selectedPlanet].angSizePolar / 1.5029224114395615801287337173096e-4;// / g_planetView[selectedPlanet].angSizeAvg;
 
 	if (g_planetView[selectedPlanet].phase != 0.0)
 	{
@@ -573,7 +576,10 @@ function work(){
 //	}
 
 	canvasClassicView.width = window.innerWidth;
-	canvasClassicView.height = window.innerHeight - 410;
+	let controlsSpace = 300;
+	if (g_selectedTab == "Classic" || g_selectedTab == "Solar System")
+		controlsSpace += 60;
+	canvasClassicView.height = window.innerHeight - controlsSpace;
 	// set canvas sizes the same as the classic view size
 	canvasSkyView.width = canvasClassicView.width;
 	canvasSkyView.height = canvasClassicView.height;
@@ -594,7 +600,7 @@ function work(){
 	let phaseWidth = elongationMapHeight
 	let phaseHeight = elongationMapHeight
 
-	let elongationMapX = canvasClassicView.width / 2
+	let elongationMapX = canvasClassicView.width / 2;
 	let elongationMapY = elongationMapHeight / 2;
 
 	let phaseX = elongationMapX + 0.5 * SSmapWidth + 20
@@ -605,16 +611,16 @@ function work(){
 
 //	contextClassicView.clearRect(0, 0, canvasClassicView.width, canvasClassicView.height);
 	contextClassicView.fillStyle = "#000000";
-	contextClassicView.fillRect(0,0,canvasClassicView.width * 0.5,canvasClassicView.height * 0.5);
+	contextClassicView.fillRect(0,0,canvasClassicView.width,canvasClassicView.height);
 
 	contextClassicView.save();
 	contextClassicView.translate(elongationMapX,elongationMapY);
-	drawElongationMap(contextClassicView,elongationMapHeight);
+	drawElongationMap(contextClassicView,elongationMapHeight,elongationMapX,elongationMapY);
 	contextClassicView.restore();
 
 	contextClassicView.save();
-	contextClassicView.translate(SSmapX,SSmapY);
-	drawSSmap(contextClassicView,SSmapHeight);
+//	contextClassicView.translate(SSmapX,SSmapY);
+	drawSSmap(contextClassicView,SSmapHeight,SSmapX,SSmapY);
 	contextClassicView.restore();
 	
 	contextClassicView.save();
@@ -623,25 +629,25 @@ function work(){
 	contextClassicView.restore();
 
 	contextSkyView.fillStyle = "#000000";
-	contextSkyView.fillRect(0,0,canvasClassicView.width,canvasClassicView.height);
+	contextSkyView.fillRect(0,0,canvasSkyView.width,canvasSkyView.height);
 
 	contextSkyView.save();
 	contextSkyView.translate(canvasSkyView.width * 0.5,canvasSkyView.height * 0.5);
-	drawElongationMap(contextSkyView, canvasSkyView.height - 20);
+	drawElongationMap(contextSkyView, canvasSkyView.height - 20,canvasSkyView.width * 0.5,canvasSkyView.height * 0.5);
 	contextSkyView.restore();
 
 
 	contextSolaySystemView.fillStyle = "#000000";
-	contextSolaySystemView.fillRect(0,0,canvasClassicView.width,canvasClassicView.height);
+	contextSolaySystemView.fillRect(0,0,canvasSolaySystemView.width,canvasSolaySystemView.height);
 
 	contextSolaySystemView.save();
-	contextSolaySystemView.translate(canvasSolaySystemView.width * 0.5,canvasSolaySystemView.height * 0.5);
-	drawSSmap(contextSolaySystemView, canvasSolaySystemView.height);
+//	contextSolaySystemView.translate(canvasSolaySystemView.width * 0.5,canvasSolaySystemView.height * 0.5);
+	drawSSmap(contextSolaySystemView, canvasSolaySystemView.height,canvasSolaySystemView.width * 0.5,canvasSolaySystemView.height * 0.5);
 	contextSolaySystemView.restore();
 	
 
 	contextTelescopeView.fillStyle = "#000000";
-	contextTelescopeView.fillRect(0,0,canvasClassicView.width,canvasClassicView.height);
+	contextTelescopeView.fillRect(0,0,canvasTelescopeView.width,canvasTelescopeView.height);
 
 	contextTelescopeView.save();
 	contextTelescopeView.translate(canvasTelescopeView.width * 0.5,canvasTelescopeView.height * 0.5);

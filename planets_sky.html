@@ -21,6 +21,10 @@
 		width: 40px;
 		height: 40px;
 		}
+		.timeLarger {
+		width: 60px;
+		height: 40px;
+		}
 		.planet {
 		width: 100px;
 		height: 40px;
@@ -33,6 +37,11 @@
 		width: 130px;
 		height: 40px;
 		}
+		td {
+			color: yellow;
+			text-align: center;
+			padding: 5px 20px;
+		}
 
     </style>
 </head>
@@ -43,18 +52,28 @@
             Canvas not supported; please update your browser.
         </canvas>
     </div>
+    <div id="divStatus" style="margin-left:auto; margin-right:auto;text-align:center;">
+    	<table 	style="margin-left:auto; margin-right:auto;text-align:center;"><tbody><tr>
+			<td id="tdDate">Date: <input id="inputDate" type="datetime-local" value="2012-06-04T18:28:00" onchange="onSetDate()"></td>
+			<td id="tdJD">JD: 2456083.27</td>
+			<td id="tdElongation">Elongation: 2.1°</td>
+			<td id="tdMagnitude">V: -3.3</td>
+		</tr></tbody></table>
+    </div>
     <div id="divTimeControls" style="margin-left:auto; margin-right:auto;text-align:center">
 		<input type="button" class="time" value="-1y" onclick="requestBackYear();">
 		<input type="button" class="time" value="-30d" onclick="requestBackMonth();">
 		<input type="button" class="time" value="-7d" onclick="requestBackWeek();">
 		<input type="button" class="time" style="margin-right:20px" value="-1d" onclick="requestBackDay();">
-		<input type="button" class="time" value="<<" onclick="requestFasterBackward();">
+		<input type="button" class="time" value="<" onclick="requestTimeRewind();">
 		<input type="button" id="buttonPause" class="time" value="| |" onclick="requestPause();">
-		<input type="button" class="time" style="margin-right:20px" value=">>" onclick="requestFasterForward();">
-		<input type="button" class="time" value="+1y" onclick="requestAdvanceYear();">
-		<input type="button" class="time" value="+30d" onclick="requestAdvanceMonth();">
-		<input type="button" class="time" value="+7d" onclick="requestAdvanceWeek();">
+		<input type="button" class="time" style="margin-right:20px" value=">" onclick="requestTimeForward();">
+		<input type="button" class="timeLarger" value="🕐×½" onclick="requestSlower();">
+		<input type="button" class="timeLarger" style="margin-right:20px" value="🕐×2" onclick="requestFaster();">
 		<input type="button" class="time" value="+1d" onclick="requestAdvanceDay();">
+		<input type="button" class="time" value="+7d" onclick="requestAdvanceWeek();">
+		<input type="button" class="time" value="+30d" onclick="requestAdvanceMonth();">
+		<input type="button" class="time" value="+1y" onclick="requestAdvanceYear();">
     </div>
     <div id="divSelectPlanet" style="margin-left:auto; margin-right:auto;text-align:center">
 		<input type="button" id="buttonPlanetMercury" class="planet" value="Mercury" onclick="selectPlanet('Mercury');">

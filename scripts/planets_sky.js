@@ -1,20 +1,10 @@
 let theCanvas = document.getElementById("theCanvas");
 theCanvas.onselectstart = function () { return false; } // prevent selection of text below the canvas when you click on it
 
-let theContext = theCanvas.getContext("2d");
+let theContext = theCanvas.getContext("2d",{willReadFrequently: true});
 
 const minimumControlsHeightTop = 50;
 
-theCanvas.height = window.innerHeight - 220;
-theCanvas.width = window.innerWidth;
-
-const elongationMapHeight = theCanvas.height - minimumControlsHeightTop;
-const elongationMapWidth = elongationMapHeight * 2;
-
-const elongationMapX = theCanvas.width / 2
-const elongationMapY = elongationMapHeight / 2;
-
-const bottomSpace = theCanvas.width
 
 
 let buttonPlanetMercury = document.getElementById("buttonPlanetMercury");
@@ -126,24 +116,57 @@ function selectCenter(value)
 }
 selectCenter("Sun");
 
+function onSetDate()
+{
+	let inputDate = document.getElementById("inputDate");
+	const requestDate = new Date(inputDate.value + "Z");
+	g_timer = requestDate.valueOf() / 86400000.0 + 2440587.50000;
+//	inputDate.blur();
+}
+
+let g_preDateFocusPause = false;
+let g_DateFocus = false;
+function onDateFocusIn()
+{
+	g_preDateFocusPause = pause;
+	g_DateFocus = true;
+	pause = true;
+}
+function onDateFocusOut()
+{
+	pause = g_preDateFocusPause;
+	g_DateFocus = false;
+}
+
+
 let g_basespeed = 1.0;
-function requestFasterBackward()
+function requestSlower()
 {
 	if (pause)
 		pause = false;
-	else if (g_speed >= 0)
-		g_speed = -g_basespeed;
+	else
+		g_speed *= 0.5; 
+}
+function requestFaster()
+{
+	if (pause)
+		pause = false;
 	else
 		g_speed *= 2; 
 }
-function requestFasterForward()
+function requestTimeRewind()
 {
 	if (pause)
 		pause = false;
-	else if (g_speed <= 0)
+	if (g_speed > 0)
+		g_speed = -g_basespeed;
+}
+function requestTimeForward()
+{
+	if (pause)
+		pause = false;
+	if (g_speed < 0)
 		g_speed = g_basespeed;
-	else
-		g_speed *= 2; 
 }
 
 
@@ -199,156 +222,149 @@ let g_timer = 2456083.27000; //2451545.0;
 const planetsID = ['Mercury','Venus','Mars','Jupiter','Saturn','Uranus','Neptune'];
 
 
-function drawElongationMap()
+function drawElongationMap(context, height, xOffset, yOffset)
 {
-	const halfHeight = elongationMapHeight * 0.5;
-	const halfWidth = elongationMapWidth * 0.5;
-	const qtrWidth = elongationMapWidth * 0.25;
+	const halfHeight = height * 0.5;
+	const halfWidth = height;
+	const qtrWidth = height * 0.50;
 
-	theContext.save();
-	theContext.translate(elongationMapX,elongationMapY);
-	
-	const sunLongitude = (180.0 + g_planetView["Earth"].planetHelio.theta * kDegrees) % 360.0;
+	context.save();
+	const sunLongitude = (180.0 + g_planetView["Earth"].planetHelio.theta * kDegrees) % 360.0;//-g_planetView["Earth"].planetHelio.theta * kDegrees;
 	let projectionLongitude = 0;
 	if (g_viewCenter == "Sun")
 		projectionLongitude = sunLongitude;
 	else if (g_viewCenter == "Planet")
 		projectionLongitude = g_planetView[selectedPlanet].elongLong * kDegrees + sunLongitude;
-		
 	const projection = new Mollweide(projectionLongitude,0.0);
 // draw the stars on the map
 	if (starsm6.ready)
 	{
-		const mapImage = new ImgData(theContext, elongationMapX - halfWidth, elongationMapY - halfHeight, elongationMapWidth, elongationMapHeight);
-		const len = starsm6.length;
-		let i;
-		for (i = 0; i < len; i++)
+		const mapImage = new ImgData(context, xOffset - halfWidth, yOffset - halfHeight, height * 2.0, height);
+		for (let i in starsm6._data)
 		{
 			//console.log("here " + starsm6.at(i).latitude + " " + starsm6.at(i).longitude + " " + projection.x + " " + projection.y);
 			const starProj = projection.calculate(starsm6.at(i).eclat, starsm6.at(i).eclong);
 			const color = UBVRItoRGB(starsm6.at(i).U, starsm6.at(i).B, starsm6.at(i).V, starsm6.at(i).R, starsm6.at(i).I);
-			drawStar(mapImage, (1.0 - starProj.x) * halfWidth, (1.0 - starProj.y	) * halfHeight, 2.0, color);
-/*			theContext.fillStyle  = UBVRItoRGB(starsm6.at(i).U,starsm6.at(i).B,starsm6.at(i).V,starsm6.at(i).R,starsm6.at(i).I).style;
-			theContext.beginPath();
-			theContext.arc(starProj.x * halfWidth,starProj.y * halfHeight,1,0,2.0*Math.PI,true);
-			theContext.closePath();
-			theContext.fill();*/
+			drawStar(mapImage, (1.0 - starProj.x) * halfWidth, (1.0 - starProj.y) * halfHeight, 2.0, color);
+/*			context.fillStyle  = UBVRItoRGB(starsm6.at(i).U,starsm6.at(i).B,starsm6.at(i).V,starsm6.at(i).R,starsm6.at(i).I).style;
+			context.beginPath();
+			context.arc(starProj.x * halfWidth,starProj.y * halfHeight,1,0,2.0*Math.PI,true);
+			context.closePath();
+			context.fill();*/
 		}
 		mapImage.draw();
 	}
 	else
 	{
-		theContext.fillStyle = "#7F7F7F"
-		theContext.font = "15px Arial";
-		drawTextCenter(theContext,"Loading stars. Standby.",0,-60);
+		context.fillStyle = "#7F7F7F"
+		context.font = "15px Arial";
+		drawTextCenter(context,"Loading stars. Standby.",0,-60);
 	}
 
 // draw the ellipse for the map
-	theContext.strokeStyle  = "#FFFFFF";
-	drawEllipseByCenter(theContext,0,0,elongationMapWidth,elongationMapHeight);
+	context.strokeStyle  = "#FFFFFF";
+	drawEllipseByCenter(context,0,0,height * 2.0,height);
 // draw the ecliptic on the map
-	theContext.strokeStyle  = "#3F3F3F";
-	theContext.beginPath();
-	theContext.moveTo(-halfWidth,0 );
-	theContext.lineTo(halfWidth,0);
-	theContext.stroke();
+	context.strokeStyle  = "#3F3F3F";
+	context.beginPath();
+	context.moveTo(-halfWidth,0 );
+	context.lineTo(halfWidth,0);
+	context.stroke();
 // draw the Sun on the map
-	const sunSize = Math.max(0.5 * halfWidth / 180.0,1) * 4;
-	const sunProj = projection.calculate(0.0,sunLongitude);
-	theContext.fillStyle  = "#FFFF00";
-	theContext.beginPath();
-	theContext.arc(-sunProj.x * halfWidth,0,sunSize,0,2.0*Math.PI,true);
-	theContext.closePath();
-	theContext.fill();
-	
-	let i;
-	for (i = 0; i < planetsID.length; i++)
+	const sunSize = Math.max(0.5 * halfWidth / 180.0,2);
+	context.fillStyle  = "#FFFF00";
+	context.beginPath();
+	context.arc(0,0,sunSize,0,2.0*Math.PI,true);
+	context.closePath();
+	context.fill();
+
+// draw the selected planet on the map
+	for (let i in g_planetView)
 	{
-	// draw the selected planet on the map
-		const planetProj = projection.calculate(g_planetView[planetsID[i]].elongLat * kDegrees,g_planetView[planetsID[i]].elongLong * kDegrees + sunLongitude);
-		const sizeEq = 0.5 * halfWidth * g_planetView[planetsID[i]].angSizeEq / Math.PI;// / g_planetView[selectedPlanet].angSizeAvg;
-		const sizePol = 0.5 * halfWidth * g_planetView[planetsID[i]].angSizePolar / Math.PI;// / g_planetView[selectedPlanet].angSizeAvg;
-		const size = Math.max(Math.max(sizeEq,sizePol),1) * 4;
-		const brightness = Math.max(Math.pow(10.0,g_planetView[planetsID[i]].appBright*0.4),1);
-		let color = new RGB();
-		color.style = g_planetView[planetsID[i]].style;
-		color.scale(brightness);
-		theContext.fillStyle  = color.style;
-		theContext.beginPath();
-		theContext.arc(-planetProj.x * halfWidth,-planetProj.y * halfHeight,size,0,2.0*Math.PI,true);
-		theContext.closePath();
-		theContext.fill();
-		if (planetsID[i] == selectedPlanet)
+		const planetProj = projection.calculate(g_planetView[i].elongLat * kDegrees,g_planetView[i].elongLong * kDegrees + sunLongitude);
+		context.fillStyle  = g_planetView[i].style;
+		context.beginPath();
+		context.arc(-planetProj.x * halfWidth,-planetProj.y * halfHeight,2,0,2.0*Math.PI,true);
+		context.closePath();
+		context.fill();
+		if (i == selectedPlanet)
 		{
-			theContext.strokeStyle  = "#ffffff"
-			theContext.beginPath();
-			theContext.arc(-planetProj.x * halfWidth,-planetProj.y * halfHeight,12,0,2.0*Math.PI,true);
-			theContext.closePath();
-			theContext.stroke();
+			context.strokeStyle  = "#ffffff"
+			context.beginPath();
+			context.arc(-planetProj.x * halfWidth,-planetProj.y * halfHeight,8,0,2.0*Math.PI,true);
+			context.closePath();
+			context.stroke();
 		}
 	}
 
 // move to below map
-	theContext.translate(0,halfHeight);
+	context.translate(0,halfHeight);
 
 // draw the elongation reference on the map
-	theContext.font = "10px Arial";
+	context.font = "10px Arial";
 
-	theContext.strokeStyle = "#7F7F7F"
-	theContext.fillStyle  = "#FFFF00";
-	theContext.beginPath();
-	theContext.moveTo(-halfWidth,-halfHeight);
-	theContext.lineTo(-halfWidth,0);
-	theContext.stroke();
-	drawTextCenter(theContext,"+180",-halfWidth,10);
+	context.strokeStyle = "#7F7F7F"
+	context.fillStyle  = "#FFFF00";
+	context.beginPath();
+	context.moveTo(-halfWidth,-halfHeight);
+	context.lineTo(-halfWidth,0);
+	context.stroke();
+	drawTextCenter(context,"+180",-halfWidth,10);
 
-	theContext.beginPath();
-	theContext.moveTo(-qtrWidth,-halfHeight * (1.0 - Math.sqrt(0.75)));
-	theContext.lineTo(-qtrWidth,0);
-	theContext.stroke();
-	drawTextCenter(theContext,"+90",-qtrWidth,10);
+	context.beginPath();
+	context.moveTo(-qtrWidth,-halfHeight * (1.0 - Math.sqrt(0.75)));
+	context.lineTo(-qtrWidth,0);
+	context.stroke();
+	drawTextCenter(context,"+90",-qtrWidth,10);
 
-	drawTextCenter(theContext,"0",0,10);
+	drawTextCenter(context,"0",0,10);
 
-	theContext.beginPath();
-	theContext.moveTo(qtrWidth,-halfHeight * (1.0 - Math.sqrt(0.75)));
-	theContext.lineTo(qtrWidth,0);
-	theContext.stroke();
-	drawTextCenter(theContext,"-90",qtrWidth,10);
+	context.beginPath();
+	context.moveTo(qtrWidth,-halfHeight * (1.0 - Math.sqrt(0.75)));
+	context.lineTo(qtrWidth,0);
+	context.stroke();
+	drawTextCenter(context,"-90",qtrWidth,10);
 
-	theContext.beginPath();
-	theContext.moveTo(halfWidth,-halfHeight);
-	theContext.lineTo(halfWidth,0);
-	theContext.stroke();
-	drawTextCenter(theContext,"-180",halfWidth,10);
+	context.beginPath();
+	context.moveTo(halfWidth,-halfHeight);
+	context.lineTo(halfWidth,0);
+	context.stroke();
+	drawTextCenter(context,"-180",halfWidth,10);
 	
+	context.restore();
+}
+function updateStatusReadout()
+{
 	let elongationDisplayValue = g_planetView[selectedPlanet].elongLong * kDegrees;
 	if (elongationDisplayValue > 180.0)
 		elongationDisplayValue = elongationDisplayValue - 360.0;
-	let elongationDisplay = (Math.round(elongationDisplayValue * 10.0) / 10.0).toString();
-	if (elongationDisplay.charAt(elongationDisplay.length - 2) != '.')
-		elongationDisplay = elongationDisplay + ".0"
-// draw planet information on the map
-	theContext.fillStyle = "#FFFF00"
-	theContext.font = "15px Arial";
-	drawTextRight(theContext,"Planet: ",-410,35);
-	drawTextLeft(theContext,selectedPlanet,-405,35);
-	drawTextRight(theContext,"Elongation: " ,-255,35);
-	drawTextLeft(theContext,elongationDisplay + String.fromCharCode(0x00b0),-255,35);
+	let tdElongation = document.getElementById	("tdElongation");
+	tdElongation.innerHTML = "Elongation: " + elongationDisplayValue.toFixed(1) + String.fromCharCode(0x00b0);
 
-// draw planet information on the map
-	theContext.fillStyle = "#FFFF00"
-	theContext.font = "15px Arial";
 
-	const timerReadable = Math.round(g_timer / 365.0 * 100.0 - 6716.0) / 100.0
-	let timerDisplay = timerReadable.toString();
-	if (timerDisplay.charAt(timerDisplay.length - 3) != '.')
+	if (!g_DateFocus)
 	{
-		if (timerDisplay.charAt(timerDisplay.length - 2) == '.')
-			timerDisplay = timerDisplay + '0'
-		else
-			timerDisplay = timerDisplay + '.00'
+		let tdDate = document.getElementById("tdDate");
+		const dateFmt = new Date((g_timer - 2440587.50000) * 86400000.0);
+		const month = dateFmt.toLocaleString('default', { month: 'long' });	
+	/*	const calend = JDtoGregorian(g_timer);
+		let monthDisplay = calend.month.toString();
+		if (calend.month < 10)
+			monthDisplay = "0" + monthDisplay;
+		let dayDisplay = Math.floor(calend.day).toString()
+		if (calend.day < 10)
+			dayDisplay = "0" + dayDisplay;*/
+			
+		const isoString = dateFmt.toISOString();
+		const localeString = isoString.substring(0,isoString.length - 1);
+		tdDate.innerHTML = '<input id="inputDate" type="datetime-local" style="background-color:black;color:yellow;" value="' + localeString + '" oninput="onSetDate();" onfocusin="onDateFocusIn();" onfocusout="onDateFocusOut();">' // padZero(dateFmt.getUTCHours(),2) + ":" + padZero(dateFmt.getUTCMinutes(),2) + ", " + dateFmt.getUTCDate() + " " + month + "  " + dateFmt.getUTCFullYear();
 	}
+
+	let tdJD = document.getElementById("tdJD");
+/*
+	const timerReadable = Math.round(g_timer / 365.0 * 100.0 - 6716.0) / 100.0
+	let timerDisplay = g_timer.toFixed(2);
+
 	const timerReadableDays = Math.round(g_timer * 100.0) / 100.0;
 	let timerDisplayDays = timerReadableDays.toString();
 	if (timerDisplayDays.charAt(timerDisplayDays.length - 3) != '.')
@@ -358,24 +374,26 @@ function drawElongationMap()
 		else
 			timerDisplayDays = timerDisplayDays + '.00'
 	}
+	*/
+	tdJD.innerHTML = "JD " + g_timer.toFixed(2);
 
+	let tdMagnitude = document.getElementById("tdMagnitude");
+	tdMagnitude.innerHTML = "V:" + g_planetView[selectedPlanet].appBright.toFixed(1);
 
-//	theContext.fillText("Date: ",0,35);
-	const calend = JDtoGregorian(g_timer);
-	let monthDisplay = calend.month.toString();
-	if (calend.month < 10)
-		monthDisplay = "0" + monthDisplay;
-	let dayDisplay = Math.floor(calend.day).toString()
-	if (calend.day < 10)
-		dayDisplay = "0" + dayDisplay;
-	drawTextRight(theContext,calend.year + "/" + monthDisplay + '/' + dayDisplay,-5,35);
-	drawTextLeft(theContext,"(JD "+ timerDisplayDays + ")",5,35);
-
-	theContext.restore();
 }
 
 
 function work(){
+	theCanvas.height = window.innerHeight - 260;
+	theCanvas.width = window.innerWidth;
+
+	const elongationMapHeight = theCanvas.height - minimumControlsHeightTop;
+	const elongationMapWidth = elongationMapHeight * 2;
+
+	const elongationMapX = theCanvas.width / 2
+	const elongationMapY = elongationMapHeight / 2;
+
+	const bottomSpace = theCanvas.width
 
 
 // as long as it isn't paussed, advance the timer
@@ -419,8 +437,15 @@ function work(){
 	theContext.fillStyle = "#000000";
 	theContext.fillRect(0,0,theCanvas.width,theCanvas.height);
 
+	theContext.fillStyle = "#000000";
+	theContext.fillRect(0,0,theCanvas.width,theCanvas.height);
 
-	drawElongationMap();
+	theContext.save();
+	theContext.translate(theCanvas.width * 0.5,theCanvas.height * 0.5);
+	drawElongationMap(theContext, theCanvas.height - 20,theCanvas.width * 0.5,theCanvas.height * 0.5);
+	theContext.restore();
+
+	updateStatusReadout();
 
 	window.setTimeout(work, 1000.0/30.0);
 }

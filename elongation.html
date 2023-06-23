@@ -16,18 +16,151 @@
 
         gtag('config', 'G-0M15ZVRGK6');
     </script>
+    <style>
+		/* Style the tab */
+		.tab {
+		  overflow: hidden;
+		  border: 1px solid #ccc;
+		  background-color: #f1f1f1;
+		}
+
+		/* Style the buttons inside the tab */
+		.tab button {
+		  background-color: inherit;
+		  float: left;
+		  border: none;
+		  outline: none;
+		  cursor: pointer;
+		  padding: 14px 16px;
+		  transition: 0.3s;
+		  font-size: 17px;
+		}
+
+		/* Change background color of buttons on hover */
+		.tab button:hover {
+		  background-color: #ddd;
+		}
+
+		/* Create an active/current tablink class */
+		.tab button.active {
+		  background-color: #ccc;
+		}
+
+		/* Style the tab content */
+		.tabcontent {
+		  display: none;
+		  padding: 6px 12px;
+		  border: 1px solid #ccc;
+		  border-top: none;
+		}
+		.time {
+		width: 40px;
+		height: 40px;
+		}
+		.timeLarger {
+		width: 60px;
+		height: 40px;
+		}
+		
+		
+		.zoom {
+		width: 40px;
+		height: 40px;
+		}
+		.planet {
+		width: 100px;
+		height: 40px;
+		}
+		.model {
+		width: 130px;
+		height: 40px;
+		}
+		.focus {
+		width: 130px;
+		height: 40px;
+		}
+		td {
+			color: yellow;
+			text-align: center;
+			padding: 5px 20px;
+		}
+    </style>
 </head>
 <body style="font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#000000;">
     <!--<h1 style="font-size:24px;text-align:center;color:#FFFFFF;">Elongation</h1>-->
-    <div style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center">
-        <canvas id="theCanvas" width="1000" height="900" onclick="commonUIOnClick(event);">
+		<div class="tab" style="text-align:center;margin-left:0px;margin-right:auto;">
+		  <button id="tabClassic" class="tablinks" onclick="selectTab('Classic')">Classic View</button>
+		  <button id="tabSky" class="tablinks" onclick="selectTab('Sky')">Sky View</butto											n>
+		  <button id="tabSolarSystem" class="tablinks" onclick="selectTab('Solar System')">Solar System View</button>
+		  <button id="tabTelescope" class="tablinks" onclick="selectTab('Telescope')">Telescope View</button>
+		</div>
+    <div id="divClassicView" style="width:100%; margin-left:auto; margin-right:auto;text-align:center;margin-bottom:10px">
+        <canvas id="canvasClassicView" onclick="commonUIOnClick(event);">
             Canvas not supported; please update your browser.
         </canvas>
+    </div>
+    <div id="divSkyView" style="width:100%; margin-left:auto; margin-right:auto;text-align:center">
+        <canvas id="canvasSkyView">
+            Canvas not supported; please update your browser.
+        </canvas>
+    </div>
+    <div id="divSolaySystemView" style="width:100%; margin-left:auto; margin-right:auto;text-align:center">
+        <canvas id="canvasSolaySystemView">
+            Canvas not supported; please update your browser.
+        </canvas>
+    </div>
+    <div id="divTelescopeView" style="width:100%; margin-left:auto; margin-right:auto;text-align:center">
+        <canvas id="canvasTelescopeView">
+            Canvas not supported; please update your browser.
+        </canvas>
+    </div>
+    <div id="divStatus" style="margin-left:auto; margin-right:auto;text-align:center;">
+    	<table 	style="margin-left:auto; margin-right:auto;text-align:center;"><tbody><tr>
+			<td id="tdDate">Date: <input id="inputDate" type="datetime-local" value="2012-06-04T18:28:00" onchange="onSetDate()"></td>
+			<td id="tdJD">JD: 2456083.27</td>
+			<td id="tdElongation">Elongation: 2.1°</td>
+		</tr><tr>
+			<td id="tdPhase">Phase: 0.1</td>
+			<td id="tdSize">Size: 57.8"</td>
+			<td id="tdMagnitude">V: -3.3</td>
+    	</tr></tbody></table>
+    </div>
+    <div id="divZoomControls" style="margin-left:auto; margin-right:auto;text-align:center">
+		<input type="button" class="zoom" value="🔍+" onclick="zoomIn();">
+		<input type="button" class="zoom" value="🔍-" onclick="zoomOut();">
+    </div>
+    <div id="divTimeControls" style="margin-left:auto; margin-right:auto;text-align:center">
+		<input type="button" class="time" value="-1y" onclick="requestBackYear();">
+		<input type="button" class="time" value="-30d" onclick="requestBackMonth();">
+		<input type="button" class="time" value="-7d" onclick="requestBackWeek();">
+		<input type="button" class="time" style="margin-right:20px" value="-1d" onclick="requestBackDay();">
+		<input type="button" class="time" value="<" onclick="requestTimeRewind();">
+		<input type="button" id="buttonPause" class="time" value="| |" onclick="requestPause();">
+		<input type="button" class="time" style="margin-right:20px" value=">" onclick="requestTimeForward();">
+		<input type="button" class="timeLarger" value="🕐×½" onclick="requestSlower();">
+		<input type="button" class="timeLarger" style="margin-right:20px" value="🕐×2" onclick="requestFaster();">
+		<input type="button" class="time" value="+1d" onclick="requestAdvanceDay();">
+		<input type="button" class="time" value="+7d" onclick="requestAdvanceWeek();">
+		<input type="button" class="time" value="+30d" onclick="requestAdvanceMonth();">
+		<input type="button" class="time" value="+1y" onclick="requestAdvanceYear();">
+    </div>
+    <div id="divSelectPlanet" style="margin-left:auto; margin-right:auto;text-align:center">
+		<input type="button" id="buttonPlanetMercury" class="planet" value="Mercury" onclick="selectPlanet('Mercury');">
+		<input type="button" id="buttonPlanetVenus" class="planet" value="Venus" onclick="selectPlanet('Venus');">
+		<input type="button" id="buttonPlanetMars" class="planet" value="Mars" onclick="selectPlanet('Mars');">
+		<input type="button" id="buttonPlanetJupiter" class="planet" value="Jupiter" onclick="selectPlanet('Jupiter');">
+		<input type="button" id="buttonPlanetSaturn" class="planet" value="Saturn" onclick="selectPlanet('Saturn');">
+		<input type="button" id="buttonPlanetUranus" class="planet" value="Uranus" onclick="selectPlanet('Uranus');">
+		<input type="button" id="buttonPlanetNeptune" class="planet" value="Neptune" onclick="selectPlanet('Neptune');">
+    </div>
+    <div id="divSelectModel" style="margin-left:auto; margin-right:auto;text-align:center">
+		<input type="button" id="buttonModelSimple" class="model" value="Simple Model" onclick="selectComplexity('Simple Model');">
+		<input type="button" id="buttonModelReal" class="model" value="Real Model" onclick="selectComplexity('Real Model');">
     </div>
     <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
         <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
             <p style="color: gray;font-size:75%">
-                Copyright (c) 2020 - 2021, Brian W. Mulligan
+                Copyright (c) 2020 - 2023, Brian W. Mulligan
                 <a href="https://www.iubenda.com/privacy-policy/91469080" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe " title="Privacy Policy ">Privacy Policy</a>
                 <script type="text/javascript">(function (w, d) { var loader = function () { var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src = "https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s, tag); }; if (w.addEventListener) { w.addEventListener("load", loader, false); } else if (w.attachEvent) { w.attachEvent("onload", loader); } else { w.onload = loader; } })(window, document);</script>
             </p>

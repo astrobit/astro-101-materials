@@ -15,21 +15,6 @@ let zoomCenterX = 0;
 let zoomCenterY = 0;
 
 
-let maxHeight = window.innerHeight - 300;
-let maxWidth = window.innerWidth - 20;
-
-theCanvas.width = Math.min(maxHeight * 2.0, maxWidth);
-theCanvas.height = Math.min(maxHeight, maxWidth * 0.5);
-
-
-let mapWidth = theCanvas.width - 80.0;
-let mapHeight = mapWidth * 0.5;
-
-
-const mapCenterX = theCanvas.width / 2;
-const mapCenterY = mapHeight / 2 + 5;
-
-let g_update =
 
 function onWheel(event)
 {
@@ -105,7 +90,22 @@ function selectCoordinateSystem(value)
 }
 selectCoordinateSystem("Equatorial");
 
-function draw(){
+function draw()
+{
+
+	let maxHeight = window.innerHeight - 300;
+	let maxWidth = window.innerWidth - 20;
+
+	theCanvas.width = Math.min(maxHeight * 2.0, maxWidth);
+	theCanvas.height = Math.min(maxHeight, maxWidth * 0.5);
+
+
+	let mapWidth = theCanvas.width - 80.0;
+	let mapHeight = mapWidth * 0.5;
+
+
+	const mapCenterX = theCanvas.width / 2;
+	const mapCenterY = mapHeight / 2 + 5;
 
 	if (skyMap !== null)
 	{

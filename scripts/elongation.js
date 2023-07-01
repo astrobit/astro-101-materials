@@ -575,11 +575,13 @@ function work(){
 //		datechange = Math.floor(g_timer);
 //	}
 
-	canvasClassicView.width = window.innerWidth;
-	let controlsSpace = 300;
+	let controlSpace = 300;
 	if (g_selectedTab == "Classic" || g_selectedTab == "Solar System")
-		controlsSpace += 60;
-	canvasClassicView.height = window.innerHeight - controlsSpace;
+		controlSpace += 60;
+	canvasClassicView.height = Math.min(window.innerHeight - controlSpace, window.innerWidth * 0.5);
+	if (canvasClassicView.height < 200)
+		canvasClassicView.height = 200;
+	canvasClassicView.width = canvasClassicView.height * 2.0;
 	// set canvas sizes the same as the classic view size
 	canvasSkyView.width = canvasClassicView.width;
 	canvasSkyView.height = canvasClassicView.height;

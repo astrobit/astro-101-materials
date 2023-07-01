@@ -384,7 +384,12 @@ function updateStatusReadout()
 
 
 function work(){
-	theCanvas.height = window.innerHeight - 260;
+	canvasClassicView.height = Math.min(window.innerHeight - controlsSpace, window.innerWidth * 0.5 - controlSpace);
+
+	const controlSpace = 260;
+	theCanvas.height = Math.min(window.innerHeight - controlSpace, window.innerWidth * 0.5 - controlSpace);
+	if (theCanvas.height < 200)
+		theCanvas.height = 200;
 	theCanvas.width = window.innerWidth;
 
 	const elongationMapHeight = theCanvas.height - minimumControlsHeightTop;

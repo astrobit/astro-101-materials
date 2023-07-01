@@ -16,18 +16,242 @@
 
         gtag('config', 'G-0M15ZVRGK6');
     </script>-->
+    <style>
+		.time {
+		width: 40px;
+		height: 40px;
+		}
+		.timeLarger {
+		width: 60px;
+		height: 40px;
+		}
+		.planet {
+		width: 100px;
+		height: 40px;
+		}
+		.model {
+		width: 130px;
+		height: 40px;
+		}
+		.effect {
+		width: 130px;
+		height: 40px;
+		}
+		.focus {
+		width: 130px;
+		height: 40px;
+		}
+		td {
+			color: yellow;
+			text-align: center;
+			padding: 5px 20px;
+		}
+		.closetd {
+			color: yellow;
+			text-align: center;
+			padding: 0px 0px;
+		}
+		.readout{
+			color: white;
+			font: 20px;
+		}
+		.readoutLabel{
+			color: green;
+			font: 20px;
+		}
+		.zoomslew{
+		width: 40px;
+		height: 40px;
+		}
+		/* Style the tab */
+		.tab {
+		  overflow: hidden;
+		  border: 1px solid #ccc;
+		  background-color: #f1f1f1;
+		}
+
+		/* Style the buttons inside the tab */
+		.tab button {
+		  background-color: inherit;
+		  float: left;
+		  border: none;
+		  outline: none;
+		  cursor: pointer;
+		  padding: 14px 16px;
+		  transition: 0.3s;
+		  font-size: 17px;
+		}
+
+		/* Change background color of buttons on hover */
+		.tab button:hover {
+		  background-color: #ddd;
+		}
+
+		/* Create an active/current tablink class */
+		.tab button.active {
+		  background-color: #ccc;
+		}
+
+		/* Style the tab content */
+		.tabcontent {
+		  display: none;
+		  padding: 6px 12px;
+		  border: 1px solid #ccc;
+		  border-top: none;
+		}
+		
+    </style>
+    
 </head>
 <body style="font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#000000;">
     <!--<h1 style="font-size:24px;text-align:center;color:#FFFFFF;">Elongation</h1>-->
+	<div class="tab" style="text-align:center;margin-left:0px;margin-right:auto;">
+	  <button id="tabTelescopeView" class="tablinks" onclick="selectTab('Telescope')">Telescope View</button>
+	  <button id="tabHighParallax" class="tablinks" onclick="selectTab('Parallax')">High Parallax List</button>
+	  <button id="tabHighProperMotion" class="tablinks" onclick="selectTab('Proper Motion')">High Proper Motion List</button>
+	</div>
+	<div id="divHighParallaxList" style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center">
+    <table style="margin-left:auto; margin-right:auto;">
+		<thead style="color:white;font-size:18pt;position:sticky;top: 0px;">
+    		<tr>
+    			<td> ID </td>
+    			<td>    </td>
+    			<td> RA (J2000.0) </td>
+    			<td> Dec (J2000.0) </td>
+    			<td> Parallax </td>
+    			<td> PM-RA </td>
+    			<td> PM-Dec </td>
+    		</tr>
+    		<tr>
+    			<td>    </td>
+    			<td>    </td>
+    			<td>    </td>
+    			<td>    </td>
+    			<td> (")   </td>
+    			<td> ("/y)   </td>
+    			<td> ("/y)   </td>
+			</tr>
+		</thead>
+		<tbody id="bodyParallax">
+		</tbody>
+    </table>
+    </div>
+	<div id="divHighProperMotionList" style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center">
+    <table style="margin-left:auto; margin-right:auto;">
+		<thead style="color:white;font-size:18pt;position:sticky;top: 0px;">
+    		<tr>
+    			<td> ID </td>
+    			<td>    </td>
+    			<td> RA (J2000.0) </td>
+    			<td> Dec (J2000.0) </td>
+    			<td> Parallax </td>
+    			<td> PM-RA </td>
+    			<td> PM-Dec </td>
+    		</tr>
+    		<tr>
+    			<td>    </td>
+    			<td>    </td>
+    			<td>    </td>
+    			<td>    </td>
+    			<td> (")   </td>
+    			<td> ("/y)   </td>
+    			<td> ("/y)   </td>
+			</tr>
+		</thead>
+		<tbody id="bodyProperMotion">
+		</tbody>
+	</table>
+    </div>
+    <div id="divTelescopeView" style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center">
     <div style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center">
-        <canvas id="theCanvas" width="100%" height="900" onclick="commonUIOnClick(event);">
-            Canvas not supported; please update your browser.
-        </canvas>
+    <table style="margin-left:auto; margin-right:auto;">
+    	<tbody>
+    	<tr>
+    	<td> <table>
+    		<tr><td class="readout" id="tdStarID"> * 12 Oph </td></tr>
+    		<tr><td class="readout" id="tdParallax"> Parallax: 0.1011" </td></tr>
+    		<tr><td><div style="height:20px"></div></td></tr>
+    		<tr><td class="readout" id="tdPMra"> PM (RA): 0.4561"/y </td></tr>
+    		<tr><td class="readout" id="tdPMdec"> PM (Dec.): -0.3092"/y </td></tr>
+    		<tr><td><div style="height:20px"></div></td></tr>
+    		<tr><td class="readoutLabel"> RA (J2000.0) </td></tr>
+    		<tr><td class="readout" id="tdRAJ2000"> 16h 36m 21.45s </td></tr>
+    		<tr><td class="readoutLabel"> Dec. (J2000.0) </td></tr>
+    		<tr><td class="readout" id="tdDecJ2000"> -2° 19' 28.51" </td></tr>
+    		<tr><td><div style="height:20px"></div></td></tr>
+    		<tr><td class="readoutLabel"> RA (Date) </td></tr>
+    		<tr><td class="readout" id="tdRAdate"> 16h 36m 21.45s </td></tr>
+    		<tr><td class="readoutLabel"> Dec. (Date) </td></tr>
+    		<tr><td class="readout" id="tdDecdate"> -2° 19' 28.51" </td></tr>
+    	</table> </td>
+    	<td>
+		    <canvas id="theCanvas" width="400" height="400">
+		        Canvas not supported; please update your browser.
+	        </canvas>
+	     </td>
+	     <td><table><tr><td><table>
+	     	<tr>
+	     		<td class="closetd"><input type="button" class="zoomslew" value="🔍+" onmousedown="requestZoomInStart();" onmouseup="requestZoomInEnd()"></td>
+		     	<td class="closetd"><div class="zoomslew"></div></td>
+				<td class="closetd"><input type="button" class="zoomslew" value="🔍-" onmousedown="requestZoomOutStart();" onmouseup="requestZoomOutEnd()"></td>
+			</tr>
+	     	<tr>
+		     	<td class="closetd"><div class="zoomslew"></div></td>
+	     		<td class="closetd"><input type="button" class="zoomslew" value="^"  onmousedown="requestviewNorthStart();" onmouseup="requestviewNorthEnd()"></td>
+		     	<td class="closetd"><div class="zoomslew"></div></td>
+			</tr>
+	     	<tr>
+	     		<td class="closetd"><input type="button" class="zoomslew" value="<"  onmousedown="requestviewWestStart();" onmouseup="requestviewWestEnd()"></td>
+		     	<td class="closetd"><div class="zoomslew"></div></td>
+	     		<td class="closetd"><input type="button" class="zoomslew" value=">"  onmousedown="requestviewEastStart();" onmouseup="requestviewEastEnd()"></td>
+			</tr>
+	     	<tr>
+		     	<td class="closetd"><div class="zoomslew"></div></td>
+	     		<td class="closetd"><input type="button" class="zoomslew" value="v"  onmousedown="requestviewSouthStart();" onmouseup="requestviewSouthEnd()"></td>
+		     	<td class="closetd"><div class="zoomslew"></div></td>
+			</tr>
+			</table></td></tr>
+			<tr><td class="readoutLabel"> RA (J2000.0) </td> </tr>			
+			<tr><td class="readout" id="tdViewRA">  16h 36m 21.45s </td> </tr>			
+			<tr><td class="readoutLabel"> Dec. (J2000.0) </td> </tr>			
+			<tr><td class="readout" id="tdViewDec">  -2° 19' 28.51" </td> </tr>			
+		</table></td>
+		</tr>
+    	</tbody>
+		</table>
+    </div>
+    <div id="divStatus" style="margin-left:auto; margin-right:auto;text-align:center;">
+    	<table 	style="margin-left:auto; margin-right:auto;text-align:center;"><tbody><tr>
+			<td id="tdDate">Date: <input id="inputDate" type="datetime-local" value="2012-06-04T18:28:00" onchange="onSetDate()"></td>
+			<td id="tdJD">JD: 2456083.27</td>
+		</tr></tbody></table>
+    </div>
+    <div id="divTimeControls" style="margin-left:auto; margin-right:auto;text-align:center">
+		<input type="button" class="time" value="-1y" onclick="requestBackYear();">
+		<input type="button" class="time" value="-30d" onclick="requestBackMonth();">
+		<input type="button" class="time" value="-7d" onclick="requestBackWeek();">
+		<input type="button" class="time" style="margin-right:20px" value="-1d" onclick="requestBackDay();">
+		<input type="button" class="time" value="<" onclick="requestTimeRewind();">
+		<input type="button" id="buttonPause" class="time" value="| |" onclick="requestPause();">
+		<input type="button" class="time" style="margin-right:20px" value=">" onclick="requestTimeForward();">
+		<input type="button" class="timeLarger" value="🕐×½" onclick="requestSlower();">
+		<input type="button" class="timeLarger" style="margin-right:20px" value="🕐×2" onclick="requestFaster();">
+		<input type="button" class="time" value="+1d" onclick="requestAdvanceDay();">
+		<input type="button" class="time" value="+7d" onclick="requestAdvanceWeek();">
+		<input type="button" class="time" value="+30d" onclick="requestAdvanceMonth();">
+		<input type="button" class="time" value="+1y" onclick="requestAdvanceYear();">
+    </div>
+    <div id="divSelectEffects" style="margin-left:auto; margin-right:auto;text-align:center">
+		<input type="button" id="buttonEffectParallax" class="effect" value="Parallax" onclick="requestParallax();">
+		<input type="button" id="buttonEffectProperMotion" class="effect" value="Proper Motion" onclick="requestProperMotion();">
+		<input type="button" id="buttonModelSimple" class="model" value="Simple Model" onclick="selectComplexity('Simple Model');">
+		<input type="button" id="buttonModelReal" class="model" value="Real Model" onclick="selectComplexity('Real Model');">
+    </div>
     </div>
     <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
         <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
             <p style="color: gray;font-size:75%">
-                Copyright (c) 2020 - 2021, Brian W. Mulligan
+                Copyright (c) 2020 - 2023, Brian W. Mulligan
                 <a href="https://www.iubenda.com/privacy-policy/91469080" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe " title="Privacy Policy ">Privacy Policy</a>
                 <script type="text/javascript">(function (w, d) { var loader = function () { var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src = "https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s, tag); }; if (w.addEventListener) { w.addEventListener("load", loader, false); } else if (w.attachEvent) { w.attachEvent("onload", loader); } else { w.onload = loader; } })(window, document);</script>
             </p>

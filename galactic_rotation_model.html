@@ -24,6 +24,13 @@
             Canvas not supported; please update your browser.
         </canvas>
     </div>
+    <div id="divTimeControls" style="margin-left:auto; margin-right:auto;text-align:center">
+		<input type="button" class="time" value="<" onclick="requestTimeRewind();">
+		<input type="button" id="buttonPause" class="time" value="| |" onclick="requestPause();">
+		<input type="button" class="time" style="margin-right:20px" value=">" onclick="requestTimeForward();">
+		<input type="button" class="timeLarger" value="🕐×½" onclick="requestSlower();">
+		<input type="button" class="timeLarger" style="margin-right:20px" value="🕐×2" onclick="requestFaster();">
+    </div>
     <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
         <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
             <p style="color: gray;font-size:75%">

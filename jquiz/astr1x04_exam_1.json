@@ -1,0 +1,171 @@
+{
+	"title": "ASTR 1304/1404 Exam 1 Review",
+	"categories": ["Altitude and Azimuth", "Right Ascension and Declination", "Coordinate Systems", "Moon Phases", "Time", "Models and Observations"],
+	"questions": 
+	[
+		[
+			[
+				{
+					"q": "This is the name for the coordinate measuring up and down from the horizon.",
+					"a": "Altitude",
+					"complete": false
+				},
+				{
+					"q": "An azimuth of 270° means this.",
+					"a": "West",
+					"complete": false
+				},
+				{
+					"q": "This is the name for the point directly overhead.",
+					"a": "Zenith",
+					"complete": false
+				},
+				{
+					"q": "The altitude of the zenith is this.",
+					"a": "+90°",
+					"complete": false
+				},
+				{
+					"q": "This line is equivalent to 0° and 180° azimuth, and passes through the zenith.",
+					"a": "Meridian",
+					"complete": false
+				}
+			],
+			[
+				{
+					"q": "This coordinate describes the angle north or south of the celestial equator.",
+					"a": "Declination",
+					"complete": false
+				},
+				{
+					"q": "The point marks the zero point for right ascension.",
+					"a": "Vernal Equinox",
+					"complete": false
+				},
+				{
+					"q": "The declination of the south celestial pole",
+					"a": "-90°",
+					"complete": false
+				},
+				{
+					"q": "The right ascension of the Sun on March 21.",
+					"a": "0 h",
+					"complete": false
+				},
+				{
+					"q": "The declination of the Sun on June 21",
+					"a": "23.5°",
+					"complete": false
+				}
+			],
+			[
+				{
+					"q": "This coordinate system is based on a local viewpoint and differs for every observer.",
+					"a": "Altitude and Azimuth",
+					"complete": false
+				},
+				{
+					"q": "The coordinates of a star in this system change only very slowly over many years.",
+					"a": "Equatorial (Right Ascension and Declination)",
+					"complete": false
+				},
+				{
+					"q": "The coordinates of a star changes in this coordinate by a little more than 15° every hour.",
+					"a": "Hour Angle",
+					"complete": false
+				},
+				{
+					"q": "This coordinate system is best for telling a distant observer where to find a planet or star",
+					"a": "Equatorial (Right Ascension and Declination)",
+					"complete": false
+				},
+				{
+					"q": "This coordinate is directly related to the local sidereal time.",
+					"a": "Right ascension",
+					"complete": false
+				}
+			],
+			[
+				{
+					"q": "This phase occurs when the Moon is nearest the Sun.",
+					"a": "New Moon",
+					"complete": false
+				},
+				{
+					"q": "This phase is when the Moon is most illuminated and rises at about sunset.",
+					"a": "Full Moon",
+					"complete": false
+				},
+				{
+					"q": "The Moons rise and set time change by about this much each day.",
+					"a": "One hour",
+					"complete": false
+				},
+				{
+					"q": "This phase, in the simplified model, rises at midnight.",
+					"a": "Third Quarter",
+					"complete": false
+				},
+				{
+					"q": "Waxing gibbous moon sets at about this time (in the simplified model)",
+					"a": "3 pm",
+					"complete": false
+				}
+			],
+			[
+				{
+					"q": "A Mean Solar Day",
+					"a": "The length of time it takes for the Sun to cross the meridian twice on average, 24 h",
+					"complete": false
+				},
+				{
+					"q": "The angle of an object measured along the equator starting at the meridian.",
+					"a": "Hour Angle",
+					"complete": false
+				},
+				{
+					"q": "The length of time it takes for a star to cross the meridian twice",
+					"a": "23h 56 m, a siderel day",
+					"complete": false
+				},
+				{
+					"q": "The amount of time between two summer solstices.",
+					"a": "Year",
+					"complete": false
+				},
+				{
+					"q": "The hour angle of the Sun at 8 am local time.",
+					"a": "-4h",
+					"complete": false
+				}
+			],
+			[
+				{
+					"q": "A term for models that place the Sun at the center of the solar system",
+					"a": "Heliocentric",
+					"complete": false
+				},
+				{
+					"q": "The term for when a planet moves the opposite direction than usual with respect to the stars.",
+					"a": "Retrograde",
+					"complete": false
+				},
+				{
+					"q": "These events offer evidence that the Moon is closer to us than the Sun",
+					"a": "Solar Eclipses",
+					"complete": false
+				},
+				{
+					"q": "This apparent motion of distant stars is the best evidence against Geocentric models of the Solar System",
+					"a": "Parallax,,
+					"complete": false
+				},
+				{
+					"q": "The motion of these planets must be very complicated to explain the Geocentric model",
+					"a": "Venus and Mercury",
+					"complete": false
+				}
+			]
+		]
+	]
+}

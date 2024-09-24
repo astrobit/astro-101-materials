@@ -26,21 +26,21 @@
 				{"q":"M-Type asteroids are thought to be the remnant of this part of a larger body","a":"Iron Core","complete":false}
 			],
 			[
-				{"q":"This object is the largest known body within the Kuiper belt", "q": "Pluto","complete":false},
+				{"q":"This object is the largest known body within the Kuiper belt", "a": "Pluto","complete":false},
 				{"q":"This moon is thought to be a captured Kuiper Belt object","a":"Triton","complete":false},
 				{"q":"These companions seem to be quite common to Kuiper Belt Objects, unlike the smaller planets in the inner solar system.","a":"Moons","complete":false},
 				{"q":"Craters on parts of Pluto show evidence of this phenomenon, only otherwise directly observed on Earth.","a":"Frost or Snow","complete":false},
 				{"q":"Dwarf planets in the Kuiper Belt probably all have mantles consisting of this substance.","a":"Ices","complete":false}
 			],
 			[
-				{"q":"This well known comet returns every 75 years; it will return in 2061", "q": "Halley","complete":false},
+				{"q":"This well known comet returns every 75 years; it will return in 2061", "a": "Halley","complete":false},
 				{"q":"This substance, extremely common on Earth, can readily be found on comets and their coma and tail.","a":"Water","complete":false},
 				{"q":"This type of comet may originate in the Oort cloud","a":"One-and-Done","complete":false},
 				{"q":"This component of a comet is contorlled by the Sun's magnetic field","a":"Ion Tail","complete":false},
 				{"q":"This scary sounding molecule can be found in the coma and tail of comets","a":"Formeldehyde","complete":false}
 			],
 			[
-				{"q":"The synodic variety of this can be observed directly, the sidereal one needs a little bit of calculation", "q": "Orbital Period","complete":false},
+				{"q":"The synodic variety of this can be observed directly, the sidereal one needs a little bit of calculation", "a": "Orbital Period","complete":false},
 				{"q":"By measuring the angular size of an object, and knowing it's distance, we can find this property of an object","a":"Radius or Diameter","complete":false},
 				{"q":"Only by observing an orbiting partner or moon can we find this for a planet or other body","a":"Mass","complete":false},
 				{"q":"The orbital distance of any object is found using this mathematical method","a":"Trigonometry","complete":false},

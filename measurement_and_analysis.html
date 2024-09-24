@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="description" content="A web app geared toward astronomy education to explore uncertainty in measurements and analysing trends in data.">
     <meta name="keywords" content="astronomy, education, uncertainty, ">
-    <meta name="author" content="Brian W. Mulligan">
+    <meta name="author" content="Brian W. Mulligan" >
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Measurement and Analysis</title>
     <!-- Global site tag (gtag.js) - Google Analytics -->
@@ -28,12 +28,16 @@
 		  <button name="buttonLinearRegression" id="buttonLinearRegression" onclick="OnLinearRegressionSelect();" style="font-size:20px;height:25px;">Linear Analysis</button>
 		  <button name="buttonLogPlot" id="buttonLogPlot" onclick="OnLogPlotSelect();" style="font-size:20px;height:25px;">Display Log-Log Plot</button>
     </div>
-    <div style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center">
-        <canvas id="theCanvas" width="100%" height="900" onclick="commonUIOnClick(event);">
+    <div style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center;">
+        <canvas id="theCanvas" width="100%" height="400" onclick="commonUIOnClick(event);">
             Canvas not supported; please update your browser.
         </canvas>
     </div>
-    <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
+    <div style="width:100%;text-align:center" id="display data num measurements">
+    		<label style="color:white;text-align:left;">Number of Measurements</label><br/>
+		    	<output id="num measurements" style="color:white;text-align:left;"></output><br/>
+    </div>
+    <div style="width:100%;text-align:center;visibility:visible;" id="display data"></div>
         <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
             <p style="color: gray;font-size:75%">
                 Copyright (c) 2022, Brian W. Mulligan

@@ -1,3 +1,34 @@
+let divRADec = document.getElementById("display data radec");
+let divLLS = document.getElementById("display data LLS");
+
+let outputNumMeasurements = document.getElementById("num measurements");
+let outputRA = document.getElementById("ra");
+let outputRAUnc = document.getElementById("ra unc");
+let outputDec = document.getElementById("dec");
+let outputDecUnc = document.getElementById("dec unc");
+
+let outputLLSeq = document.getElementById("LLS eq");
+
+
+function createDisplayBlockRA()
+{
+	let divDisplay = document.getElementById("display data");
+	divDisplay.innerHTML = "<label style=\"color:white;text-align:left;\">Averages</label><br/><div style=\"width: 150px;display:inline-block;\"><label style=\"color:white;text-align:left;\">RA</label><br/><output id=\"ra\" style=\"color:white;text-align:left;\"></output><br/><output id=\"ra unc\" style=\"color:white;text-align:left;\"></output><br/></div><div style=\"width: 150px;display:inline-block;\"><label style=\"color:white;text-align:left;\">Dec</label><br/><output id=\"dec\" style=\"color:white;text-align:left;\"></output><br/><output id=\"dec unc\" style=\"color:white;text-align:left;\"></output><br/></div>";
+	
+	outputRA = document.getElementById("ra");
+	outputRAUnc = document.getElementById("ra unc");
+	outputDec = document.getElementById("dec");
+	outputDecUnc = document.getElementById("dec unc");
+
+}
+function createDisplayBlockEq()
+{
+	let divDisplay = document.getElementById("display data");
+
+	divDisplay.innerHTML = "<output id=\"LLS eq\" style=\"color:white;text-align:left;\"></output><br/>"
+
+	outputLLSeq = document.getElementById("LLS eq");
+}
 
 class StarPositionActvity
 {
@@ -27,7 +58,7 @@ class StarPositionActvity
 		this._axisVertical._labelFormatter._showUnitsAngle = true;
 		this._axisVertical._labelFormatter._angleFormat = "D 0M 0S.ss";
 
-		this._graph = new Graph("position",500,500,"#ffffff");
+		this._graph = new Graph("position",400,400,"#ffffff");
 		this._graph.addHorizontalAxis(this._axisHorizontal);
 		this._graph.addVerticalAxis(this._axisVertical);
 		this._measurements = new GraphDataSet("positions","xaxis", "yaxis", null,1,3,"#7f7f7f",true);
@@ -112,52 +143,42 @@ class StarPositionActvity
 	graph(context)
 	{
 		this._graph.draw(context,0,0);
-		context.strokeStyle = "#ffffff";
-		context.fillStyle = "#ffffff";
-		context.font = "20px Arial";
-		context.textBaseline = "middle";
-		context.textAlign = "center";
-		context.save();
-		context.translate(0,510);
-		context.fillText("Number of Measurements: " + this._measurements.length.toString(), 250,0);
-		context.translate(0,25);
+//		divRADec.style.visibility = 'visible';
+//		divLLS.style.visibility = 'hidden';
+		createDisplayBlockRA();
+		
+		outputNumMeasurements.value = this._measurements.length.toString();
 		if (this._averageRA !== null && this._averageDec !== null)
 		{
 			const raDMS = degreestoDMS(this._averageRA);
 			const decDMS = degreestoDMS(this._averageDec);
-			context.translate(250,0);
 
-			context.fillText("Averages",0,0);
-			context.translate(0,25);
-			context.save();
-				context.translate(-125,0);
-				context.fillText("Right Ascension",0,0);
-				context.translate(0,25);
-				context.fillText(raDMS.deg.toString() + "h" + raDMS.min.toString() + "m" + raDMS.sec.toString() + "s",0,0);
-				context.translate(0,25);
-				if (this._stdErrRA !== null)
-				{
-					const raErrDMS = degreestoDMS(this._stdErrRA);
-					context.fillText("±" + raErrDMS.sec.toString() + "s",0,0);
-					context.translate(0,25);
-				}
-			context.restore();
+			outputRA.value = raDMS.deg.toString() + "h" + raDMS.min.toString() + "m" + raDMS.sec.toString() + "s";
+			if (this._stdErrRA !== null)
+			{
+				const raErrDMS = degreestoDMS(this._stdErrRA);
+				outputRAUnc.value = "±" + raErrDMS.sec.toString() + "s";
+			}
+			else
+				outputRAUnc.value = "± ∞ s";
 			
-			context.save();
-				context.translate(125,0);
-				context.fillText("Declination",0,0);
-				context.translate(0,25);
-				context.fillText(decDMS.deg.toString() + "°" + decDMS.min.toString() + "'" + decDMS.sec.toString() + "\"",0,0);
-				context.translate(0,25);
-				if (this._stdErrDec !== null)
-				{
-					const decErrDMS = degreestoDMS(this._stdErrDec);
-					context.fillText("±" + decErrDMS.sec.toString() + "\"",0,0);
-					context.translate(0,25);
-				}
-			context.restore();
+			outputDec.value	 = decDMS.deg.toString() + "°" + decDMS.min.toString() + "'" + decDMS.sec.toString() + "\"";
+			if (this._stdErrDec !== null)
+			{
+				const decErrDMS = degreestoDMS(this._stdErrDec);
+				outputDecUnc.value = "±" + decErrDMS.sec.toString() + "\"";
+			}
+			else
+				outputDecUnc.value = "± ∞ \""
 		}
-		context.restore();
+		else
+		{
+			outputRA.value = "---";
+			outputRAUnc.value = "± ∞ s";
+			outputDec.value	 = "---";
+			outputDecUnc.value = "± ∞ \""
+		}
+		
 	}
 
 }
@@ -218,7 +239,7 @@ class AsteroidNearJupiter
 		
 		this._axisVertical = new GraphAxis("yaxis","Distance From the Sun (au)",min_y,max_y);
 
-		this._graph = new Graph("position",500,500,"#ffffff");
+		this._graph = new Graph("position",400,400,"#ffffff");
 		this._graph.addHorizontalAxis(this._axisHorizontal);
 		this._graph.addVerticalAxis(this._axisVertical);
 		this._measurements = new GraphDataSet("positions","xaxis", "yaxis", null,1,3,"#7f7f7f",true);
@@ -281,15 +302,10 @@ class AsteroidNearJupiter
 	graph(context)
 	{
 		this._graph.draw(context,0,0);
-		context.strokeStyle = "#ffffff";
-		context.fillStyle = "#ffffff";
-		context.font = "20px Arial";
-		context.textBaseline = "middle";
-		context.textAlign = "center";
-		context.save();
-		context.translate(0,510);
-		context.fillText("Number of Measurements: " + this._measurements.length.toString(), 250,0);
-		context.restore();
+		createDisplayBlockEq();
+//		divRADec.style.visibility = 'hidden';
+//		divLLS.style.visibility = 'hidden';
+		outputNumMeasurements.value = this._measurements.length.toString();
 	}
 
 }
@@ -336,7 +352,7 @@ class AsteroidDiameterBrightnessActivity
 		this._axisHorizontal = new GraphAxis("xaxis","Absolute Magnitude",this._min_x,this._max_x);
 		this._axisVertical = new GraphAxis("yaxis","Diameter (km)",this._min_y,this._max_y);
 
-		this._graph = new Graph("position",500,500,"#ffffff");
+		this._graph = new Graph("position",400,400,"#ffffff");
 		this._graph.addHorizontalAxis(this._axisHorizontal);
 		this._graph.addVerticalAxis(this._axisVertical);
 		this._measurements = new GraphDataSet("positions","xaxis", "yaxis", null,1,3,"#7f7f7f",true);
@@ -399,15 +415,9 @@ class AsteroidDiameterBrightnessActivity
 	graph(context)
 	{
 		this._graph.draw(context,0,0);
-		context.strokeStyle = "#ffffff";
-		context.fillStyle = "#ffffff";
-		context.font = "20px Arial";
-		context.textBaseline = "middle";
-		context.textAlign = "center";
-		context.save();
-		context.translate(0,510);
-		context.fillText("Number of Measurements: " + this._measurements.length.toString(), 250,0);
-		context.translate(0,35);
+		createDisplayBlockEq();
+		outputNumMeasurements.value = this._measurements.length.toString();
+
 		if (this._lls !== undefined && this._lls !== null)
 		{
 			if (this._lls.type == "Log-Log LLS")
@@ -418,12 +428,7 @@ class AsteroidDiameterBrightnessActivity
 				const Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
 				const eqnString = "D = (" + D_1.standard_notation + " km) M";
 				const expString = Exp.standard_notation;
-				
-				context.fillText(eqnString, 250,0);
-				let offset = context.measureText(eqnString).width;
-				context.textAlign = "left";
-				context.font = "12px Arial";
-				context.fillText(expString, 250 + offset * 0.5,-8);
+				outputLLSeq.value = eqnString + " + "  + expString;
 			
 			}
 			else
@@ -431,11 +436,11 @@ class AsteroidDiameterBrightnessActivity
 				const b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
 				const m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
 				const eqnString = "D = " + m.standard_notation + " M + " + b.standard_notation + " km";
-				context.fillText(eqnString, 250,0);
+				outputLLSeq.value = eqnString;
 			}
-			context.translate(0,35);
 		}
-		context.restore();
+		else
+			outputLLSeq.value = "";
 	}
 
 }
@@ -481,7 +486,7 @@ class AsteroidDiameterDistanceActivity
 		this._axisHorizontal = new GraphAxis("xaxis","Distance (au)",this._min_x,this._max_x);
 		this._axisVertical = new GraphAxis("yaxis","Diameter (km)",this._min_y,this._max_y);
 
-		this._graph = new Graph("position",500,500,"#ffffff");
+		this._graph = new Graph("position",400,400,"#ffffff");
 		this._graph.addHorizontalAxis(this._axisHorizontal);
 		this._graph.addVerticalAxis(this._axisVertical);
 		this._measurements = new GraphDataSet("data","xaxis", "yaxis", null,1,3,"#7f7f7f",true);
@@ -544,15 +549,9 @@ class AsteroidDiameterDistanceActivity
 	graph(context)
 	{
 		this._graph.draw(context,0,0);
-		context.strokeStyle = "#ffffff";
-		context.fillStyle = "#ffffff";
-		context.font = "20px Arial";
-		context.textBaseline = "middle";
-		context.textAlign = "center";
-		context.save();
-		context.translate(0,510);
-		context.fillText("Number of Measurements: " + this._measurements.length.toString(), 250,0);
-		context.translate(0,35);
+		createDisplayBlockEq();
+		outputNumMeasurements.value = this._measurements.length.toString();
+
 		if (this._lls !== undefined && this._lls !== null)
 		{
 			if (this._lls.type == "Log-Log LLS")
@@ -563,12 +562,7 @@ class AsteroidDiameterDistanceActivity
 				const Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
 				const eqnString = "D = (" + D_1.standard_notation + ") a";
 				const expString = Exp.standard_notation;
-				
-				context.fillText(eqnString, 250,0);
-				let offset = context.measureText(eqnString).width;
-				context.textAlign = "left";
-				context.font = "12px Arial";
-				context.fillText(expString, 250 + offset * 0.5,-8);
+				outputLLSeq.value = eqnString + " + " + expString;
 			
 			}
 			else
@@ -576,11 +570,13 @@ class AsteroidDiameterDistanceActivity
 				const b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
 				const m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
 				let eqnString = "D = " + m.standard_notation + " km/au a + (" + b.standard_notation + " km";
-				context.fillText(eqnString, 250,0);
+				outputLLSeq.value = eqnString;
 			}
-			context.translate(0,35);
 		}
-		context.restore();
+		else
+			outputLLSeq.value = "";
+
+
 	}
 
 }
@@ -630,7 +626,7 @@ class AsteroidOrbitalParametersctivity
 		this._axisHorizontal = new GraphAxis("xaxis","Longitude of Ascending Node (°)",this._min_x,this._max_x);
 		this._axisVertical = new GraphAxis("yaxis","Orbital Inclination (°)",this._min_y,this._max_y);
 
-		this._graph = new Graph("position",500,500,"#ffffff");
+		this._graph = new Graph("position",400,400,"#ffffff");
 		this._graph.addHorizontalAxis(this._axisHorizontal);
 		this._graph.addVerticalAxis(this._axisVertical);
 		this._measurements = new GraphDataSet("data","xaxis", "yaxis", null,1,3,"#7f7f7f",true);
@@ -693,15 +689,9 @@ class AsteroidOrbitalParametersctivity
 	graph(context)
 	{
 		this._graph.draw(context,0,0);
-		context.strokeStyle = "#ffffff";
-		context.fillStyle = "#ffffff";
-		context.font = "20px Arial";
-		context.textBaseline = "middle";
-		context.textAlign = "center";
-		context.save();
-		context.translate(0,510);
-		context.fillText("Number of Measurements: " + this._measurements.length.toString(), 250,0);
-		context.translate(0,35);
+		createDisplayBlockEq();
+		outputNumMeasurements.value = this._measurements.length.toString();
+
 		if (this._lls !== undefined && this._lls !== null)
 		{
 			if (this._lls.type == "Log-Log LLS")
@@ -712,12 +702,7 @@ class AsteroidOrbitalParametersctivity
 				const Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
 				const eqnString = "i = (" + D_1.standard_notation + ") Ω";
 				const expString = Exp.standard_notation;
-				
-				context.fillText(eqnString, 250,0);
-				const offset = context.measureText(eqnString).width;
-				context.textAlign = "left";
-				context.font = "12px Arial";
-				context.fillText(expString, 250 + offset * 0.5,-8);
+				outputLLSeq.value = eqnString + " + " + expString;
 			
 			}
 			else
@@ -725,11 +710,11 @@ class AsteroidOrbitalParametersctivity
 				const b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
 				const m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
 				const eqnString = "i = " + m.standard_notation + " Ω + " + b.standard_notation + "°";
-				context.fillText(eqnString, 250,0);
+				outputLLSeq.value = eqnString;
 			}
-			context.translate(0,35);
 		}
-		context.restore();
+		else
+			outputLLSeq.value = "";
 	}
 
 }
@@ -789,7 +774,7 @@ class StarSpTypeColorActivity
 		this._axisHorizontal = new GraphAxis("xaxis","Numeric Spectral Type",this._min_x,this._max_x);
 		this._axisVertical = new GraphAxis("yaxis","Color Index (B - V)",this._min_y,this._max_y);
 
-		this._graph = new Graph("position",500,500,"#ffffff");
+		this._graph = new Graph("position",400,400,"#ffffff");
 		this._graph.addHorizontalAxis(this._axisHorizontal);
 		this._graph.addVerticalAxis(this._axisVertical);
 		this._measurements = new GraphDataSet("data","xaxis", "yaxis", null,1,3,"#7f7f7f",true);
@@ -857,15 +842,9 @@ class StarSpTypeColorActivity
 			this.prepare();
 			
 		this._graph.draw(context,0,0);
-		context.strokeStyle = "#ffffff";
-		context.fillStyle = "#ffffff";
-		context.font = "20px Arial";
-		context.textBaseline = "middle";
-		context.textAlign = "center";
-		context.save();
-		context.translate(0,510);
-		context.fillText("Number of Measurements: " + this._measurements.length.toString(), 250,0);
-		context.translate(0,35);
+		createDisplayBlockEq();
+		outputNumMeasurements.value = this._measurements.length.toString();
+
 		if (this._lls !== undefined && this._lls !== null)
 		{
 			if (this._lls.type == "Log-Log LLS")
@@ -876,12 +855,7 @@ class StarSpTypeColorActivity
 				const Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
 				const eqnString = "B - V = (" + D_1.standard_notation + ") n";
 				const expString = Exp.standard_notation;
-				
-				context.fillText(eqnString, 250,0);
-				const offset = context.measureText(eqnString).width;
-				context.textAlign = "left";
-				context.font = "12px Arial";
-				context.fillText(expString, 250 + offset * 0.5,-8);
+				outputLLSeq.value = eqnString + " + " + expString;
 			
 			}
 			else
@@ -889,11 +863,12 @@ class StarSpTypeColorActivity
 				const b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
 				const m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
 				const eqnString = "B - V = " + m.standard_notation + " n + " + b.standard_notation;
-				context.fillText(eqnString, 250,0);
+				outputLLSeq.value = eqnString;
 			}
-			context.translate(0,35);
 		}
-		context.restore();
+		else
+			outputLLSeq.value = "";
+
 	}
 
 }
@@ -950,7 +925,7 @@ class StarColorColorActivity
 		this._axisHorizontal = new GraphAxis("xaxis","Color Index (B - V)",this._min_x,this._max_x);
 		this._axisVertical = new GraphAxis("yaxis","Color Index (V - R)",this._min_y,this._max_y);
 
-		this._graph = new Graph("position",500,500,"#ffffff");
+		this._graph = new Graph("position",400,400,"#ffffff");
 		this._graph.addHorizontalAxis(this._axisHorizontal);
 		this._graph.addVerticalAxis(this._axisVertical);
 		this._measurements = new GraphDataSet("data","xaxis", "yaxis", null,1,3,"#7f7f7f",true);
@@ -1020,15 +995,9 @@ class StarColorColorActivity
 			this.prepare();
 
 		this._graph.draw(context,0,0);
-		context.strokeStyle = "#ffffff";
-		context.fillStyle = "#ffffff";
-		context.font = "20px Arial";
-		context.textBaseline = "middle";
-		context.textAlign = "center";
-		context.save();
-		context.translate(0,510);
-		context.fillText("Number of Measurements: " + this._measurements.length.toString(), 250,0);
-		context.translate(0,35);
+		createDisplayBlockEq();
+		outputNumMeasurements.value = this._measurements.length.toString();
+
 		if (this._lls !== undefined && this._lls !== null)
 		{
 			if (this._lls.type == "Log-Log LLS")
@@ -1039,12 +1008,7 @@ class StarColorColorActivity
 				const Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
 				const eqnString = "V - R = (" + D_1.standard_notation + ") (B - V)";
 				const expString = Exp.standard_notation;
-				
-				context.fillText(eqnString, 250,0);
-				const offset = context.measureText(eqnString).width;
-				context.textAlign = "left";
-				context.font = "12px Arial";
-				context.fillText(expString, 250 + offset * 0.5,-8);
+				outputLLSeq.value = eqnString + " + " + expString;
 			
 			}
 			else
@@ -1052,11 +1016,12 @@ class StarColorColorActivity
 				const b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
 				const m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
 				const eqnString = "V - R = " + m.standard_notation + " (B - V) + " + b.standard_notation;
-				context.fillText(eqnString, 250,0);
+				outputLLSeq.value = eqnString;
 			}
-			context.translate(0,35);
 		}
-		context.restore();
+		else
+			outputLLSeq.value = "";
+
 	}
 
 }
@@ -1110,7 +1075,7 @@ class StarRedshiftGalLongActivity
 		this._axisHorizontal = new GraphAxis("xaxis","Galactic Longitude (°)",this._min_x,this._max_x);
 		this._axisVertical = new GraphAxis("yaxis","Redshift",this._min_y,this._max_y);
 
-		this._graph = new Graph("position",500,500,"#ffffff");
+		this._graph = new Graph("position",400,400,"#ffffff");
 		this._graph.addHorizontalAxis(this._axisHorizontal);
 		this._graph.addVerticalAxis(this._axisVertical);
 		this._measurements = new GraphDataSet("data","xaxis", "yaxis", null,1,3,"#7f7f7f",true);
@@ -1180,15 +1145,9 @@ class StarRedshiftGalLongActivity
 			this.prepare();
 
 		this._graph.draw(context,0,0);
-		context.strokeStyle = "#ffffff";
-		context.fillStyle = "#ffffff";
-		context.font = "20px Arial";
-		context.textBaseline = "middle";
-		context.textAlign = "center";
-		context.save();
-		context.translate(0,510);
-		context.fillText("Number of Measurements: " + this._measurements.length.toString(), 250,0);
-		context.translate(0,35);
+		createDisplayBlockEq();
+		outputNumMeasurements.value = this._measurements.length.toString();
+
 		if (this._lls !== undefined && this._lls !== null)
 		{
 			if (this._lls.type == "Log-Log LLS")
@@ -1199,12 +1158,7 @@ class StarRedshiftGalLongActivity
 				const Exp = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
 				const eqnString = "z = (" + D_1.standard_notation + ") ℓ";
 				const expString = Exp.standard_notation;
-
-				context.fillText(eqnString, 250,0);
-				const offset = context.measureText(eqnString).width;
-				context.textAlign = "left";
-				context.font = "12px Arial";
-				context.fillText(expString, 250 + offset * 0.5,-8);
+				outputLLSeq.value = eqnString + " + " + expString;
 			
 			}
 			else
@@ -1212,11 +1166,12 @@ class StarRedshiftGalLongActivity
 				const b = sig_figs(this._lls.intercept,this._lls.intercept_uncertainty);
 				const m = sig_figs(this._lls.slope,this._lls.slope_uncertainty);
 				const eqnString = "z = " + m.standard_notation + " deg.⁻¹ ℓ + " + b.standard_notation;
-				context.fillText(eqnString, 250,0);
+				outputLLSeq.value = eqnString;
 			}
-			context.translate(0,35);
 		}
-		context.restore();
+		else
+			outputLLSeq.value = "";
+
 	}
 
 }
@@ -1389,7 +1344,7 @@ function OnMeasurmentNumberSelect()
 
 //const minimumControlsHeightTop = 130;
 
-theCanvas.height = window.innerHeight - 120; // 60 larger than normal (60) to accomodate drop down box
+theCanvas.height = 400;//window.innerHeight - 120; // 60 larger than normal (60) to accomodate drop down box
 theCanvas.width = window.innerWidth;
 //theCanvas.width = theCanvas.height;
 

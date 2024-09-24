@@ -9,6 +9,17 @@ let outputDecUnc = document.getElementById("dec unc");
 
 let outputLLSeq = document.getElementById("LLS eq");
 
+let width = window.innerWidth
+|| document.documentElement.clientWidth
+|| document.body.clientWidth;
+
+let height = window.innerHeight
+|| document.documentElement.clientHeight
+|| document.body.clientHeight;
+
+const graphSize = Math.max(500,Math.min(window.innerHeight - 540,window.innerWidth));
+// warning: I'm finding incorrect height and width information in my browser. The minimum of 500 should circumvent that problem for now...
+
 
 function createDisplayBlockRA()
 {
@@ -58,7 +69,7 @@ class StarPositionActvity
 		this._axisVertical._labelFormatter._showUnitsAngle = true;
 		this._axisVertical._labelFormatter._angleFormat = "D 0M 0S.ss";
 
-		this._graph = new Graph("position",400,400,"#ffffff");
+		this._graph = new Graph("position",graphSize, graphSize,"#ffffff");
 		this._graph.addHorizontalAxis(this._axisHorizontal);
 		this._graph.addVerticalAxis(this._axisVertical);
 		this._measurements = new GraphDataSet("positions","xaxis", "yaxis", null,1,3,"#7f7f7f",true);
@@ -239,7 +250,7 @@ class AsteroidNearJupiter
 		
 		this._axisVertical = new GraphAxis("yaxis","Distance From the Sun (au)",min_y,max_y);
 
-		this._graph = new Graph("position",400,400,"#ffffff");
+		this._graph = new Graph("position",graphSize, graphSize,"#ffffff");
 		this._graph.addHorizontalAxis(this._axisHorizontal);
 		this._graph.addVerticalAxis(this._axisVertical);
 		this._measurements = new GraphDataSet("positions","xaxis", "yaxis", null,1,3,"#7f7f7f",true);
@@ -352,7 +363,7 @@ class AsteroidDiameterBrightnessActivity
 		this._axisHorizontal = new GraphAxis("xaxis","Absolute Magnitude",this._min_x,this._max_x);
 		this._axisVertical = new GraphAxis("yaxis","Diameter (km)",this._min_y,this._max_y);
 
-		this._graph = new Graph("position",400,400,"#ffffff");
+		this._graph = new Graph("position",graphSize, graphSize,"#ffffff");
 		this._graph.addHorizontalAxis(this._axisHorizontal);
 		this._graph.addVerticalAxis(this._axisVertical);
 		this._measurements = new GraphDataSet("positions","xaxis", "yaxis", null,1,3,"#7f7f7f",true);
@@ -486,7 +497,7 @@ class AsteroidDiameterDistanceActivity
 		this._axisHorizontal = new GraphAxis("xaxis","Distance (au)",this._min_x,this._max_x);
 		this._axisVertical = new GraphAxis("yaxis","Diameter (km)",this._min_y,this._max_y);
 
-		this._graph = new Graph("position",400,400,"#ffffff");
+		this._graph = new Graph("position",graphSize, graphSize,"#ffffff");
 		this._graph.addHorizontalAxis(this._axisHorizontal);
 		this._graph.addVerticalAxis(this._axisVertical);
 		this._measurements = new GraphDataSet("data","xaxis", "yaxis", null,1,3,"#7f7f7f",true);
@@ -626,7 +637,7 @@ class AsteroidOrbitalParametersctivity
 		this._axisHorizontal = new GraphAxis("xaxis","Longitude of Ascending Node (°)",this._min_x,this._max_x);
 		this._axisVertical = new GraphAxis("yaxis","Orbital Inclination (°)",this._min_y,this._max_y);
 
-		this._graph = new Graph("position",400,400,"#ffffff");
+		this._graph = new Graph("position",graphSize, graphSize,"#ffffff");
 		this._graph.addHorizontalAxis(this._axisHorizontal);
 		this._graph.addVerticalAxis(this._axisVertical);
 		this._measurements = new GraphDataSet("data","xaxis", "yaxis", null,1,3,"#7f7f7f",true);
@@ -774,7 +785,7 @@ class StarSpTypeColorActivity
 		this._axisHorizontal = new GraphAxis("xaxis","Numeric Spectral Type",this._min_x,this._max_x);
 		this._axisVertical = new GraphAxis("yaxis","Color Index (B - V)",this._min_y,this._max_y);
 
-		this._graph = new Graph("position",400,400,"#ffffff");
+		this._graph = new Graph("position",graphSize, graphSize,"#ffffff");
 		this._graph.addHorizontalAxis(this._axisHorizontal);
 		this._graph.addVerticalAxis(this._axisVertical);
 		this._measurements = new GraphDataSet("data","xaxis", "yaxis", null,1,3,"#7f7f7f",true);
@@ -925,7 +936,7 @@ class StarColorColorActivity
 		this._axisHorizontal = new GraphAxis("xaxis","Color Index (B - V)",this._min_x,this._max_x);
 		this._axisVertical = new GraphAxis("yaxis","Color Index (V - R)",this._min_y,this._max_y);
 
-		this._graph = new Graph("position",400,400,"#ffffff");
+		this._graph = new Graph("position",graphSize, graphSize,"#ffffff");
 		this._graph.addHorizontalAxis(this._axisHorizontal);
 		this._graph.addVerticalAxis(this._axisVertical);
 		this._measurements = new GraphDataSet("data","xaxis", "yaxis", null,1,3,"#7f7f7f",true);
@@ -1075,7 +1086,7 @@ class StarRedshiftGalLongActivity
 		this._axisHorizontal = new GraphAxis("xaxis","Galactic Longitude (°)",this._min_x,this._max_x);
 		this._axisVertical = new GraphAxis("yaxis","Redshift",this._min_y,this._max_y);
 
-		this._graph = new Graph("position",400,400,"#ffffff");
+		this._graph = new Graph("position",graphSize, graphSize,"#ffffff");
 		this._graph.addHorizontalAxis(this._axisHorizontal);
 		this._graph.addVerticalAxis(this._axisVertical);
 		this._measurements = new GraphDataSet("data","xaxis", "yaxis", null,1,3,"#7f7f7f",true);
@@ -1344,8 +1355,8 @@ function OnMeasurmentNumberSelect()
 
 //const minimumControlsHeightTop = 130;
 
-theCanvas.height = 400;//window.innerHeight - 120; // 60 larger than normal (60) to accomodate drop down box
-theCanvas.width = window.innerWidth;
+theCanvas.height = graphSize;//window.innerHeight - 120; // 60 larger than normal (60) to accomodate drop down box
+theCanvas.width = graphSize;
 //theCanvas.width = theCanvas.height;
 
 

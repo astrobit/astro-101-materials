@@ -1,6 +1,6 @@
 {
 	"title": "ASTR 1303/1403 Exam 2 Review",
-	"categories": ["Blackbodies", "Spectra", "Sun", "Gravity", "Telescopes", "Potpurri"],
+	"categories": ["Blackbodies", "Spectra", "Sun", "Gravity", "Telescopes", "Fusion","Potpurri"],
 	"questions": 
 	[
 		[
@@ -40,7 +40,14 @@
 				{"q":"The term for a system that reverses the effect of turbulence in the atmosphere","a":"Adaptive Optics","complete":false}
 			],
 			[
-				{"q":"The terrm for when light is shifted to a shorter wavelength due to motion of the source.", "a": "Blueshift","complete":false},
+				{"q":"The element beyond which fusion can't release energy.","a":"Iron (Fe)","complete":false},
+				{"q":"The end product of the p-p chain.","a":"Helium (He)","complete":false},
+				{"q":"The temperature needed to star hydrogen fusion.","a":"10 - 15 Million K ","complete":false},
+				{"q":"Carbon, nitrogen, or oxygen catalyze this form of fusion, which forms helium from hydrogen.","a":"CNO Cycle","complete":false},
+				{"q":"This subatomic particle is released when a proton transforms into a neutron, or vice-versa.","a":"Neutrino","complete":false}
+			],
+			[
+				{"q":"The term for when light is shifted to a shorter wavelength due to motion of the source.", "a": "Blueshift","complete":false},
 				{"q":"A device used to break up light into its wavelengths, used on a telescope.","a":"Spectrograph","complete":false},
 				{"q":"The term used to describe a shift in the wavelength in light due to motion","a":"Doppler Shift","complete":false},
 				{"q":"The term for a atom that has lost one or more electrons.","a":"Ion","complete":false},

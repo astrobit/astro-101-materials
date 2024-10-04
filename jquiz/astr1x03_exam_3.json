@@ -1,16 +1,9 @@
 {
 	"title": "ASTR 1303/1403 Exam 3 Review",
-	"categories": ["Fusion", "Stars", "Star Formation", "Stellar Evolution", "White Dwarfs", "Supernovae", "Neutron Stars and Black Holes"],
+	"categories": ["Stars", "Star Formation", "Stellar Evolution", "White Dwarfs", "Supernovae", "Neutron Stars and Black Holes"],
 	"questions": 
 	[
 		[
-			[
-				{"q":"The element beyond which fusion can't release energy.","a":"Iron (Fe)","complete":false},
-				{"q":"The end product of the p-p chain.","a":"Helium (He)","complete":false},
-				{"q":"The temperature needed to star hydrogen fusion.","a":"10 - 15 Million K ","complete":false},
-				{"q":"Carbon, nitrogen, or oxygen catalyze this form of fusion, which forms helium from hydrogen.","a":"CNO Cycle","complete":false},
-				{"q":"This subatomic particle is released when a proton transforms into a neutron, or vice-versa.","a":"Neutrino","complete":false}
-			],
 			[
 				{"q":"The majority of stars can be found in this region of the H-R diagram or CMD.","a":"Main Sequence","complete":false},
 				{"q":"This spectral type is hottest.","a":"O","complete":false},

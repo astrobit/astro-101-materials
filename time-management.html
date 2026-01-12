@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+<!--    <meta name="description" content="A site geared toward astronomy education to explore the complexities in designing a transient survey.">
+    <meta name="keywords" content="astronomy, education, stars, telescopes">-->
+    <meta name="author" content="Brian W. Mulligan">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Class Load and Time Management</title>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+<!--    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M15ZVRGK6"></script> -->
+<!--    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-0M15ZVRGK6');
+    </script>-->
+</head>
+<body style="font-family:sans-serif;font-size:24px;width:100%;margin-left:auto;margin-right:auto;background-color:#000000;">
+    <!--<h1 style="font-size:24px;text-align:center;color:#FFFFFF;">Elongation</h1>-->
+    <div style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:right">
+    	<table><tbody>
+		<tr><td><label style="color:white">How many credits are you enrolled for?</label></td><td></td><td><input type="text" id="courseload"></input></td></tr>
+		</tbody></table>
+	    <hr/>
+    	<table><tbody>
+	    <tr><td colspan="3" style="color:white"> How many hours each week do you spend doing the following:</td></tr> 
+		<tr><td><label style="color:white">Working?</label></td><td></td><td><input type="text" id="work"></input></td></tr>
+		<tr><td><label style="color:white">Commuting to/from campus, work, etc.?</label></td><td></td><td><input type="text" id="commute"></input></td></tr>
+		<tr><td><label style="color:white">Caring for others (children, parents, etc.)</label></td><td></td><td><input type="text" id="childcare"></input></td></tr>
+		<tr><td><label style="color:white">Volunteering or other service?</label></td><td></td><td><input type="text" id="volunteer" ></input></td></tr>
+		<tr><td><label style="color:white">Clubs, organizations, or playing sports?</label></td><td></td><td><input type="text" id="organizations" ></input></td></tr>
+		<tr><td><label style="color:white">Social media (TikTok, IG, etc.)?</label></td><td></td><td><input type="text" id="social media" ></input></td></tr>
+		<tr><td><label style="color:white">Entertainment (YouTube, TV, video games, etc.)?</label></td><td></td><td><input type="text" id="entertainment" ></input></td></tr>
+		<tr><td><label style="color:white">Socializing?</label></td><td></td><td><input type="text" id="socializing"></input></td></tr>
+		<tr><td><label style="color:white">Other activites (don't include sleep)? </label></td><td></td><td><input type="text" id="other"></input></td></tr>
+		</tbody></table>
+    </div>
+    <hr/>
+    <div style="width:100%; margin-left:auto; margin-right:auto;height:100%;text-align:center">
+		<label style="color:white">Total Committed Hours Outside of Class: </label><output id="totalHours" style="color:white">40</output><br/>
+		<label style="color:white">Maximum Recommended Credit Hour Load: </label><output id="maxLoad" style="color:white">13</output><br/>
+    <hr/>
+		<label style="color:white">Time Management Score: </label><output id="score" style="color:white">100</output><br/>
+		<output id="scoreComments" style="color:white"></output><br/>
+    </div>
+    <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
+        <div style="width:500px; margin-left:auto; margin-right:auto;text-align:center">
+            <p style="color: gray;font-size:75%">
+                Copyright (c) 2026, Brian W. Mulligan
+                <a href="https://www.iubenda.com/privacy-policy/91469080" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe " title="Privacy Policy ">Privacy Policy</a>
+                <script type="text/javascript">(function (w, d) { var loader = function () { var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src = "https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s, tag); }; if (w.addEventListener) { w.addEventListener("load", loader, false); } else if (w.attachEvent) { w.attachEvent("onload", loader); } else { w.onload = loader; } })(window, document);</script>
+            </p>
+        </div>
+    </div>
+    <script type="text/javascript" src="scripts/time-management.js"></script>
+</body>
+</html>

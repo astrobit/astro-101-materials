@@ -9,8 +9,7 @@
             text-align: center;
             background-color: #000000;
             color: #FFFFFF;
-            text-shadow: 4px 4px #00001f;
-            font-size: 128px;
+            font-size: 256px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -19,8 +18,25 @@
             text-align: center;
             background-color: #000000;
             color: #FF7F00;
-            text-shadow: 4px 4px #00001f;
             font-size: 64px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .date {
+            width: 80%;
+            text-align: center;
+            background-color: #000000;
+            color: #FFFFFF;
+            font-size: 64px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .notes {
+            width: 80%;
+            text-align: center;
+            background-color: #000000;
+            color: #FFFFFF;
+            font-size: 32px;
             margin-left: auto;
             margin-right: auto;
         }
@@ -29,16 +45,29 @@
     </style>
 </head>
 <body id="body" style="font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#000000;text-align:center">
-	<input id="endinput" type="time" onchange="updateEnd();">
-	<p id="clock" class="clock"> 00:00 </p>
-	<p id="endtime" class="endtime"> End Time: 10:25 </p>
+	<input id="endinput" type="time" onchange="updateEnd();"></br></br>
+	<div id="clock" class="clock"> 00:00 </div></br></br>
+	<div id="date" class="date"> </div></br></br></br>
+	<div id="endtime" class="endtime"> End Time: 10:25 </div></br></br></br>
+	<div id="notes" class="notes"> Screen Color </br> <span style="background-color: #7F7F00"> Under 15 Min </span>&nbsp;&nbsp; <span style="background-color: #FFFF00;color:#000000"> Under 5 Min </span> &nbsp;&nbsp;<span style="background-color: #ff0000"> Under 1 Min </span> </div>
 	<script type="text/javascript" >
-		let g_EndTimeMin = 10 * 60 + 25;
+		let g_EndTimeMin = null;
+		let g_EndTimeDate = new Date();
+		function dateToDisplayableTime(date)
+		{
+			const am_pm = date.getHours() >= 12;
+			const hoursDisplay = (date.getHours() % 12) > 0 ? (date.getHours() % 12) : 12;
+			const minutesDisplay = (date.getMinutes() >= 10) ? date.getMinutes() : "0" + date.getMinutes();
+			return hoursDisplay + ":" + minutesDisplay + " " + (am_pm ? "pm" : "am");
+		}
 		function updateEnd()
 		{
 			let elem = document.getElementById("endinput");
-			let bits = elem.value.split(":");
-			g_EndTimeMin = Number(bits[0]) * 60 + Number(bits[1]);
+			let today = new Date();
+			g_EndTimeDate = new Date((today.getMonth() + 1) + "/" + today.getDay() + "/" + today.getYear() + " " + elem.value);
+			g_EndTimeMin = g_EndTimeDate.getHours() * 60 + g_EndTimeDate.getMinutes();
+			let elemEndTimeDisplay = document.getElementById("endtime");
+			elemEndTimeDisplay.innerHTML = dateToDisplayableTime(g_EndTimeDate);
 		}
 //		let g_test = 600;
 		let g_TimeStep = 500.0;
@@ -46,63 +75,43 @@
 		function updateTime()
 		{
 			let date = new Date();
-			const minutes_ref = (Math.floor(Date.now() / 60000) - date.getTimezoneOffset()) % 1440;
-//			const minutes_ref = g_test;
-//			g_test += 5;
-//			g_test = g_test % 1440;	
-			const minutes_cur = minutes_ref % 60;
-			let hours_cur = Math.floor(minutes_ref / 60) % 24;
-			const am_pm = (hours_cur > 12);
-			if (hours_cur == 0)
-				hours_cur = 12;
-			if (hours_cur > 12)
-				hours_cur -= 12;
-			let minutes_display = (minutes_cur < 10) ? "0" + minutes_cur.toFixed(0) : minutes_cur.toFixed(0);
-			let elem = document.getElementById("clock");
-			elem.innerHTML = hours_cur.toFixed(0) + ":" + minutes_display + (am_pm ? " pm" : " am");
-
-			let minutes_end = g_EndTimeMin % 60;
-			let hours_end = Math.floor(g_EndTimeMin / 60) % 24;
-			const am_pm_end = (hours_end > 12);
-			if (hours_end == 0)
-				hours_end = 12;
-			if (hours_end > 12)
-				hours_end -= 12;
-			let minutes_end_display = (minutes_end < 10) ? "0" + minutes_end.toFixed(0) : minutes_end.toFixed(0);
-
-			let elem_end = document.getElementById("endtime");
-			elem_end.innerHTML = "End Time: " + hours_end.toFixed(0) + ":" + minutes_end_display + (am_pm_end ? " pm" : " am");
 			
-			if ((g_EndTimeMin - minutes_ref) <= 0)
+			if (g_EndTimeMin == null) // set initial end time
 			{
-				let elem_body = document.getElementById("body");
+				g_EndTimeDate = new Date();
+				g_EndTimeDate.setHours(g_EndTimeDate.getHours() + 2);
+				let minRound = Math.round(date.getMinutes() / 15)
+				g_EndTimeDate.setMinutes(minRound * 15);
+				g_EndTimeMin = g_EndTimeDate.getHours() * 60 + g_EndTimeDate.getMinutes();
+				let elemEndTimeDisplay = document.getElementById("endtime");
+				elemEndTimeDisplay.innerHTML = "End Time: " + dateToDisplayableTime(g_EndTimeDate);
+			}
+			
+			const minutes_ref = date.getHours() * 60 + date.getMinutes();
+			document.getElementById("clock").innerHTML = dateToDisplayableTime(date);
+			
+			const timeRemainingMinutes = g_EndTimeMin - minutes_ref;
+			let elem_body = document.getElementById("body");
+			if (timeRemainingMinutes <= 0)
+			{
 				g_TimeStep = 100;
 				g_On = g_On ? false : true;
 				if (g_On)
-					elem_body.style = "font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#FF0000;text-align:center";
+					elem_body.style.backgroundColor = "#ff0000";
 				else
-					elem_body.style = "font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#FFFF00;text-align:center";
+					elem_body.style.backgroundColor = "#ffff00";
 			}
-			else if ((g_EndTimeMin - minutes_ref) <= 1)
-			{
-				let elem_body = document.getElementById("body");
-				elem_body.style = "font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#FF0000;text-align:center";
-			}
-			else if ((g_EndTimeMin - minutes_ref) <= 5)
-			{
-				let elem_body = document.getElementById("body");
-				elem_body.style = "font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#FFFF00;text-align:center";
-			}
-			else if ((g_EndTimeMin - minutes_ref) <= 15)
-			{
-				let elem_body = document.getElementById("body");
-				elem_body.style = "font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#7F7F00;text-align:center";
-			}
+			else if (timeRemainingMinutes <= 1)
+				elem_body.style.backgroundColor = "#ff0000";
+			else if (timeRemainingMinutes <= 5)
+				elem_body.style.backgroundColor = "#ffff00";
+			else if (timeRemainingMinutes <= 15)
+				elem_body.style.backgroundColor = "#7f7f00";
 			else
-			{
-				let elem_body = document.getElementById("body");
-				elem_body.style = "font-family:sans-serif;font-size:15px;width:100%;margin-left:auto;margin-right:auto;background-color:#000000;text-align:center";
-			}
+				elem_body.style.backgroundColor = "#000000";
+			
+
+			document.getElementById("date").innerHTML = (date.getMonth() + 1) + "/" + date.getDate() + "/" + date.getFullYear();
 
 			window.setTimeout(updateTime, g_TimeStep);
 			

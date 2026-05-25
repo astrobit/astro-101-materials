@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="description" content="A site geared toward physics education to explore how the the representation of motion using strobe diagrams.">
+    <meta name="keywords" content="1-D motion, 2-D motion, stop-motion, kinematics">
+    <meta name="author" content="Brian W. Mulligan">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Strobe Motion Diagrams</title>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+<!--    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M15ZVRGK6"></script> -->
+<!--    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-0M15ZVRGK6');
+    </script>-->
+</head>
+<body style="background-color:#000000;">
+    <!--<h1 style="font-size:24px;text-align:center;color:#FFFFFF;">Elongation</h1>-->
+    <div style="margin-left:auto; margin-right:auto;text-align:center">
+        <canvas id="theCanvas" onclick="commonUIOnClick(event);" width="100%" height="100%">
+            Canvas not supported; please update your browser.
+        </canvas>
+    </div>
+    <div>
+    	<input type="button" onclick="onResetTime();" value="Reset"></input>
+    	<label for="posVectCheck" style="color:white;">Show Position Vector</label><input type="checkbox" onclick="onTogglePositionVector();" id="posVectCheck"></input>
+    	<label for="dispVectCheck" style="color:white;">Show Displacement Vector</label><input type="checkbox" onclick="onToggleDisplacementVector();" id="dispVectCheck"></input>
+    </div>
+    <div>
+		<input type="radio" id="flat" name="ramp" value="Flat" checked />
+		<label for="flat" style="color:white;">Flat</label>
+		<input type="radio" id="uphill" name="ramp" value="Uphill" />
+		<label for="uphill" style="color:white;">Uphill</label>
+		<input type="radio" id="downhill" name="ramp" value="Downhill" />
+		<label for="downhill" style="color:white;">Downhill</label>
+    </div>
+    <div style="margin-left:auto; margin-right:auto;text-align:center">
+        <div style="margin-left:auto; margin-right:auto;text-align:center">
+            <p style="color: gray;font-size:75%">
+                Copyright (c) 2020 - 2025, Brian W. Mulligan
+                <a href="https://www.iubenda.com/privacy-policy/91469080" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe " title="Privacy Policy ">Privacy Policy</a>
+                <script type="text/javascript">(function (w, d) { var loader = function () { var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src = "https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s, tag); }; if (w.addEventListener) { w.addEventListener("load", loader, false); } else if (w.attachEvent) { w.attachEvent("onload", loader); } else { w.onload = loader; } })(window, document);</script>
+            </p>
+        </div>
+    </div>
+    
+    
+<!--    <script type="text/javascript" src="stringsParallax.js"></script>-->
+<!--    <script type="text/javascript" src="scripts/tutorial.js"></script>
+    <script type="text/javascript" src="scripts/ui.js"></script>
+    <script type="text/javascript" src="scripts/VectorMatrix.js"></script>-->
+<!--    <script type="text/javascript" src="scripts/commonGP.js"></script>
+    <script type="text/javascript" src="scripts/common.js"></script>
+    <script type="text/javascript" src="scripts/commonAstro.js"></script>-->	
+<!--    <script type="text/javascript" src="m6.js"></script>-->
+<!--    <script type="text/javascript" src="stars.js"></script>-->
+<!--    <script type="text/javascript" src="planets.js"></script>-->
+<!--    <script type="text/javascript" src="Mollweide.js"></script> -->
+    <script type="text/javascript" src="scripts/strobe-motion-diagrams.js"></script>
+</body>
+</html>

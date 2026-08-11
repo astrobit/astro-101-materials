@@ -7,6 +7,19 @@
     <meta name="author" content="Brian W. Mulligan">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Strobe Motion Diagrams</title>
+    <style>
+        input[type=button] {
+            background-color: black;
+            color: white;
+            border: 4px solid gray;
+            border-radius: 10px;
+            text-align: center;
+            font-size: large;
+        }
+        label{
+            font-size: large;
+        }
+    </style>
     <!-- Global site tag (gtag.js) - Google Analytics -->
 <!--    <script async src="https://www.googletagmanager.com/gtag/js?id=G-0M15ZVRGK6"></script> -->
 <!--    <script>
@@ -20,16 +33,22 @@
 <body style="background-color:#000000;">
     <!--<h1 style="font-size:24px;text-align:center;color:#FFFFFF;">Elongation</h1>-->
     <div style="margin-left:auto; margin-right:auto;text-align:center">
-        <canvas id="theCanvas" onclick="commonUIOnClick(event);" width="100%" height="100%">
+    	<input type="button" id="show normal" value="Show Normal View"></input>
+    	<input type="button" id="show strobe" value="Show Strobe View"></input>
+    	<input type="button" id="show stop-motion" value="Show Stop-Motion View"></input>
+    	<input type="button" id="show all" value="Show All Views"></input>
+    </div>
+    <div style="margin-left:auto; margin-right:auto;text-align:center">
+        <canvas id="theCanvas" onclick="commonUIOnClick(event);" width="100%" height="600">
             Canvas not supported; please update your browser.
         </canvas>
     </div>
-    <div>
+    <div style="margin-left:auto; margin-right:auto;text-align:center">
     	<input type="button" onclick="onResetTime();" value="Reset"></input>
-    	<label for="posVectCheck" style="color:white;">Show Position Vector</label><input type="checkbox" onclick="onTogglePositionVector();" id="posVectCheck"></input>
-    	<label for="dispVectCheck" style="color:white;">Show Displacement Vector</label><input type="checkbox" onclick="onToggleDisplacementVector();" id="dispVectCheck"></input>
+    	<input type="button" onclick="onTogglePositionVector();" id="posVectCheck" value="Show Position Vector"></input>
+    	<input type="button" onclick="onToggleDisplacementVector();" id="dispVectCheck" value="Show Displacement Vector"></input>
     </div>
-    <div>
+    <div style="margin-left:auto; margin-right:auto;text-align:center">
 		<input type="radio" id="flat" name="ramp" value="Flat" checked />
 		<label for="flat" style="color:white;">Flat</label>
 		<input type="radio" id="uphill" name="ramp" value="Uphill" />
@@ -40,7 +59,7 @@
     <div style="margin-left:auto; margin-right:auto;text-align:center">
         <div style="margin-left:auto; margin-right:auto;text-align:center">
             <p style="color: gray;font-size:75%">
-                Copyright (c) 2020 - 2025, Brian W. Mulligan
+                Copyright (c) 2020 - 2026, Brian W. Mulligan
                 <a href="https://www.iubenda.com/privacy-policy/91469080" class="iubenda-white iubenda-noiframe iubenda-embed iubenda-noiframe " title="Privacy Policy ">Privacy Policy</a>
                 <script type="text/javascript">(function (w, d) { var loader = function () { var s = d.createElement("script"), tag = d.getElementsByTagName("script")[0]; s.src = "https://cdn.iubenda.com/iubenda.js"; tag.parentNode.insertBefore(s, tag); }; if (w.addEventListener) { w.addEventListener("load", loader, false); } else if (w.attachEvent) { w.attachEvent("onload", loader); } else { w.onload = loader; } })(window, document);</script>
             </p>

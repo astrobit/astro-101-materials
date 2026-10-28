@@ -67,7 +67,7 @@
 			g_EndTimeDate = new Date((today.getMonth() + 1) + "/" + today.getDay() + "/" + today.getYear() + " " + elem.value);
 			g_EndTimeMin = g_EndTimeDate.getHours() * 60 + g_EndTimeDate.getMinutes();
 			let elemEndTimeDisplay = document.getElementById("endtime");
-			elemEndTimeDisplay.innerHTML = dateToDisplayableTime(g_EndTimeDate);
+			elemEndTimeDisplay.innerHTML = "End Time: " + dateToDisplayableTime(g_EndTimeDate);
 		}
 //		let g_test = 600;
 		let g_TimeStep = 500.0;
@@ -84,7 +84,7 @@
 				g_EndTimeDate.setMinutes(minRound * 15);
 				g_EndTimeMin = g_EndTimeDate.getHours() * 60 + g_EndTimeDate.getMinutes();
 				let elemEndTimeDisplay = document.getElementById("endtime");
-				elemEndTimeDisplay.innerHTML = "End Time: " + dateToDisplayableTime(g_EndTimeDate);
+				elemEndTimeDisplay.innerHTML = "End Time: " + dateToDisplayableTime(g_EndTimeDate)
 			}
 			
 			const minutes_ref = date.getHours() * 60 + date.getMinutes();
